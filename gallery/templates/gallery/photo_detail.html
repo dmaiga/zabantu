@@ -1,0 +1,391 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ photo.title|default:"Photo sans titre" }} | {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Variables CSS */
+    :root {
+        --photo-primary: #3498db;
+        --photo-primary-dark: #2980b9;
+        --photo-light: #f8f9fa;
+        --photo-gray-dark: #495057;
+        --photo-gray-light: #e9ecef;
+    }
+
+    /* Structure générale */
+    .photo-detail-container {
+        padding: 4rem 0;
+        background-color: var(--photo-light);
+    }
+
+    .container-max {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+
+    /* Conteneur de l'image */
+    .photo-wrapper {
+        margin: 0 auto 4rem;
+        text-align: center;
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+        background: white;
+        padding: 1rem;
+    }
+
+    .photo-img {
+        max-width: 100%;
+        max-height: 70vh;
+        object-fit: contain;
+        border-radius: 8px;
+        display: block;
+        margin: 0 auto;
+        transition: transform 0.3s ease;
+    }
+
+    .photo-wrapper:hover .photo-img {
+        transform: scale(1.02);
+    }
+
+    /* Métadonnées */
+    .photo-metadata {
+        background: white;
+        border-radius: 12px;
+        padding: 3rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    /* En-tête */
+    .photo-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .photo-title {
+        font-size: 2.25rem;
+        margin-bottom: 0.75rem;
+        color: var(--photo-primary-dark);
+        font-weight: 700;
+        position: relative;
+        display: inline-block;
+    }
+
+    .photo-title::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: var(--photo-primary);
+    }
+
+    .photo-caption {
+        color: var(--photo-gray-dark);
+        line-height: 1.7;
+        font-size: 1.15rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Grille de métadonnées */
+    .metadata-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1.75rem;
+        margin: 3rem 0;
+    }
+
+    .metadata-item {
+        padding: 1.5rem;
+        background: var(--photo-light);
+        border-radius: 10px;
+        border-left: 4px solid var(--photo-primary);
+    }
+
+    .metadata-label {
+        font-size: 0.9rem;
+        color: var(--photo-gray-dark);
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+    }
+
+    .metadata-value {
+        font-weight: 600;
+        color: var(--photo-primary-dark);
+        font-size: 1.1rem;
+    }
+
+    /* Actions */
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        padding: 0.7rem 1.5rem;
+        font-size: 0.95rem;
+        font-weight: 500;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s;
+    }
+
+    .btn-action i {
+        margin-right: 0.6rem;
+    }
+
+    /* Navigation */
+    .navigation-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 3rem;
+        padding-top: 2.5rem;
+        border-top: 1px solid var(--photo-gray-light);
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .btn-navigation {
+        padding: 0.8rem 1.75rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s;
+    }
+
+    .btn-navigation i {
+        margin-right: 0.7rem;
+        transition: transform 0.3s;
+    }
+
+    .btn-navigation:hover i {
+        transform: translateX(-3px);
+    }
+
+    .btn-download {
+        padding: 0.8rem 1.75rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s;
+    }
+
+    .btn-download:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .photo-detail-container {
+            padding: 3rem 0;
+        }
+        
+        .photo-metadata {
+            padding: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .photo-title {
+            font-size: 2rem;
+        }
+        
+        .photo-header {
+            flex-direction: column;
+        }
+        
+        .metadata-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .photo-wrapper {
+            margin-bottom: 2.5rem;
+            padding: 0.5rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .photo-title {
+            font-size: 1.8rem;
+        }
+        
+        .photo-metadata {
+            padding: 1.5rem;
+        }
+        
+        .navigation-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .btn-navigation, .btn-download {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="photo-detail-container">
+    <div class="container-max">
+        {% include 'includes/messages.html' %}
+        
+        <!-- Photo principale -->
+        <div class="photo-wrapper">
+            <img src="{{ photo.image.url }}" 
+                 alt="{{ photo.title|default:'Photo sans titre' }}" 
+                 class="photo-img"
+                 loading="eager"
+                 id="detail-photo">
+        </div>
+        
+        <!-- Métadonnées -->
+        <div class="photo-metadata">
+            <div class="photo-header">
+                <div>
+                    <h1 class="photo-title">{{ photo.title|default:"Sans titre" }}</h1>
+                    
+                    {% if photo.caption %}
+                    <div class="photo-caption">
+                        {{ photo.caption|linebreaks }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if request.user == photo.uploaded_by or request.user.is_superuser %}
+                    <div class="action-buttons">
+                        <a href="{% url 'photo_update' photo.pk %}" 
+                           class="btn btn-outline-primary btn-action">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        <a href="{% url 'photo_delete' photo.pk %}" 
+                           class="btn btn-outline-danger btn-action">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if photo.gallery %}
+                <a href="{% url 'gallery_detail' photo.gallery.slug %}" 
+                   class="btn btn-outline-secondary btn-action">
+                    <i class="fas fa-images"></i> Voir la galerie
+                </a>
+                {% endif %}
+            </div>
+            
+            <!-- Grille d'informations -->
+            <div class="metadata-grid">
+                {% if photo.uploaded_by %}
+                <div class="metadata-item">
+                    <div class="metadata-label">Auteur</div>
+                    <div class="metadata-value">
+                        {{ photo.uploaded_by.get_full_name|default:photo.uploaded_by.username }}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="metadata-item">
+                    <div class="metadata-label">Date d'upload</div>
+                    <div class="metadata-value">
+                        {{ photo.uploaded_at|date:"d F Y à H:i" }}
+                    </div>
+                </div>
+                
+                {% if photo.gallery %}
+                <div class="metadata-item">
+                    <div class="metadata-label">Galerie associée</div>
+                    <div class="metadata-value">
+                        <a href="{% url 'gallery_detail' photo.gallery.slug %}" class="text-decoration-none">
+                            {{ photo.gallery.title }}
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="metadata-item">
+                    <div class="metadata-label">Dimensions</div>
+                    <div class="metadata-value" id="photo-dimensions">
+                        Chargement...
+                    </div>
+                </div>
+                
+                <div class="metadata-item">
+                    <div class="metadata-label">Taille du fichier</div>
+                    <div class="metadata-value" id="photo-size">
+                        Chargement...
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <div class="navigation-actions">
+                {% if photo.gallery %}
+                <a href="{% url 'gallery_detail' photo.gallery.slug %}" 
+                   class="btn btn-outline-secondary btn-navigation">
+                    <i class="fas fa-arrow-left"></i> Retour à la galerie
+                </a>
+                {% else %}
+                <a href="{% url 'photo_list' %}" 
+                   class="btn btn-outline-secondary btn-navigation">
+                    <i class="fas fa-arrow-left"></i> Retour aux photos
+                </a>
+                {% endif %}
+                
+                <a href="{{ photo.image.url }}" 
+                   download 
+                   class="btn btn-primary btn-download">
+                    <i class="fas fa-download"></i> Télécharger
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Détection des dimensions et taille de l'image
+    document.addEventListener('DOMContentLoaded', function() {
+        const img = document.getElementById('detail-photo');
+        
+        function updatePhotoInfo() {
+            // Dimensions
+            document.getElementById('photo-dimensions').textContent = 
+                `${img.naturalWidth} × ${img.naturalHeight} pixels`;
+            
+            // Taille du fichier (approximative)
+            fetch(img.src)
+                .then(response => response.blob())
+                .then(blob => {
+                    const sizeInMB = (blob.size / (1024*1024)).toFixed(2);
+                    document.getElementById('photo-size').textContent = 
+                        `${sizeInMB} MB`;
+                });
+        }
+        
+        img.onload = updatePhotoInfo;
+        
+        // Si l'image est déjà chargée
+        if (img.complete) updatePhotoInfo();
+    });
+</script>
+{% endblock %}

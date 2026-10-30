@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer le message | Zabantu Backoffice{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="fas fa-trash-alt me-2 text-danger"></i>
+            Confirmer la suppression
+        </h4>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger">
+            <h5>Êtes-vous sûr de vouloir supprimer ce message ?</h5>
+            <p class="mb-0">Cette action est irréversible.</p>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <h6>Détails du message</h6>
+                <p><strong>De:</strong> {{ message.name }} ({{ message.email }})</p>
+                <p><strong>Sujet:</strong> {{ message.subject }}</p>
+                <p><strong>Date:</strong> {{ message.created_at|date:"d/m/Y H:i" }}</p>
+                <p><strong>Message:</strong> {{ message.message|truncatewords:20 }}</p>
+            </div>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-flex gap-2">
+                <a href="{% url 'contact_message_detail' message.pk %}" class="btn btn-secondary">
+                    <i class="fas fa-times me-1"></i> Annuler
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash me-1"></i> Confirmer la suppression
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

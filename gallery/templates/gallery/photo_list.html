@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small">
+        <li class="breadcrumb-item">
+            <a href="{% url 'gallery_list' %}" class="text-decoration-none">
+                Galeries
+            </a>
+        </li>
+        <li class="breadcrumb-item active text-muted" aria-current="page">
+            Photos
+        </li>
+    </ol>
+</nav>
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Photos</h2>
+
+        <a href="{% url 'photo_create' %}" class="btn btn-primary btn-sm">
+            + Ajouter des photos
+        </a>
+    </div>
+
+    {% if photos %}
+    <div class="row g-3">
+
+        {% for photo in photos %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="{% url 'photo_detail' photo.pk %}" class="text-decoration-none">
+
+                <div class="photo-card">
+                    <img src="{{ photo.image.url }}" alt="{{ photo.title }}">
+                </div>
+
+                <div class="mt-1">
+                    {% if photo.title %}
+                        <p class="small text-truncate mb-0 text-dark">
+                            {{ photo.title }}
+                        </p>
+                    {% endif %}
+
+                    {% if photo.gallery %}
+                        <small class="text-muted">
+                            {{ photo.gallery.title }}
+                        </small>
+                    {% else %}
+                        <small class="text-muted">
+                            Indépendante
+                        </small>
+                    {% endif %}
+                </div>
+
+            </a>
+        </div>
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+        <div class="text-center py-5">
+            <p class="text-muted">Aucune photo disponible</p>
+            <a href="{% url 'photo_create' %}" class="btn btn-outline-primary btn-sm">
+                Ajouter une photo
+            </a>
+        </div>
+    {% endif %}
+
+</div>
+
+<style>
+.photo-card {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #f5f5f5;
+}
+
+.photo-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.2s ease;
+}
+
+.photo-card:hover img {
+    transform: scale(1.05);
+}
+</style>
+
+{% endblock %}

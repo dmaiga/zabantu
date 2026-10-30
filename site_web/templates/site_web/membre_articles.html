@@ -1,0 +1,419 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Publications de {{ membre.get_full_name }} | Zabantu{% endblock %}
+
+{% block banner_title %}Publications de {{ membre.get_full_name }}{% endblock %}
+
+{% block banner_subtitle %}
+    {{ membre.job_title }}{% if membre.department %}, {{ membre.department }}{% endif %}
+{% endblock %}
+
+{% block content %}
+<style>
+    .member-publications {
+        max-width: 1200px;
+        margin: 3rem auto;
+        padding: 0 1.5rem;
+    }
+    
+    .member-header {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+        margin-bottom: 3rem;
+        flex-wrap: wrap;
+    }
+    
+    .member-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background-color: var(--zabantu-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: var(--zabantu-primary);
+        font-weight: bold;
+        overflow: hidden;
+    }
+    
+    .member-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .member-info {
+        flex: 1;
+    }
+    
+    .member-name {
+        font-size: 2rem;
+        color: var(--zabantu-primary-dark);
+        margin-bottom: 0.5rem;
+    }
+    
+    .member-position {
+        color: var(--zabantu-gray);
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .member-bio {
+        color: var(--zabantu-dark);
+        line-height: 1.6;
+    }
+    
+    .publication-section {
+        margin: 3rem 0;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        color: var(--zabantu-primary-dark);
+        border-bottom: 2px solid var(--zabantu-light);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .section-title .badge {
+        background-color: var(--zabantu-primary-light);
+        color: var(--zabantu-primary-dark);
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .articles-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+    }
+    
+    .article-card {
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .article-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .article-image {
+        height: 180px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
+    
+    .article-image::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3));
+    }
+    
+    .article-content {
+        padding: 1.5rem;
+    }
+    
+    .article-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        line-height: 1.3;
+        margin-bottom: 0.5rem;
+    }
+    
+    .article-title a {
+        color: var(--zabantu-primary-dark);
+        text-decoration: none;
+    }
+    
+    .article-meta {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+        flex-wrap: wrap;
+    }
+    
+    .article-category {
+        background-color: var(--zabantu-primary-light);
+        color: var(--zabantu-primary-dark);
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .article-date {
+        color: var(--zabantu-gray);
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .article-excerpt {
+        color: var(--zabantu-dark);
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+    }
+    
+    .read-more {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--zabantu-primary);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+        gap: 0.5rem;
+    }
+    
+    .page-link {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--zabantu-light);
+        border-radius: 4px;
+        color: var(--zabantu-primary);
+        text-decoration: none;
+    }
+    
+    .page-link:hover {
+        background-color: var(--zabantu-light);
+    }
+    
+    .page-link.active {
+        background-color: var(--zabantu-primary);
+        color: white;
+        border-color: var(--zabantu-primary);
+    }
+    
+    @media (max-width: 768px) {
+        .member-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .member-avatar {
+            width: 100px;
+            height: 100px;
+            font-size: 2rem;
+        }
+        
+        .articles-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="member-publications">
+    <header class="member-header">
+        <div class="member-avatar">
+            {% if membre.profile_picture %}
+                <img src="{{ membre.profile_picture.url }}" alt="{{ membre.get_full_name }}">
+            {% else %}
+                {{ membre.prenom|first|upper }}{{ membre.nom|first|upper }}
+            {% endif %}
+        </div>
+        <div class="member-info">
+            <h1 class="member-name">{{ membre.get_full_name }}</h1>
+            <div class="member-position">
+                {{ membre.job_title }}{% if membre.department %}, {{ membre.department }}{% endif %}
+            </div>
+            {% if membre.bio %}
+                <p class="member-bio">{{ membre.bio }}</p>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="publication-stats">
+        <p>
+            {{ membre.get_full_name }} a contribué à <strong>{{ total_articles }}</strong> publication{{ total_articles|pluralize }}, 
+            dont <strong>{{ academic_count }}</strong> publication{{ academic_count|pluralize }} académique{{ academic_count|pluralize }}
+            et <strong>{{ regular_count }}</strong> article{{ regular_count|pluralize }}.
+        </p>
+    </div>
+
+    <!-- Publications académiques -->
+    {% if academic_articles %}
+    <div class="publication-section">
+        <h2 class="section-title">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 14L4 9V19L12 14ZM12 14L20 9V19L12 14ZM12 14V5M4 9L12 5L20 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Publications académiques
+            <span class="badge">{{ academic_count }}</span>
+        </h2>
+        
+        <div class="articles-grid">
+            {% for article in academic_articles %}
+            <div class="article-card">
+                {% if article.cover_image %}
+                <div class="article-image" style="background-image: url('{{ article.cover_image.url }}')"></div>
+                {% else %}
+                <div class="article-image" style="background-color: var(--zabantu-light); display: flex; align-items: center; justify-content: center;">
+                    <svg width="50%" height="50%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity: 0.3;">
+                        <path d="M12 3V5M12 19V21M5 12H3M21 12H19M7.757 7.757L6.343 6.343M17.657 17.657L16.243 16.243M7.757 16.243L6.343 17.657M17.657 6.343L16.243 7.757M12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8C14.2091 8 16 9.79086 16 12C16 14.2091 14.2091 16 12 16Z" stroke="var(--zabantu-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                {% endif %}
+                <div class="article-content">
+                    <h3 class="article-title">
+                        <a href="{% url 'public_article_detail' article.slug %}">{{ article.title }}</a>
+                    </h3>
+                    <div class="article-meta">
+                        <span class="article-date">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19 4H5C3.895 4 3 4.895 3 6V20C3 21.105 3.895 22 5 22H19C20.105 22 21 21.105 21 20V6C21 4.895 20.105 4 19 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M16 2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            {% if article.publication_date %}
+                                {{ article.publication_date|date:"F Y" }}
+                            {% else %}
+                                {{ article.created_at|date:"F Y" }}
+                            {% endif %}
+                        </span>
+                        {% if article.publisher %}
+                        <span class="article-category">{{ article.publisher }}</span>
+                        {% endif %}
+                    </div>
+                    {% if article.abstract %}
+                        <p class="article-excerpt">{{ article.abstract|truncatewords:20 }}</p>
+                    {% endif %}
+                    <a href="{% url 'public_article_detail' article.slug %}" class="read-more">
+                        Lire la publication
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination académique -->
+        {% if academic_articles.has_other_pages %}
+        <div class="pagination">
+            {% if academic_articles.has_previous %}
+                <a href="?page_academic={{ academic_articles.previous_page_number }}&page_regular={{ regular_articles.number }}" class="page-link">&laquo;</a>
+            {% endif %}
+            
+            {% for num in academic_articles.paginator.page_range %}
+                {% if academic_articles.number == num %}
+                    <span class="page-link active">{{ num }}</span>
+                {% else %}
+                    <a href="?page_academic={{ num }}&page_regular={{ regular_articles.number }}" class="page-link">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if academic_articles.has_next %}
+                <a href="?page_academic={{ academic_articles.next_page_number }}&page_regular={{ regular_articles.number }}" class="page-link">&raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Articles réguliers -->
+    {% if regular_articles %}
+    <div class="publication-section">
+        <h2 class="section-title">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 20H5C3.895 20 3 19.105 3 18V6C3 4.895 3.895 4 5 4H15L21 10V18C21 19.105 20.105 20 19 20Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M15 4V10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M7 16H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M7 12H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M7 8H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Articles & Analyses
+            <span class="badge">{{ regular_count }}</span>
+        </h2>
+        
+        <div class="articles-grid">
+            {% for article in regular_articles %}
+            <div class="article-card">
+                {% if article.cover_image %}
+                <div class="article-image" style="background-image: url('{{ article.cover_image.url }}')"></div>
+                {% else %}
+                <div class="article-image" style="background-color: var(--zabantu-light); display: flex; align-items: center; justify-content: center;">
+                    <svg width="50%" height="50%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity: 0.3;">
+                        <path d="M19 3H5C3.895 3 3 3.895 3 5V19C3 20.105 3.895 21 5 21H19C20.105 21 21 20.105 21 19V5C21 3.895 20.105 3 19 3Z" stroke="var(--zabantu-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8 12H16" stroke="var(--zabantu-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 8V16" stroke="var(--zabantu-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                {% endif %}
+                <div class="article-content">
+                    <h3 class="article-title">
+                        <a href="{% url 'public_article_detail' article.slug %}">{{ article.title }}</a>
+                    </h3>
+                    <div class="article-meta">
+                        <span class="article-category">{{ article.get_category_display }}</span>
+                        <span class="article-date">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19 4H5C3.895 4 3 4.895 3 6V20C3 21.105 3.895 22 5 22H19C20.105 22 21 21.105 21 20V6C21 4.895 20.105 4 19 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M16 2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            {{ article.created_at|date:"d F Y" }}
+                        </span>
+                    </div>
+                    {% if article.content %}
+                        <p class="article-excerpt">{{ article.content|striptags|truncatewords:20 }}</p>
+                    {% endif %}
+                    <a href="{% url 'public_article_detail' article.slug %}" class="read-more">
+                        Lire l'article
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination régulière -->
+        {% if regular_articles.has_other_pages %}
+        <div class="pagination">
+            {% if regular_articles.has_previous %}
+                <a href="?page_regular={{ regular_articles.previous_page_number }}&page_academic={{ academic_articles.number }}" class="page-link">&laquo;</a>
+            {% endif %}
+            
+            {% for num in regular_articles.paginator.page_range %}
+                {% if regular_articles.number == num %}
+                    <span class="page-link active">{{ num }}</span>
+                {% else %}
+                    <a href="?page_regular={{ num }}&page_academic={{ academic_articles.number }}" class="page-link">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if regular_articles.has_next %}
+                <a href="?page_regular={{ regular_articles.next_page_number }}&page_academic={{ academic_articles.number }}" class="page-link">&raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

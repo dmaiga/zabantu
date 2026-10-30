@@ -1,0 +1,336 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Adhésion - Zabantu{% endblock %}
+{% block banner_title %}Formulaire d'adhésion à Zabantu{% endblock %}
+{% block banner_subtitle %}Economy | Conflict | State{% endblock %}
+
+{% block extra_css %}
+<style>
+    .wizard { max-width: 760px; margin: 0 auto; padding: 1.5rem 1rem 6rem; }
+    .wizard-intro {
+        background: white; border-left: 4px solid var(--zabantu-primary); border-radius: 8px;
+        padding: 1rem 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); line-height: 1.55;
+    }
+    .stepper { display: flex; list-style: none; margin: 0 0 1.25rem; padding: 0; counter-reset: none; }
+    .stepper li { flex: 1; position: relative; text-align: center; }
+    .stepper li::before {   /* trait de liaison avec l'étape précédente */
+        content: ''; position: absolute; top: 18px; left: -50%; width: 100%; height: 3px; background: #d9ddd2; z-index: 0;
+    }
+    .stepper li:first-child::before { display: none; }
+    .stepper li.visited::before, .stepper li.active::before { background: var(--zabantu-primary); }
+    .stepper button {
+        position: relative; z-index: 1; background: none; border: 0; padding: 0; width: 100%;
+        display: flex; flex-direction: column; align-items: center; gap: .4rem; color: #6c757d; cursor: pointer;
+    }
+    .stepper .dot {
+        width: 36px; height: 36px; border-radius: 50%; background: #fff; border: 2px solid #c8cdc0; color: #6c757d;
+        display: flex; align-items: center; justify-content: center; font-weight: 600; transition: all .2s;
+    }
+    .stepper .label { font-size: .78rem; line-height: 1.2; max-width: 110px; }
+    .stepper li.visited .dot { border-color: var(--zabantu-primary); color: var(--zabantu-primary); }
+    .stepper li.active .dot { background: var(--zabantu-primary); border-color: var(--zabantu-primary); color: #fff; box-shadow: 0 0 0 4px rgba(111,130,106,.2); }
+    .stepper li.active .label { color: var(--zabantu-primary-dark, #2c3e2c); font-weight: 600; }
+    .stepper li.has-error .dot { background: #dc3545; border-color: #dc3545; color: #fff; }
+    .stepper li.has-error .label { color: #dc3545; font-weight: 600; }
+    .stepper-note { font-size: .85rem; color: #6c757d; text-align: center; margin: -.5rem 0 1rem; }
+    @media (max-width: 576px) {
+        .stepper .label { display: none; }
+        .stepper li.active .label { display: block; position: absolute; top: 44px; left: 50%; transform: translateX(-50%); white-space: nowrap; max-width: none; }
+        .stepper { margin-bottom: 2.5rem; }
+    }
+    .wizard-step {
+        display: none; background: white; border: 0; border-radius: 8px; padding: 1.5rem; margin: 0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .wizard-step.active { display: block; animation: stepIn .25s ease; }
+    @keyframes stepIn { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: none; } }
+    .wizard-step legend { font-size: 1.2rem; color: var(--zabantu-primary-dark, #2c3e2c); float: none; width: auto; margin-bottom: .25rem; }
+    .wizard-step .step-hint { color: #6c757d; font-size: .9rem; margin-bottom: 1.25rem; }
+    .form-control, .form-select { min-height: 46px; }
+    .choice-list { display: grid; gap: .5rem; }
+    .choice-list label {
+        display: flex; align-items: center; gap: .75rem; padding: .75rem 1rem; margin: 0;
+        border: 1px solid #d9ddd2; border-radius: 8px; cursor: pointer; min-height: 48px;
+    }
+    .choice-list label:has(input:checked) { border-color: var(--zabantu-primary); background: rgba(111,130,106,.08); }
+    .choice-list input { width: 1.2rem; height: 1.2rem; flex-shrink: 0; }
+    .word-counter { font-size: .8rem; color: #6c757d; text-align: right; }
+    .word-counter.over { color: #dc3545; font-weight: 600; }
+    .photo-preview { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; display: none; margin-top: .75rem; border: 2px solid var(--zabantu-light); }
+    .wizard-nav { display: flex; gap: .75rem; justify-content: space-between; margin-top: 1.25rem; }
+    .wizard-nav .btn { min-height: 48px; padding: 0 1.5rem; flex: 1; max-width: 240px; }
+    .btn-wizard { background: var(--zabantu-primary); color: #fff; border: 0; border-radius: 6px; font-weight: 500; }
+    .btn-wizard:hover { background: var(--zabantu-primary-dark, #2c3e2c); color: #fff; }
+    .field-error { color: #dc3545; font-size: .85rem; margin-top: .25rem; }
+    @media (max-width: 576px) {
+        .wizard { padding-bottom: 7rem; }
+        .wizard-step { padding: 1.1rem; }
+        .wizard-nav {
+            position: fixed; left: 0; right: 0; bottom: 0; margin: 0; padding: .75rem 1rem;
+            background: #fff; box-shadow: 0 -2px 10px rgba(0,0,0,.1); z-index: 1030;
+        }
+        .wizard-nav .btn { max-width: none; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wizard">
+    <div class="wizard-intro">
+        <p class="mb-2">Vous souhaitez rejoindre le Groupe de recherche Zabantu ? Ce formulaire permet aux personnes intéressées de manifester leur intérêt pour le groupe.</p>
+        <p class="mb-0">Zabantu promeut une recherche pluridisciplinaire et ancrée dans les réalités locales, autour des dynamiques économiques et sociales, des conflits et de l'État.</p>
+    </div>
+
+    {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">{{ message }}</div>
+    {% endfor %}
+
+    <ol class="stepper" id="stepper" aria-label="Étapes du formulaire">
+        <li><button type="button" data-goto="0"><span class="dot">1</span><span class="label">Informations personnelles</span></button></li>
+        <li><button type="button" data-goto="1"><span class="dot">2</span><span class="label">Profil et recherche</span></button></li>
+        <li><button type="button" data-goto="2"><span class="dot">3</span><span class="label">Motivation</span></button></li>
+        <li><button type="button" data-goto="3"><span class="dot">4</span><span class="label">Profil public</span></button></li>
+        <li><button type="button" data-goto="4"><span class="dot">5</span><span class="label">Consentement</span></button></li>
+    </ol>
+    <p class="stepper-note">Naviguez librement entre les étapes : les champs obligatoires (*) sont vérifiés à l'envoi.</p>
+
+    <form method="post" enctype="multipart/form-data" id="wizardForm" data-start="{{ start_step }}" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+        <fieldset class="wizard-step" data-title="Informations personnelles">
+            <legend>1. Informations personnelles</legend>
+            <p class="step-hint">Les champs marqués * sont obligatoires.</p>
+            <div class="row g-3">
+                {% for f in form %}{% if f.name == 'full_name' or f.name == 'email' or f.name == 'phone' or f.name == 'city_country' %}
+                <div class="col-md-6">
+                    <label for="{{ f.id_for_label }}" class="form-label">{{ f.label }}{% if f.field.required %} *{% endif %}</label>
+                    {{ f }}
+                    {% for e in f.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+                </div>
+                {% endif %}{% endfor %}
+            </div>
+        </fieldset>
+
+        <fieldset class="wizard-step" data-title="Profil et recherche">
+            <legend>2. Profil académique ou professionnel</legend>
+            <p class="step-hint">Votre statut, votre institution et vos centres d'intérêt scientifiques.</p>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="{{ form.academic_status.id_for_label }}" class="form-label">Quel est votre statut académique ? *</label>
+                    {{ form.academic_status }}
+                    {% for e in form.academic_status.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.institution.id_for_label }}" class="form-label">Quelle est votre institution d'affiliation ? *</label>
+                    {{ form.institution }}
+                    {% for e in form.institution.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+                </div>
+                <div class="col-12">
+                    <label for="{{ form.research_interests.id_for_label }}" class="form-label">Quels sont vos principaux centres de recherche ? *</label>
+                    {{ form.research_interests }}
+                    {% for e in form.research_interests.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="wizard-step" data-title="Motivation">
+            <legend>3. Adhésion au groupe</legend>
+            <p class="step-hint">Motivation et contribution.</p>
+            <div class="mb-3">
+                <label for="{{ form.contribution.id_for_label }}" class="form-label">{{ form.contribution.label }} *</label>
+                {{ form.contribution }}
+                <div class="word-counter" data-for="{{ form.contribution.id_for_label }}"></div>
+                {% for e in form.contribution.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.career_benefit.id_for_label }}" class="form-label">{{ form.career_benefit.label }} *</label>
+                {{ form.career_benefit }}
+                <div class="word-counter" data-for="{{ form.career_benefit.id_for_label }}"></div>
+                {% for e in form.career_benefit.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+            </div>
+            <div class="mb-3" id="howHeardGroup">
+                <div class="form-label">Comment avez-vous entendu parler de Zabantu ? * <small class="text-muted">(plusieurs réponses possibles)</small></div>
+                <div class="choice-list">
+                    {% for choice in form.how_heard_choices %}
+                    <label for="{{ choice.id_for_label }}">{{ choice.tag }}<span>{{ choice.choice_label }}</span></label>
+                    {% endfor %}
+                </div>
+                {% for e in form.how_heard_choices.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+                <div class="mt-2">
+                    <label for="{{ form.how_heard.id_for_label }}" class="form-label">Autre (précisez)</label>
+                    {{ form.how_heard }}
+                    {% for e in form.how_heard.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="wizard-step" data-title="Votre profil public">
+            <legend>4. Votre profil de membre</legend>
+            <p class="step-hint">Facultatif. Si votre adhésion est validée, ces informations seront reprises sur votre page membre du site, ce qui vous évitera de les renseigner plus tard. Vous pouvez passer cette étape.</p>
+            <div class="row g-3">
+                <div class="col-12">
+                    <label for="{{ form.profile_picture.id_for_label }}" class="form-label">Photo de profil <small class="text-muted">(5 Mo max)</small></label>
+                    {{ form.profile_picture }}
+                    <img id="photoPreview" class="photo-preview" alt="Aperçu de la photo">
+                    {% for e in form.profile_picture.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+                </div>
+                <div class="col-12">
+                    <label for="{{ form.bio.id_for_label }}" class="form-label">Courte biographie</label>
+                    {{ form.bio }}
+                    {% for e in form.bio.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+                </div>
+                {% for f in form %}{% if f.name == 'social_linkedin' or f.name == 'social_facebook' or f.name == 'social_twitter' or f.name == 'social_instagram' or f.name == 'scholar_link' or f.name == 'personal_website' %}
+                <div class="col-md-6">
+                    <label for="{{ f.id_for_label }}" class="form-label">{{ f.label }}</label>
+                    {{ f }}
+                    {% for e in f.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+                </div>
+                {% endif %}{% endfor %}
+            </div>
+        </fieldset>
+
+        <fieldset class="wizard-step" data-title="Consentement">
+            <legend>5. Consentement</legend>
+            <p class="step-hint">Dernière étape avant l'envoi.</p>
+            <div class="form-check mb-3">
+                {{ form.consent }}
+                <label for="{{ form.consent.id_for_label }}" class="form-check-label">{{ form.consent.label }} *</label>
+                {% for e in form.consent.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+            </div>
+            <p class="text-muted small mb-0">Les informations de l'étape 4, si vous les renseignez, pourront être affichées sur votre page membre une fois votre adhésion validée.</p>
+        </fieldset>
+
+        <div class="wizard-nav">
+            <button type="button" class="btn btn-outline-secondary" id="prevBtn">Précédent</button>
+            <button type="button" class="btn btn-wizard" id="nextBtn">Suivant</button>
+            <button type="submit" class="btn btn-wizard" id="submitBtn">Envoyer ma demande</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    var form = document.getElementById('wizardForm');
+    var steps = Array.prototype.slice.call(form.querySelectorAll('.wizard-step'));
+    var prev = document.getElementById('prevBtn'), next = document.getElementById('nextBtn'), submit = document.getElementById('submitBtn');
+    var current = Math.min(parseInt(form.dataset.start, 10) || 0, steps.length - 1);
+    var firstShow = true;
+    var stepperItems = Array.prototype.slice.call(document.querySelectorAll('#stepper li'));
+    var visited = {};
+
+    function show(i) {
+        current = i;
+        visited[i] = true;
+        steps.forEach(function (s, idx) { s.classList.toggle('active', idx === i); });
+        stepperItems.forEach(function (li, idx) {
+            li.classList.toggle('active', idx === i);
+            li.classList.toggle('visited', !!visited[idx] && idx !== i);
+            li.querySelector('button').setAttribute('aria-current', idx === i ? 'step' : 'false');
+        });
+        prev.style.visibility = i === 0 ? 'hidden' : 'visible';
+        next.style.display = i === steps.length - 1 ? 'none' : '';
+        submit.style.display = i === steps.length - 1 ? '' : 'none';
+        if (!firstShow) window.scrollTo({ top: form.getBoundingClientRect().top + window.pageYOffset - 150, behavior: 'smooth' });
+        firstShow = false;
+    }
+
+    function setError(el, msg) {
+        var holder = el.closest('.col-md-6, .col-12, .mb-3, .mb-1, .form-check') || el.parentNode;
+        var old = holder.querySelector('.js-error'); if (old) old.remove();
+        if (msg) {
+            var d = document.createElement('div'); d.className = 'field-error js-error'; d.textContent = msg;
+            holder.appendChild(d);
+        }
+    }
+
+    // Vérifie une étape ; renvoie le premier champ en erreur (ou null). Aucun focus ici.
+    function validateStep(i) {
+        var first = null;
+        steps[i].querySelectorAll('input, select, textarea').forEach(function (el) {
+            if (el.name === 'how_heard_choices' || el.name === 'how_heard') return;
+            var msg = '';
+            if (el.required && ((el.type === 'checkbox' && !el.checked) || (el.type !== 'checkbox' && !el.value.trim()))) msg = 'Ce champ est obligatoire.';
+            else if (el.type !== 'file' && el.value && !el.checkValidity()) msg = 'Valeur invalide.';
+            if (el.dataset.maxWords && el.value.trim() && el.value.trim().split(/\s+/).length > +el.dataset.maxWords) msg = 'Maximum ' + el.dataset.maxWords + ' mots.';
+            setError(el, msg);
+            if (msg && !first) first = el;
+        });
+        var group = steps[i].querySelector('#howHeardGroup');
+        if (group) {
+            var boxes = group.querySelectorAll('input[name="how_heard_choices"]');
+            var any = Array.prototype.some.call(boxes, function (b) { return b.checked; });
+            var other = group.querySelector('input[value="autre"]');
+            var otherText = document.getElementById('{{ form.how_heard.id_for_label }}');
+            var old = group.querySelector('.js-error-group'); if (old) old.remove();
+            var msg2 = !any ? 'Sélectionnez au moins une réponse.' : (other.checked && !otherText.value.trim() ? 'Précisez votre réponse.' : '');
+            if (msg2) {
+                var d = document.createElement('div'); d.className = 'field-error js-error-group'; d.textContent = msg2;
+                group.querySelector('.choice-list').after(d);
+                if (!first) first = boxes[0];
+            }
+        }
+        return first;
+    }
+
+    // Navigation libre : aucune vérification en passant d'une étape à l'autre
+    next.addEventListener('click', function () { show(current + 1); });
+    prev.addEventListener('click', function () { show(current - 1); });
+    stepperItems.forEach(function (li, idx) {
+        li.querySelector('button').addEventListener('click', function () { show(idx); });
+    });
+
+    // Vérification complète uniquement à l'envoi : retour sur la première étape incomplète
+    form.addEventListener('submit', function (e) {
+        var firstStep = -1, firstField = null;
+        steps.forEach(function (st, i) {
+            var bad = validateStep(i);
+            stepperItems[i].classList.toggle('has-error', !!bad);
+            if (bad && firstStep === -1) { firstStep = i; firstField = bad; }
+        });
+        if (firstStep !== -1) {
+            e.preventDefault();
+            show(firstStep);
+            firstField.focus({ preventScroll: true });
+        }
+    });
+    // Une étape corrigée perd son marqueur d'erreur
+    form.addEventListener('input', function () {
+        stepperItems.forEach(function (li, i) {
+            if (li.classList.contains('has-error') && !validateStep(i)) li.classList.remove('has-error');
+        });
+    });
+    form.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && current < steps.length - 1) {
+            e.preventDefault(); next.click();
+        }
+    });
+    // Erreurs renvoyées par le serveur : marquer les étapes concernées
+    steps.forEach(function (st, i) {
+        if (st.querySelector('.field-error')) stepperItems[i].classList.add('has-error');
+    });
+
+    document.querySelectorAll('.word-counter').forEach(function (counter) {
+        var field = document.getElementById(counter.dataset.for), max = parseInt(field.dataset.maxWords, 10);
+        function update() {
+            var n = field.value.trim() ? field.value.trim().split(/\s+/).length : 0;
+            counter.textContent = n + ' / ' + max + ' mots';
+            counter.classList.toggle('over', n > max);
+        }
+        field.addEventListener('input', update); update();
+    });
+
+    var photo = document.getElementById('{{ form.profile_picture.id_for_label }}'), preview = document.getElementById('photoPreview');
+    photo.addEventListener('change', function () {
+        var f = photo.files[0];
+        if (f && f.size > 5 * 1024 * 1024) { setError(photo, 'La photo ne doit pas dépasser 5 Mo.'); photo.value = ''; preview.style.display = 'none'; return; }
+        setError(photo, '');
+        if (f) { preview.src = URL.createObjectURL(f); preview.style.display = 'block'; } else { preview.style.display = 'none'; }
+    });
+
+    show(current);
+})();
+</script>
+{% endblock %}

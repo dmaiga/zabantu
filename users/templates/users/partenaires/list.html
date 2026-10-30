@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Gestion des Partenaires{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h4 fw-bold text-dark">Nos Partenaires</h2>
+    <a href="{% url 'partenaire_create' %}" class="btn btn-primary px-4 shadow-sm">
+        <i class="fas fa-plus me-2"></i> Ajouter un partenaire
+    </a>
+</div>
+
+<div class="row g-4">
+    {% for p in partenaires %}
+    <div class="col-md-4 col-lg-3">
+        <div class="card h-100 border-0 shadow-sm overflow-hidden text-center p-3">
+            <div class="d-flex justify-content-center align-items-center mb-3" style="height: 100px;">
+                {% if p.logo %}
+                    <img src="{{ p.logo.url }}" class="img-fluid rounded" style="max-height: 80px; object-fit: contain;">
+                {% else %}
+                    <div class="bg-light rounded d-flex align-items-center justify-content-center w-100 h-100">
+                        <i class="fas fa-image fa-2x text-muted"></i>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <h5 class="card-title h6 fw-bold mb-1">{{ p.name }}</h5>
+            <p class="text-muted small mb-3">Ordre d'affichage : <strong>{{ p.order }}</strong></p>
+            
+            <div class="mb-3">
+                {% if p.is_active %}
+                    <span class="badge bg-success-subtle text-success px-3 rounded-pill">Actif</span>
+                {% else %}
+                    <span class="badge bg-danger-subtle text-danger px-3 rounded-pill">Inactif</span>
+                {% endif %}
+            </div>
+
+            <div class="d-flex gap-2 justify-content-center border-top pt-3">
+                <a href="{% url 'partenaire_detail' p.pk %}" class="btn btn-sm btn-light border" title="Détails">
+                    Detail
+                </a>
+                <a href="{% url 'partenaire_toggle' p.pk %}" class="btn btn-sm {% if p.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}" title="Changer statut">
+                    <i class="fas fa-power-off"></i>
+                </a>
+               
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <div class="text-muted">Aucun partenaire enregistré.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

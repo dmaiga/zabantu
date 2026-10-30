@@ -1,0 +1,387 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}{{ event.title }} - Administration Zabantu{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Intégration du style neutre et épuré */
+    :root {
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --bg-card: #ffffff;
+        --border-color: #e2e8f0;
+        --primary-color: #4f46e5; /* Indigo sobre */
+    }
+
+    body {
+        background-color: #f8fafc;
+        color: var(--text-main);
+    }
+
+    .card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+        background-color: #fff;
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem 1.5rem;
+    }
+
+    .event-header-section {
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+    }
+
+    /* Section Intervenants - Refonte Complète UX/UI */
+    .intervenant-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .intervenant-card {
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background-color: #fff;
+        transition: box-shadow 0.2s;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .intervenant-card:hover {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .intervenant-body {
+        padding: 1.25rem;
+        flex-grow: 1;
+        display: flex;
+        align-items: start;
+    }
+
+    /* Correction des photos pour qu'elles ne débordent plus */
+    .intervenant-avatar-container {
+        width: 64px;
+        height: 64px;
+        flex-shrink: 0; /* Empêche l'image de rétrécir */
+        margin-right: 1rem;
+    }
+
+    .intervenant-avatar {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Recadre proprement l'image dans le cercle */
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 1px var(--border-color);
+    }
+
+    .intervenant-info {
+        flex-grow: 1;
+        overflow: hidden; /* Empêche le texte de déborder */
+    }
+
+    .intervenant-name {
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 2px;
+        color: var(--text-main);
+    }
+
+    .intervenant-org {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+        display: block;
+        truncate: true;
+    }
+
+    .role-badge {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-uppercase: true;
+        padding: 3px 8px;
+        background-color: #eef2ff;
+        color: var(--primary-color);
+        border-radius: 4px;
+    }
+
+    .intervenant-footer {
+        padding: 0.75rem 1.25rem;
+        border-top: 1px solid var(--border-color);
+        background-color: #f8fafc;
+        border-radius: 0 0 8px 8px;
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    /* Style pour le contenu safe */
+    .event-description-text {
+        line-height: 1.8;
+        color: #334155;
+    }
+
+    /* Badges de statut neutres */
+    .badge-status {
+        font-weight: 500;
+        padding: 0.5em 0.75em;
+    }
+
+    /* Icônes Méta */
+    .meta-icon-wrapper {
+        width: 32px;
+        color: var(--primary-color);
+        text-align: center;
+        font-size: 1.1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{% url 'event_list' %}" class="text-decoration-none">Événements</a></li>
+            <li class="breadcrumb-item active text-muted" aria-current="page">{{ event.title|truncatechars:40 }}</li>
+        </ol>
+    </nav>
+
+    <div class="event-header-section d-flex justify-content-between align-items-start flex-wrap gap-3">
+        <div>
+            <h1 class="h2 font-weight-bold mb-2">{{ event.title }}</h1>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <span class="badge badge-status bg-{% if event.status == 'published' %}success{% else %}warning text-dark{% endif %}">
+                    {{ event.get_status_display }}
+                </span>
+                <span class="badge badge-status bg-light text-dark border">
+                    <i class="fas {% if event.is_webinar %}fa-video text-info{% else %}fa-map-marker-alt text-danger{% endif %} me-1"></i>
+                    {% if event.is_webinar %}En ligne{% else %}Présentiel{% endif %}
+                </span>
+                <span class="text-muted small">Créé le {{ event.created_at|date:"d/m/Y" }}</span>
+            </div>
+        </div>
+        
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'event_list' %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Liste
+            </a>
+            
+            {% if user.is_authenticated %}
+                {% if user == event.author or user.role in 'admin,moderateur'|split:',' %}
+                <a href="{% url 'event_update' event.id %}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-edit me-1"></i> Modifier
+                </a>
+                {% endif %}
+
+                {% if perms.events.publish_event %}
+                    {% if event.status == 'draft' %}
+                    <a href="{% url 'event_publish' event.id %}" class="btn btn-sm btn-success">
+                        <i class="fas fa-paper-plane me-1"></i> Publier
+                    </a>
+                    {% elif event.status == 'published' %}
+                    <a href="{% url 'event_unpublish' event.id %}" class="btn btn-sm btn-warning text-dark">
+                        <i class="fas fa-eye-slash me-1"></i> Dépublier
+                    </a>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                {% if event.image %}
+                <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}" style="max-height: 300px; object-fit: cover; border-radius: 8px 8px 0 0;">
+                {% endif %}
+                <div class="card-body p-4">
+                    <h4 class="h5 font-weight-bold mb-3">À propos de cet événement</h4>
+                    <div class="event-description-text article-content">
+                        {{ event.content|safe }}
+                    </div>
+                </div>
+            </div>
+{% with event_intervenants=event.eventintervenant_set.all %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 font-weight-bold">
+            <i class="fas fa-users-cog me-2 text-primary"></i>Intervenants
+        </h5>
+
+        <a href="{% url 'manage_event_intervenants' event.id %}" class="btn btn-sm btn-primary">
+            Gérer
+        </a>
+    </div>
+
+    {% if event_intervenants %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th></th>
+                    <th>Intervenant</th>
+                    <th>Organisation</th>
+                    <th>Rôle</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ei in event_intervenants %}
+                {% with intervenant=ei.intervenant %}
+                <tr>
+                    <td>
+                        {% if intervenant.photo %}
+                        <img src="{{ intervenant.photo.url }}" class="rounded-circle" width="40" height="40">
+                        {% else %}
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <strong>{{ intervenant.full_name }}</strong><br>
+                        <small class="text-muted">{{ intervenant.email }}</small>
+                    </td>
+
+                    <td>
+                        {{ intervenant.organization }}<br>
+                        <small class="text-muted">{{ intervenant.position }}</small>
+                    </td>
+
+                    <td>
+                        <span class="badge bg-primary">
+                            {{ ei.get_role_display }}
+                        </span>
+                    </td>
+                </tr>
+                {% endwith %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+    <div class="p-4 text-center">
+        <p class="text-muted mb-2">Aucun intervenant ajouté</p>
+        <a href="{% url 'manage_event_intervenants' event.id %}" class="btn btn-outline-primary btn-sm">
+            Ajouter un intervenant
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endwith %}
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="h6 mb-0 font-weight-bold text-uppercase tracking-wider text-muted">Détails Logistiques</h5>
+                </div>
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                        <div class="meta-icon-wrapper"><i class="fas fa-calendar-day"></i></div>
+                        <div class="ms-2">
+                            <small class="text-muted d-block">Date et heure</small>
+                            <span class="font-weight-medium text-dark">{{ event.date|date:"d F Y à H:i" }}</span>
+                            {% if event.end_date %}
+                            <span class="d-block small text-muted">Fin : {{ event.end_date|date:"H:i" }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center {% if event.is_webinar and event.webinar_link %}mb-3 pb-3 border-bottom{% endif %}">
+                        <div class="meta-icon-wrapper">
+                            <i class="fas {% if event.is_webinar %}fa-video{% else %}fa-map-marker-alt{% endif %}"></i>
+                        </div>
+                        <div class="ms-2">
+                            <small class="text-muted d-block">Lieu / Format</small>
+                            <span class="font-weight-medium text-dark">
+                                {% if event.is_webinar %}Webinaire en ligne{% else %}{{ event.location|default:"Lieu non spécifié" }}{% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    {% if event.is_webinar and event.webinar_link %}
+                    <div class="mt-2">
+                        <a href="{{ event.webinar_link }}" target="_blank" class="btn btn-primary btn-sm w-100">
+                            <i class="fas fa-external-link-alt me-1"></i> Rejoindre le webinaire
+                        </a>
+                    </div>
+                    {% elif not event.is_webinar and event.lieu_gps %}
+                    <div class="mt-2">
+                        <a href="{{ event.lieu_gps }}" target="_blank" class="btn btn-outline-secondary btn-sm w-100">
+                            <i class="fas fa-map-marked-alt me-1"></i> Voir sur Google Maps
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if event.primary_topic or event.target_audience %}
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="h6 mb-0 font-weight-bold text-uppercase tracking-wider text-muted">Informations Clés</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush small">
+                        {% if event.primary_topic %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                            <span class="text-muted"><i class="fas fa-tag me-2 text-primary"></i>Thème principal</span>
+                            <span class="font-weight-medium text-dark text-end ms-2">{{ event.primary_topic }}</span>
+                        </li>
+                        {% endif %}
+                        {% if event.target_audience %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                            <span class="text-muted"><i class="fas fa-users me-2 text-primary"></i>Public cible</span>
+                            <span class="font-weight-medium text-dark text-end ms-2">{{ event.target_audience }}</span>
+                        </li>
+                        {% endif %}
+                        {% if event.expected_attendees %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                            <span class="text-muted"><i class="fas fa-user-plus me-2 text-primary"></i>Participants attendus</span>
+                            <span class="badge bg-light text-primary border border-primary-subtle rounded-pill">{{ event.expected_attendees }}</span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                    {% if event.secondary_topics %}
+                    <div class="p-3 pt-2 bg-light border-top">
+                        <small class="text-muted d-block mb-1">Thèmes secondaires :</small>
+                        <p class="mb-0 small text-dark">{{ event.secondary_topics }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-xs {
+        padding: 1px 5px;
+        font-size: 0.75rem;
+        border-radius: 4px;
+    }
+    .font-weight-medium { font-weight: 500; }
+    .font-weight-bold { font-weight: 600; }
+    .text-truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .table > :not(caption) > * > * {
+    padding: 0.5rem 0.5rem; /* Réduit l'espacement interne des cellules */
+}
+.font-weight-bold { font-weight: 600; }
+</style>
+{% endblock %}

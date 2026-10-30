@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h2 class="mb-0">Confirmer la suppression</h2>
+        </div>
+        <div class="card-body">
+            <p class="lead">Êtes-vous sûr de vouloir supprimer définitivement ce Guelekan ?</p>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="h5">{{ guelekan.title }}</h3>
+                    <p class="text-muted mb-0">
+                        Créé le {{ guelekan.created_at|date:"d/m/Y" }} | 
+                        Statut : 
+                        <span class="badge 
+                            {% if guelekan.status == 'published' %}bg-success
+                            {% else %}bg-warning{% endif %}">
+                            {{ guelekan.get_status_display }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'guelekan_detail' guelekan.slug %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Confirmer la suppression
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

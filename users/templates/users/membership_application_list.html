@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Demandes d'adhésion | Zabantu Backoffice{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="fas fa-user-check me-2"></i>Demandes d'adhésion</h4>
+        <div>
+            <span class="badge bg-primary me-1">{{ total_count }} demandes</span>
+            {% if counts.pending %}<span class="badge bg-danger">{{ counts.pending }} en attente</span>{% endif %}
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4 g-2">
+            <div class="col-lg-8">
+                <div class="btn-group flex-wrap" role="group">
+                    <a href="?{% if query %}q={{ query }}{% endif %}" class="btn btn-outline-primary {% if not status_filter %}active{% endif %}">Toutes</a>
+                    <a href="?status=pending{% if query %}&q={{ query }}{% endif %}" class="btn btn-outline-danger {% if status_filter == 'pending' %}active{% endif %}">En attente ({{ counts.pending }})</a>
+                    <a href="?status=approved{% if query %}&q={{ query }}{% endif %}" class="btn btn-outline-success {% if status_filter == 'approved' %}active{% endif %}">Validées ({{ counts.approved }})</a>
+                    <a href="?status=rejected{% if query %}&q={{ query }}{% endif %}" class="btn btn-outline-warning {% if status_filter == 'rejected' %}active{% endif %}">Refusées ({{ counts.rejected }})</a>
+                    <a href="?status=revoked{% if query %}&q={{ query }}{% endif %}" class="btn btn-outline-secondary {% if status_filter == 'revoked' %}active{% endif %}">Révoquées ({{ counts.revoked }})</a>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <form method="get" class="d-flex gap-2">
+                    {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+                    <input type="search" name="q" value="{{ query }}" class="form-control" placeholder="Nom, e-mail, institution">
+                    <button class="btn btn-outline-primary" type="submit"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+        </div>
+
+        {% if applications %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr><th>Nom</th><th>E-mail</th><th>Statut académique</th><th>Institution</th><th>Reçue le</th><th>Statut</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for a in applications %}
+                    <tr class="{% if a.status == 'pending' %}table-warning{% endif %}">
+                        <td>{{ a.full_name }}</td>
+                        <td>{{ a.email }}</td>
+                        <td>{{ a.get_academic_status_display }}</td>
+                        <td>{{ a.institution }}</td>
+                        <td>{{ a.created_at|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if a.status == 'pending' %}<span class="badge bg-warning text-dark">En attente</span>
+                            {% elif a.status == 'approved' %}<span class="badge bg-success">Validée</span>
+                            {% elif a.status == 'rejected' %}<span class="badge bg-secondary">Refusée</span>
+                            {% else %}<span class="badge bg-danger">Révoquée</span>{% endif %}
+                        </td>
+                        <td><a href="{% url 'membership_application_detail' a.pk %}" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i> Examiner</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if applications.has_other_pages %}
+        <nav><ul class="pagination justify-content-center">
+            {% if applications.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ applications.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if query %}&q={{ query }}{% endif %}">Précédent</a></li>{% endif %}
+            <li class="page-item disabled"><span class="page-link">{{ applications.number }} / {{ applications.paginator.num_pages }}</span></li>
+            {% if applications.has_next %}<li class="page-item"><a class="page-link" href="?page={{ applications.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if query %}&q={{ query }}{% endif %}">Suivant</a></li>{% endif %}
+        </ul></nav>
+        {% endif %}
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-user-check fa-3x text-muted mb-3"></i>
+            <p class="text-muted">Aucune demande d'adhésion pour le moment.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

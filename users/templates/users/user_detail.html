@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Profil de {{ user_detail.prenom }} {{ user_detail.nom }}</h2>
+  <div class="row">
+    <div class="col-md-4">
+      {% if user_detail.profile_picture %}
+        <img src="{{ user_detail.profile_picture.url }}" class="img-thumbnail" style="max-width: 100%;">
+      {% else %}
+        <div class="bg-light d-flex align-items-center justify-content-center rounded" style="height: 200px; width: 200px;">
+          <span class="text-muted">Aucune image de profil</span>
+        </div>
+      {% endif %}
+    </div>
+    <div class="col-md-8">
+      <ul class="list-group">
+
+        <li class="list-group-item"><strong>Email :</strong> {{ user_detail.email|default:" — " }}</li>
+        <li class="list-group-item"><strong>Téléphone :</strong> {{ user_detail.phone_number|default:" — "  }}</li>
+        <li class="list-group-item"><strong>Rôle :</strong> {{ user_detail.get_role_display|default:" — "  }}</li>
+        <li class="list-group-item"><strong>Fonction :</strong> {{ user_detail.job_title |default:" — " }}</li>
+        <li class="list-group-item"><strong>Département :</strong> {{ user_detail.department |default:" — " }}</li>
+        <li class="list-group-item"><strong>Bio :</strong><br>{{ user_detail.bio|safe|default:" — "  }}</li>
+        <li class="list-group-item"><strong>Depuis :</strong> {{ user_detail.date_started|default:" — "  }}</li>
+      </ul>
+    </div>
+  </div>
+  
+<div class="btn-group mt-3">
+    <a href="{% url 'user_list' %}" class="btn btn-outline-info">
+        Retour à la liste
+    </a>
+
+    <a href="{% url 'update_user' user_detail.id %}" class="btn btn-outline-primary">
+        <i class="fas fa-edit me-1"></i> Modifier
+    </a>
+
+    {% if user_detail.role != 'admin' or request.user.role == 'admin' %}
+    <a href="{% url 'user_delete' user_detail.id %}" class="btn btn-outline-danger">
+        <i class="fas fa-trash me-1"></i> Supprimer
+    </a>
+    {% endif %}
+</div>
+</div>
+
+{% endblock %}
+
+

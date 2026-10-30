@@ -1,0 +1,529 @@
+
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block title %}À propos | Zabantu{% endblock %}
+{% block banner_title %}Qui sommes-nous{% endblock %}
+{% block banner_subtitle %}{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --zabantu-primary: #6f826a;
+        --zabantu-primary-light: rgba(111, 130, 106, 0.1);
+        --zabantu-primary-dark: #2c3e2c;
+        --zabantu-secondary: #bf9264;
+        --zabantu-secondary-light: rgba(191, 146, 100, 0.1);
+        --zabantu-secondary-dark: #8a5a2e;
+        --zabantu-accent: #bbd8a3;
+        --zabantu-light: #f0f1c5;
+        --zabantu-gray: #6c757d;
+        --zabantu-light-gray: #f8f9fa;
+    }
+
+    /* Layout général */
+    .about-container {
+        max-width: 1200px;
+        margin: 3rem auto;
+        padding: 0 1.5rem;
+    }
+    
+    .section {
+        margin-bottom: 4rem;
+        position: relative;
+    }
+    
+    .section-title {
+        color: var(--zabantu-primary-dark);
+        font-size: 2.2rem;
+        margin-bottom: 2rem;
+        padding-bottom: 0.75rem;
+        position: relative;
+        font-weight: 700;
+    }
+    
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background: var(--zabantu-secondary);
+        border-radius: 2px;
+    }
+    
+    /* Section Identité */
+    .identity-card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 3rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        margin-bottom: 3rem;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .group-name {
+        color: var(--zabantu-primary);
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        line-height: 1.2;
+    }
+    
+    .group-subtitle {
+        color: var(--zabantu-secondary-dark);
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+        font-style: italic;
+    }
+    
+    .vision-box {
+        background-color: var(--zabantu-primary-light);
+        padding: 2rem;
+        border-radius: 12px;
+        margin: 2rem 0;
+        border-left: 4px solid var(--zabantu-primary);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .vision-box:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%236f826a" opacity="0.05"><path d="M50 0 L100 50 L50 100 L0 50 Z"/></svg>');
+        background-size: contain;
+    }
+    
+    .vision-title {
+        font-weight: 600;
+        color: var(--zabantu-primary-dark);
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+    }
+    
+    .research-domains {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin: 2rem 0;
+    }
+    
+    .domain-badge {
+        background-color: var(--zabantu-secondary-light);
+        color: var(--zabantu-secondary-dark);
+        padding: 0.6rem 1.2rem;
+        border-radius: 30px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(191, 146, 100, 0.3);
+    }
+    
+    .domain-badge:hover {
+        background-color: var(--zabantu-secondary);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    /* Section Activités */
+    .activity-section {
+        background-color: white;
+        border-radius: 12px;
+        padding: 3rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        margin-bottom: 3rem;
+    }
+    
+    .activity-title {
+        color: var(--zabantu-primary);
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+    
+    /* Section Équipe */
+   
+    
+    
+    .expertise-tag {
+        background: var(--zabantu-light);
+        color: var(--zabantu-primary-dark);
+        padding: 0.4rem 0.9rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        border: 1px solid rgba(111, 130, 106, 0.2);
+    }
+    
+    .social-link {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: var(--zabantu-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--zabantu-primary-dark);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(111, 130, 106, 0.2);
+    }
+    
+    .social-link:hover {
+        background: var(--zabantu-primary);
+        color: white;
+        transform: translateY(-3px);
+    }
+    
+    
+    /* Partners section */
+    .partners-section {
+        background-color: white;
+        border-radius: 12px;
+        padding: 3rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        margin-bottom: 3rem;
+    }
+    
+    .partners-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 2rem;
+        align-items: center;
+        margin-top: 2rem;
+    }
+    
+    .partner-item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 120px;
+        padding: 1.5rem;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .partner-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .partner-logo {
+        max-width: 100%;
+        max-height: 80px;
+        object-fit: contain;
+      
+        transition: all 0.3s ease;
+    }
+    
+    
+    
+    /* Responsive */
+    @media (max-width: 992px) {
+        .identity-card,
+        .activity-section,
+        .partners-section {
+            padding: 2rem;
+        }
+        
+        .group-name {
+            font-size: 2rem;
+        }
+        
+        .group-subtitle {
+            font-size: 1.3rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .about-container {
+            padding: 0 1rem;
+        }
+        
+        .section {
+            margin-bottom: 3rem;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+        }
+        
+        .identity-card,
+        .activity-section,
+        .partners-section {
+            padding: 1.5rem;
+        }
+        
+        .group-name {
+            font-size: 1.8rem;
+        }
+        
+        .group-subtitle {
+            font-size: 1.1rem;
+        }
+        
+        .team-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .member-photo-container {
+            height: 250px;
+        }
+        
+        .partners-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .member-photo-container {
+            height: 220px;
+        }
+        
+        .partners-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .partner-item {
+            height: 100px;
+        }
+    }
+
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.member-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    padding: 2rem 1rem 1rem;
+    text-align: center;
+}
+
+.member-photo-container {
+    width: 120px;
+    height: 120px;
+    margin: -70px auto 10px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid #f8f9fa;
+}
+
+.member-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.member-info h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.member-info p {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+@media (max-width: 768px) {
+    .team-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+    .member-photo-container {
+        width: 100px;
+        height: 100px;
+        margin-top: -50px;
+    }
+}
+/* Container du Carrousel */
+.partners-container {
+    padding: 3rem 0;
+    background-color: #fff; /* Fond blanc pur */
+    overflow: hidden; /* Cache les logos qui sortent du cadre */
+    position: relative;
+    margin-top: 2rem;
+}
+
+.partners-slider {
+    display: flex;
+    width: calc(250px * 20); /* Largeur dynamique selon le nombre de logos */
+    animation: scroll 40s linear infinite; /* Vitesse du défilement */
+}
+
+.partners-slider:hover {
+    animation-play-state: paused; /* Le carrousel s'arrête quand on passe la souris */
+}
+
+.partner-slide {
+    width: 250px; /* Largeur de chaque emplacement de logo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 40px;
+}
+
+.partner-logo {
+    max-height: 70px;
+    width: auto;
+    max-width: 180px;
+    object-fit: contain;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0.8; /* Légèrement transparent par défaut */
+}
+
+.partner-slide:hover .partner-logo {
+    transform: scale(1.1);
+    opacity: 1; /* Pleine couleur et opacité au survol */
+}
+
+/* Animation du défilement infini */
+@keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-250px * 10)); } /* Ajuster selon le nb de partenaires */
+}
+
+/* Version Mobile */
+@media (max-width: 768px) {
+    .partner-slide { width: 150px; padding: 0 20px; }
+    .partner-logo { max-height: 50px; }
+    @keyframes scroll {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(calc(-150px * 10)); }
+    }
+}
+</style>
+
+
+<div class="about-container">
+    <!-- Identity Section -->
+    <section class="section">
+        <div class="identity-card">
+            <h1 class="group-name">Groupe de recherche Zabantu</h1>
+            <p class="group-subtitle">« Économie-Guerre-État »</p>
+            
+            <p>Nom inspiré d'une plante locale mandingue, Zabantu est un groupe 
+                de chercheurs en sciences sociales travaillant sur le développement
+                 économique et social.C'est de ce fait un groupe pluri et
+                  interdisciplinaire, qui est ouvert à tous les chercheurs et
+                   chercheuses du monde dans l'objectif d'avoir une recherche 
+                   plus inclusive et plus ancrée.</p>
+            
+            <div class="vision-box">
+                <h3 class="vision-title">Vision</h3>
+                <p class="group-subtitle">Vers une recherche ancrée dans les dynamiques économiques et sociales</p>              
+            </div>
+            
+            <h3 class="section-title">Domaines de recherche</h3>
+            <div class="research-domains">
+                <span class="domain-badge">Économie politique</span>
+                <span class="domain-badge">Conflits et sécurité</span>
+                <span class="domain-badge">Développement</span>
+                <span class="domain-badge">Politiques publiques</span>
+                <span class="domain-badge">Études africaines</span>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Activités Section -->
+    <section class="section">
+        <div class="activity-section">
+            <h2 class="section-title">Activités</h2>
+            
+            <h3 class="activity-title">Séminaire Gɛlɛkan</h3>
+            <p>Gɛlɛkan est une tribune scientifique de collaboration et
+                 de partage d'expérience et de connaissance. Inspiré de 
+                 la tribune de sagesse bamanan réservée aux ainés
+                  (considérés comme des sagesses et des érudits), Gɛlɛkan est 
+                  un espace de communication scientifique permettant aux chercheurs 
+                  de partager les résultats de leurs recherches accomplies ou en 
+                  cours.</p>            
+            <p>Les séminaires Gɛlɛkan portent aussi sur les thématiques de formation
+                 comme la méthodologie de recherche et les astuces de publications
+                  académiques. Il s'agit de partage d'expérience des auteurs bien 
+                  établis dans leurs domaines visant à initier et ou renforcer les 
+                  jeunes chercheurs à la conduite de la recherche scientifique et de
+                   la communication scientifique.</p>            
+            <p>Au-delà de la démarche méthodologique, les séminaires Gɛlɛkan mettent
+                 un accent particulier sur les débats épistémologiques, qui 
+                 déterminent, dans une large mesure, la contribution à la 
+                 connaissance scientifique.</p>
+            
+            <p>La nécessité d'un tel cadre académique réside dans le caractère 
+                collectif de la production de la connaissance. Ainsi, débattre
+                 des résultats de recherche permettent de mettre en évidence leurs
+                  pertinence et limites éventuelles et par conséquent de les
+                   consolider, dans la mesure où ces limites seront adressées
+                    à la communauté scientifique. Dans ce contexte, la communication des résultats de recherche devient plus qu'une nécessité, elle contribue à la validation externe des connaissances et leur diffusion.</p>
+        </div>
+    </section>
+</div>
+
+<!-- Section Équipe - Photos indépendantes -->
+<section class="team-section">
+    <div class="about-container">
+        <h2 class="section-title">Notre Équipe</h2>
+        
+        <div class="team-grid">
+            {% for member in active_members %}
+            <div class="member-card">
+                <div class="member-photo-container">
+                    <img src="{% if member.profile_picture %}{{ member.profile_picture.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" 
+                         alt="{{ member.get_full_name }}" 
+                         class="member-photo">
+                </div>
+                <div class="member-info text-center mt-3">
+                    <h3 class="member-name">{{ member.get_full_name }}</h3>
+                    <p class="member-position">{{ member.bio|safe|truncatewords:12 }}</p>
+                    <a href="{% url 'public_member_detail' member.pk %}" class="btn btn-outline-primary btn-sm mt-2">
+                        Voir le profil
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Lien vers la page complète de l'équipe -->
+        <div class="text-center mt-5">
+            <a href="{% url 'membre_liste' %}" class="btn btn-primary">
+                Voir toute l'équipe <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container text-center">
+        <h2 class="section-title">Nos Partenaires</h2>
+    </div>
+
+    <div class="partners-container">
+        <div class="partners-slider">
+            {% for partenaire in partenaires %}
+                <div class="partner-slide">
+                    <img src="{{ partenaire.logo.url }}" alt="{{ partenaire.name }}" class="partner-logo">
+                </div>
+            {% endfor %}
+            
+            {% for partenaire in partenaires %}
+                <div class="partner-slide">
+                    <img src="{{ partenaire.logo.url }}" alt="{{ partenaire.name }}" class="partner-logo">
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

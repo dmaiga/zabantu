@@ -1,0 +1,217 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ content_type }} : {{ content.title }}</title>
+    <!--[if !mso]><!-- -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--<![endif]-->
+    <style type="text/css">
+        /* Styles de base compatibles avec les clients email */
+        body {
+            margin: 0;
+            padding: 0;
+            min-width: 100%;
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+            color: #2c3e2c; /* --zabantu-dark */
+            background-color: #f8f9fa;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        
+        table {
+            border-collapse: collapse;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background-color: #6f826a; /* --zabantu-primary */
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .content {
+            padding: 30px 20px;
+            background-color: #ffffff;
+        }
+        
+        .footer {
+            background-color: #2c3e2c; /* --zabantu-dark */
+            color: #f0f1c5; /* --zabantu-light */
+            padding: 25px 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .button {
+            background-color: #bf9264; /* --zabantu-secondary */
+            color: #ffffff;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        
+        .preview {
+            background-color: #f0f1c5; /* --zabantu-light */
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 4px solid #bf9264; /* --zabantu-secondary */
+        }
+        
+        .social-links {
+            margin: 15px 0;
+        }
+        
+        .social-links a {
+            color: #bbd8a3; /* --zabantu-accent */
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        
+        .unsubscribe {
+            color: #bbd8a3; /* --zabantu-accent */
+            font-size: 12px;
+            margin-top: 15px;
+        }
+        
+        .unsubscribe a {
+            color: #bbd8a3;
+            text-decoration: underline;
+        }
+        
+        /* Media queries pour la responsivité */
+        @media only screen and (max-width: 480px) {
+            .container {
+                width: 100% !important;
+            }
+            
+            .header, .content, .footer {
+                padding: 20px 15px;
+            }
+            
+            .button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+    <!--[if mso]>
+    <style type="text/css">
+        .button {
+            background-color: #bf9264 !important;
+            color: #ffffff !important;
+        }
+    </style>
+    <![endif]-->
+</head>
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" style="margin: 0; padding: 0; min-width: 100%; background-color: #f8f9fa;">
+    <center>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#f8f9fa">
+            <tr>
+                <td align="center" valign="top">
+                    <!-- Container principal -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" class="container">
+                        <!-- En-tête -->
+                        <tr>
+                            <td bgcolor="#6f826a" class="header">
+                                <h1 style="margin: 0; font-size: 28px; color: #ffffff;">Nouveau contenu sur Zabantu!</h1>
+                                <p style="margin: 10px 0 0; font-size: 16px; color: #f0f1c5;">Découvrez notre dernière publication</p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Contenu -->
+                        <tr>
+                            <td bgcolor="#ffffff" class="content">
+                                <h2 style="margin: 0 0 20px; color: #2c3e2c; border-bottom: 2px solid #bbd8a3; padding-bottom: 10px;">
+                                    {{ content_type }} : {{ content.title }}
+                                </h2>
+                                
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                    <tr>
+                                        <td bgcolor="#f0f1c5" class="preview">
+                                            {{ content.content|safe|truncatewords:50 }}
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                    <tr>
+                                        <td align="center" style="padding: 30px 0;">
+                                            <a href="https://zabantu.net{{ content.get_absolute_url }}" class="button" style="color: #ffffff; text-decoration: none;">
+                                                Lire la suite
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <p style="margin: 0; color: #2c3e2c;">
+                                    Nous espérons que ce {{ content_type|lower }} vous plaira. N'hésitez pas à partager vos impressions avec nous!
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Pied de page -->
+                        <tr>
+                            <td bgcolor="#2c3e2c" class="footer">
+                                <!-- Liens sociaux -->
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                    <tr>
+                                        <td align="center" class="social-links">
+                                            <a href="https://www.facebook.com/zabantu.ecs" target="_blank" style="color: #bbd8a3; text-decoration: none;">
+                                                Facebook
+                                            </a> | 
+                                            <a href="https://www.linkedin.com/company/zabantu-ecs/about/" target="_blank" style="color: #bbd8a3; text-decoration: none;">
+                                                LinkedIn
+                                            </a> | 
+                                            <a href="https://zabantu.net" target="_blank" style="color: #bbd8a3; text-decoration: none;">
+                                                Site Web
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <!-- Copyright -->
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                    <tr>
+                                        <td align="center">
+                                            <p style="margin: 10px 0; color: #f0f1c5;">
+                                                © {% now "Y" %} Zabantu. Tous droits réservés.
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <!-- Lien de désabonnement -->
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                    <tr>
+                                        <td align="center" class="unsubscribe">
+                                            <p style="margin: 0; color: #bbd8a3;">
+                                                Vous recevez cet email parce que vous êtes abonné à notre newsletter.<br />
+                                                <a href="{{ unsubscribe_url }}" target="_blank" style="color: #bbd8a3; text-decoration: underline;">
+                                                    Se désabonner
+                                                </a>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </center>
+</body>
+</html>

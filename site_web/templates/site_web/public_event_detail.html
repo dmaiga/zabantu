@@ -1,0 +1,605 @@
+{% extends 'base_public.html' %}
+
+{% block title %}{{ event.title }} | Zabantu{% endblock %}
+
+{% block extra_css %}
+<style>
+    .event-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+    
+    .event-header {
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+    
+    .event-title {
+        color: var(--zabantu-primary);
+        font-size: 2.3rem;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+        font-weight: 700;
+    }
+    
+    .event-meta {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        color: #666;
+        font-size: 1.1rem;
+    }
+    
+    /* Layout principal image + carte */
+    .event-main-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 3rem;
+        align-items: start;
+    }
+    
+    .event-image-container {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        height: 100%;
+    }
+    
+    .event-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        min-height: 300px;
+    }
+    
+    /* Carte d'informations */
+    .event-details-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        height: 100%;
+    }
+    
+    .detail-item {
+        display: flex;
+        margin-bottom: 1.5rem;
+        align-items: flex-start;
+    }
+    
+    .detail-icon {
+        font-size: 1.3rem;
+        color: var(--zabantu-primary);
+        margin-right: 1rem;
+        width: 24px;
+        text-align: center;
+        padding-top: 3px;
+        flex-shrink: 0;
+    }
+    
+    .detail-content {
+        flex: 1;
+    }
+    
+    .detail-title {
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+        color: var(--zabantu-dark);
+        font-size: 1.1rem;
+    }
+    
+    /* Intervenants */
+    .intervenants-section {
+        margin-top: 3rem;
+    }
+    
+    .role-section {
+        margin-bottom: 2.5rem;
+    }
+    
+    .role-title {
+        color: var(--zabantu-primary);
+        font-size: 1.3rem;
+        margin-bottom: 1.2rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--zabantu-secondary);
+    }
+    
+    .intervenants-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+    
+    .intervenant-card {
+        border: none;
+        border-radius: 10px;
+        padding: 1.2rem;
+        background: white;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .intervenant-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    }
+    
+    .intervenant-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.2rem;
+        gap: 1rem;
+    }
+    
+    .intervenant-photo {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--zabantu-secondary);
+        flex-shrink: 0;
+    }
+    
+    .intervenant-info {
+        flex: 1;
+    }
+    
+    .intervenant-name {
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+        color: var(--zabantu-dark);
+        font-size: 1.1rem;
+    }
+    
+    .intervenant-org {
+        font-size: 0.9rem;
+        color: var(--zabantu-primary);
+        margin-bottom: 0.3rem;
+        font-weight: 500;
+    }
+    
+    .intervenant-position {
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 0.8rem;
+    }
+    
+    .intervenant-bio {
+        font-size: 0.9rem;
+        color: #555;
+        line-height: 1.5;
+        margin-bottom: 1.2rem;
+        flex: 1;
+    }
+    
+    .intervenant-social {
+        display: flex;
+        gap: 0.6rem;
+        margin-top: auto;
+    }
+    
+    .intervenant-social a {
+        color: #666;
+        transition: all 0.3s ease;
+        font-size: 1.1rem;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+    }
+    
+    .intervenant-social a:hover {
+        color: white;
+        background: var(--zabantu-primary);
+        transform: translateY(-2px);
+    }
+    
+    /* Contenu */
+    .event-content {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: #333;
+        margin-bottom: 3rem;
+    }
+    
+    .event-content h2, .event-content h3, .event-content h4 {
+        color: var(--zabantu-primary);
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .event-content p {
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Badges */
+    .badge-event {
+        background-color: var(--zabantu-primary);
+        color: white;
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .badge-past {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    .badge-upcoming {
+        background-color: #28a745;
+        color: white;
+    }
+    
+    /* CTA */
+    .event-cta {
+        background: linear-gradient(135deg, var(--zabantu-primary) 0%, var(--zabantu-secondary) 100%);
+        color: white;
+        padding: 2.5rem;
+        border-radius: 12px;
+        text-align: center;
+        margin: 3rem 0;
+    }
+    
+    /* Boutons */
+    .btn-event {
+        padding: 0.5rem 1.2rem;
+        font-size: 0.95rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 992px) {
+        .event-main-layout {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        .event-image-container {
+            height: 300px;
+        }
+        
+        .event-title {
+            font-size: 2rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .event-title {
+            font-size: 1.8rem;
+        }
+        
+        .event-meta {
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .intervenants-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .intervenant-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.8rem;
+        }
+        
+        .detail-item {
+            flex-direction: column;
+            text-align: center;
+            margin-bottom: 1.2rem;
+        }
+        
+        .detail-icon {
+            margin-right: 0;
+            margin-bottom: 0.5rem;
+        }
+        
+        .event-cta {
+            padding: 2rem 1.5rem;
+        }
+        
+        .event-content {
+            font-size: 1rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .event-container {
+            padding: 0 0.5rem;
+        }
+        
+        .event-title {
+            font-size: 1.6rem;
+        }
+        
+        .event-details-card {
+            padding: 1.5rem;
+        }
+        
+        .event-cta {
+            padding: 1.5rem 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="event-container">
+    <!-- En-tête de l'événement -->
+    <header class="event-header">
+        <h1 class="event-title">{{ event.title }}</h1>
+        
+        <div class="event-meta">
+            <span class="badge {% if is_past_event %}badge-past{% else %}badge-upcoming{% endif %} me-2">
+                {% if is_past_event %}Événement passé{% else %}À venir{% endif %}
+            </span>
+            <span class="badge badge-event me-2">{{ event.get_event_type_display }}</span>
+            <span><i class="far fa-calendar-alt me-1"></i> {{ event.date|date:"d F Y à H:i" }}</span>
+            {% if event.end_date %}
+            <span class="ms-2"><i class="fas fa-flag-checkered me-1"></i> {{ event.end_date|date:"d F Y à H:i" }}</span>
+            {% endif %}
+        </div>
+    </header>
+    
+    <!-- Layout principal : Image + Carte d'informations -->
+    <div class="event-main-layout">
+        <!-- Image de l'événement -->
+        {% if event.image %}
+        <div class="event-image-container">
+            <img src="{{ event.image.url }}" 
+                 class="event-image" 
+                 alt="{{ event.title }}"
+                 loading="lazy">
+        </div>
+        {% else %}
+        <div class="event-image-container bg-light d-flex align-items-center justify-content-center">
+            <i class="fas fa-calendar-alt fa-5x text-muted opacity-25"></i>
+        </div>
+        {% endif %}
+        
+        <!-- Carte d'informations -->
+        <div class="event-details-card">
+            <!-- Date et heure -->
+            <div class="detail-item">
+                <div class="detail-icon"><i class="far fa-clock"></i></div>
+                <div class="detail-content">
+                    <h3 class="detail-title">Date et heure</h3>
+                    <p class="mb-0">{{ event.get_event_duration }}</p>
+                </div>
+            </div>
+            
+<div class="detail-item">
+    <div class="detail-icon">
+        
+        <i class="fas {% if event.is_webinar and event.location %}fa-map-marked-alt{% elif event.is_webinar %}fa-video{% else %}fa-map-marker-alt{% endif %}"></i>
+    </div>
+    <div class="detail-content">
+        <h3 class="detail-title">Informations d'accès</h3>
+
+        {# --- BLOC EN LIGNE --- #}
+        {% if event.is_webinar %}
+            <div class="mb-3">
+                <p class="mb-1 text-primary fw-bold"><i class="fas fa-laptop me-1"></i> Événement en ligne</p>
+        
+                {% if event.webinar_link %}
+                    <a href="{{ event.webinar_link }}" target="_blank" class="btn btn-primary btn-sm btn-event">
+                        <i class="fas fa-external-link-alt me-1"></i>Rejoindre la réunion
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        
+        {% if event.is_webinar and event.location %}<hr class="my-3 opacity-25">{% endif %}
+
+        {# --- BLOC PRÉSENTIEL --- #}
+        {% if event.location or event.lieu_gps %}
+            <div class="mb-2">
+                <p class="mb-1 text-primary fw-bold"><i class="fas fa-building me-1"></i> Présentiel</p>
+                <p class="mb-2">{{ event.location|default:"Lieu à confirmer" }}</p>
+                {% if event.lieu_gps %}
+                    <a href="{{ event.lieu_gps }}" target="_blank" class="btn btn-outline-primary btn-sm btn-event">
+                        <i class="fas fa-directions me-1"></i>Itinéraire
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if not event.is_webinar and not event.location %}
+            <p class="text-muted">Détails de l'emplacement à venir.</p>
+        {% endif %}
+    </div>
+</div>
+            
+            <!-- Public cible -->
+            {% if event.target_audience %}
+            <div class="detail-item">
+                <div class="detail-icon"><i class="fas fa-users"></i></div>
+                <div class="detail-content">
+                    <h3 class="detail-title">Public concerné</h3>
+                    <p class="mb-0">{{ event.target_audience }}</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Participants attendus -->
+            {% if event.expected_attendees %}
+            <div class="detail-item">
+                <div class="detail-icon"><i class="fas fa-user-plus"></i></div>
+                <div class="detail-content">
+                    <h3 class="detail-title">Participants attendus</h3>
+                    <p class="mb-0">{{ event.expected_attendees }} personnes</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Thème principal -->
+            {% if event.primary_topic %}
+            <div class="detail-item">
+                <div class="detail-icon"><i class="fas fa-tag"></i></div>
+                <div class="detail-content">
+                    <h3 class="detail-title">Thème principal</h3>
+                    <p class="mb-0">{{ event.primary_topic }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Contenu de l'événement -->
+    {% if event.content %}
+    <div class="event-content">
+        {{ event.content|safe }}
+    </div>
+    {% endif %}
+    
+    <!-- Intervenants -->
+    {% if intervenants_par_role %}
+    <div class="intervenants-section">
+        <h2 class="text-center mb-5">Nos Intervenants</h2>
+        
+        {% for role, intervenants in intervenants_par_role.items %}
+        <div class="role-section">
+            <h3 class="role-title">{{ role }}</h3>
+            <div class="intervenants-grid">
+                {% for intervenant in intervenants %}
+                <div class="intervenant-card">
+                    <div class="intervenant-header">
+                        {% if intervenant.photo %}
+                        <img src="{{ intervenant.photo.url }}" 
+                             class="intervenant-photo" 
+                             alt="{{ intervenant.full_name }}"
+                             loading="lazy">
+                        {% else %}
+                        <div class="intervenant-photo bg-light d-flex align-items-center justify-content-center">
+                            <i class="fas fa-user fa-2x text-muted"></i>
+                        </div>
+                        {% endif %}
+                        <div class="intervenant-info">
+                            <h4 class="intervenant-name">{{ intervenant.full_name }}</h4>
+                            {% if intervenant.organization %}
+                            <div class="intervenant-org">{{ intervenant.organization }}</div>
+                            {% endif %}
+                            {% if intervenant.position %}
+                            <div class="intervenant-position">{{ intervenant.position }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if intervenant.bio %}
+                    <div class="intervenant-bio">
+                        {{ intervenant.bio|truncatewords:30 }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if intervenant.expertise %}
+                    <div class="mb-2">
+                        <strong class="small">Expertise:</strong> 
+                        <span class="small">{{ intervenant.expertise }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="intervenant-social">
+                        {% if intervenant.email %}
+                        <a href="mailto:{{ intervenant.email }}" title="Email">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                        {% endif %}
+                        {% if intervenant.linkedin %}
+                        <a href="{{ intervenant.linkedin }}" target="_blank" title="LinkedIn">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        {% endif %}
+                        {% if intervenant.twitter %}
+                        <a href="{{ intervenant.twitter }}" target="_blank" title="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        {% endif %}
+                        {% if intervenant.website %}
+                        <a href="{{ intervenant.website }}" target="_blank" title="Site web">
+                            <i class="fas fa-globe"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Call to Action -->
+    {% if not is_past_event %}
+    <div class="event-cta">
+        <h3 class="mb-3">Rejoignez-nous pour cet événement</h3>
+        <p class="mb-4">Ne manquez pas cette opportunité unique d'échanger et d'apprendre</p>
+        {% if event.is_webinar and event.webinar_link %}
+        <a href="{{ event.webinar_link }}" target="_blank" class="btn btn-light btn-lg">
+            <i class="fas fa-video me-2"></i>Rejoindre le webinaire
+        </a>
+        {% elif not event.is_webinar %}
+        <div class="d-flex gap-2 justify-content-center flex-wrap">
+            {% if event.lieu_gps %}
+            <a href="{{ event.lieu_gps }}" target="_blank" class="btn btn-light btn-lg">
+                <i class="fas fa-directions me-2"></i>Itinéraire
+            </a>
+            {% endif %}
+            
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <!-- Événements similaires -->
+    {% if similar_events %}
+    <div class="similar-events mt-5 pt-5 border-top">
+        <h2 class="text-center mb-4">Événements similaires</h2>
+        <div class="row">
+            {% for similar in similar_events %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 event-card">
+                    <div class="event-image-container" style="height: 200px;">
+                        {% if similar.image %}
+                        <img src="{{ similar.image.url }}" class="event-image" alt="{{ similar.title }}">
+                        {% else %}
+                        <div class="d-flex align-items-center justify-content-center h-100 bg-light text-muted">
+                            <i class="fas fa-calendar-alt fa-2x opacity-25"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <span class="badge event-type-badge mb-2">{{ similar.get_event_type_display }}</span>
+                        <h5 class="card-title">{{ similar.title }}</h5>
+                        <p class="card-text text-muted small">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            {{ similar.date|date:"d M Y" }}
+                        </p>
+                        <p class="card-text small">{{ similar.content|striptags|truncatewords:15 }}</p>
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        <a href="{% url 'public_event_detail' similar.pk %}" class="btn btn-outline-primary w-100">
+                            Découvrir
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

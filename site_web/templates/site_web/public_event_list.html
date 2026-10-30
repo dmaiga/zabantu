@@ -1,0 +1,188 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Événements - Zabantu{% endblock %}
+
+{% block banner_title %}Nos Événements{% endblock %}
+{% block banner_subtitle %}Retrouvez tous nos séminaires et rencontres à venir{% endblock %}
+
+{% block content %}
+<style>
+    .event-card {
+        transition: transform 0.3s;
+        border-left: 4px solid var(--zabantu-secondary);
+        height: 100%;
+    }
+    .event-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+    .past-event {
+        opacity: 0.9;
+        background-color: #f8f9fa;
+        border-left: 4px solid #6c757d;
+    }
+    .event-date-badge {
+        background-color: var(--zabantu-primary);
+        color: white;
+        font-size: 0.8rem;
+    }
+    .event-type-badge {
+        background-color: var(--zabantu-secondary);
+        color: white;
+        font-size: 0.8rem;
+    }
+    .event-image-container {
+        height: 200px;
+        overflow: hidden;
+    }
+    .event-image {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<div class="container">
+    <!-- Événements à venir -->
+    <section class="mb-5">
+        <h2 class="section-title mb-4">Événements à venir</h2>
+        
+        {% if upcoming_events %}
+        <div class="row">
+            {% for event in upcoming_events %}
+            <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                <div class="card h-100 event-card">
+                    <div class="event-image-container">
+                        {% if event.image %}
+                        <img src="{{ event.image.url }}" class="event-image" alt="{{ event.title }}">
+                        {% else %}
+                        <div class="d-flex align-items-center justify-content-center h-100 bg-light text-muted">
+                            <i class="fas fa-calendar-alt fa-3x opacity-25"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge event-date-badge">
+                                {{ event.date|date:"d M Y" }} à {{ event.date|time:"H:i" }}
+                            </span>
+                            <span class="badge event-type-badge">{{ event.get_event_type_display }}</span>
+                        </div>
+                        <h5 class="card-title">{{ event.title }}</h5>
+<p class="card-text text-muted small">
+    
+    <!-- 🔵 En ligne -->
+    {% if event.is_webinar %}
+        <span>
+            <i class="fas fa-video me-1 text-primary"></i>
+            En ligne
+        </span>
+    {% endif %}
+
+    <!-- Séparateur si les deux existent -->
+    {% if event.is_webinar and event.location %}
+        &nbsp;&bull;&nbsp;
+    {% endif %}
+
+    <!-- 📍 Présentiel -->
+    {% if event.location %}
+        <span>
+            <i class="fas fa-map-marker-alt me-1 text-danger"></i>
+            {{ event.location }}
+        </span>
+    {% elif not event.is_webinar %}
+        <span>
+            <i class="fas fa-map-marker-alt me-1"></i>
+            Lieu à confirmer
+        </span>
+    {% endif %}
+
+</p>
+                        <p class="card-text small">{{ event.content|striptags|truncatewords:20 }}</p>
+                    </div>
+                    <div class="card-footer bg-white border-0 pt-0">
+                        <a href="{% url 'public_event_detail' event.pk %}" class="btn btn-primary w-100">
+                            <i class="fas fa-info-circle me-1"></i>Plus d'informations
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-plus fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">Aucun événement à venir</h4>
+            <p class="text-muted">Revenez bientôt pour découvrir nos prochains événements.</p>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Événements passés -->
+    <section class="mb-5">
+        <h2 class="section-title mb-4">Événements passés</h2>
+        
+        {% if past_events %}
+        <div class="row">
+            {% for event in past_events %}
+            <div class="col-lg-6 mb-3">
+                <div class="card past-event h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-secondary">
+                                {{ event.date|date:"d M Y" }}
+                            </span>
+                            <span class="badge bg-light text-dark">{{ event.get_event_type_display }}</span>
+                        </div>
+                        <h5 class="card-title">{{ event.title }}</h5>
+<p class="card-text text-muted small">
+    
+    <!-- 🔵 En ligne -->
+    {% if event.is_webinar %}
+        <span>
+            <i class="fas fa-video me-1 text-primary"></i>
+            En ligne
+        </span>
+    {% endif %}
+
+    <!-- Séparateur si les deux existent -->
+    {% if event.is_webinar and event.location %}
+        &nbsp;&bull;&nbsp;
+    {% endif %}
+
+    <!-- 📍 Présentiel -->
+    {% if event.location %}
+        <span>
+            <i class="fas fa-map-marker-alt me-1 text-danger"></i>
+            {{ event.location }}
+        </span>
+    {% elif not event.is_webinar %}
+        <span>
+            <i class="fas fa-map-marker-alt me-1"></i>
+            Lieu à confirmer
+        </span>
+    {% endif %}
+
+</p>
+
+                        
+                        <p class="card-text small">{{ event.content|striptags|truncatewords:15 }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <a href="{% url 'public_event_detail' event.pk %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye me-1"></i>Voir le compte-rendu
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-history fa-2x text-muted mb-2"></i>
+            <p class="text-muted">Aucun événement passé à afficher pour le moment.</p>
+        </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

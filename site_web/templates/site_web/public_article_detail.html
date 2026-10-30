@@ -1,0 +1,214 @@
+{% extends 'base_public.html' %}
+
+{% block title %}{{ article.title }} | Zabantu{% endblock %}
+{% block banner_title %}Groupe de recherche Zabantu {% endblock %}
+{% block banner_subtitle %}{% endblock %}
+{% block content %}
+<style>
+    /* Conservation de tes styles originaux */
+    .article-detail { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+    .article-grid { display: flex; flex-direction: column; gap: 2rem; }
+    .article-main { order: 2; }
+    .article-sidebar { order: 1; display: flex; flex-direction: column; gap: 1.5rem; }
+    .article-header { margin-bottom: 1.5rem; }
+    .article-title { color: var(--zabantu-primary-dark); font-size: 1.8rem; line-height: 1.3; margin-bottom: 0.8rem; font-weight: 700; }
+    .article-subtitle { color: var(--zabantu-gray); font-size: 1.1rem; margin-bottom: 1.2rem; font-weight: 400; }
+    .article-meta { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1.5rem; color: var(--zabantu-gray); }
+    .article-category { background-color: var(--zabantu-primary-light); color: var(--zabantu-primary-dark); padding: 0.3rem 0.8rem; border-radius: 4px; font-weight: 500; font-size: 0.9rem; }
+    .article-date { display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; }
+    .article-content { line-height: 1.7; font-size: 1rem; color: var(--zabantu-dark); }
+    .article-content p { margin-bottom: 1.2rem; }
+    .article-content img { max-width: 100%; height: auto; border-radius: 6px; margin: 1.2rem auto; display: block; }
+    .article-content h2, .article-content h3 { color: var(--zabantu-primary); margin: 1.5rem 0 0.8rem; font-size: 1.3rem; }
+    .article-cover-container { width: 100%; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 1.2rem; }
+    .article-cover { width: 100%; height: auto; max-height: 250px; object-fit: cover; display: block; }
+    .metadata-card { background: #f8f9fa; border-radius: 10px; padding: 1.2rem; border: 1px solid #e9ecef; }
+    .metadata-title { font-weight: 600; color: var(--zabantu-primary-dark); margin-bottom: 0.8rem; border-bottom: 2px solid var(--zabantu-primary-light); padding-bottom: 0.4rem; font-size: 1.1rem; }
+    .metadata-grid { display: grid; gap: 0.8rem; }
+    .metadata-item { display: flex; flex-direction: column; gap: 0.2rem; }
+    .metadata-label { font-weight: 500; color: var(--zabantu-gray); font-size: 0.85rem; }
+    .metadata-value { color: var(--zabantu-dark); font-weight: 500; font-size: 0.95rem; }
+    .authors-section { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--zabantu-light); }
+    .authors-title { font-weight: 600; color: var(--zabantu-primary-dark); margin-bottom: 1.2rem; border-bottom: 2px solid var(--zabantu-primary-light); padding-bottom: 0.4rem; font-size: 1.3rem; }
+    .authors-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+    .author-card { display: flex; align-items: center; gap: 0.8rem; padding: 0.8rem; background: #f8f9fa; border-radius: 8px; transition: transform 0.2s ease; }
+    .author-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .author-avatar { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1rem; flex-shrink: 0; }
+    .author-info { flex: 1; }
+    .author-name { font-weight: 600; color: var(--zabantu-primary-dark); margin-bottom: 0.2rem; font-size: 1rem; }
+    .author-role { color: var(--zabantu-gray); font-size: 0.85rem; }
+    .external-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--zabantu-primary); text-decoration: none; margin-top: 0.4rem; font-weight: 500; font-size: 0.9rem; }
+    .external-link:hover { text-decoration: underline; }
+    .back-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--zabantu-primary); text-decoration: none; font-weight: 500; transition: all 0.2s; padding: 0.6rem 1.2rem; border: 2px solid var(--zabantu-primary-light); border-radius: 8px; margin-top: 1.5rem; font-size: 0.95rem; }
+    
+    @media (min-width: 768px) { .article-title { font-size: 2rem; } .authors-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .article-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 2.5rem; align-items: start; } .article-main { order: 1; } .article-sidebar { order: 2; } }
+</style>
+
+<div class="article-detail">
+    <header class="article-header">
+        <h1 class="article-title">{{ article.title }}</h1>
+        {% if article.subtitle %}<div class="article-subtitle">{{ article.subtitle }}</div>{% endif %}
+        
+        <div class="article-meta">
+            <span class="article-category">{{ article.get_article_type_display }}</span>
+            <span class="article-date">
+                <i class="fas fa-calendar-alt me-1"></i>
+                {% if article.article_type == 'academic' and article.publication_year %}
+                    {{ article.publication_year }}
+                {% elif article.article_type == 'working' and article.working_year %}
+                    {{ article.working_year }}
+                {% else %}
+                    {{ article.publish_at|default:article.created_at|date:"d F Y" }}
+                {% endif %}
+            </span>
+        </div>
+    </header>
+
+    <div class="article-grid">
+        <div class="article-main">
+            <div class="article-content">
+                {# Gestion unifiée des résumés selon ton modèle #}
+                {% if article.article_type == 'academic' and article.abstract %}
+                    <h3>Résumé</h3>
+                    {{ article.abstract|safe }}
+                {% elif article.resume %}
+                    <h3>Résumé</h3>
+                    {{ article.resume|safe }}
+                {% endif %}
+                
+                {% if article.content %}
+                    <div class="mt-4">{{ article.content|safe }}</div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="article-sidebar">
+            {# Utilisation de l'image de couverture appropriée #}
+            {% if article.article_type == 'independent' and article.independent_cover %}
+                <div class="article-cover-container">
+                    <img src="{{ article.independent_cover.url }}" class="article-cover" alt="{{ article.title }}">
+                </div>
+            {% elif article.cover_image %}
+                <div class="article-cover-container">
+                    <img src="{{ article.cover_image.url }}" class="article-cover" alt="{{ article.title }}">
+                </div>
+            {% endif %}
+            
+            <div class="metadata-card">
+                <h3 class="metadata-title">Informations</h3>
+                <div class="metadata-grid">
+                    <div class="metadata-item">
+                        <span class="metadata-label">Type</span>
+                        <span class="metadata-value">{{ article.get_article_type_display }}</span>
+                    </div>
+
+                    {# Champs spécifiques Working Papers #}
+                    {% if article.article_type == 'working' %}
+                        {% if article.institution %}
+                        <div class="metadata-item">
+                            <span class="metadata-label">Institution</span>
+                            <span class="metadata-value">{{ article.institution }}</span>
+                        </div>
+                        {% endif %}
+                        {% if article.working_series %}
+                        <div class="metadata-item">
+                            <span class="metadata-label">Série / Numéro</span>
+                            <span class="metadata-value">{{ article.working_series }} {% if article.working_number %}#{{ article.working_number }}{% endif %}</span>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {# Champs spécifiques Académiques #}
+                    {% if article.article_type == 'academic' %}
+                        {% if article.journal %}<div class="metadata-item"><span class="metadata-label">Revue</span><span class="metadata-value">{{ article.journal }}</span></div>{% endif %}
+                        {% if article.publisher %}<div class="metadata-item"><span class="metadata-label">Éditeur</span><span class="metadata-value">{{ article.publisher }}</span></div>{% endif %}
+                    {% endif %}
+
+                    {# Liens Externes #}
+                    {% with ext_link=article.external_link|default:article.external_link_academique %}
+                    {% if ext_link %}
+                    <div class="metadata-item">
+                        <span class="metadata-label">Lien externe</span>
+                        <a href="{{ ext_link }}" target="_blank" class="external-link metadata-value">
+                            <i class="fas fa-external-link-alt"></i> Consulter l'article
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                    
+                    {% if article.pdf_file %}
+                    <div class="metadata-item">
+                        <span class="metadata-label">Document</span>
+                        <a href="{{ article.pdf_file.url }}" target="_blank" class="external-link">
+                            <i class="fas fa-file-pdf"></i> Télécharger le PDF
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+ 
+{% with display_authors=article.get_display_authors %}
+
+{% if display_authors or article.external_author %}
+<div class="authors-section">
+    <h3 class="authors-title">Auteur(s)</h3>
+    <div class="authors-grid">
+        
+        {% for author in display_authors %}
+            {% if author.type == 'zabantu' %}
+            <a href="{{ author.url }}" class="author-card" style="text-decoration: none; color: inherit;">
+                <div class="author-avatar">
+                    {% if author.user.profile_picture %}
+                    <img src="{{ author.user.profile_picture.url }}" alt="{{ author.name }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                    {% else %}
+                    {{ author.name|slice:":2"|upper }}
+                    {% endif %}
+                </div>
+                <div class="author-info">
+                    <div class="author-name">{{ author.name }}</div>
+                    <div class="author-role">Membre Zabantu</div>
+                </div>
+            </a>
+            {% else %}
+            <div class="author-card">
+                <div class="author-avatar">{{ author.name|slice:":2"|upper }}</div>
+                <div class="author-info">
+                    <div class="author-name">{{ author.name }}</div>
+                    <div class="author-role">
+                        {% if author.type == 'academic' %}Collaborateur Académique{% else %}Auteur externe{% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+
+
+       
+{% if article.external_author %}
+<div class="author-card">
+    <div class="author-avatar">
+        {{ article.external_author|slice:":2"|upper }}
+    </div>
+    <div class="author-info">
+        <div class="author-name">{{ article.external_author }}</div>
+        <div class="author-role">Auteur externe</div>
+    </div>
+</div>
+{% endif %}
+
+    </div>
+</div>
+{% endif %}
+{% endwith %}
+    
+    <div class="text-center mt-4">
+        <a href="{% url 'public_article_list' %}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Retour aux publications
+        </a>
+    </div>
+</div>
+{% endblock %}

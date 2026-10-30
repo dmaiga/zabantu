@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages de Contact | Zabantu Backoffice{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">
+            <i class="fas fa-comments me-2"></i>
+            Messages de Contact
+        </h4>
+        <div>
+            <span class="badge bg-primary me-2">{{ total_count }} messages</span>
+            {% if unread_count > 0 %}
+            <span class="badge bg-danger">{{ unread_count }} non lus</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- Filtres -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="btn-group" role="group">
+                    <a href="?status=all" class="btn btn-outline-primary {% if not request.GET.status or request.GET.status == 'all' %}active{% endif %}">
+                        Tous
+                    </a>
+                    <a href="?status=unread" class="btn btn-outline-danger {% if request.GET.status == 'unread' %}active{% endif %}">
+                        Non lus
+                    </a>
+                    <a href="?status=read" class="btn btn-outline-success {% if request.GET.status == 'read' %}active{% endif %}">
+                        Lus
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                  <a class="nav-link" href="{% url 'sent_messages_list' %}">
+        <i class="fas fa-paper-plane"></i> Messages envoyés
+    </a>
+            </div>
+        </div>
+
+        {% if contact_messages %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Sujet</th>
+                            <th>Date</th>
+                            <th>Statut</th>
+                            <th>Réponse</th>
+                            <th>Actions</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for message in contact_messages %}
+                        <tr class="{% if not message.is_read %}table-warning{% endif %}">
+                            <td>{{ message.name }}</td>
+                            <td>{{ message.email }}</td>
+                            <td>{{ message.subject|truncatewords:5 }}</td>
+                            <td>{{ message.created_at|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if message.is_read %}
+                                <span class="badge bg-success">Lu</span>
+                                {% else %}
+                                <span class="badge bg-danger">Non lu</span>
+                                {% endif %}
+                            </td>
+                            <td>
+    {% if message.replied %}
+        <span class="badge bg-success">Répondu</span>
+        <small class="d-block">{{ message.replied_at|date:"d/m/Y" }}</small>
+    {% else %}
+        <span class="badge bg-warning">En attente</span>
+    {% endif %}
+</td>
+                            <td>
+                                <a href="{% url 'contact_message_detail' message.pk %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'contact_message_delete' message.pk %}" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if contact_messages.has_other_pages %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if contact_messages.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ contact_messages.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Précédent</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in contact_messages.paginator.page_range %}
+                    <li class="page-item {% if contact_messages.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+                    
+                    {% if contact_messages.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ contact_messages.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Suivant</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Aucun message de contact pour le moment.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

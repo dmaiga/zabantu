@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mt-4">Campagnes de newsletter</h1>
+        <a href="{% url 'newsletter_campaign_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Nouvelle campagne
+        </a>
+    </div>
+
+   
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <i class="fas fa-envelope me-1"></i>
+            Liste des campagnes
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Titre</th>
+                            <th>Sujet</th>
+                            <th>Statut</th>
+                            <th>Destinataires</th>
+                            <th>Créée le</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for campaign in campaigns %}
+                        <tr>
+                            <td>{{ campaign.title }}</td>
+                            <td>{{ campaign.subject }}</td>
+                            <td>
+                                <span class="badge bg-{% if campaign.status == 'draft' %}secondary{% elif campaign.status == 'sent' %}success{% elif campaign.status == 'sending' %}warning{% elif campaign.status == 'scheduled' %}info{% else %}danger{% endif %}">
+                                    {{ campaign.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ campaign.get_recipients_count }}</td>
+                            <td>{{ campaign.created_at|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'newsletter_campaign_preview' campaign.pk %}" class="btn btn-info" target="_blank" title="Prévisualiser">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    {% if campaign.status == 'draft' %}
+                                    <a href="{% url 'newsletter_campaign_edit' campaign.pk %}" class="btn btn-primary" title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'newsletter_campaign_send' campaign.pk %}" class="btn btn-success" title="Envoyer" onclick="return confirm('Êtes-vous sûr de vouloir envoyer cette campagne ?')">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </a>
+                                    {% endif %}
+                                    <form action="{% url 'newsletter_campaign_delete' campaign.pk %}" method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette campagne ?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4">Aucune campagne de newsletter pour le moment.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

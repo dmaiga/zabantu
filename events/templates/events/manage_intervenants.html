@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+
+    <h3 class="mb-4">
+        Gérer les intervenants — {{ event.title }}
+    </h3>
+
+    <!-- 🔹 Form ajout -->
+    <div class="card mb-4">
+        <div class="card-header">Ajouter un intervenant</div>
+        <div class="card-body">
+
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+
+                <button type="submit" class="btn btn-primary">
+                    Ajouter
+                </button>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- 🔹 Liste -->
+    <div class="card">
+        <div class="card-header">Liste des intervenants</div>
+        <div class="card-body">
+
+            {% if event_intervenants %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Rôle</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ei in event_intervenants %}
+                        <tr>
+                            <td>{{ ei.intervenant.full_name }}</td>
+                            <td>{{ ei.get_role_display }}</td>
+                            <td>
+                                <a href="{% url 'remove_event_intervenant' ei.id %}"
+                                   class="btn btn-sm btn-danger">
+                                    Supprimer
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-muted">Aucun intervenant</p>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <a href="{% url 'event_detail' event.id %}" class="btn btn-secondary mt-3">
+        ← Retour à l'événement
+    </a>
+
+</div>
+{% endblock %}

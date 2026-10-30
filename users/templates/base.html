@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}Zabantu | Admin{% endblock %}</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Palette Zabantu originale */
+            --zabantu-primary: #6f826a;
+            --zabantu-secondary: #bf9264;
+            --zabantu-accent: #bbd8a3;
+            --zabantu-light: #f0f1c5;
+            --zabantu-dark: #2c3e2c;
+            
+            /* Variables Layout */
+            --sidebar-width: 260px;
+            --sidebar-bg: var(--zabantu-dark);
+            --sidebar-color: rgba(255, 255, 255, 0.8);
+            --sidebar-active-bg: var(--zabantu-primary);
+            --main-bg: #fdfdfb;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--main-bg);
+            color: var(--zabantu-dark);
+            overflow-x: hidden;
+        }
+
+        .wrapper { 
+            display: flex; 
+            width: 100%;
+            align-items: stretch; 
+        }
+
+        /* --- SIDEBAR FIXE ET SCROLLABLE --- */
+        #sidebar {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            color: var(--sidebar-color);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Reste fixe à gauche même sur les longues pages */
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1030;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: var(--zabantu-accent);
+            letter-spacing: 2px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            flex-shrink: 0; /* Garder le header fixe */
+        }
+
+        /* Défilement interne si trop d'éléments de menu */
+        .sidebar-scroll {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px 0;
+        }
+
+        #sidebar ul li a {
+            padding: 12px 25px;
+            display: block;
+            color: var(--sidebar-color);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        #sidebar ul li a:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+        }
+
+        #sidebar ul li.active > a {
+            color: #ffffff;
+            background: var(--sidebar-active-bg);
+            border-left: 4px solid var(--zabantu-secondary);
+        }
+
+        #sidebar ul li a i { 
+            margin-right: 12px; 
+            width: 20px; 
+            text-align: center;
+            color: var(--zabantu-accent); 
+        }
+        
+        #sidebar ul li.active a i { color: #ffffff; }
+
+        hr.sidebar-divider { 
+            border-top: 1px solid rgba(255,255,255,0.1); 
+            margin: 10px 20px; 
+            opacity: 1; 
+        }
+
+        /* --- ZONE DE CONTENU AJUSTÉE AU SIDEBAR FIXE --- */
+        #content {
+            width: 100%;
+            min-height: 100vh;
+            background-color: var(--main-bg);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding-left: var(--sidebar-width); /* Repousse le contenu à droite du sidebar fixe */
+        }
+
+        .navbar-custom {
+            background: #ffffff;
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1020; /* Reste au dessus du contenu lors du scroll */
+        }
+
+        .content-padding { padding: 40px; }
+
+        /* --- MÉCANISME DE COLLAPSE (Drawer et Réduction) --- */
+        
+        /* En mode ordinateur : on le cache pour l'ouvrir/fermer */
+        @media (min-width: 992px) {
+            .wrapper.collapsed #sidebar {
+                margin-left: calc(-1 * var(--sidebar-width));
+            }
+            .wrapper.collapsed #content {
+                padding-left: 0;
+            }
+        }
+
+        /* En mode mobile/tablette : le sidebar devient un Drawer volant */
+        @media (max-width: 991.98px) {
+            #sidebar {
+                margin-left: calc(-1 * var(--sidebar-width));
+            }
+            #content {
+                padding-left: 0; /* Le contenu prend 100% de base */
+            }
+            
+            /* Quand on l'active (Drawer ouvert sur mobile) */
+            .wrapper.collapsed #sidebar {
+                margin-left: 0;
+            }
+            
+            /* Overlay d'arrière-plan pour fermer le drawer sur mobile */
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.4);
+                z-index: 1025;
+                backdrop-filter: blur(2px);
+            }
+            .wrapper.collapsed .sidebar-overlay {
+                display: block;
+            }
+        }
+
+        /* Personnalisation Bootstrap Globale */
+        .btn-primary { background-color: var(--zabantu-primary); border-color: var(--zabantu-primary); }
+        .btn-primary:hover { background-color: var(--zabantu-dark); border-color: var(--zabantu-dark); }
+        .card { border-radius: 12px; border: 1px solid var(--border-color); }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper" id="appWrapper">
+        <div class="sidebar-overlay" id="overlay"></div>
+
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                ZABANTU
+            </div>
+
+            <div class="sidebar-scroll">
+                <ul class="list-unstyled components">
+                    <li class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                        <a href="{% url 'dashboard' %}"><i class="fas fa-chart-pie"></i> Dashboard</a>
+                    </li>
+                    <hr class="sidebar-divider">
+                    
+                    {# Correction des URL dynamiques pour matcher /articles/ #}
+                    <li class="{% if request.resolver_match.url_name == 'article_list' or 'articles/article/' in request.path %}active{% endif %}">
+                        <a href="{% url 'article_list' %}"><i class="fas fa-file-alt"></i> Publications</a>
+                    </li>
+                    <li class="{% if 'articles/guelekan' in request.path %}active{% endif %}">
+                        <a href="{% url 'guelekan_list' %}"><i class="fas fa-book"></i> Gelekan</a>
+                    </li>
+                    <li class="{% if 'events' in request.path %}active{% endif %}">
+                        <a href="{% url 'event_list' %}"><i class="fas fa-calendar-day"></i> Événements</a>
+                    </li>
+
+                    <hr class="sidebar-divider">
+                   
+                    <li><a href="{% url 'user_list' %}"><i class="fas fa-users"></i> Membres</a></li>
+                    <li><a href="{% url 'partenaire_list' %}"><i class="fas fa-handshake"></i> Paternaires</a></li>
+                                          
+
+                    <li>
+                        <a href="{% url 'intervenant_list' %}">
+                            <i class="fas fa-chalkboard-teacher"></i> Intervenants
+                        </a>
+                    </li>
+                    <li class="{% if 'galleries' in request.path %}active{% endif %}">
+                        <a href="{% url 'gallery_list' %}"><i class="fas fa-images"></i> Galeries</a>
+                    </li>
+                    <hr class="sidebar-divider">
+                    
+                    {% if user.role == 'admin' or user.role == 'moderateur' %}
+                    <li class="{% if 'adhesions' in request.path %}active{% endif %}">
+                        <a href="{% url 'membership_application_list' %}">
+                            <i class="fas fa-user-check"></i> Adhésions
+                            {% if pending_applications_count %}<span class="badge bg-danger ms-1">{{ pending_applications_count }}</span>{% endif %}
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li><a href="{% url 'contact_message_list' %}"><i class="fas fa-comments"></i> Messages</a></li>
+                    
+                    <li>
+                        <a href="{% url 'newsletter_list' %}">
+                            <i class="fas fa-envelope"></i> Newsletter
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'home' %}" target="_blank" style="color: var(--zabantu-secondary);">
+                            <i class="fas fa-globe" style="color: var(--zabantu-secondary);"></i> Voir le Site
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div id="content">
+            <nav class="navbar-custom d-flex justify-content-between align-items-center">
+                <button type="button" id="sidebarCollapse" class="btn btn-light border btn-sm">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <div class="dropdown">
+                    <a href="#" class="text-decoration-none text-dark dropdown-toggle" data-bs-toggle="dropdown">
+                     
+                        <strong style="color: var(--zabantu-primary);">{{ user.get_short_name }}</strong>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-3">
+                        <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user-circle me-2"></i> Profil</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i> Déconnexion</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="content-padding">
+                {% include 'partials/messages.html' %}
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        $(document).ready(function () {
+            // Action sur le bouton Menu Hamburger
+            $('#sidebarCollapse').on('click', function () {
+                $('#appWrapper').toggleClass('collapsed');
+            });
+
+            // Cliquer sur le voile d'arrière-plan ferme la sidebar en mobile
+            $('#overlay').on('click', function () {
+                $('#appWrapper').removeClass('collapsed');
+            });
+        });
+    </script>
+</body>
+</html>

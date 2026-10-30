@@ -1,0 +1,22 @@
+{% extends 'base_public.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-zabantu-dark text-white text-center">
+                    <h4>Désabonnement confirmé</h4>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-envelope-open-text fa-3x text-zabantu-secondary"></i>
+                    </div>
+                    <p>Vous avez été désabonné de notre newsletter avec succès.</p>
+                    <p>Nous sommes désolés de vous voir partir.</p>
+                    <a href="{% url 'home' %}" class="btn btn-zabantu-primary">Retour à l'accueil</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mt-4">Tableau de bord</h1>
+        <div class="d-flex align-items-center">
+            <span class="me-2">Dernière connexion:</span>
+            <span class="text-muted">{{ user.last_login|date:"d/m/Y à H:i" }}</span>
+        </div>
+    </div>
+
+    {% if user.role == 'admin' or user.role == 'moderateur' %}
+    <!-- Adhésions -->
+    {% if pending_applications_count %}
+    <div class="alert alert-warning d-flex justify-content-between align-items-center">
+        <div><i class="fas fa-bell me-2"></i><strong>{{ pending_applications_count }}</strong> demande{{ pending_applications_count|pluralize }} d'adhésion en attente de validation.</div>
+        <a href="{% url 'membership_application_list' %}?status=pending" class="btn btn-sm btn-warning">Examiner</a>
+    </div>
+    {% endif %}
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <div><i class="fas fa-user-check me-1"></i> Dernières demandes d'adhésion</div>
+            <span class="badge bg-light text-dark">{{ approved_applications_count }} membre{{ approved_applications_count|pluralize }} validé{{ approved_applications_count|pluralize }}</span>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover mb-3">
+                <thead><tr><th>Nom</th><th>Institution</th><th>Reçue le</th><th>Statut</th></tr></thead>
+                <tbody>
+                    {% for a in latest_applications %}
+                    <tr>
+                        <td><a href="{% url 'membership_application_detail' a.pk %}">{{ a.full_name }}</a></td>
+                        <td>{{ a.institution }}</td>
+                        <td>{{ a.created_at|date:"d/m/Y" }}</td>
+                        <td>{{ a.get_status_display }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center">Aucune demande pour le moment</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="d-grid"><a href="{% url 'membership_application_list' %}" class="btn btn-outline-dark">Voir toutes les demandes</a></div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Cartes de statistiques -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Publication</h5>
+                        <h2 class="card-text">{{ article_count }}</h2>
+                    </div>
+                    <i class="fas fa-newspaper fa-2x"></i>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="{% url 'article_list' %}">Voir détails</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning text-white mb-4">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Guelekan</h5>
+                        <h2 class="card-text">{{ gelekan_count }}</h2>
+                    </div>
+                    <i class="fas fa-book fa-2x"></i>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="{% url 'guelekan_list' %}">Voir détails</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Galerie</h5>
+                        <h2 class="card-text">{{ gallery_count }}</h2>
+                    </div>
+                    <i class="fas fa-images fa-2x"></i>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="{% url 'gallery_list' %}">Voir détails</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-danger text-white mb-4">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Événements</h5>
+                        <h2 class="card-text">{{ event_count }}</h2>
+                    </div>
+                    <i class="fas fa-calendar-alt fa-2x"></i>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="{% url 'event_list' %}">Voir détails</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Derniers abonnés newsletter -->
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-envelope me-1"></i>
+                        Derniers abonnés à la newsletter
+                    </div>
+                    <span class="badge bg-light text-dark">{{ newsletter_count }} abonnés</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Date d'inscription</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for subscriber in latest_subscribers %}
+                                <tr>
+                                    <td>{{ subscriber.email }}</td>
+                                    <td>{{ subscriber.subscribed_at|date:"d/m/Y" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2" class="text-center">Aucun abonné pour le moment</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-grid">
+                        <a href="{% url 'newsletter_list' %}" class="btn btn-outline-info">Voir tous les abonnés</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Derniers messages de contact -->
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-comments me-1"></i>
+                        Derniers messages de contact
+                    </div>
+                    <span class="badge bg-light text-dark">{{ contact_messages_count }} messages</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Sujet</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for message in latest_messages %}
+                                <tr>
+                                    <td>{{ message.name }}</td>
+                                    <td>{{ message.subject|truncatewords:4 }}</td>
+                                    <td>
+                                        {% if message.is_read %}
+                                        <span class="badge bg-success">Lu</span>
+                                        {% else %}
+                                        <span class="badge bg-warning">Non lu</span>
+                                        {% endif %}
+                                        {% if message.replied %}
+                                        <span class="badge bg-info">Répondu</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">Aucun message pour le moment</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-grid">
+                        <a href="{% url 'contact_message_list' %}" class="btn btn-outline-primary">Voir tous les messages</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau de statistiques détaillées -->
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <i class="fas fa-chart-bar me-1"></i>
+            Statistiques détaillées
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="text-center mb-3">Types de contenu</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Nombre</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Publication</td>
+                                    <td>{{ article_count }}</td>
+                                    <td>
+                                        <a href="{% url 'article_list' %}" class="btn btn-sm btn-outline-primary me-1">Lister</a>
+                                        <a href="{% url 'article_create' %}" class="btn btn-sm btn-primary">Créer</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Guelekan</td>
+                                    <td>{{ gelekan_count }}</td>
+                                    <td>
+                                        <a href="{% url 'guelekan_list' %}" class="btn btn-sm btn-outline-primary me-1">Lister</a>
+                                        <a href="{% url 'guelekan_create' %}" class="btn btn-sm btn-primary">Créer</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Galeries</td>
+                                    <td>{{ gallery_count }}</td>
+                                    <td>
+                                        <a href="{% url 'gallery_list' %}" class="btn btn-sm btn-outline-primary me-1">Lister</a>
+                                        <a href="{% url 'gallery_create' %}" class="btn btn-sm btn-primary">Créer</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Photos</td>
+                                    <td>{{ photo_count }}</td>
+                                    <td>
+                                        <a href="{% url 'gallery_list' %}" class="btn btn-sm btn-outline-primary me-1">Lister</a>
+                                        <a href="{% url 'gallery_create' %}"  class="btn btn-sm btn-primary">Créer</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="text-center mb-3">Événements et intervenants</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Nombre</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Événements</td>
+                                    <td>{{ event_count }}</td>
+                                    <td>
+                                        <a href="{% url 'event_list' %}" class="btn btn-sm btn-outline-success me-1">Lister</a>
+                                        <a href="{% url 'event_create' %}" class="btn btn-sm btn-success">Créer</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Intervenants</td>
+                                    <td>{{ intervenant_count }}</td>
+                                    <td>
+                                        <a href="{% url 'intervenant_list' %}" class="btn btn-sm btn-outline-success me-1">Lister</a>
+                                        <a href="{% url 'intervenant_create' %}" class="btn btn-sm btn-success">Créer</a>
+                                    </td>
+                                </tr>
+                                {% if user.role == "admin" or user.role == "moderateur" %}
+                                <tr>
+                                    <td>Membres</td>
+                                    <td>{{ member_count }}</td>
+                                    <td>
+                                        <a href="{% url 'user_list' %}" class="btn btn-sm btn-outline-info me-1">Lister</a>
+                                        <a href="{% url 'create_member' %}" class="btn btn-sm btn-info">Créer</a>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+        border-top-left-radius: 10px !important;
+        border-top-right-radius: 10px !important;
+        font-weight: 600;
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #6e707e;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+</style>
+{% endblock %}

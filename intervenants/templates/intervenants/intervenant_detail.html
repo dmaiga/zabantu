@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ intervenant.full_name }} - Zabantu{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'intervenant_list' %}">Intervenants</a></li>
+            <li class="breadcrumb-item active">{{ intervenant.full_name }}</li>
+        </ol>
+    </nav>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 text-center">
+                    {% if intervenant.photo %}
+                    <img src="{{ intervenant.photo.url }}" class="rounded-circle img-fluid mb-3" alt="{{ intervenant.full_name }}" style="max-width: 200px;">
+                    {% else %}
+                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 200px; height: 200px;">
+                        <span class="text-white fw-bold display-6">{{ intervenant.first_name|first }}{{ intervenant.last_name|first }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <span class="badge bg-info fs-6">{{ intervenant.get_intervenant_type_display }}</span>
+                        <span class="badge bg-{% if intervenant.is_available %}success{% else %}secondary{% endif %} fs-6">
+                            {% if intervenant.is_available %}Disponible{% else %}Indisponible{% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'intervenant_update' intervenant.id %}" class="btn btn-outline-primary">
+                            Modifier
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-md-9">
+                    <h1 class="card-title">{{ intervenant.full_name }}</h1>
+                    <p class="text-muted fs-5">{{ intervenant.position }} chez {{ intervenant.organization }}</p>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p><strong>Email:</strong> {{ intervenant.email|default:"Non renseigné" }}</p>
+                            <p><strong>Téléphone:</strong> {{ intervenant.phone|default:"Non renseigné" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            {% if intervenant.linkedin %}
+                            <p><strong>LinkedIn:</strong> <a href="{{ intervenant.linkedin }}" target="_blank">{{ intervenant.linkedin }}</a></p>
+                            {% endif %}
+                            {% if intervenant.twitter %}
+                            <p><strong>Twitter:</strong> <a href="{{ intervenant.twitter }}" target="_blank">{{ intervenant.twitter }}</a></p>
+                            {% endif %}
+                            {% if intervenant.website %}
+                            <p><strong>Site web:</strong> <a href="{{ intervenant.website }}" target="_blank">{{ intervenant.website }}</a></p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <h4>Biographie</h4>
+                    <p class="card-text">{{ intervenant.bio|linebreaks }}</p>
+                    
+                    {% if intervenant.expertise %}
+                    <h4>Domaines d'expertise</h4>
+                    <p class="card-text">{{ intervenant.expertise }}</p>
+                    {% endif %}
+                    
+                    {% if participations %}
+                    <h4>Événements participés</h4>
+                    <div class="list-group">
+                        {% for participation in participations %}
+                        <a href="{% url 'event_detail' participation.event.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ participation.event.title }}</h6>
+                                <small>{{ participation.event.date|date:"d/m/Y" }}</small>
+                            </div>
+                            <p class="mb-1">Rôle: {{ participation.get_role_display }}</p>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    {% if intervenant.note_internal %}
+                    <div class="mt-4">
+                        <h5>Notes internes</h5>
+                        <div class="card bg-light">
+                            <div class="card-body text-black">
+                                {{ intervenant.note_internal|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

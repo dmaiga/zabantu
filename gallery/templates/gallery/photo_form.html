@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter des photos{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h4 mb-0">
+                        <i class="fas fa-camera me-2"></i>
+                        Ajouter des photos
+                    </h2>
+                </div>
+                <div class="card-body">
+                    {% include 'includes/messages.html' %}
+
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Champ Titre -->
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">
+                                {{ form.title.label }}
+                                {% if not form.title.field.required %}
+                                <span class="text-muted">(optionnel)</span>
+                                {% endif %}
+                            </label>
+                            {{ form.title }}
+                            {% if form.title.help_text %}
+                            <div class="form-text">{{ form.title.help_text }}</div>
+                            {% endif %}
+                            {% for error in form.title.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Champ Images (multiple) - STYLE HARMONISÉ -->
+                        <div class="mb-4">
+                            <label for="{{ form.images.id_for_label }}" class="form-label">
+                                {{ form.images.label }} *
+                            </label>
+                            <div class="custom-file-input">
+                                {{ form.images }}
+                            </div>
+                            {% if form.images.help_text %}
+                            <div class="form-text">{{ form.images.help_text }}</div>
+                            {% endif %}
+                            {% for error in form.images.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Champ Galerie -->
+                        <div class="mb-3">
+                            <label for="{{ form.gallery.id_for_label }}" class="form-label">
+                                {{ form.gallery.label }}
+                            </label>
+                            {{ form.gallery }}
+                            {% if form.gallery.help_text %}
+                            <div class="form-text">{{ form.gallery.help_text }}</div>
+                            {% endif %}
+                            {% for error in form.gallery.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Champ Standalone -->
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                {{ form.is_standalone }}
+                                <label class="form-check-label" for="{{ form.is_standalone.id_for_label }}">
+                                    {{ form.is_standalone.label }}
+                                </label>
+                            </div>
+                            {% if form.is_standalone.help_text %}
+                            <div class="form-text">{{ form.is_standalone.help_text }}</div>
+                            {% endif %}
+                            {% for error in form.is_standalone.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Messages d'information -->
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Astuce :</strong> Maintenez la touche <kbd>Ctrl</kbd> (Windows) ou <kbd>Cmd</kbd> (Mac) pour sélectionner plusieurs fichiers.
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            {% if form.initial.gallery %}
+                            <a href="{% url 'gallery_detail' slug=form.initial.gallery %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Retour à la galerie
+                            </a>
+                            {% else %}
+                            <a href="{% url 'photo_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Retour aux photos
+                            </a>
+                            {% endif %}
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload me-1"></i> Uploader les photos
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Style harmonisé pour le champ fichier multiple */
+    .custom-file-input input[type="file"] {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+        background-color: #ffffff;
+        color: #212529;
+        font-size: 1rem;
+        line-height: 1.5;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    .custom-file-input input[type="file"]:focus {
+        border-color: #86b7fe;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .custom-file-input input[type="file"]:hover {
+        border-color: #86b7fe;
+    }
+    
+    .custom-file-input input[type="file"]::file-selector-button {
+        padding: 0.375rem 0.75rem;
+        margin-right: 0.75rem;
+        border: 1px solid #0d6efd;
+        border-radius: 0.375rem;
+        background-color: #0d6efd;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+        font-weight: 500;
+    }
+    
+    .custom-file-input input[type="file"]::file-selector-button:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+    }
+    
+    /* Styles pour les autres éléments du formulaire */
+    .form-control {
+        background-color: #ffffff;
+        border: 1px solid #ced4da;
+        color: #212529;
+    }
+    
+    .form-control:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .form-select {
+        background-color: #ffffff;
+        border: 1px solid #ced4da;
+        color: #212529;
+    }
+    
+    .form-select:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .form-check-input {
+        margin-top: 0.25rem;
+    }
+    
+    .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    
+    .form-check-input:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    kbd {
+        background-color: #6c757d;
+        color: white;
+        padding: 0.15rem 0.3rem;
+        border-radius: 0.2rem;
+        font-size: 0.875em;
+    }
+    
+    .btn-primary {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+    }
+    
+    .btn-outline-secondary {
+        color: #6c757d;
+        border-color: #6c757d;
+    }
+    
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: white;
+    }
+    
+    .alert-info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+    }
+</style>
+
+<script>
+    // Script pour améliorer l'expérience utilisateur
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.querySelector('input[type="file"]');
+        const gallerySelect = document.getElementById('{{ form.gallery.id_for_label }}');
+        const standaloneCheckbox = document.getElementById('{{ form.is_standalone.id_for_label }}');
+        
+        // Désactiver la galerie si standalone est coché
+        function toggleGalleryField() {
+            gallerySelect.disabled = standaloneCheckbox.checked;
+            if (standaloneCheckbox.checked) {
+                gallerySelect.value = '';
+            }
+        }
+        
+        standaloneCheckbox.addEventListener('change', toggleGalleryField);
+        toggleGalleryField(); // Initial state
+        
+        // Afficher le nombre de fichiers sélectionnés
+        fileInput.addEventListener('change', function() {
+            const fileCount = this.files.length;
+            const helpText = this.nextElementSibling;
+            
+            if (fileCount > 0) {
+                const fileText = fileCount === 1 ? 'fichier sélectionné' : 'fichiers sélectionnés';
+                helpText.textContent = `${fileCount} ${fileText}`;
+            }
+        });
+        
+        // Ajouter une classe pour styliser le champ file
+        fileInput.classList.add('form-control');
+    });
+</script>
+{% endblock %}

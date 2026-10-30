@@ -1,0 +1,176 @@
+{% extends 'base_public.html' %}
+{% load static %}  
+
+{% block title %}Membres - Zabantu{% endblock %}
+
+{% block banner_title %}Nos Membres{% endblock %}
+{% block banner_subtitle %}Découvrez les membres du  Groupe de recheche Zabantu{% endblock %}
+
+{% block content %}
+<style>
+    .member-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    .member-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    .img-container {
+        height: 250px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+        position: relative;
+    }
+    .member-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+    .member-card:hover .member-photo {
+        transform: scale(1.05);
+    }
+    .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 1.25rem;
+    }
+    .card-text {
+        flex: 1;
+    }
+    .social-icon {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: var(--zabantu-primary);
+        color: white;
+        margin-right: 8px;
+        transition: all 0.3s ease;
+    }
+    .social-icon:hover {
+        background-color: var(--zabantu-secondary);
+        transform: scale(1.1);
+    }
+    .btn-view-profile {
+        transition: all 0.3s ease;
+    }
+    .btn-view-profile:hover {
+        transform: translateY(-2px);
+    }
+    
+    /* Style pour les images portrait vs paysage */
+    .img-container.portrait .member-photo {
+        width: auto;
+        height: 100%;
+    }
+    .img-container.landscape .member-photo {
+        width: 100%;
+        height: auto;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row">
+        {% for member in members %}
+        <div class="col-md-6 col-lg-4 mb-4 d-flex align-items-stretch">
+            <div class="card member-card w-100">
+                <div class="img-container">
+                    <img src="{% if member.profile_picture %}{{ member.profile_picture.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" 
+                         alt="{{ member.get_full_name }}" 
+                         class="member-photo"
+                         onload="checkImageOrientation(this)">
+                </div>
+                
+                <div class="card-body">
+                    <h5 class="card-title">{{ member.first_name }} {{ member.last_name }}</h5>
+                    
+                    {% if member.department %}
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        {{ member.department }}
+                    </h6>
+                    {% endif %}
+                    
+                    {% if member.bio %}
+                    <p class="card-text">{{ member.bio|safe|truncatewords:20 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div class="card-footer bg-white pt-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'public_member_detail' member.pk %}" class="btn btn-outline-primary btn-sm btn-view-profile">
+                            Voir le profil
+                        </a>
+                        
+                      <div class="social-links">
+    {% if member.social_linkedin %}
+    <a href="{{ member.social_linkedin }}" target="_blank" class="social-icon" title="LinkedIn">
+        <i class="fab fa-linkedin-in"></i>
+    </a>
+    {% endif %}
+    {% if member.social_twitter %}
+    <a href="{{ member.social_twitter }}" target="_blank" class="social-icon" title="Twitter">
+        <i class="fab fa-twitter"></i>
+    </a>
+    {% endif %}
+    {% if member.social_facebook %}
+    <a href="{{ member.social_facebook }}" target="_blank" class="social-icon" title="Facebook">
+        <i class="fab fa-facebook-f"></i>
+    </a>
+    {% endif %}
+    {% if member.scholar_link %}
+    <a href="{{ member.scholar_link }}" target="_blank" class="social-icon" title="Google Scholar">
+        <i class="fas fa-graduation-cap"></i>
+    </a>
+    {% endif %}
+    {% if member.personal_website %}
+    <a href="{{ member.personal_website }}" target="_blank" class="social-icon" title="Site web personnel">
+        <i class="fas fa-globe"></i>
+    </a>
+    {% endif %}
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <p class="lead">Aucun membre à afficher pour le moment.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function checkImageOrientation(img) {
+        const container = img.parentElement;
+        if (img.naturalWidth > img.naturalHeight) {
+            container.classList.add('landscape');
+        } else {
+            container.classList.add('portrait');
+        }
+    }
+    
+    // Alternative si les images sont déjà chargées
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.member-photo').forEach(img => {
+            if (img.complete) {
+                checkImageOrientation(img);
+            }
+        });
+    });
+</script>
+{% endblock %}

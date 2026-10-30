@@ -1,0 +1,531 @@
+{% extends 'base_public.html' %}
+
+{% block title %}
+    {% if current_filter %}
+        {{ current_filter|title }} - Zabantu
+    {% else %}
+        Publications - Zabantu
+    {% endif %}
+{% endblock %}
+
+{% block banner_title %}
+    {% if current_filter %}
+        {{ current_filter|title }}
+    {% else %}
+        Toutes nos publications
+    {% endif %}
+{% endblock %}
+
+{% block banner_subtitle %}
+    Découvrez les travaux du Groupe de recherche Zabantu
+{% endblock %}
+
+{% block content %}
+<style>
+    .publication-container {
+        display: flex;
+        gap: 3rem;
+        margin-top: 2rem;
+    }
+    .filter-sidebar {
+        width: 280px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 20px;
+        align-self: flex-start;
+        height: fit-content;
+    }
+    .articles-list {
+        flex: 1;
+    }
+    .filter-title {
+        font-weight: 600;
+        color: var(--zabantu-primary);
+        margin-bottom: 1.5rem;
+        font-size: 1.25rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--zabantu-light);
+    }
+    .filter-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .filter-item {
+        margin-bottom: 0.5rem;
+    }
+    .filter-link {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1.25rem;
+        color: var(--zabantu-dark);
+        text-decoration: none;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        background-color: rgba(255, 255, 255, 0.8);
+    }
+    .filter-link:hover {
+        background-color: var(--zabantu-light);
+        color: var(--zabantu-primary);
+    }
+    .filter-link.active {
+        background-color: var(--zabantu-primary-light);
+        color: var(--zabantu-primary-dark);
+        font-weight: 600;
+        border-left: 4px solid var(--zabantu-primary);
+    }
+    .badge-count {
+        background-color: var(--zabantu-secondary-light);
+        color: var(--zabantu-secondary-dark);
+        border-radius: 12px;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    .badge-type {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+    .badge-type-zabantu {
+        background-color: var(--zabantu-primary-light);
+        color: var(--zabantu-primary-dark);
+    }
+    .badge-type-academic {
+        background-color: #6c757d;
+        color: white;
+    }
+    .badge-type-independent {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    .article-card {
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 1.5rem;
+        align-items: start;
+        margin-bottom: 1.5rem;
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .article-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    /* La couverture est affichée en entier (contain), sans rognage ni voile sombre */
+    .article-image {
+        align-self: stretch;
+        aspect-ratio: 3 / 4;
+        max-height: 300px;
+        width: 100%;
+        background-color: #f4f5ef;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+    .article-content {
+        padding: 1.25rem 1.5rem 1.25rem 0;
+    }
+    .article-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1.25;
+        margin-bottom: 0.4rem;
+        color: var(--zabantu-primary-dark);
+    }
+    .article-title a {
+        text-decoration: none;
+        color: inherit;
+        transition: color 0.2s;
+    }
+    .article-title a:hover {
+        color: var(--zabantu-secondary);
+    }
+    .article-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.4rem;
+        flex-wrap: wrap;
+    }
+    .article-category {
+        background-color: var(--zabantu-primary-light);
+        color: var(--zabantu-primary-dark);
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    .article-date {
+        color: var(--zabantu-gray);
+        font-size: 0.9rem;
+    }
+    .article-authors {
+        margin-bottom: 0.25rem;
+        color: var(--zabantu-dark);
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    .article-excerpt {
+        color: var(--zabantu-dark);
+        line-height: 1.5;
+        margin-top: 0.5rem;
+        margin-bottom: 0.9rem;
+    }
+    .article-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        margin-bottom: 0;
+        font-size: 0.9rem;
+        color: var(--zabantu-gray);
+    }
+    .article-journal, .article-publisher, .article-year {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .article-journal::before {
+        content: "📰";
+    }
+    .article-publisher::before {
+        content: "🏢";
+    }
+    .article-year::before {
+        content: "📅";
+    }
+    .read-more {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background-color: var(--zabantu-primary);
+        color: white;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    .read-more:hover {
+        background-color: var(--zabantu-primary-dark);
+    }
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .empty-state-icon {
+        font-size: 3rem;
+        color: var(--zabantu-light);
+        margin-bottom: 1rem;
+    }
+    .empty-state-title {
+        color: var(--zabantu-primary);
+        margin-bottom: 0.5rem;
+    }
+    .empty-state-text {
+        color: var(--zabantu-gray);
+        margin-bottom: 1.5rem;
+    }
+/* --- Mobile First Design --- */
+.filter-sidebar {
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.filter-title {
+    font-weight: 600;
+    color: var(--zabantu-primary);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    border-bottom: 2px solid var(--zabantu-light);
+    padding-bottom: 0.5rem;
+}
+
+/* Sur Mobile : On transforme la liste en barre horizontale scrollable */
+.filter-list {
+    display: flex;
+    overflow-x: auto; /* Scroll horizontal */
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+    list-style: none;
+    margin: 0;
+    -webkit-overflow-scrolling: touch; /* Scroll fluide sur iOS */
+}
+
+/* Masquer la barre de défilement pour un look plus propre */
+.filter-list::-webkit-scrollbar {
+    display: none;
+}
+
+.filter-item {
+    flex: 0 0 auto; /* Empêche les items de rétrécir */
+}
+
+.filter-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: white;
+    border: 1px solid #eee;
+    border-radius: 25px; /* Look "pilule" sur mobile */
+    text-decoration: none;
+    color: var(--zabantu-dark);
+    font-size: 0.9rem;
+    white-space: nowrap; /* Empêche le texte de revenir à la ligne */
+    transition: all 0.2s ease;
+}
+
+.filter-link.active {
+    background-color: var(--zabantu-primary);
+    color: white !important;
+    border-color: var(--zabantu-primary);
+}
+
+.badge-count {
+    background-color: rgba(0,0,0,0.1);
+    padding: 0.1rem 0.5rem;
+    border-radius: 10px;
+    font-size: 0.75rem;
+}
+
+.filter-link.active .badge-count {
+    background-color: rgba(255,255,255,0.2);
+}
+
+/* --- Desktop Design (992px et plus) --- */
+@media (min-width: 992px) {
+    .filter-sidebar {
+        width: 280px;
+        position: sticky;
+        top: 20px;
+    }
+
+    .filter-list {
+        flex-direction: column; /* Retour en liste verticale */
+        overflow-x: visible;
+        gap: 0.5rem;
+    }
+
+    .filter-link {
+        border-radius: 8px; /* Look plus carré sur desktop */
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    .filter-link.active {
+        border-left: 4px solid var(--zabantu-secondary); /* Accentuation sur le côté */
+    }
+}
+    @media (max-width: 992px) {
+        .article-card {
+            grid-template-columns: 160px 1fr;
+        }
+    }
+    @media (max-width: 768px) {
+        .publication-container {
+            flex-direction: column;
+        }
+        .filter-sidebar {
+            width: 100%;
+            position: static;
+            margin-bottom: 2rem;
+        }
+        .article-card {
+            grid-template-columns: 1fr;
+        }
+        .article-image {
+            aspect-ratio: 16 / 10;
+            max-height: 220px;
+        }
+        .article-content {
+            padding: 0 1.25rem 1.25rem;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="publication-container">
+        <!-- Sidebar des filtres -->
+        <div class="filter-sidebar">
+            <h3 class="filter-title">Catégories</h3>
+            <ul class="filter-list">
+                <li class="filter-item">
+                    <a href="{% url 'public_article_list' %}" 
+                       class="filter-link {% if not current_filter %}active{% endif %}">
+                        Toutes les publications
+                        <span class="badge-count">{{ total_count }}</span>
+                    </a>
+                </li>
+                <li class="filter-item">
+                    <a href="{% url 'public_guelekan_list' %}" 
+                       class="filter-link {% if current_filter == 'public_guelekan_list' %}active{% endif %}">
+                        Séminaire Gɛlɛkan
+                        <span class="badge-count">{{ guelekan_count }}</span>
+                    </a>
+                </li>
+
+                {% for key, label, count in category_data %}
+                    <li class="filter-item">
+                        <a href="{% url 'public_article_list' %}?type={{ key }}" 
+                           class="filter-link {% if current_filter == key %}active{% endif %}">
+                            {{ label }}
+                            <span class="badge-count">{{ count }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Liste des articles -->
+        <div class="articles-list">
+            {% if articles %}
+                {% for article in articles %}
+                <div class="article-card">
+                    <!-- Gestion des images de couverture selon le type d'article -->
+                    {% if article.article_type == 'independent' and article.independent_cover %}
+                    <div class="article-image" style="background-image: url('{{ article.independent_cover.url }}')"></div>
+                    {% elif article.cover_image %}
+                    <div class="article-image" style="background-image: url('{{ article.cover_image.url }}')"></div>
+                    {% else %}
+                    <div class="article-image" style="background-color: var(--zabantu-light); display: flex; align-items: center; justify-content: center;">
+                        <svg width="50%" height="50%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity: 0.3;">
+                            <path d="M4 16L8.586 11.414C8.961 11.039 9.47 10.828 10 10.828C10.53 10.828 11.039 11.039 11.414 11.414L16 16M14 14L15.586 12.414C15.961 12.039 16.47 11.828 17 11.828C17.53 11.828 18.039 12.039 18.414 12.414L20 14M14 8H14.01M6 20H18C19.105 20 20 19.105 20 18V6C20 4.895 19.105 4 18 4H6C4.895 4 4 4.895 4 6V18C4 19.105 4.895 20 6 20Z" stroke="var(--zabantu-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="article-content">
+                        <h3 class="article-title">
+                            <a href="{% url 'public_article_detail' article.slug %}">
+                                {{ article.title|safe }}
+                            </a>
+                        </h3>
+                        
+                        <div class="article-meta">
+                            {% if article.category %}
+                                <span class="article-category">
+                                    {{ article.get_category_display }}
+                                </span>
+                            {% endif %}
+
+                            <!-- Badge type d'article -->
+                            {% if article.article_type == 'academic' %}
+                                <span class="badge-type badge-type-academic">Académique</span>
+                            {% elif article.article_type == 'zabantu' %}
+                                <span class="badge-type badge-type-zabantu">Zabantu</span>
+                            {% elif article.article_type == 'independent' %}
+                                <span class="badge-type badge-type-independent">Indépendant</span>
+                            {% endif %}
+
+                            <span class="article-date">{{ article.created_at|date:"d F Y" }}</span>
+                        </div>
+<!-- Affichage des auteurs selon le type d'article -->
+<div class="article-authors">
+    {% if article.article_type == 'academic' %}
+        <!-- D'abord les auteurs Zabantu/Guelekan -->
+        {% if article.authors.all %}
+            Par {% for author in article.authors.all %}
+                {{ author.get_full_name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+            {% if article.academic_authors %}, {% endif %}
+        {% endif %}
+
+        <!-- Ensuite les auteurs académiques externes -->
+        {% if article.academic_authors %}
+            {{ article.academic_authors }}
+        {% endif %}
+
+    {% elif article.article_type == 'independent' and article.external_author %}
+        Par {{ article.external_author }}
+
+    {% elif article.authors.all %}
+        Par {% for author in article.authors.all %}
+            {{ author.get_full_name }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+    {% endif %}
+</div>
+
+                        <!-- Détails supplémentaires pour les articles académiques -->
+{% if article.article_type == 'academic' %}
+<div class="article-details">
+    <div class="d-flex flex-wrap gap-3 align-items-center">
+        {% if article.journal %}
+        <span class="d-flex align-items-center text-muted">
+            <i class="fas fa-book me-2"></i>
+            <strong>Revue :</strong> {{ article.journal }}
+        </span>
+        {% endif %}
+        
+        {% if article.publisher %}
+        <span class="d-flex align-items-center text-muted">
+            <i class="fas fa-building me-2"></i>
+            <strong>Éditeur :</strong> {{ article.publisher }}
+        </span>
+        {% endif %}
+        
+        {% if article.publication_year %}
+        <span class="d-flex align-items-center text-muted">
+            <i class="fas fa-calendar-alt me-2"></i>
+            <strong>Année :</strong> {{ article.publication_year }}
+        </span>
+        {% endif %}
+        
+        {% if article.external_link_academique %}
+        <span class="d-flex align-items-center">
+            <i class="fas fa-external-link-alt me-2 text-primary"></i>
+            <a href="{{ article.external_link_academique }}" target="_blank" class="text-decoration-none">
+                <strong>Lire l'article</strong>
+            </a>
+        </span>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+
+                        <!-- Extrait ou résumé -->
+                        <p class="article-excerpt">
+                            {% if article.article_type == 'academic' and article.abstract %}
+                                {{ article.abstract|safe|truncatewords:15 }}
+                            {% elif article.resume %}
+                                {{ article.resume|safe|truncatewords:20 }}
+                            {% else %}
+                                {{ article.content|safe|striptags|truncatewords:20 }}
+                            {% endif %}
+                        </p>
+                        
+                        <a href="{% url 'public_article_detail' article.slug %}" class="read-more">
+                            Lire la suite
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <h3 class="empty-state-title">Aucun article trouvé</h3>
+                    <p class="empty-state-text">
+                        {% if search_query %}
+                            Aucun résultat pour "{{ search_query }}". Essayez avec d'autres termes.
+                        {% else %}
+                            Aucune publication disponible dans cette catégorie pour le moment.
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'public_article_list' %}" class="read-more">
+                        Voir toutes les publications
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

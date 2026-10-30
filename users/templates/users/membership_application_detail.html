@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ application.full_name }} | Adhésion{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="fas fa-user-check me-2"></i>{{ application.full_name }}</h4>
+        {% if application.status == 'pending' %}<span class="badge bg-warning text-dark fs-6">En attente</span>
+        {% elif application.status == 'approved' %}<span class="badge bg-success fs-6">Validée</span>
+        {% elif application.status == 'rejected' %}<span class="badge bg-secondary fs-6">Refusée</span>
+        {% else %}<span class="badge bg-danger fs-6">Révoquée</span>{% endif %}
+    </div>
+    <div class="card-body">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <h6 class="text-muted text-uppercase">Informations personnelles</h6>
+                <dl class="row">
+                    <dt class="col-sm-4">E-mail</dt><dd class="col-sm-8"><a href="mailto:{{ application.email }}">{{ application.email }}</a></dd>
+                    <dt class="col-sm-4">Téléphone</dt><dd class="col-sm-8">{{ application.phone|default:"—" }}</dd>
+                    <dt class="col-sm-4">Résidence</dt><dd class="col-sm-8">{{ application.city_country }}</dd>
+                </dl>
+                <h6 class="text-muted text-uppercase">Profil</h6>
+                <dl class="row">
+                    <dt class="col-sm-4">Statut</dt><dd class="col-sm-8">{{ application.get_academic_status_display }}</dd>
+                    <dt class="col-sm-4">Institution</dt><dd class="col-sm-8">{{ application.institution }}</dd>
+                    <dt class="col-sm-4">Centres de recherche</dt><dd class="col-sm-8">{{ application.research_interests|linebreaksbr }}</dd>
+                </dl>
+                <h6 class="text-muted text-uppercase">Profil public (repris sur la page membre à la validation)</h6>
+                <div class="d-flex gap-3 mb-3">
+                    {% if application.profile_picture %}<img src="{{ application.profile_picture.url }}" alt="Photo" style="width:96px;height:96px;object-fit:cover;border-radius:50%;">{% endif %}
+                    <dl class="row flex-grow-1 mb-0">
+                        <dt class="col-sm-4">Biographie</dt><dd class="col-sm-8">{{ application.bio|linebreaksbr|default:"—" }}</dd>
+                        <dt class="col-sm-4">LinkedIn</dt><dd class="col-sm-8">{% if application.social_linkedin %}<a href="{{ application.social_linkedin }}" target="_blank" rel="noopener noreferrer">{{ application.social_linkedin }}</a>{% else %}—{% endif %}</dd>
+                        <dt class="col-sm-4">Facebook</dt><dd class="col-sm-8">{% if application.social_facebook %}<a href="{{ application.social_facebook }}" target="_blank" rel="noopener noreferrer">{{ application.social_facebook }}</a>{% else %}—{% endif %}</dd>
+                        <dt class="col-sm-4">Twitter / X</dt><dd class="col-sm-8">{% if application.social_twitter %}<a href="{{ application.social_twitter }}" target="_blank" rel="noopener noreferrer">{{ application.social_twitter }}</a>{% else %}—{% endif %}</dd>
+                        <dt class="col-sm-4">Instagram</dt><dd class="col-sm-8">{% if application.social_instagram %}<a href="{{ application.social_instagram }}" target="_blank" rel="noopener noreferrer">{{ application.social_instagram }}</a>{% else %}—{% endif %}</dd>
+                        <dt class="col-sm-4">Google Scholar</dt><dd class="col-sm-8">{% if application.scholar_link %}<a href="{{ application.scholar_link }}" target="_blank" rel="noopener noreferrer">{{ application.scholar_link }}</a>{% else %}—{% endif %}</dd>
+                        <dt class="col-sm-4">Site personnel</dt><dd class="col-sm-8">{% if application.personal_website %}<a href="{{ application.personal_website }}" target="_blank" rel="noopener noreferrer">{{ application.personal_website }}</a>{% else %}—{% endif %}</dd>
+                    </dl>
+                </div>
+                <h6 class="text-muted text-uppercase">Adhésion</h6>
+                <dl class="row">
+                    <dt class="col-sm-4">Connaissance de Zabantu</dt><dd class="col-sm-8">{% for item in application.how_heard_display %}{{ item }}{% if not forloop.last %}<br>{% endif %}{% empty %}—{% endfor %}</dd>
+                    <dt class="col-sm-4">Contribution</dt><dd class="col-sm-8">{{ application.contribution|linebreaksbr }}</dd>
+                    <dt class="col-sm-4">Apport pour la carrière</dt><dd class="col-sm-8">{{ application.career_benefit|linebreaksbr }}</dd>
+                    <dt class="col-sm-4">Consentement</dt><dd class="col-sm-8">{% if application.consent %}Donné{% else %}Non donné{% endif %}</dd>
+                </dl>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="border rounded p-3 mb-3">
+                    <h6 class="text-muted text-uppercase">Suivi</h6>
+                    <p class="mb-1"><small>Reçue le {{ application.created_at|date:"d/m/Y H:i" }}</small></p>
+                    {% if application.reviewed_at %}<p class="mb-1"><small>Traitée le {{ application.reviewed_at|date:"d/m/Y H:i" }}{% if application.reviewed_by %} par {{ application.reviewed_by.get_full_name|default:application.reviewed_by.username }}{% endif %}</small></p>{% endif %}
+                    {% if application.revoked_at %}
+                        <p class="mb-1"><small>Révoquée le {{ application.revoked_at|date:"d/m/Y H:i" }}{% if application.revoked_by %} par {{ application.revoked_by.get_full_name|default:application.revoked_by.username }}{% endif %}</small></p>
+                        {% if application.revocation_reason %}<p class="mb-0"><small>Motif : {{ application.revocation_reason }}</small></p>{% endif %}
+                    {% endif %}
+                </div>
+
+                <div class="d-grid gap-2">
+                    {% if application.status == 'pending' or application.status == 'rejected' or application.status == 'revoked' %}
+                    <form method="post" action="{% url 'membership_application_action' application.pk 'approve' %}">{% csrf_token %}
+                        <button class="btn btn-success w-100" type="submit"><i class="fas fa-check me-1"></i> Valider l'adhésion</button>
+                    </form>
+                    {% endif %}
+                    {% if application.status == 'pending' %}
+                    <form method="post" action="{% url 'membership_application_action' application.pk 'reject' %}" onsubmit="return confirm('Refuser cette demande ?');">{% csrf_token %}
+                        <button class="btn btn-outline-secondary w-100" type="submit"><i class="fas fa-times me-1"></i> Refuser</button>
+                    </form>
+                    {% endif %}
+                    {% if application.status == 'approved' %}
+                    <form method="post" action="{% url 'membership_application_action' application.pk 'revoke' %}" onsubmit="return confirm('Révoquer cette adhésion ?');">{% csrf_token %}
+                        <textarea name="reason" class="form-control mb-2" rows="2" placeholder="Motif de révocation (facultatif)"></textarea>
+                        <button class="btn btn-danger w-100" type="submit"><i class="fas fa-ban me-1"></i> Révoquer l'adhésion</button>
+                    </form>
+                    {% endif %}
+                    {% if application.status != 'pending' %}
+                    <form method="post" action="{% url 'membership_application_action' application.pk 'reset' %}">{% csrf_token %}
+                        <button class="btn btn-link w-100" type="submit">Remettre en attente</button>
+                    </form>
+                    {% endif %}
+                    <a href="{% url 'membership_application_list' %}" class="btn btn-secondary">Retour à la liste</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

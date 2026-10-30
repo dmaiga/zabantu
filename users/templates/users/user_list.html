@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Liste des utilisateurs</h2>
+   <a href="{% url 'create_member' %}" class="btn btn-success">
+              <i class="fas fa-plus me-1"></i> Créer
+            </a>
+
+
+  </a>          
+  <table class="table table-bordered table-striped mt-3">
+    <thead class="table-light">
+      <tr>
+        <th>Nom complet</th>
+        <th>Tel</th>
+        <th>Email</th>
+        <th>Rôle</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.nom }} {{ user.prenom }}</td>
+        <td>{{ user.phone_number }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.get_role_display }}</td>
+        <td>
+        <div class="btn-group btn-group-sm">
+            <a href="{% url 'user_detail' user.id %}" class="btn btn-outline-info" title="Voir">
+                <i class="fas fa-eye"></i>
+            </a>
+            <a href="{% url 'update_user' user.id %}" class="btn btn-outline-primary" title="Modifier">
+                <i class="fas fa-edit"></i>
+            </a>
+            {% if user.role != 'admin' or request.user.role == 'admin' %}
+            <a href="{% url 'user_delete' user.id %}" class="btn btn-outline-danger" title="Supprimer">
+                <i class="fas fa-trash"></i>
+            </a>
+            {% endif %}
+        </div>
+    </td>
+</tr>
+      {% empty %}
+      <tr>
+        <td colspan="5">Aucun utilisateur trouvé.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

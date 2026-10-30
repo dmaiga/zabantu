@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Supprimer "{{ photo.title|default:'cette photo' }}" | {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="h5 mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmer la suppression
+                    </h2>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <img src="{{ photo.image.url }}" 
+                             alt="{{ photo.title|default:'Photo à supprimer' }}" 
+                             class="img-fluid rounded" 
+                             style="max-height: 300px;">
+                    </div>
+                    
+                    <h3 class="h4 mb-3">
+                        Supprimer "{{ photo.title|default:'cette photo' }}" ?
+                    </h3>
+                    
+                    <div class="alert alert-danger text-start">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Attention :</strong> Cette action est irréversible.
+                        {% if photo.gallery %}
+                        La photo sera retirée de la galerie "{{ photo.gallery.title }}".
+                        {% endif %}
+                    </div>
+                    
+                    <form method="POST" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'photo_detail' photo.pk %}" 
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Confirmer la suppression
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

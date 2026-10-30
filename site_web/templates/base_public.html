@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Zabantu - Analyses et Séminaires{% endblock %}</title>
+    <meta name="description" content="Blog Zabantu - un groupe de chercheurs en sciences sociales travaillant sur le développement économique et social.">
+  <!-- Favicon -->
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+    :root {
+      --zabantu-primary: #6f826a;
+      --zabantu-secondary: #bf9264;
+      --zabantu-accent: #bbd8a3;
+      --zabantu-light: #f0f1c5;
+      --zabantu-dark: #2c3e2c;
+    }
+
+    body { font-family: 'Georgia', serif; background-color: #f8f9fa; color: #333; }
+    .zabantu-header { background-color: var(--zabantu-dark); border-bottom: 3px solid var(--zabantu-secondary); }
+    .navbar-brand img { height: 70px; transition: 0.3s; }
+    .nav-link { color: white !important; font-weight: 700; border-radius: 5px; }
+    .nav-link:hover { background-color: rgba(255, 255, 255, 0.1); }
+
+    /* --- NOUVEAUX STYLES RECHERCHE RETRACTABLE --- */
+    .search-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+        transition: all 0.4s ease;
+    }
+    .search-input {
+        width: 0;
+        padding: 0;
+        border: none;
+        outline: none;
+        background: none;
+        color: white;
+        transition: all 0.4s ease;
+        line-height: 40px;
+        background-color: rgba(255,255,255,0.1);
+        border-radius: 20px;
+    }
+    .search-box.active .search-input {
+        width: 200px;
+        padding: 0 15px;
+        margin-right: 10px;
+    }
+    .search-btn {
+        color: white;
+        background: var(--zabantu-secondary);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        border: none;
+    }
+
+    /* Bouton Login/Admin */
+    .admin-link {
+        font-size: 0.9rem;
+        color: var(--zabantu-accent) !important;
+        text-decoration: none;
+        margin-left: 15px;
+        border: 1px solid var(--zabantu-accent);
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: 0.3s;
+    }
+    .admin-link:hover {
+        background: var(--zabantu-accent);
+        color: var(--zabantu-dark) !important;
+    }
+
+    /* Footer & Banner standard... */
+    .zabantu-banner { background: linear-gradient(135deg, var(--zabantu-primary), var(--zabantu-dark)); padding: 1rem 0; color: white; text-align: center; }
+    .zabantu-footer { background-color: var(--zabantu-dark); color: white; margin-top: 3rem; text-align: center; }
+  /* 🔥 LIENS FOOTER */
+.zabantu-footer a {
+    color: #ffffff;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+/* 🔥 HOVER */
+.zabantu-footer a:hover {
+    color: var(--zabantu-accent);
+}
+.zabantu-footer a:hover {
+    text-decoration: underline;
+}
+/* 🔥 NAVIGATION */
+.footer-navigation li {
+    margin-bottom: 6px;
+}
+
+.zabantu-footer a {
+    color: #ffffff;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.zabantu-footer a:hover {
+    color: var(--zabantu-accent);
+}
+
+/* 🔥 SOCIAL */
+.footer-social {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.footer-social a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+}
+
+/* ICON STYLE */
+.footer-social i {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+}
+
+/* HOVER */
+.footer-social a:hover i {
+    background: var(--zabantu-secondary);
+}
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <!-- Header/Navbar -->
+  <header class="zabantu-header">
+    <div class="container">
+      <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+          <!-- Logo à gauche -->
+          <a class="navbar-brand" href="{% url 'home' %}">
+            <img src="/static/site_web/images/zabantu_logo.jpg" alt="Zabantu Logo" class="logo">
+          
+          </a>
+
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="mainNav">
+            <!-- Liens de navigation au centre -->
+            <ul class="navbar-nav mx-auto mb-2 mb-lg-0 text-center">
+                 <li class="nav-item">
+                <a class="nav-link" href="{%url 'about' %}">A propos</a>
+              </li>
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+        Publications
+    </a>
+
+    <ul class="dropdown-menu text-center">
+        <li>
+            <a class="dropdown-item fw-semibold" href="{% url 'public_article_list' %}">
+                Toutes les publications
+            </a>
+        </li>
+        
+        <li><hr class="dropdown-divider"></li>
+
+        <!-- Editorial -->
+        <li class="dropdown-header">Editorial</li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=zabantu">Zabantu</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=article">Articles</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=analyse">Analyses</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=policy">Policy Briefs</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=rapport">Rapports</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=ouvrage">Ouvrages</a></li>
+
+        <li><hr class="dropdown-divider"></li>
+
+        <!-- Scientifique -->
+        <li class="dropdown-header">Scientifique</li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=academic">Publications académiques</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=working">Working Papers</a></li>
+
+        <li><hr class="dropdown-divider"></li>
+
+        <!-- Externe -->
+        <li class="dropdown-header">Externe</li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=independent">Publications indépendantes</a></li>
+
+    
+
+        <!-- Tous -->
+        
+
+    </ul>
+</li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'public_event_list' %}">Events</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'public_guelekan_list' %}">Gɛlɛkan</a>
+              </li>
+               <li class="nav-item">
+                <a class="nav-link" href="{% url 'public_member_list' %}">Membres</a>
+              </li>
+           
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'liste_galeries' %}">Galerie</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'membership_apply' %}">Adhésion</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{%url 'contact' %}">Contact</a>
+              </li>
+            </ul>
+
+            <!-- Barre de recherche à droite -->
+             <div class="d-flex align-items-center">
+              <form class="search-box" id="searchBox" action="{% url 'public_article_list' %}" method="get">
+                <input type="text" name="q" class="search-input" placeholder="Rechercher...">
+                <button type="button" class="search-btn" onclick="toggleSearch()">
+                  <i class="fas fa-search"></i>
+                </button>
+              </form>
+
+              
+                <a href="{% url 'login' %}" class="admin-link">
+                  <i class="fas fa-sign-in-alt"></i> Connexion
+                </a>
+               
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Banner -->
+  <section class="zabantu-banner text-white">
+    <div class="container">
+      <h1>{% block banner_title %} Bienvenue au groupe de recherche Zabantu {% endblock %}</h1>
+      <p class="lead">{% block banner_subtitle %}Economy | Conflict | State {% endblock %}</p>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="container my-5">
+    {% block content %}{% endblock %}
+  </main>
+
+<footer class="zabantu-footer text-white py-5">
+  <div class="container">
+    <div class="row gy-4">
+
+      <!-- COL 1 -->
+      <div class="col-md-4">
+        <h5 class="mb-3">Zabantu</h5>
+        <p class="small text-light">
+          Vers une recherche ancrée dans les dynamiques économiques et sociales.
+        </p>
+      </div>
+
+      <!-- COL 2 -->
+      <div class="col-md-4">
+        <h5 class="mb-3">Navigation</h5>
+        <ul class="list-unstyled footer-navigation">
+          <li><a href="{% url 'home' %}">Accueil</a></li>
+          <li><a href="{% url 'public_member_list' %}">Membres</a></li>
+          <li><a href="{% url 'public_article_list' %}">Publications</a></li>
+          <li><a href="{% url 'public_event_list' %}">Événements</a></li>
+        </ul>
+      </div>
+
+      <!-- COL 3 -->
+      <div class="col-md-4">
+        <h5 class="mb-3">Contact</h5>
+
+        <p class="small mb-2">
+          <strong>Campus universitaire de Badalabougou</strong>
+        </p>
+
+        <p class="small mb-1">
+          <i class="fas fa-envelope me-2"></i> Info@zabantu.net
+        </p>
+
+        <p class="small mb-3">
+          <i class="fas fa-phone me-2"></i> 77941470
+        </p>
+
+        
+          <a href="https://www.linkedin.com/company/zabantu-ecs/about/" target="_blank">
+            <i class="fab fa-linkedin"></i>
+            <span>LinkedIn</span>
+          </a> <br>
+
+          <a href="https://www.facebook.com/zabantu.ecs" target="_blank">
+            <i class="fab fa-facebook"></i>
+            <span>Facebook</span>
+          </a>
+  
+      </div>
+
+    </div>
+
+    <hr class="my-4 bg-light" />
+
+    <div class="text-center small">
+      &copy; {% now "Y" %} Groupe de recherche Zabantu. Tous droits réservés.
+    </div>
+  </div>
+</footer>
+
+  <!-- JavaScript Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    function toggleSearch() {
+        const searchBox = document.getElementById('searchBox');
+        const input = searchBox.querySelector('.search-input');
+        
+        if (!searchBox.classList.contains('active')) {
+            searchBox.classList.add('active');
+            input.focus();
+        } else {
+            if (input.value.length > 0) {
+                searchBox.submit(); // Si on a écrit quelque chose, on lance la recherche
+            } else {
+                searchBox.classList.remove('active'); // Sinon on referme
+            }
+        }
+    }
+
+    // Fermer la recherche si on clique ailleurs
+    document.addEventListener('click', function(event) {
+        const searchBox = document.getElementById('searchBox');
+        if (!searchBox.contains(event.target)) {
+            searchBox.classList.remove('active');
+        }
+    });
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

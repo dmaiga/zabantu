@@ -1,0 +1,24 @@
+{% extends 'base_public.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-zabantu-dark text-white text-center">
+                    <h4>Confirmer le désabonnement</h4>
+                </div>
+                <div class="card-body text-center">
+                    <p>Êtes-vous sûr de vouloir vous désabonner de la newsletter Zabantu ?</p>
+                    <p>Email: <strong>{{ subscriber.email }}</strong></p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger me-2">Confirmer le désabonnement</button>
+                        <a href="{% url 'home' %}" class="btn btn-secondary">Annuler</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

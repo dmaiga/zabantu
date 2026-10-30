@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Message de {{ message.name }} | Zabantu Backoffice{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">
+            <i class="fas fa-comment me-2"></i>
+            Message de {{ message.name }}
+        </h4>
+        <div>
+            <span class="badge {% if message.is_read %}bg-success{% else %}bg-danger{% endif %} me-2">
+                {% if message.is_read %}Lu{% else %}Non lu{% endif %}
+            </span>
+            {% if message.replied %}
+            <span class="badge bg-info me-2">
+                Répondu le {{ message.replied_at|date:"d/m/Y" }}
+            </span>
+            {% endif %}
+            <a href="{% url 'contact_message_delete' message.pk %}" class="btn btn-sm btn-danger">
+                <i class="fas fa-trash"></i> Supprimer
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h6>Informations de contact</h6>
+                <p><strong>Nom:</strong> {{ message.name }}</p>
+                <p><strong>Prénom:</strong> {{ message.last_name }}</p>
+                <p><strong>Tel:</strong> {{ message.phone }}</p>
+                <p><strong>Email:</strong> <a href="mailto:{{ message.email }}">{{ message.email }}</a></p>
+                <p><strong>Date:</strong> {{ message.created_at|date:"d/m/Y H:i" }}</p>
+            </div>
+            <div class="col-md-6">
+                <h6>Sujet</h6>
+                <p class="lead">{{ message.subject }}</p>
+                {% if message.replied %}
+                <p><strong>Répondu par:</strong> {{ message.replied_by }}</p>
+                <p><strong>Date de réponse:</strong> {{ message.replied_at|date:"d/m/Y H:i" }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <hr>
+        
+        <div class="mb-4">
+            <h6>Message</h6>
+            <div class="card mb-3 p-4 rounded">
+                <div class="card-body ">
+               <span  > {{ message.message|linebreaks }} </span>
+               </div>
+            </div>
+        </div>
+        
+        <!-- Section des réponses -->
+        {% if responses %}
+        <div class="mb-4">
+            <h6>Historique des réponses ({{ responses|length }})</h6>
+            {% for response in responses %}
+            <div class="card mb-3 {% if response.email_sent %}border-success{% endif %}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>
+                        <strong>{{ response.responded_by }}</strong>
+                        <small class="text-muted"> - {{ response.created_at|date:"d/m/Y H:i" }}</small>
+                    </span>
+                    {% if response.email_sent %}
+                    <span class="badge bg-success">
+                        <i class="fas fa-check"></i> Email envoyé
+                    </span>
+                    {% else %}
+                    <span class="badge bg-warning">
+                        <i class="fas fa-exclamation-triangle"></i> Non envoyé
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="card-body ">
+                   <span > {{ response.response_content|linebreaks }} </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="d-flex gap-2">
+            <a href="{% url 'contact_message_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+            </a>
+            <a href="{% url 'contact_message_reply' message.pk %}" class="btn btn-success">
+                <i class="fas fa-reply me-1"></i> Répondre
+            </a>
+            {% if responses %}
+            <a href="{% url 'sent_messages_list' %}?date={{ message.replied_at|date:'Y-m-d' }}" class="btn btn-info">
+                <i class="fas fa-paper-plane me-1"></i> Voir les messages envoyés
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

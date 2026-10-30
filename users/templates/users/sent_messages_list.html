@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages Envoyés | Zabantu Backoffice{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">
+            <i class="fas fa-paper-plane me-2"></i>
+            Messages Envoyés
+        </h4>
+        <span class="badge bg-primary">{{ total_count }} réponses envoyées</span>
+    </div>
+    <div class="card-body">
+        <!-- Filtre par date -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <form method="get" class="d-flex">
+                    <input type="date" name="date" class="form-control me-2" value="{{ date_filter|default:'' }}">
+                    <button type="submit" class="btn btn-outline-primary">Filtrer</button>
+                    {% if date_filter %}
+                    <a href="{% url 'sent_messages_list' %}" class="btn btn-outline-secondary ms-2">Effacer</a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+
+        {% if sent_responses %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Destinataire</th>
+                            <th>Sujet original</th>
+                            <th>Date d'envoi</th>
+                            <th>Statut</th>
+                            <th>Aperçu de la réponse</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for response in sent_responses %}
+                        <tr>
+                            <td>
+                                <strong>{{ response.contact_message.full_name }}</strong>
+                                <br>
+                                <small>{{ response.contact_message.email }}</small>
+                            </td>
+                            <td>{{ response.contact_message.subject }}</td>
+                            <td>
+                                {{ response.sent_at|date:"d/m/Y H:i" }}
+                                <br>
+                                <small>par {{ response.responded_by }}</small>
+                            </td>
+                            <td>
+                                {% if response.email_sent %}
+                                <span class="badge bg-success">Envoyé</span>
+                                {% else %}
+                                <span class="badge bg-warning">Non envoyé</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ response.response_content|truncatewords:10 }}
+                            </td>
+                            <td>
+                                <a href="{% url 'contact_message_detail' response.contact_message.pk %}" 
+                                   class="btn btn-sm btn-primary" title="Voir le message original">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if sent_responses.has_other_pages %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if sent_responses.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ sent_responses.previous_page_number }}{% if date_filter %}&date={{ date_filter }}{% endif %}">Précédent</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in sent_responses.paginator.page_range %}
+                    <li class="page-item {% if sent_responses.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}{% if date_filter %}&date={{ date_filter }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+                    
+                    {% if sent_responses.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ sent_responses.next_page_number }}{% if date_filter %}&date={{ date_filter }}{% endif %}">Suivant</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-paper-plane fa-3x text-muted mb-3"></i>
+                <p class="text-muted">Aucun message envoyé pour le moment.</p>
+                <a href="{% url 'contact_message_list' %}" class="btn btn-primary">
+                    Voir les messages reçus
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

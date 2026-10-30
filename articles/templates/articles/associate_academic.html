@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Associer une publication académique</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Titre</label>
+                        {{ form.title }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Sous-titre</label>
+                        {{ form.subtitle }}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Auteur(s)</label>
+                        {{ form.authors }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Éditeur/Revue</label>
+                        {{ form.publisher }}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Date de publication</label>
+                        {{ form.publication_date }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Lien Scholar</label>
+                        {{ form.scholar_link }}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Résumé</label>
+                    {{ form.abstract }}
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Fichier PDF</label>
+                        {{ form.pdf_file }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Image de couverture</label>
+                        {{ form.cover_image }}
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Enregistrer
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

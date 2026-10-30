@@ -1,0 +1,137 @@
+{% extends 'base_public.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Colonne principale avec la photo -->
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-body p-0">
+                    <img src="{{ photo.image.url }}" alt="{{ photo.title|default:'Photo sans titre' }}" class="img-fluid rounded-top w-100">
+                    
+                    <div class="p-4">
+                        <h1 class="mb-3">{{ photo.title|default:"Photo sans titre" }}</h1>
+                        
+                        {% if photo.caption %}
+                        <div class="mb-4">
+                            <p class="lead">{{ photo.caption }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                            <div>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar-alt"></i> Ajoutée le {{ photo.uploaded_at|date:"d/m/Y" }}
+                                    {% if photo.uploaded_by %}
+                                    par {{ photo.uploaded_by.username }}
+                                    {% endif %}
+                                </small>
+                            </div>
+                            
+                            <div>
+                                {% if photo.gallery %}
+                                <a href="{% url 'detail_galerie' photo.gallery.slug %}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-images"></i> Voir la galerie
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Colonne latérale avec informations -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Informations</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% if photo.gallery %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-folder me-2"></i> Galerie</span>
+                            <a href="{% url 'detail_galerie' photo.gallery.slug %}" class="badge bg-primary rounded-pill">
+                                {{ photo.gallery.title }}
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-calendar me-2"></i> Date</span>
+                            <span class="text-muted">{{ photo.uploaded_at|date:"d F Y" }}</span>
+                        </li>
+                        
+                        {% if photo.tags.exists %}
+                        <li class="list-group-item">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-tags me-2"></i> <strong>Mots-clés</strong>
+                            </div>
+                            <div>
+                                {% for tag in photo.tags.all %}
+                                <span class="badge bg-secondary me-1 mb-1">{{ tag.name }}</span>
+                                {% endfor %}
+                            </div>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2">
+                <a href="{% url 'toutes_photos' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-images"></i> Toutes les photos
+                </a>
+                
+                {% if photo.gallery %}
+                <a href="{% url 'detail_galerie' photo.gallery.slug %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour à la galerie
+                </a>
+                {% else %}
+                <a href="{% url 'liste_galeries' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour aux galeries
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .photo-metadata {
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+    }
+    .photo-tags .badge {
+        font-weight: normal;
+        font-size: 0.85rem;
+        padding: 0.35em 0.65em;
+    }
+    .photo-actions .btn {
+        margin-bottom: 0.5rem;
+    }
+    .img-detail {
+        max-height: 70vh;
+        object-fit: contain;
+        background-color: #f0f0f0;
+    }
+    @media (max-width: 992px) {
+        .img-detail {
+            max-height: 50vh;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Option pour ouvrir l'image en plein écran au clic
+    document.querySelector('.card img').addEventListener('click', function() {
+        window.open(this.src, '_blank');
+    });
+</script>
+{% endblock %}

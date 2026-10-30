@@ -1,0 +1,136 @@
+{% extends 'base_public.html' %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">{{ galerie.title }}</h1>
+
+        <a href="{% url 'liste_galeries' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
+
+    <!-- DESCRIPTION -->
+    {% if galerie.description %}
+    <div class="mb-4 p-3 bg-light rounded">
+        <p class="mb-0">{{ galerie.description|linebreaks }}</p>
+    </div>
+    {% endif %}
+
+    <!-- INFOS -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <span class="badge bg-primary">
+            {{ galerie.photo_count }} photo{{ galerie.photo_count|pluralize }}
+        </span>
+
+        <a href="{% url 'toutes_photos' %}" class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-images"></i> Toutes les photos
+        </a>
+    </div>
+
+    <!-- GRID -->
+    {% if photos %}
+    <div class="photo-grid">
+
+        {% for photo in photos %}
+        <div class="photo-card">
+
+            <a href="{{ photo.image.url }}"
+               data-lightbox="gallery-{{ galerie.slug }}"
+               data-title="{{ photo.title }}">
+
+                <img src="{{ photo.image.url }}" alt="{{ photo.title }}">
+            </a>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+    <!-- PAGINATION -->
+    {% if photos.has_other_pages %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+
+            {% if photos.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ photos.previous_page_number }}">
+                    &laquo;
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in photos.paginator.page_range %}
+                {% if photos.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if photos.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ photos.next_page_number }}">
+                    &raquo;
+                </a>
+            </li>
+            {% endif %}
+
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="alert alert-info text-center">
+        Aucune photo dans cette galerie.
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- 🔥 STYLE -->
+<style>
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 15px;
+}
+
+.photo-card {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #f5f5f5;
+}
+
+.photo-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.photo-card:hover img {
+    transform: scale(1.05);
+}
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+lightbox.option({
+    'albumLabel': "Photo %1 sur %2 - {{ galerie.title }}",
+    'wrapAround': true,
+    'fadeDuration': 200
+});
+</script>
+{% endblock %}

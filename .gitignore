@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Environnements
+.venv/
+venv/
+env/
+.env
+
+# Base de données locale
+*.sqlite3
+*.db
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Django
+media/
+staticfiles/

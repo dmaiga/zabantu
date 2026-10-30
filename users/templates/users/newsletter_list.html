@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block title %}Abonnés Newsletter | Zabantu Backoffice{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0" style="color: black;">
+            <i class="fas fa-envelope me-2"></i>
+            Abonnés Newsletter
+        </h4>
+        <div>
+            <span class="badge bg-primary me-2">{{ total_count }} abonnés</span>
+            <a href="{% url 'newsletter_campaign_create' %}" class="btn btn-success btn-sm">
+                <i class="fas fa-plus me-1"></i> Créer une campagne
+            </a>
+            <a href="{% url 'newsletter_campaign_list' %}" class="btn btn-info btn-sm">
+                <i class="fas fa-list me-1"></i> Voir les campagnes
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- En-tête avec statistiques et actions rapides -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-primary text-white text-center p-3">
+                    <h5 class="mb-0">{{ total_count }}</h5>
+                    <small>Total abonnés</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-success text-white text-center p-3">
+                    <h5 class="mb-0">{{ active_count }}</h5>
+                    <small>Abonnés actifs</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-info text-white text-center p-3">
+                    <h5 class="mb-0">{{ campaigns_count }}</h5>
+                    <small>Campagnes créées</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions rapides -->
+        <div class="d-flex gap-2 mb-4 flex-wrap">
+            <a href="{% url 'newsletter_campaign_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> Nouvelle campagne
+            </a>
+            <a href="{% url 'newsletter_campaign_list' %}" class="btn btn-outline-primary">
+                <i class="fas fa-list me-1"></i> Gérer les campagnes
+            </a>
+            <a href="#" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#exportModal">
+                <i class="fas fa-download me-1"></i> Exporter la liste
+            </a>
+        </div>
+
+        {% if subscribers %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Email</th>
+                            <th>Date d'inscription</th>
+                            <th>Statut</th>
+                           
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for subscriber in subscribers %}
+                        <tr>
+                            <td>
+                                <i class="fas fa-envelope text-muted me-2"></i>
+                                {{ subscriber.email }}
+                            </td>
+                            <td>{{ subscriber.subscribed_at|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <span class="badge bg-{% if subscriber.is_active %}success{% else %}secondary{% endif %}">
+                                    {% if subscriber.is_active %}Actif{% else %}Inactif{% endif %}
+                                </span>
+                            </td>
+                          
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if subscribers.has_other_pages %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mt-4">
+                    {% if subscribers.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ subscribers.previous_page_number }}">
+                            <i class="fas fa-chevron-left"></i> Précédent
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in subscribers.paginator.page_range %}
+                        {% if subscribers.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% elif num > subscribers.number|add:'-3' and num < subscribers.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if subscribers.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ subscribers.next_page_number }}">
+                            Suivant <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-envelope-open-text fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Aucun abonné à la newsletter</h5>
+                <p class="text-muted">Commencez par créer votre première campagne de newsletter.</p>
+                <a href="{% url 'newsletter_campaign_create' %}" class="btn btn-primary mt-3">
+                    <i class="fas fa-plus me-1"></i> Créer une campagne
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal d'exportation -->
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportModalLabel">Exporter la liste des abonnés</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Sélectionnez le format d'exportation :</p>
+                <div class="d-grid gap-2">
+                    <a href="#" class="btn btn-outline-primary">
+                        <i class="fas fa-file-csv me-2"></i> CSV (Excel)
+                    </a>
+                    <a href="#" class="btn btn-outline-secondary">
+                        <i class="fas fa-file-alt me-2"></i> JSON
+                    </a>
+                    <a href="#" class="btn btn-outline-success">
+                        <i class="fas fa-file-excel me-2"></i> Excel
+                    </a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card-header {
+        background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+        border-bottom: 1px solid rgba(0,0,0,0.125);
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        background-color: #f8f9fa;
+    }
+    
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+</style>
+
+<script>
+    // Activation des tooltips Bootstrap
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    })
+</script>
+{% endblock %}

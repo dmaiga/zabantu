@@ -1,0 +1,17 @@
+<!-- templates/articles/article_preview.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="editor-container">
+  <div class="editor-column">
+    <h2>Éditeur</h2>
+    {{ form.content }}
+  </div>
+  <div class="preview-column">
+    <h2>Aperçu</h2>
+    <div id="preview-content">
+      {{ article.content|safe }}
+    </div>
+  </div>
+</div>
+{% endblock %}

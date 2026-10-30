@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb custom-breadcrumb">
+
+                <li class="breadcrumb-item">
+                    <a href="{% url 'gallery_list' %}">Galeries</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">{{ gallery.title }}</li>
+            </ol>
+        </nav>
+<div class="container py-4">
+
+    <h2 class="mb-2">{{ gallery.title }}</h2>
+    {% if gallery.description %}
+        <p class="text-muted">{{ gallery.description }}</p>
+    {% endif %}
+
+    <div class="mb-3">
+        <a href="{% url 'photo_create' %}?gallery={{ gallery.id }}" class="btn btn-primary btn-sm">
+            + Ajouter des photos
+        </a>
+    </div>
+
+    {% if photos %}
+    <div class="row g-3">
+
+        {% for photo in photos %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="{% url 'photo_detail' photo.pk %}" class="text-decoration-none">
+
+                <div class="photo-card">
+                    <img src="{{ photo.image.url }}" alt="{{ photo.title }}">
+                </div>
+
+                {% if photo.title %}
+                    <p class="small mt-1 text-truncate text-dark">
+                        {{ photo.title }}
+                    </p>
+                {% endif %}
+
+            </a>
+        </div>
+        {% endfor %}
+
+    </div>
+    {% else %}
+        <div class="text-center py-5">
+            <p class="text-muted">Aucune photo dans cette galerie</p>
+            <a href="{% url 'photo_create' %}?gallery={{ gallery.id }}" class="btn btn-outline-primary btn-sm">
+                Ajouter la première photo
+            </a>
+        </div>
+    {% endif %}
+
+</div>
+
+<style>
+.photo-card {
+    width: 100%;
+    aspect-ratio: 1 / 1; /* 🔥 clé : carré */
+    overflow: hidden;
+    border-radius: 6px;
+    background: #f5f5f5;
+}
+
+.photo-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 🔥 image bien cadrée */
+    transition: transform 0.2s ease;
+}
+
+.photo-card:hover img {
+    transform: scale(1.05);
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmer la suppression - Zabantu{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger ">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmer la suppression
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Attention :</strong> Cette action est irréversible.
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-4">
+                        {% if user_to_delete.profile_picture %}
+                        <img src="{{ user_to_delete.profile_picture.url }}" 
+                             class="rounded-circle me-3" 
+                             width="60" 
+                             height="60" 
+                             alt="{{ user_to_delete.get_full_name }}"
+                             onerror="this.src='/static/images/default-profile.png'">
+                        {% else %}
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-3" 
+                             style="width: 60px; height: 60px;">
+                            <i class="fas fa-user text-light"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h5 class="mb-1">{{ user_to_delete.get_full_name }}</h5>
+                            <p class="text-muted mb-0">
+                                {{ user_to_delete.email }} • 
+                                <span class="badge bg-{% if user_to_delete.is_active %}success{% else %}secondary{% endif %}">
+                                    {% if user_to_delete.is_active %}Actif{% else %}Inactif{% endif %}
+                                </span>
+                            </p>
+                            <small class="text-muted">
+                                {{ user_to_delete.get_role_display }}
+                                {% if user_to_delete.job_title %} • {{ user_to_delete.job_title }}{% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6>Informations qui seront supprimées :</h6>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item bg-transparent text-light border-0">
+                                <i class="fas fa-user me-2 text-danger"></i>
+                                Profil utilisateur
+                            </li>
+                            <li class="list-group-item bg-transparent text-light border-0">
+                                <i class="fas fa-image me-2 text-danger"></i>
+                                Photo de profil
+                            </li>
+                            <li class="list-group-item bg-transparent text-light border-0">
+                                <i class="fas fa-history me-2 text-danger"></i>
+                                Historique des actions
+                            </li>
+                            {% if user_to_delete.authored_articles.exists %}
+                            <li class="list-group-item bg-transparent text-warning border-0">
+                                <i class="fas fa-newspaper me-2 text-warning"></i>
+                                {{ user_to_delete.authored_articles.count }} article(s) créé(s)
+                                <small class="text-muted">(Les articles seront conservés mais sans auteur)</small>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="confirmation" class="form-label">
+                                Tapez "SUPPRIMER" pour confirmer :
+                            </label>
+                            <input type="text" class="form-control" id="confirmation" 
+                                   name="confirmation" required 
+                                   placeholder="SUPPRIMER">
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'user_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger" >
+                                <i class="fas fa-trash me-1"></i> Supprimer définitivement
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const confirmationInput = document.getElementById('confirmation');
+        const deleteButton = document.getElementById('deleteButton');
+        
+        confirmationInput.addEventListener('input', function() {
+            deleteButton.disabled = this.value.toUpperCase() !== 'SUPPRIMER';
+        });
+        
+        // Confirmation supplémentaire
+        deleteButton.addEventListener('click', function(e) {
+            if (!confirm('Êtes-vous ABSOLUMENT sûr de vouloir supprimer ce membre ? Cette action ne peut pas être annulée.')) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+{% endblock %}

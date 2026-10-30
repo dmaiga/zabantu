@@ -1,0 +1,617 @@
+{% extends "base_public.html" %}
+{% load static %}
+
+{% block title %}{{ guelekan.title }} | Séminaires Gɛlɛkan{% endblock %}
+
+{% block meta %}
+<meta name="description" content="{{ guelekan.meta_description|default:guelekan.subtitle|default:guelekan.title|truncatewords:20 }}">
+<meta property="og:title" content="{{ guelekan.title }}">
+<meta property="og:description" content="{{ guelekan.meta_description|default:guelekan.subtitle|default:guelekan.title|truncatewords:20 }}">
+{% if guelekan.cover_image %}
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ guelekan.cover_image.url }}">
+{% endif %}
+{% endblock %}
+
+{% block banner_title %}{{ guelekan.title }}{% endblock %}
+{% block banner_subtitle %}{{ guelekan.subtitle|default:"Séminaire de recherche" }}{% endblock %}
+
+{% block content %}
+<div class="guelekan-detail-container">
+    <article class="guelekan-article">
+        <!-- Header Section -->
+        <header class="guelekan-header">
+            <div class="guelekan-header-content">
+                <h1 class="guelekan-title">{{ guelekan.title }}</h1>
+                
+                {% if guelekan.subtitle %}
+                <h2 class="guelekan-subtitle">{{ guelekan.subtitle }}</h2>
+                {% endif %}
+                
+                <!-- Meta Information -->
+                <div class="guelekan-meta-grid">
+                    <div class="guelekan-meta-item">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="meta-icon">
+                            <path d="M19 4H5C3.895 4 3 4.895 3 6V20C3 21.105 3.895 22 5 22H19C20.105 22 21 21.105 21 20V6C21 4.895 20.105 4 19 4Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M16 2V6" stroke="currentColor" stroke-width="2"/>
+                            <path d="M8 2V6" stroke="currentColor" stroke-width="2"/>
+                            <path d="M3 10H21" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span>Publié le {{ guelekan.created_at|date:"d F Y" }}</span>
+                    </div>
+                    
+                    {% if guelekan.get_intervenants_list %}
+                    <div class="guelekan-meta-item">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="meta-icon">
+                            <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" stroke-width="2"/>
+                            <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span>{{ guelekan.get_intervenants_list|join:", " }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if guelekan.location %}
+                    <div class="guelekan-meta-item">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="meta-icon">
+                            <path d="M21 10C21 17 12 23 12 23C12 23 3 17 3 10C3 7.613 3.948 5.323 5.636 3.636C7.324 1.948 9.614 1 12 1C14.386 1 16.676 1.948 18.364 3.636C20.052 5.323 21 7.613 21 10Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 13C13.657 13 15 11.657 15 10C15 8.343 13.657 7 12 7C10.343 7 9 8.343 9 10C9 11.657 10.343 13 12 13Z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span>{{ guelekan.location }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Cover Image -->
+            {% if guelekan.cover_image %}
+            <div class="guelekan-cover-container">
+                <img src="{{ guelekan.cover_image.url }}" 
+                     class="guelekan-cover-image" 
+                     alt="{{ guelekan.title }}"
+                     loading="eager"
+                     onerror="this.style.display='none'">
+            </div>
+            {% endif %}
+        </header>
+
+        <!-- Content Section -->
+        <section class="guelekan-content-section">
+            <div class="guelekan-content">
+                {{ guelekan.content|safe }}
+            </div>
+            
+            <!-- PDF Download -->
+            {% if guelekan.pdf_file %}
+            <div class="download-card">
+                <div class="download-content">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="download-icon">
+                        <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2"/>
+                        <path d="M14 2V8H20" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <div class="download-info">
+                        <h3>Document associé</h3>
+                        <p>PDF disponible en téléchargement</p>
+                        <span class="file-size">{{ guelekan.pdf_file.size|filesizeformat }}</span>
+                    </div>
+                </div>
+                <a href="{{ guelekan.pdf_file.url }}" class="download-button" target="_blank" download>
+                    Télécharger
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2"/>
+                        <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 15V3" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </a>
+            </div>
+            {% endif %}
+        </section>
+
+        <!-- Associated Galleries Section -->
+<!-- Associated Galleries Section -->
+{% if galleries %}
+<section class="associated-galleries-section">
+    <div class="section-header">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="section-icon">
+            <path d="M4 16L4 17C4 18.6569 5.34315 20 7 20L17 20C18.6569 20 20 18.6569 20 17L20 16" stroke="currentColor" stroke-width="2"/>
+            <path d="M4 8.00001L4 7.00001C4 5.34315 5.34315 4 7 4L17 4C18.6569 4 20 5.34315 20 7.00001L20 8.00001" stroke="currentColor" stroke-width="2"/>
+            <rect x="1" y="8" width="22" height="8" rx="2" stroke="currentColor" stroke-width="2"/>
+            <circle cx="12" cy="12" r="3" fill="currentColor"/>
+        </svg>
+        <h2>Galeries photos associées</h2>
+    </div>
+    
+    <div class="galleries-grid">
+        {% for gallery in galleries %}
+        <article class="gallery-card">
+            <div class="gallery-card-image">
+                {% if gallery.cover_image %}
+                <img src="{{ gallery.cover_image.url }}" 
+                     alt="{{ gallery.title }}"
+                     loading="lazy"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                {% endif %}
+                <div class="gallery-placeholder" {% if gallery.cover_image %}style="display: none;"{% endif %}>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                        <path d="M4 16L4 17C4 18.6569 5.34315 20 7 20L17 20C18.6569 20 20 18.6569 20 17L20 16" stroke="currentColor" stroke-width="2"/>
+                        <path d="M4 8.00001L4 7.00001C4 5.34315 5.34315 4 7 4L17 4C18.6569 4 20 5.34315 20 7.00001L20 8.00001" stroke="currentColor" stroke-width="2"/>
+                        <rect x="1" y="8" width="22" height="8" rx="2" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div class="gallery-overlay">
+                    <span class="photo-count">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 3H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        {{ gallery.annotated_photo_count }} photo(s)
+                    </span>
+                </div>
+            </div>
+            
+            <div class="gallery-card-content">
+                <h3 class="gallery-title">{{ gallery.title }}</h3>
+                
+                {% if gallery.description %}
+                <p class="gallery-description">
+                    {{ gallery.description|truncatewords:12 }}
+                </p>
+                {% endif %}
+                
+                <a href="{% url 'detail_galerie' gallery.slug %}" class="gallery-link">
+                    Voir la galerie
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path d="M5 12H19" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </a>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+        <!-- Footer Navigation -->
+        <footer class="guelekan-footer">
+            <a href="{% url 'public_guelekan_list' %}" class="back-button">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M19 12H5" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 19L5 12L12 5" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                Retour aux séminaires
+            </a>
+            
+            
+        </footer>
+    </article>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Styles pour une mise en page responsive et moderne */
+.guelekan-detail-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.guelekan-header {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+    .guelekan-header {
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+    }
+}
+
+.guelekan-header-content {
+    order: 2;
+}
+
+@media (min-width: 768px) {
+    .guelekan-header-content {
+        order: 1;
+    }
+}
+
+.guelekan-cover-container {
+    order: 1;
+}
+
+@media (min-width: 768px) {
+    .guelekan-cover-container {
+        order: 2;
+    }
+}
+
+.guelekan-cover-image {
+    width: 100%;
+    height: 30vh;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.guelekan-meta-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+}
+
+.guelekan-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.meta-icon {
+    flex-shrink: 0;
+}
+
+/* Sections de contenu */
+.guelekan-content-section {
+    margin-bottom: 3rem;
+}
+
+.guelekan-content {
+    line-height: 1.7;
+    font-size: 1.1rem;
+}
+
+/* Cartes de galeries */
+/* Cartes de galeries - Version compacte */
+/* Cartes de galeries - Version single album */
+.associated-galleries-section {
+    margin: 2rem 0;
+    display: flex;
+    flex-direction: column;
+   
+}
+
+.galleries-grid {
+    display: flex;
+    justify-content: left;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    width: 100%;
+}
+
+.gallery-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.2s ease;
+    max-height: 400px;
+    display: flex;
+    flex-direction: column;
+    max-width: 400px;
+    width: 100%;
+}
+
+.gallery-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.gallery-card-image {
+    position: relative;
+    height: 180px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.gallery-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.gallery-card:hover .gallery-card-image img {
+    transform: scale(1.05);
+}
+
+.gallery-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    padding: 0.5rem 0.75rem;
+    color: white;
+}
+
+.photo-count {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.photo-count svg {
+    width: 14px;
+    height: 14px;
+}
+
+.gallery-card-content {
+    padding: 1rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.gallery-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #333;
+    line-height: 1.3;
+}
+
+.gallery-description {
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.4;
+    margin: 0 0 0.75rem 0;
+    flex-grow: 1;
+}
+
+.gallery-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.4rem 0;
+    transition: color 0.2s ease;
+}
+
+.gallery-link:hover {
+    color: #0056b3;
+}
+
+.gallery-link svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.2s ease;
+}
+
+.gallery-link:hover svg {
+    transform: translateX(2px);
+}
+
+.gallery-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: #f8f9fa;
+    color: #6c757d;
+}
+
+.gallery-placeholder svg {
+    width: 32px;
+    height: 32px;
+}
+
+/* Section header */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    justify-content: center;
+    text-align: center;
+}
+
+.section-header h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.section-icon {
+    width: 24px;
+    height: 24px;
+    color: #007bff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .gallery-card {
+        max-width: 350px;
+    }
+    
+    .gallery-card-image {
+        height: 150px;
+    }
+    
+    .gallery-card-content {
+        padding: 0.75rem;
+    }
+    
+    .gallery-title {
+        font-size: 0.95rem;
+    }
+    
+    .section-header h2 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .gallery-card {
+        max-width: 100%;
+        margin: 0 1rem;
+    }
+    
+    .gallery-card-image {
+        height: 160px;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+/* Section header plus compact */
+.associated-galleries-section {
+    margin: 2rem 0;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.section-header h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.section-icon {
+    width: 24px;
+    height: 24px;
+    color: #007bff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .galleries-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 0.75rem;
+    }
+    
+    .gallery-card-image {
+        height: 150px;
+    }
+    
+    .gallery-card-content {
+        padding: 0.75rem;
+    }
+    
+    .gallery-title {
+        font-size: 0.95rem;
+    }
+    
+    .section-header h2 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .galleries-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .gallery-card {
+        max-height: none;
+        height: auto;
+    }
+    
+    .gallery-card-image {
+        height: 160px;
+    }
+}
+/* Footer */
+.guelekan-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #eee;
+    margin-top: 3rem;
+}
+
+@media (min-width: 768px) {
+    .guelekan-footer {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+/* Utilitaires */
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.back-button:hover {
+    color: #0056b3;
+}
+
+.social-sharing {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.social-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.social-button {
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.social-button.facebook { color: #1877f2; }
+.social-button.twitter { color: #1da1f2; }
+.social-button.email { color: #666; }
+
+.social-button:hover {
+    background-color: #f8f9fa;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion des erreurs d'images
+    document.querySelectorAll('img').forEach(img => {
+        img.addEventListener('error', function() {
+            this.style.display = 'none';
+        });
+    });
+    
+    // Smooth scrolling pour les ancres
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <h2>Répondre à: {{ message.name }}</h2>
+    <p>Cette réponse sera envoyée à <strong>{{ message.email }}</strong> depuis <strong>{{ DEFAULT_FROM_EMAIL}}</strong></p>
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Envoyer la réponse</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - Zabantu{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">{{ title }}</h3>
+                </div>
+                
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Prénom *</label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                    <div class="text-danger">{{ form.first_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nom *</label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                    <div class="text-danger">{{ form.last_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email {% if not intervenant %}*{% endif %}</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger">{{ form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Téléphone</label>
+                                {{ form.phone }}
+                                {% if form.phone.errors %}
+                                    <div class="text-danger">{{ form.phone.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Organisation *</label>
+                                {{ form.organization }}
+                                {% if form.organization.errors %}
+                                    <div class="text-danger">{{ form.organization.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Poste</label>
+                                {{ form.position }}
+                                {% if form.position.errors %}
+                                    <div class="text-danger">{{ form.position.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Type d'intervenant *</label>
+                                {{ form.intervenant_type }}
+                                {% if form.intervenant_type.errors %}
+                                    <div class="text-danger">{{ form.intervenant_type.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Photo de profil</label>
+                                {{ form.photo }}
+                                {% if form.photo.errors %}
+                                    <div class="text-danger">{{ form.photo.errors }}</div>
+                                {% endif %}
+                                {% if intervenant and intervenant.photo %}
+                                    <div class="mt-2">
+                                        <img src="{{ intervenant.photo.url }}" alt="Photo actuelle" style="max-height: 100px;" class="img-thumbnail">
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Biographie *</label>
+                            {{ form.bio }}
+                            {% if form.bio.errors %}
+                                <div class="text-danger">{{ form.bio.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Domaines d'expertise</label>
+                            {{ form.expertise }}
+                            <div class="form-text">Séparez les domaines par des virgules</div>
+                            {% if form.expertise.errors %}
+                                <div class="text-danger">{{ form.expertise.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">LinkedIn</label>
+                                {{ form.linkedin }}
+                                {% if form.linkedin.errors %}
+                                    <div class="text-danger">{{ form.linkedin.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Facebook</label>
+                                {{ form.facebook }}
+                                {% if form.facebook.errors %}
+                                    <div class="text-danger">{{ form.facebook.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Site web</label>
+                                {{ form.website }}
+                                {% if form.website.errors %}
+                                    <div class="text-danger">{{ form.website.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3 form-check form-switch">
+                            {{ form.is_available }}
+                            <label class="form-check-label">Disponible pour de nouveaux événements</label>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Notes internes</label>
+                            {{ form.note_internal }}
+                            {% if form.note_internal.errors %}
+                                <div class="text-danger">{{ form.note_internal.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% if intervenant %}{% url 'intervenant_detail' intervenant.id %}{% else %}{% url 'intervenant_list' %}{% endif %}" 
+                               class="btn btn-outline-secondary">
+                                Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                {% if intervenant %}Mettre à jour{% else %}Créer l'intervenant{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

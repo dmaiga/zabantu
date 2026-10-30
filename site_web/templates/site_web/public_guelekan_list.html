@@ -1,0 +1,151 @@
+{% extends "base_public.html" %}
+
+{% block title %}Séminaires Gɛlɛkan | {{ block.super }}{% endblock %}
+
+{% block banner_title %}Séminaires Gɛlɛkan{% endblock %}
+{% block banner_subtitle %}Retrouvez tous nos séminaires de recherche{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+
+            <!-- Seminar list -->
+            {% if page_obj %}
+                <div class="row g-4">
+                    {% for guelekan in page_obj %}
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm border-0 overflow-hidden seminar-card">
+                            {% if guelekan.cover_image %}
+                            <div class="card-img-top overflow-hidden" style="height: 180px;">
+                                <img src="{{ guelekan.cover_image.url }}" alt="{{ guelekan.title }}" class="img-fluid w-100 h-100 object-fit-cover">
+                            </div>
+                            {% else %}
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                                <i class="fas fa-microscope fa-3x text-muted"></i>
+                            </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="badge bg-secondary">{{ guelekan.publish_at|date:"d M Y" }}</span>
+                                    {% if guelekan.pdf_file %}
+                                    <a href="{{ guelekan.pdf_file.url }}" class="text-decoration-none" title="Télécharger le PDF">
+                                        <i class="fas fa-file-pdf text-danger"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                                <h3 class="h5 card-title fw-bold">
+                                    <a href="{% url 'public_guelekan_detail' guelekan.slug %}" class="text-decoration-none text-dark stretched-link">
+                                        {{ guelekan.title }}
+                                    </a>
+                                </h3>
+                                {% if guelekan.subtitle %}
+                                <p class="card-text text-muted">{{ guelekan.subtitle }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-transparent border-0 pt-0">
+                                <a href="{% url 'public_guelekan_detail' guelekan.slug %}" class="btn btn-sm btn-outline-primary">
+                                    Lire plus <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <nav aria-label="Pagination" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1" aria-label="Premier">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Précédent">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active" aria-current="page">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Suivant">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Dernier">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                    <p class="text-center text-muted mt-2">
+                        Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                    </p>
+                </nav>
+                {% endif %}
+            {% else %}
+                <!-- Empty state -->
+                <div class="text-center py-5 my-5">
+                    <div class="mb-4">
+                        <i class="fas fa-microscope fa-4x text-muted"></i>
+                    </div>
+                    <h3 class="h4 text-muted mb-3">Aucun séminaire disponible pour le moment</h3>
+                    <p class="text-muted">Revenez plus tard pour découvrir nos prochains séminaires.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .seminar-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 0.5rem;
+    }
+    
+    .seminar-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .card-title a:hover {
+        color: var(--zabantu-secondary) !important;
+    }
+    
+    .search-form .form-control:focus {
+        border-color: var(--zabantu-secondary);
+        box-shadow: 0 0 0 0.25rem rgba(191, 146, 100, 0.25);
+    }
+    
+    .page-item.active .page-link {
+        background-color: var(--zabantu-secondary);
+        border-color: var(--zabantu-secondary);
+    }
+    
+    .page-link {
+        color: var(--zabantu-secondary);
+    }
+    
+    .page-link:hover {
+        color: var(--zabantu-dark);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>Options de publication</h2>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <h3>Publier immédiatement</h3>
+                    <p>L'article sera visible par tous les visiteurs dès maintenant.</p>
+                    <button type="submit" name="publish_now" class="btn btn-success btn-lg">
+                        <i class="fas fa-check"></i> Confirmer la publication
+                    </button>
+                </div>
+                
+                <hr>
+                
+                <div class="mb-3">
+                    <h3>Ou planifier la publication</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="publish_at" class="form-label">Date et heure</label>
+                            <input type="datetime-local" id="publish_at" name="publish_at" 
+                                   class="form-control" 
+                                   value="{{ article.publish_at|date:'Y-m-d\TH:i' }}">
+                        </div>
+                    </div>
+                    <p class="text-muted mt-2">L'article restera en brouillon jusqu'à cette date.</p>
+                    <button type="submit" name="schedule" class="btn btn-primary mt-2">
+                        <i class="fas fa-calendar-check"></i> Planifier
+                    </button>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{% url 'article_detail' article.slug %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Annuler
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

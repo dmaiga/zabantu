@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;">
+    <link href='https://fonts.googleapis.com/css?family=Questrial' rel='stylesheet' type='text/css'>
+</head>
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+    <center>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#f9f9f9">
+            <tr>
+                <td align="center" valign="top">
+                    <!-- Container principal -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width: 600px; max-width: 600px; background-color: #ffffff; border-collapse: collapse;">
+                        <!-- Header -->
+                        <tr>
+                            <td bgcolor="#6f826a" style="background-color: #6f826a; color: #ffffff; padding: 25px 20px; text-align: center;">
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                    <tr>
+                                        <td>
+                                            <h2 style="margin: 0; font-size: 24px; font-weight: bold; color: #ffffff;">
+                                                Groupe de recherche Zabantu
+                                            </h2>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-top: 10px;">
+                                            <p style="margin: 0; font-size: 16px; color: #f0f1c5;">
+                                                Recherche ancrée dans les dynamiques économiques et sociales
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <!-- Content -->
+                        <tr>
+                            <td style="padding: 30px 20px;">
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                    <!-- Salutation -->
+                                    <tr>
+                                        <td style="padding-bottom: 15px;">
+                                            <p style="margin: 0; color: #2c3e2c; font-size: 16px;">
+                                                Bonjour <strong style="color: #bf9264;">{{ original_message.name }}</strong>,
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- Message de remerciement -->
+                                    <tr>
+                                        <td style="padding-bottom: 20px;">
+                                            <p style="margin: 0; color: #2c3e2c;">
+                                                Nous vous remercions pour votre message. Voici notre réponse :
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- Réponse -->
+                                    <tr>
+                                        <td style="padding-bottom: 25px;">
+                                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                                <tr>
+                                                    <td bgcolor="#f0f1c5" style="background-color: #f0f1c5; padding: 15px; border-left: 4px solid #bf9264;">
+                                                        {{ reply_content|linebreaks }}
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- Vision -->
+                                    <tr>
+                                        <td style="padding-bottom: 25px;">
+                                            <p style="margin: 0; color: #2c3e2c;">
+                                                <strong style="color: #6f8264;">Notre vision :</strong> 
+                                                Vers une recherche ancrée dans les dynamiques économiques et sociales, 
+                                                promouvant l'inclusion et le développement.
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- Séparateur -->
+                                    <tr>
+                                        <td style="padding-bottom: 20px;">
+                                            <hr style="border: 0; height: 1px; background-color: #bbd8a3; margin: 20px 0;" />
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- Message original -->
+                                    <tr>
+                                        <td style="padding-bottom: 15px;">
+                                            <p style="margin: 0; color: #2c3e2c; font-weight: bold;">
+                                                Votre message original :
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-bottom: 15px;">
+                                            <p style="margin: 0; font-style: italic; color: #2c3e2c; padding-left: 10px; border-left: 2px solid #bbd8a3;">
+                                                "{{ original_message.message }}"
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-bottom: 25px;">
+                                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                                <tr>
+                                                    <td style="font-size: 13px; color: #6f826a;">
+                                                        <strong>Sujet :</strong> {{ original_message.subject }}<br />
+                                                        <strong>Date :</strong> {{ original_message.created_at|date:"d F Y à H:i" }}
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- Signature -->
+                                    <tr>
+                                        <td>
+                                            <p style="margin: 0; color: #2c3e2c;">
+                                                Cordialement,<br />
+                                                <strong style="color: #bf9264;">{{ admin_name }}</strong><br />
+                                                <span style="color: #6f826a; font-size: 14px;">Équipe Groupe de recherche Zabantu</span>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <!-- Footer -->
+                        <tr>
+                            <td bgcolor="#f0f1c5" style="background-color: #f0f1c5; color: #2c3e2c; font-size: 12px; text-align: center; padding: 20px;">
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                    <tr>
+                                        <td style="padding-bottom: 10px;">
+                                            <p style="margin: 0; color: #2c3e2c;">
+                                                Cet email a été envoyé depuis la plateforme Zabantu en réponse à votre message du 
+                                                {{ original_message.created_at|date:"d/m/Y" }}.
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <p style="margin: 0; color: #6f826a; font-weight: bold;">
+                                                © {% now "Y" %} Zabantu Research. Tous droits réservés.
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding-top: 15px;">
+                                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                                <tr>
+                                                    <td align="center">
+                                                        <a href="https://zabantu.net" target="_blank" style="color: #bf9264; text-decoration: none; margin: 0 10px; font-size: 11px;">
+                                                            Site Web
+                                                        </a>
+                                                        <span style="color: #bbd8a3;">|</span>
+                                                        <a href="https://www.facebook.com/zabantu.ecs" target="_blank" style="color: #bf9264; text-decoration: none; margin: 0 10px; font-size: 11px;">
+                                                            Facebook
+                                                        </a>
+                                                        <span style="color: #bbd8a3;">|</span>
+                                                        <a href="https://www.linkedin.com/company/zabantu-ecs/about/" target="_blank" style="color: #bf9264; text-decoration: none; margin: 0 10px; font-size: 11px;">
+                                                            LinkedIn
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </center>
+</body>
+</html>
