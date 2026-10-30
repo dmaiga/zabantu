@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.utils.http import url_has_allowed_host_and_scheme
 from .forms import CustomUserCreationForm, LoginForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
@@ -128,9 +129,12 @@ def login_view(request):
                 login(request, user)
                 messages.success(request, f"Bienvenue {user.get_full_name()} !")
                 
-                # Redirection vers la page demandée ou dashboard par défaut
-                next_url = request.GET.get('next', 'dashboard')
-                return redirect(next_url)
+                # Redirection vers la page demandée (si elle appartient à ce site) ou dashboard
+                next_url = request.GET.get('next') or request.POST.get('next')
+                if next_url and url_has_allowed_host_and_scheme(
+                        next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+                    return redirect(next_url)
+                return redirect('dashboard')
             else:
                 messages.error(request, "Identifiants invalides")
         else:

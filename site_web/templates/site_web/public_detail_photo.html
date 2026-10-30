@@ -1,137 +1,72 @@
 {% extends 'base_public.html' %}
+{% load photo_tags %}
+
+{% block title %}{{ photo.title|default:"Photo" }} - Zabantu{% endblock %}
+{% block banner_title %}Galerie photos{% endblock %}
+{% block banner_subtitle %}{% if photo.gallery %}{{ photo.gallery.title }}{% else %}Photo{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .photo-stage { background: #eef0e8; border: 1px solid #e0e4d8; border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: .5rem; }
+    .photo-stage img { max-width: 100%; max-height: 75vh; width: auto; height: auto; object-fit: contain; border-radius: 8px; }
+    .photo-nav { display: flex; justify-content: space-between; gap: .75rem; margin-top: 1rem; }
+    .photo-nav .btn { min-height: 44px; display: inline-flex; align-items: center; gap: .5rem; }
+    .photo-side dt { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: #5b6559; margin-top: .9rem; }
+    .photo-side dd { margin: .15rem 0 0; }
+    .photo-tags a { display: inline-block; margin: 0 .3rem .3rem 0; padding: .2rem .7rem; border-radius: 999px; background: rgba(86,106,82,.14); color: #2c3e2c; text-decoration: none; font-size: .85rem; }
+    .photo-tags a:hover { background: #566a52; color: #fff; }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row">
-        <!-- Colonne principale avec la photo -->
-        <div class="col-lg-8 mb-4">
-            <div class="card">
-                <div class="card-body p-0">
-                    <img src="{{ photo.image.url }}" alt="{{ photo.title|default:'Photo sans titre' }}" class="img-fluid rounded-top w-100">
-                    
-                    <div class="p-4">
-                        <h1 class="mb-3">{{ photo.title|default:"Photo sans titre" }}</h1>
-                        
-                        {% if photo.caption %}
-                        <div class="mb-4">
-                            <p class="lead">{{ photo.caption }}</p>
-                        </div>
-                        {% endif %}
-                        
-                        <div class="d-flex justify-content-between align-items-center border-top pt-3">
-                            <div>
-                                <small class="text-muted">
-                                    <i class="fas fa-calendar-alt"></i> Ajoutée le {{ photo.uploaded_at|date:"d/m/Y" }}
-                                    {% if photo.uploaded_by %}
-                                    par {{ photo.uploaded_by.username }}
-                                    {% endif %}
-                                </small>
-                            </div>
-                            
-                            <div>
-                                {% if photo.gallery %}
-                                <a href="{% url 'detail_galerie' photo.gallery.slug %}" class="btn btn-outline-secondary btn-sm">
-                                    <i class="fas fa-images"></i> Voir la galerie
-                                </a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<div class="container">
+    <nav aria-label="Fil d'Ariane" class="mb-3">
+        <ol class="breadcrumb small mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'liste_galeries' %}">Galerie</a></li>
+            {% if photo.gallery %}<li class="breadcrumb-item"><a href="{% url 'detail_galerie' photo.gallery.slug %}">{{ photo.gallery.title|truncatechars:40 }}</a></li>{% endif %}
+            <li class="breadcrumb-item active" aria-current="page">{{ photo.title|default:"Photo"|truncatechars:40 }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <h2 class="h3 mb-3">{{ photo.title|default:"Photo sans titre" }}</h2>
+            <div class="photo-stage">
+                {% thumb photo.image 1600 as t %}
+                <a href="{{ photo.image.url }}" target="_blank" rel="noopener noreferrer" title="Ouvrir l'image en taille réelle">
+                    <img src="{{ t.url }}"{% if t.width %} width="{{ t.width }}" height="{{ t.height }}"{% endif %} alt="{{ photo.title|default:'Photo sans titre' }}">
+                </a>
+            </div>
+            {% if photo.caption %}<p class="lead mt-3">{{ photo.caption }}</p>{% endif %}
+
+            <div class="photo-nav">
+                {% if newer_photo %}<a href="{% url 'detail_photo' newer_photo.pk %}" class="btn btn-outline-primary"><i class="fas fa-arrow-left"></i> Photo précédente</a>{% else %}<span></span>{% endif %}
+                {% if older_photo %}<a href="{% url 'detail_photo' older_photo.pk %}" class="btn btn-outline-primary">Photo suivante <i class="fas fa-arrow-right"></i></a>{% endif %}
             </div>
         </div>
-        
-        <!-- Colonne latérale avec informations -->
+
         <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Informations</h5>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        {% if photo.gallery %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-folder me-2"></i> Galerie</span>
-                            <a href="{% url 'detail_galerie' photo.gallery.slug %}" class="badge bg-primary rounded-pill">
-                                {{ photo.gallery.title }}
-                            </a>
-                        </li>
-                        {% endif %}
-                        
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-calendar me-2"></i> Date</span>
-                            <span class="text-muted">{{ photo.uploaded_at|date:"d F Y" }}</span>
-                        </li>
-                        
+            <div class="card">
+                <div class="card-body photo-side">
+                    <h3 class="h5 mb-0">Informations</h3>
+                    <dl class="mb-0">
+                        {% if photo.gallery %}<dt>Galerie</dt><dd><a href="{% url 'detail_galerie' photo.gallery.slug %}">{{ photo.gallery.title }}</a></dd>{% endif %}
+                        <dt>Ajoutée le</dt><dd>{{ photo.uploaded_at|date:"j F Y" }}</dd>
+                        {% if photo.uploaded_by and photo.uploaded_by.get_full_name %}<dt>Auteur</dt><dd>{{ photo.uploaded_by.get_full_name }}</dd>{% endif %}
                         {% if photo.tags.exists %}
-                        <li class="list-group-item">
-                            <div class="d-flex align-items-center mb-2">
-                                <i class="fas fa-tags me-2"></i> <strong>Mots-clés</strong>
-                            </div>
-                            <div>
-                                {% for tag in photo.tags.all %}
-                                <span class="badge bg-secondary me-1 mb-1">{{ tag.name }}</span>
-                                {% endfor %}
-                            </div>
-                        </li>
+                        <dt>Mots-clés</dt>
+                        <dd class="photo-tags">{% for tag in photo.tags.all %}<a href="{% url 'toutes_photos' %}?tag={{ tag.slug }}">{{ tag.name }}</a>{% endfor %}</dd>
                         {% endif %}
-                    </ul>
+                    </dl>
                 </div>
             </div>
-            
-            <div class="d-grid gap-2">
-                <a href="{% url 'toutes_photos' %}" class="btn btn-outline-primary">
-                    <i class="fas fa-images"></i> Toutes les photos
-                </a>
-                
-                {% if photo.gallery %}
-                <a href="{% url 'detail_galerie' photo.gallery.slug %}" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left"></i> Retour à la galerie
-                </a>
-                {% else %}
-                <a href="{% url 'liste_galeries' %}" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left"></i> Retour aux galeries
-                </a>
-                {% endif %}
+            <div class="d-grid gap-2 mt-3">
+                {% if photo.gallery %}<a href="{% url 'detail_galerie' photo.gallery.slug %}" class="btn btn-outline-secondary"><i class="fas fa-images me-2"></i>Retour à la galerie</a>
+                {% else %}<a href="{% url 'liste_galeries' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i>Retour aux galeries</a>{% endif %}
+                <a href="{% url 'toutes_photos' %}" class="btn btn-outline-primary"><i class="fas fa-th me-2"></i>Toutes les photos</a>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-    .photo-metadata {
-        background-color: #f8f9fa;
-        border-radius: 0.5rem;
-        padding: 1.5rem;
-    }
-    .photo-tags .badge {
-        font-weight: normal;
-        font-size: 0.85rem;
-        padding: 0.35em 0.65em;
-    }
-    .photo-actions .btn {
-        margin-bottom: 0.5rem;
-    }
-    .img-detail {
-        max-height: 70vh;
-        object-fit: contain;
-        background-color: #f0f0f0;
-    }
-    @media (max-width: 992px) {
-        .img-detail {
-            max-height: 50vh;
-        }
-    }
-</style>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    // Option pour ouvrir l'image en plein écran au clic
-    document.querySelector('.card img').addEventListener('click', function() {
-        window.open(this.src, '_blank');
-    });
-</script>
 {% endblock %}

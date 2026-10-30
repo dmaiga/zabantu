@@ -1,0 +1,37 @@
+<script type="module">
+    import PhotoSwipeLightbox from 'https://cdn.jsdelivr.net/npm/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js';
+
+    document.querySelectorAll('.pswp-gallery').forEach(function (gallery) {
+        const lightbox = new PhotoSwipeLightbox({
+            gallery: gallery,
+            children: 'a.pswp-item',
+            pswpModule: () => import('https://cdn.jsdelivr.net/npm/photoswipe@5.4.4/dist/photoswipe.esm.min.js'),
+            bgOpacity: 0.92,
+            wheelToZoom: true,
+        });
+        // Dimensions de l'original (attributs data), à défaut celles de l'image affichée
+        lightbox.addFilter('itemData', function (itemData) {
+            const img = itemData.element.querySelector('img');
+            const link = itemData.element;
+            itemData.src = link.href;
+            itemData.width = itemData.w = parseInt(link.dataset.pswpWidth, 10) || img.naturalWidth || 1600;
+            itemData.height = itemData.h = parseInt(link.dataset.pswpHeight, 10) || img.naturalHeight || 1067;
+            itemData.alt = img.alt;
+            return itemData;
+        });
+        // Légende sous la photo
+        lightbox.on('uiRegister', function () {
+            lightbox.pswp.ui.registerElement({
+                name: 'custom-caption', order: 9, isButton: false, appendTo: 'root', html: '',
+                onInit: function (el, pswp) {
+                    pswp.on('change', function () {
+                        const link = pswp.currSlide.data.element;
+                        el.textContent = (link && link.dataset.caption) || '';
+                        el.style.display = el.textContent ? '' : 'none';
+                    });
+                }
+            });
+        });
+        lightbox.init();
+    });
+</script>

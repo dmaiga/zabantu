@@ -1,413 +1,193 @@
 {% extends 'base_public.html' %}
 {% load static %}
 
+{% block title %}Contact - Zabantu{% endblock %}
 {% block banner_title %}Contactez-nous{% endblock %}
 {% block banner_subtitle %}Economy | Conflict | State{% endblock %}
 
 {% block extra_css %}
 <style>
-    :root {
-        --zabantu-primary: #6f826a;
-        --zabantu-secondary: #bf9264;
-        --zabantu-accent: #bbd8a3;
-        --zabantu-light: #f0f1c5;
-        --zabantu-dark: #2c3e2c;
-    }
+    .contact-wrap { max-width: 1140px; margin: 0 auto; padding: 0 1rem; }
 
-    /* Structure générale */
-    .contact-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem 1rem;
-    }
+    /* Colonne gauche : formulaire */
+    .contact-card { background: #fff; border: 1px solid #e6e9e0; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,.05); }
+    .contact-card h2 { font-size: 1.5rem; font-weight: 700; color: var(--zabantu-dark); margin-bottom: .35rem; }
+    .contact-intro { color: #5b6559; margin-bottom: 1.5rem; }
+    .contact-card .form-label { font-weight: 600; font-size: .92rem; color: var(--zabantu-dark); margin-bottom: .35rem; }
+    .contact-card .form-control, .contact-card .form-select { min-height: 46px; border: 1px solid #d5dacb; border-radius: 8px; padding: .65rem .9rem; }
+    .contact-card textarea.form-control { min-height: 150px; }
+    .contact-card .form-control:focus, .contact-card .form-select:focus { border-color: var(--zabantu-primary); box-shadow: 0 0 0 3px rgba(111,130,106,.25); }
+    .field-error { color: #b3261e; font-size: .85rem; margin-top: .25rem; }
+    .btn-submit { background: #566a52; color: #fff; border: 0; border-radius: 8px; min-height: 48px; padding: 0 2rem; font-weight: 600; transition: background .2s, transform .2s; }
+    .btn-submit:hover { background: var(--zabantu-dark); color: #fff; transform: translateY(-1px); }
 
-    /* Section Contact Info */
-    .contact-info-section {
-        background: linear-gradient(135deg, rgba(240, 241, 197, 0.2) 0%, rgba(187, 216, 163, 0.1) 100%);
-        border-radius: 12px;
-        padding: 2.5rem;
-        margin-bottom: 3rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-    }
+    /* Colonne droite : coordonnées en liste */
+    .contact-aside { background: linear-gradient(160deg, #2c3e2c 0%, #3d5240 100%); color: #fff; border-radius: 12px; padding: 2rem; position: sticky; top: 1rem; }
+    .contact-aside h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 1.25rem; color: #fff; }
+    .contact-list { list-style: none; margin: 0; padding: 0; }
+    .contact-list li { display: flex; gap: 1rem; padding: .9rem 0; border-top: 1px solid rgba(255,255,255,.14); }
+    .contact-list li:first-child { border-top: 0; padding-top: 0; }
+    .contact-list .ico { flex: 0 0 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,.12); color: var(--zabantu-accent); display: flex; align-items: center; justify-content: center; }
+    .contact-list .label { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.65); margin-bottom: .15rem; }
+    .contact-list .value { margin: 0; line-height: 1.5; }
+    .contact-list a { color: #fff; text-decoration: none; font-weight: 500; }
+    .contact-list a:hover, .contact-list a:focus-visible { color: var(--zabantu-accent); text-decoration: underline; }
+    .contact-social { display: flex; gap: .6rem; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,.14); }
+    .contact-social a { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.12); color: #fff; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: background .2s; }
+    .contact-social a:hover { background: var(--zabantu-secondary); }
 
-    .contact-info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 2rem;
-    }
+    /* Carte et FAQ */
+    .contact-block { margin-top: 3rem; }
+    .contact-block h2 { font-size: 1.5rem; font-weight: 700; color: var(--zabantu-dark); margin-bottom: 1.25rem; }
+    .map-container { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,.08); height: 380px; }
+    .map-container iframe { width: 100%; height: 100%; border: 0; }
+    .faq .accordion-item { border: 1px solid #e6e9e0; border-radius: 10px !important; overflow: hidden; margin-bottom: .6rem; }
+    .faq .accordion-button { font-weight: 600; color: var(--zabantu-dark); background: #fff; min-height: 56px; }
+    .faq .accordion-button:not(.collapsed) { background: rgba(111,130,106,.1); color: var(--zabantu-dark); box-shadow: none; }
+    .faq .accordion-body { color: #3f4a40; line-height: 1.6; }
 
-    .contact-info-card {
-        background: white;
-        border-radius: 8px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        transition: transform 0.3s ease;
-    }
-
-    .contact-info-card:hover {
-        transform: translateY(-5px);
-    }
-
-    .contact-icon {
-        font-size: 1.8rem;
-        color: var(--zabantu-primary);
-        margin-bottom: 1rem;
-    }
-
-    .social-links {
-        display: flex;
-        gap: 1rem;
-        margin-top: 1rem;
-    }
-
-    .social-link {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: rgba(111, 130, 106, 0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--zabantu-primary);
-        transition: all 0.3s ease;
-    }
-
-    .social-link:hover {
-        background: var(--zabantu-primary);
-        color: white;
-    }
-
-    /* Formulaire */
-    .form-section {
-        background: white;
-        border-radius: 12px;
-        padding: 2.5rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-        margin-bottom: 3rem;
-    }
-
-    .form-title {
-        color: var(--zabantu-dark);
-        margin-bottom: 1.5rem;
-        position: relative;
-        padding-bottom: 0.5rem;
-    }
-
-    .form-title::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 60px;
-        height: 3px;
-        background: var(--zabantu-secondary);
-    }
-
-    .form-control {
-        border: 1px solid #e0e0e0;
-        border-radius: 6px;
-        padding: 12px 15px;
-        transition: all 0.3s ease;
-    }
-
-    .form-control:focus {
-        border-color: var(--zabantu-primary);
-        box-shadow: 0 0 0 3px rgba(111, 130, 106, 0.2);
-    }
-
-    .btn-submit {
-        background: var(--zabantu-primary);
-        color: white;
-        border: none;
-        padding: 12px 30px;
-        border-radius: 6px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .btn-submit:hover {
-        background: var(--zabantu-secondary);
-        transform: translateY(-2px);
-    }
-
-    /* FAQ */
-    .faq-section {
-        background: white;
-        border-radius: 12px;
-        padding: 2.5rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-        margin-bottom: 3rem;
-    }
-
-    .faq-item {
-        border-bottom: 1px solid #f0f0f0;
-        padding: 1.5rem 0;
-    }
-
-    .faq-question {
-        font-weight: 600;
-        color: var(--zabantu-dark);
-        cursor: pointer;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .faq-question::after {
-        content: '+';
-        font-size: 1.5rem;
-        color: var(--zabantu-primary);
-    }
-
-    .faq-question[aria-expanded="true"]::after {
-        content: '-';
-    }
-
-    .faq-answer {
-        padding-top: 1rem;
-        color: #555;
-    }
-
-    /* Carte (placée en bas) */
-    .map-section {
-        margin-top: 3rem;
-    }
-
-    .map-container {
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        height: 400px;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .contact-info-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .contact-container {
-            padding: 1rem;
-        }
-        
-        .form-section, .faq-section, .contact-info-section {
-            padding: 1.5rem;
-        }
-    }
-    /* 🔥 LIENS CONTACT */
-.contact-info-card a {
-    color: var(--zabantu-primary);
-    text-decoration: none;
-    font-weight: 500;
-    transition: 0.3s;
-}
-
-/* 🔥 HOVER */
-.contact-info-card a:hover {
-    color: var(--zabantu-secondary);
-    text-decoration: underline;
-}
+    @media (max-width: 991.98px) { .contact-aside { position: static; } }
+    @media (max-width: 575.98px) { .contact-card, .contact-aside { padding: 1.25rem; } .btn-submit { width: 100%; } }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="contact-container">
-    <!-- Section 1: Informations de contact -->
-    <section class="contact-info-section">
-        <h2 class="text-center mb-4">Comment nous contacter</h2>
-        <div class="contact-info-grid">
-            <!-- Adresse -->
-            <div class="contact-info-card">
-                <div class="contact-icon">
-                    <i class="fas fa-map-marker-alt"></i>
-                </div>
-                <h4>Notre adresse</h4>
-                <p>Faculté des Sciences Économiques et de Gestion (FSEG)</p>
-              
-            </div>
-            
-            <!-- Téléphone -->
-            <div class="contact-info-card">
-                <div class="contact-icon">
-                    <i class="fas fa-phone"></i>
-                </div>
-                <h4>Téléphone</h4>
-                <p><a href="#">+223 77 94 14 70</a></p>
-                <p><a href="#">+223 76 63 45 15</a></p>
-                <p>Lundi-Samedi: 8h-17h</p>
-            </div>
-            
-            <!-- Email -->
-            <div class="contact-info-card">
-                <div class="contact-icon">
-                    <i class="fas fa-envelope"></i>
-                </div>
-                <h4>Email</h4>
-                <p>info@zabantu.net</a></p>
-                <div class="social-links">
-                    <a href="https://www.linkedin.com/company/zabantu-ecs/posts/?feedView=all" class="social-link" target="_blank">
-                        <i class="fab fa-linkedin-in"></i>  
-                    </a>
-                    <a href="https://www.facebook.com/zabantu.ecs" class="social-link" target="_blank">
-                        <i class="fab fa-facebook-f"></i> 
-                    </a>
-                    
-                    <a href="#" class="social-link" target="_blank">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-<!-- Section 2: Formulaire -->
-<section class="form-section">
-    <h3 class="form-title">Envoyez-nous un message</h3>
-    <form method="post" class="needs-validation" novalidate>
-        {% csrf_token %}
-        
-        {% if form.non_field_errors %}
-            <div class="alert alert-danger">
-                {% for error in form.non_field_errors %}
-                    {{ error }}
+<div class="contact-wrap">
+    <div class="row g-4 align-items-start">
+
+        <!-- Formulaire -->
+        <div class="col-lg-7">
+            <section class="contact-card" id="formulaire">
+                <h2>Envoyez-nous un message</h2>
+                <p class="contact-intro">Une question, une proposition de collaboration ? Écrivez-nous, nous vous répondrons.</p>
+
+                {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
                 {% endfor %}
-            </div>
-        {% endif %}
-        
-        <div class="row g-3">
-            <!-- Champ Nom -->
-            <div class="col-md-6">
-                <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
-                {{ form.name }}
-                {% if form.name.errors %}
-                    <div class="text-danger">{{ form.name.errors }}</div>
-                {% endif %}
-            </div>
-            
-            <!-- Champ Prénom -->
-            <div class="col-md-6">
-                <label for="{{ form.last_name.id_for_label }}" class="form-label">{{ form.last_name.label }}</label>
-                {{ form.last_name }}
-                {% if form.last_name.errors %}
-                    <div class="text-danger">{{ form.last_name.errors }}</div>
-                {% endif %}
-            </div>
-            
-            <!-- Champ Email -->
-            <div class="col-md-6">
-                <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
-                {{ form.email }}
-                {% if form.email.errors %}
-                    <div class="text-danger">{{ form.email.errors }}</div>
-                {% endif %}
-            </div>
-            
-            <!-- Champ Téléphone -->
-            <div class="col-md-6">
-                <label for="{{ form.phone.id_for_label }}" class="form-label">{{ form.phone.label }}</label>
-                {{ form.phone }}
-                {% if form.phone.errors %}
-                    <div class="text-danger">{{ form.phone.errors }}</div>
-                {% endif %}
-                <div class="form-text">Format : +223 XX XXX XXX ou 00223XXXXXXXX</div>
-            </div>
-            
-            <!-- Champ Sujet -->
-            <div class="col-12">
-                <label for="{{ form.subject.id_for_label }}" class="form-label">{{ form.subject.label }}</label>
-                {{ form.subject }}
-                {% if form.subject.errors %}
-                    <div class="text-danger">{{ form.subject.errors }}</div>
-                {% endif %}
-            </div>
-            
-            <!-- Champ Message -->
-            <div class="col-12">
-                <label for="{{ form.message.id_for_label }}" class="form-label">{{ form.message.label }}</label>
-                {{ form.message }}
-                {% if form.message.errors %}
-                    <div class="text-danger">{{ form.message.errors }}</div>
-                {% endif %}
-            </div>
-            <div class="mb-3">
-    {{ form.captcha.label_tag }}
-    {{ form.captcha }}
-    {{ form.captcha.errors }}
-</div>
-            <!-- Bouton de soumission -->
-            <div class="col-12">
-                <button type="submit" class="btn btn-submit">
-                    <i class="fas fa-paper-plane me-2"></i>Envoyer le message
-                </button>
-            </div>
-        </div>
-    </form>
-    
-    <!-- Messages de feedback -->
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} mt-3">{{ message }}</div>
-    {% endfor %}
-</section>
 
-    <!-- Section 3: FAQ -->
-    <section class="faq-section">
-        <h3 class="form-title">Questions fréquentes</h3>
-        
-        <div class="accordion" id="faqAccordion">
-            <div class="faq-item">
-                <div class="faq-question" id="headingOne" data-bs-toggle="collapse" data-bs-target="#collapseOne">
-                    Comment puis-je collaborer avec votre équipe ?
-                </div>
-                <div id="collapseOne" class="collapse faq-answer" aria-labelledby="headingOne">
-                    Nous sommes ouverts aux collaborations interdisciplinaires. Veuillez nous contacter via le formulaire en précisant votre domaine d'expertise et la nature de la collaboration envisagée.
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question" id="headingTwo" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
-                    Où puis-je trouver vos publications ?
-                </div>
-                <div id="collapseTwo" class="collapse faq-answer" aria-labelledby="headingTwo">
-                    Nos publications sont disponibles dans la section dédiée de notre site web. Certains travaux peuvent être disponibles sur demande.
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question" id="headingThree" data-bs-toggle="collapse" data-bs-target="#collapseThree">
-                    Quels sont vos horaires d'ouverture ?
-                </div>
-                <div id="collapseThree" class="collapse faq-answer" aria-labelledby="headingThree">
-                    Notre bureau est ouvert du lundi au vendredi de 8h à 17h. Les rendez-vous en dehors de ces horaires peuvent être arrangés sur demande.
-                </div>
-            </div>
-        </div>
-    </section>
+                <form method="post" action="#formulaire" novalidate>
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
 
-    <!-- Section 4: Carte (placée en bas) -->
-    <section class="map-section">
-        <h3 class="form-title">Nous trouver</h3>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+                            {{ form.name }}
+                            {% for e in form.name.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label">{{ form.last_name.label }}</label>
+                            {{ form.last_name }}
+                            {% for e in form.last_name.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                            {{ form.email }}
+                            {% for e in form.email.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label">{{ form.phone.label }} <small class="text-muted fw-normal">(facultatif)</small></label>
+                            {{ form.phone }}
+                            {% for e in form.phone.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+                        </div>
+                        <div class="col-12">
+                            <label for="{{ form.subject.id_for_label }}" class="form-label">{{ form.subject.label }}</label>
+                            {{ form.subject }}
+                            {% for e in form.subject.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+                        </div>
+                        <div class="col-12">
+                            <label for="{{ form.message.id_for_label }}" class="form-label">{{ form.message.label }}</label>
+                            {{ form.message }}
+                            {% for e in form.message.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn-submit"><i class="fas fa-paper-plane me-2"></i>Envoyer le message</button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+        </div>
+
+        <!-- Coordonnées en liste -->
+        <div class="col-lg-5">
+            <aside class="contact-aside" aria-label="Coordonnées">
+                <h2>Nos coordonnées</h2>
+                <ul class="contact-list">
+                    <li>
+                        <span class="ico"><i class="fas fa-location-dot"></i></span>
+                        <div>
+                            <div class="label">Adresse</div>
+                            <p class="value">Faculté des Sciences Économiques et de Gestion (FSEG)</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="ico"><i class="fas fa-phone"></i></span>
+                        <div>
+                            <div class="label">Téléphone</div>
+                            <p class="value"><a href="tel:+22377941470">+223 77 94 14 70</a></p>
+                            <p class="value"><a href="tel:+22376634515">+223 76 63 45 15</a></p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="ico"><i class="fas fa-envelope"></i></span>
+                        <div>
+                            <div class="label">E-mail</div>
+                            <p class="value"><a href="mailto:info@zabantu.net">info@zabantu.net</a></p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="ico"><i class="far fa-clock"></i></span>
+                        <div>
+                            <div class="label">Horaires</div>
+                            <p class="value">Lundi - Samedi : 8h - 17h</p>
+                        </div>
+                    </li>
+                </ul>
+                <div class="contact-social">
+                    <a href="https://www.linkedin.com/company/zabantu-ecs/posts/?feedView=all" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn de Zabantu"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://www.facebook.com/zabantu.ecs" target="_blank" rel="noopener noreferrer" aria-label="Facebook de Zabantu"><i class="fab fa-facebook-f"></i></a>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Carte -->
+    <section class="contact-block">
+        <h2>Nous trouver</h2>
         <div class="map-container">
-            <iframe src="{{ map_embed_url }}" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            <iframe src="{{ map_embed_url }}" title="Carte : localisation de Zabantu" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="contact-block faq">
+        <h2>Questions fréquentes</h2>
+        <div class="accordion" id="faqAccordion">
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1" aria-expanded="false" aria-controls="faq1">Comment puis-je collaborer avec votre équipe ?</button>
+                </h3>
+                <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">Nous sommes ouverts aux collaborations interdisciplinaires. Veuillez nous contacter via le formulaire en précisant votre domaine d'expertise et la nature de la collaboration envisagée.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" aria-expanded="false" aria-controls="faq2">Où puis-je trouver vos publications ?</button>
+                </h3>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">Nos publications sont disponibles dans la section dédiée de notre site web. Certains travaux peuvent être disponibles sur demande.</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">Quels sont vos horaires d'ouverture ?</button>
+                </h3>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">Notre bureau est ouvert du lundi au vendredi de 8h à 17h. Les rendez-vous en dehors de ces horaires peuvent être arrangés sur demande.</div>
+                </div>
+            </div>
         </div>
     </section>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    // Validation du formulaire
-    (function() {
-        'use strict';
-        const forms = document.querySelectorAll('.needs-validation');
-        
-        Array.from(forms).forEach(function(form) {
-            form.addEventListener('submit', function(event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add('was-validated');
-            }, false);
-        });
-    })();
-</script>
 {% endblock %}

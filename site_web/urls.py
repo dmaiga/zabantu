@@ -5,6 +5,7 @@ from .views import (
     public_article_detail,
     public_event_list,
     public_event_detail,
+    public_event_ics,
     public_member_list,
     public_member_detail,
     public_guelekan_list,
@@ -32,6 +33,7 @@ urlpatterns = [
     
     path('evenements/', public_event_list, name='public_event_list'),
     path('evenements/<int:pk>/', public_event_detail, name='public_event_detail'),
+    path('evenements/<int:pk>/calendrier.ics', public_event_ics, name='public_event_ics'),
     path('membres/', public_member_list, name='public_member_list'),
     path('membres/<int:pk>/', public_member_detail, name='public_member_detail'),
     # Guelekan

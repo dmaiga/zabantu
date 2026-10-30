@@ -1,136 +1,61 @@
 {% extends 'base_public.html' %}
+{% load photo_tags %}
+
+{% block title %}{{ galerie.title }} - Galerie Zabantu{% endblock %}
+{% block banner_title %}Galerie photos{% endblock %}
+{% block banner_subtitle %}{{ galerie.title }}{% endblock %}
+
+{% block extra_css %}{% include 'site_web/includes/photo_viewer_css.html' %}{% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<div class="container">
+    <nav aria-label="Fil d'Ariane" class="mb-3">
+        <ol class="breadcrumb small mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'liste_galeries' %}">Galerie</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ galerie.title|truncatechars:60 }}</li>
+        </ol>
+    </nav>
 
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">{{ galerie.title }}</h1>
-
-        <a href="{% url 'liste_galeries' %}" class="btn btn-outline-secondary btn-sm">
-            <i class="fas fa-arrow-left"></i> Retour
-        </a>
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+        <div>
+            <h2 class="h3 mb-1">{{ galerie.title }}</h2>
+            <p class="text-muted mb-0"><i class="far fa-calendar-alt me-1"></i>{{ galerie.created_at|date:"j F Y" }} · {{ photo_total }} photo{{ photo_total|pluralize }}</p>
+        </div>
+        <a href="{% url 'toutes_photos' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-images me-1"></i>Toutes les photos</a>
     </div>
 
-    <!-- DESCRIPTION -->
     {% if galerie.description %}
-    <div class="mb-4 p-3 bg-light rounded">
-        <p class="mb-0">{{ galerie.description|linebreaks }}</p>
-    </div>
+    <div class="mb-4 p-3 bg-light rounded">{{ galerie.description|linebreaks }}</div>
     {% endif %}
 
-    <!-- INFOS -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <span class="badge bg-primary">
-            {{ galerie.photo_count }} photo{{ galerie.photo_count|pluralize }}
-        </span>
-
-        <a href="{% url 'toutes_photos' %}" class="btn btn-outline-primary btn-sm">
-            <i class="fas fa-images"></i> Toutes les photos
-        </a>
-    </div>
-
-    <!-- GRID -->
     {% if photos %}
-    <div class="photo-grid">
-
+    <div class="photo-masonry pswp-gallery">
         {% for photo in photos %}
-        <div class="photo-card">
-
-            <a href="{{ photo.image.url }}"
-               data-lightbox="gallery-{{ galerie.slug }}"
-               data-title="{{ photo.title }}">
-
-                <img src="{{ photo.image.url }}" alt="{{ photo.title }}">
+        {% thumb photo.image 640 as t %}
+        <figure class="photo-tile">
+            <a class="pswp-item" href="{{ photo.image.url }}" data-caption="{{ photo.title }}"{% if t.src_width %} data-pswp-width="{{ t.src_width }}" data-pswp-height="{{ t.src_height }}"{% endif %}>
+                <img src="{{ t.url }}"{% if t.width %} width="{{ t.width }}" height="{{ t.height }}"{% endif %} alt="{{ photo.title|default:'Photo de la galerie' }}" loading="lazy">
             </a>
-
-        </div>
+            <a class="photo-info" href="{% url 'detail_photo' photo.pk %}" aria-label="Voir la fiche de la photo"><i class="fas fa-circle-info"></i></a>
+            {% if photo.title %}<figcaption>{{ photo.title }}</figcaption>{% endif %}
+        </figure>
         {% endfor %}
-
     </div>
 
-    <!-- PAGINATION -->
     {% if photos.has_other_pages %}
-    <nav class="mt-4">
-        <ul class="pagination justify-content-center">
-
-            {% if photos.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ photos.previous_page_number }}">
-                    &laquo;
-                </a>
-            </li>
-            {% endif %}
-
-            {% for num in photos.paginator.page_range %}
-                {% if photos.number == num %}
-                    <li class="page-item active">
-                        <span class="page-link">{{ num }}</span>
-                    </li>
-                {% else %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-
-            {% if photos.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ photos.next_page_number }}">
-                    &raquo;
-                </a>
-            </li>
-            {% endif %}
-
+    <nav class="mt-4" aria-label="Pagination des photos">
+        <ul class="pagination justify-content-center flex-wrap">
+            {% if photos.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ photos.previous_page_number }}">Précédent</a></li>{% endif %}
+            <li class="page-item disabled"><span class="page-link">Page {{ photos.number }} sur {{ photos.paginator.num_pages }}</span></li>
+            {% if photos.has_next %}<li class="page-item"><a class="page-link" href="?page={{ photos.next_page_number }}">Suivant</a></li>{% endif %}
         </ul>
     </nav>
     {% endif %}
-
     {% else %}
-    <div class="alert alert-info text-center">
-        Aucune photo dans cette galerie.
-    </div>
+    <div class="text-center py-5 text-muted"><i class="fas fa-images fa-3x mb-3"></i><p class="mb-0">Aucune photo dans cette galerie.</p></div>
     {% endif %}
-
 </div>
-
-<!-- 🔥 STYLE -->
-<style>
-.photo-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 15px;
-}
-
-.photo-card {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
-    border-radius: 8px;
-    background: #f5f5f5;
-}
-
-.photo-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.3s ease;
-}
-
-.photo-card:hover img {
-    transform: scale(1.05);
-}
-</style>
-
 {% endblock %}
 
-{% block extra_js %}
-<script>
-lightbox.option({
-    'albumLabel': "Photo %1 sur %2 - {{ galerie.title }}",
-    'wrapAround': true,
-    'fadeDuration': 200
-});
-</script>
-{% endblock %}
+{% block extra_js %}{% include 'site_web/includes/photo_viewer_js.html' %}{% endblock %}

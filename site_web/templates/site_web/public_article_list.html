@@ -294,8 +294,8 @@
                     </a>
                 </li>
                 <li class="filter-item">
-                    <a href="{% url 'public_guelekan_list' %}" 
-                       class="filter-link {% if current_filter == 'public_guelekan_list' %}active{% endif %}">
+                    <a href="{% url 'public_article_list' %}?type=guelekan" 
+                       class="filter-link {% if current_filter == 'guelekan' %}active{% endif %}">
                         Séminaire Gɛlɛkan
                         <span class="badge-count">{{ guelekan_count }}</span>
                     </a>
@@ -322,7 +322,35 @@
                        class="form-control" placeholder="Rechercher une publication (titre, résumé, mot-clé)…">
                 <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i><span class="visually-hidden">Rechercher</span></button>
             </form>
-            {% if articles %}
+            {% if current_filter == 'guelekan' %}
+                {% for g in guelekans %}
+                <article class="pub-card">
+                    <a class="pub-cover" href="{% url 'public_guelekan_detail' g.slug %}" tabindex="-1" aria-hidden="true">
+                        {% if g.cover_image %}<img src="{{ g.cover_image.url }}" alt="" loading="lazy">{% else %}<i class="fas fa-microphone-lines"></i>{% endif %}
+                    </a>
+                    <div class="pub-body">
+                        <div class="pub-meta-top">
+                            <span class="badge-type badge-type-zabantu">Séminaire Gɛlɛkan</span>
+                            <time class="pub-date" datetime="{{ g.publish_at|default:g.created_at|date:'Y-m-d' }}">{{ g.publish_at|default:g.created_at|date:"j F Y" }}</time>
+                        </div>
+                        <h3 class="pub-title"><a href="{% url 'public_guelekan_detail' g.slug %}">{{ g.title|striptags|safe }}</a></h3>
+                        {% with intervenants=g.intervenants.all %}{% if intervenants %}
+                        <p class="pub-authors"><i class="fas fa-users"></i>{% for i in intervenants %}{{ i.full_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+                        {% endif %}{% endwith %}
+                        <p class="pub-excerpt">{% if g.subtitle %}{{ g.subtitle|truncatewords:40 }}{% else %}{{ g.content|default_if_none:""|striptags|safe|truncatewords:40 }}{% endif %}</p>
+                        <div class="pub-actions">
+                            <a href="{% url 'public_guelekan_detail' g.slug %}" class="btn btn-primary btn-sm">Voir le compte-rendu</a>
+                            {% if g.pdf_file %}<a href="{{ g.pdf_file.url }}" class="btn btn-outline-primary btn-sm" target="_blank" rel="noopener noreferrer"><i class="fas fa-file-pdf"></i> PDF</a>{% endif %}
+                        </div>
+                    </div>
+                </article>
+                {% empty %}
+                <div class="empty-state">
+                    <h3 class="empty-state-title">Aucun séminaire trouvé</h3>
+                    <p class="empty-state-text">Aucun séminaire Gɛlɛkan ne correspond à votre recherche.</p>
+                </div>
+                {% endfor %}
+            {% elif articles %}
                 {% for article in articles %}
                 <article class="pub-card">
                     <a class="pub-cover" href="{% url 'public_article_detail' article.slug %}" tabindex="-1" aria-hidden="true">
@@ -390,6 +418,15 @@
                         Voir toutes les publications
                     </a>
                 </div>
+            {% endif %}
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Pagination des publications" class="mt-4">
+                <ul class="pagination justify-content-center flex-wrap">
+                    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?{% if current_filter %}type={{ current_filter }}&{% endif %}{% if search_query %}q={{ search_query|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">Précédent</a></li>{% endif %}
+                    <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span></li>
+                    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?{% if current_filter %}type={{ current_filter }}&{% endif %}{% if search_query %}q={{ search_query|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Suivant</a></li>{% endif %}
+                </ul>
+            </nav>
             {% endif %}
         </div>
     </div>

@@ -1,6 +1,8 @@
 {% extends 'base_public.html' %}
 
 {% block title %}{{ event.title }} | Zabantu{% endblock %}
+{% block banner_title %}Nos Événements{% endblock %}
+{% block banner_subtitle %}Séminaires, formations et rencontres du groupe Zabantu{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -46,17 +48,23 @@
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        height: 100%;
+        background: #eef0e8;
+        border: 1px solid #e0e4d8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 260px;
     }
-    
+
+    /* Affiche entière : jamais rognée */
     .event-image {
         width: 100%;
-        height: 100%;
-        object-fit: cover;
+        height: auto;
+        max-height: 520px;
+        object-fit: contain;
         display: block;
-        min-height: 300px;
     }
-    
+
     /* Carte d'informations */
     .event-details-card {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
@@ -225,9 +233,14 @@
         margin-bottom: 1.5rem;
     }
     
+    /* Cartes des événements similaires */
+    .event-type-badge { background-color: #566a52; color: #fff; font-size: 0.8rem; }
+    .event-card { border-left: 4px solid var(--zabantu-secondary); transition: transform .2s, box-shadow .2s; }
+    .event-card:hover { transform: translateY(-4px); box-shadow: 0 6px 20px rgba(0,0,0,.1); }
+
     /* Badges */
     .badge-event {
-        background-color: var(--zabantu-primary);
+        background-color: #566a52;
         color: white;
         font-size: 0.85rem;
         padding: 0.4rem 0.8rem;
@@ -239,13 +252,13 @@
     }
     
     .badge-upcoming {
-        background-color: #28a745;
+        background-color: #2f7a4b;
         color: white;
     }
     
     /* CTA */
     .event-cta {
-        background: linear-gradient(135deg, var(--zabantu-primary) 0%, var(--zabantu-secondary) 100%);
+        background: linear-gradient(135deg, #2c3e2c 0%, #566a52 100%);
         color: white;
         padding: 2.5rem;
         border-radius: 12px;
@@ -338,19 +351,24 @@
 
 {% block content %}
 <div class="event-container">
+    <nav aria-label="Fil d'Ariane" class="mb-3">
+        <ol class="breadcrumb small mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'public_event_list' %}">Événements</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ event.title|truncatechars:60 }}</li>
+        </ol>
+    </nav>
+
     <!-- En-tête de l'événement -->
     <header class="event-header">
-        <h1 class="event-title">{{ event.title }}</h1>
+        <h2 class="event-title">{{ event.title }}</h2>
         
         <div class="event-meta">
             <span class="badge {% if is_past_event %}badge-past{% else %}badge-upcoming{% endif %} me-2">
                 {% if is_past_event %}Événement passé{% else %}À venir{% endif %}
             </span>
             <span class="badge badge-event me-2">{{ event.get_event_type_display }}</span>
-            <span><i class="far fa-calendar-alt me-1"></i> {{ event.date|date:"d F Y à H:i" }}</span>
-            {% if event.end_date %}
-            <span class="ms-2"><i class="fas fa-flag-checkered me-1"></i> {{ event.end_date|date:"d F Y à H:i" }}</span>
-            {% endif %}
+            <span><i class="far fa-calendar-alt me-1"></i> {{ time_range }}</span>
         </div>
     </header>
     
@@ -377,7 +395,13 @@
                 <div class="detail-icon"><i class="far fa-clock"></i></div>
                 <div class="detail-content">
                     <h3 class="detail-title">Date et heure</h3>
-                    <p class="mb-0">{{ event.get_event_duration }}</p>
+                    <p class="mb-2">{{ time_range }}</p>
+                    {% if not is_past_event %}
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ google_calendar_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm btn-event"><i class="far fa-calendar-plus me-1"></i>Google Agenda</a>
+                        <a href="{% url 'public_event_ics' event.pk %}" class="btn btn-outline-primary btn-sm btn-event"><i class="fas fa-download me-1"></i>Autre agenda (.ics)</a>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             
@@ -394,10 +418,12 @@
             <div class="mb-3">
                 <p class="mb-1 text-primary fw-bold"><i class="fas fa-laptop me-1"></i> Événement en ligne</p>
         
-                {% if event.webinar_link %}
-                    <a href="{{ event.webinar_link }}" target="_blank" class="btn btn-primary btn-sm btn-event">
+                {% if event.webinar_link and not is_past_event %}
+                    <a href="{{ event.webinar_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm btn-event">
                         <i class="fas fa-external-link-alt me-1"></i>Rejoindre la réunion
                     </a>
+                {% elif is_past_event %}
+                    <p class="mb-0 small text-muted">Cet événement est terminé.</p>
                 {% endif %}
             </div>
         {% endif %}
@@ -411,7 +437,7 @@
                 <p class="mb-1 text-primary fw-bold"><i class="fas fa-building me-1"></i> Présentiel</p>
                 <p class="mb-2">{{ event.location|default:"Lieu à confirmer" }}</p>
                 {% if event.lieu_gps %}
-                    <a href="{{ event.lieu_gps }}" target="_blank" class="btn btn-outline-primary btn-sm btn-event">
+                    <a href="{{ event.lieu_gps }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm btn-event">
                         <i class="fas fa-directions me-1"></i>Itinéraire
                     </a>
                 {% endif %}
@@ -513,23 +539,18 @@
                     {% endif %}
                     
                     <div class="intervenant-social">
-                        {% if intervenant.email %}
-                        <a href="mailto:{{ intervenant.email }}" title="Email">
-                            <i class="fas fa-envelope"></i>
-                        </a>
-                        {% endif %}
                         {% if intervenant.linkedin %}
-                        <a href="{{ intervenant.linkedin }}" target="_blank" title="LinkedIn">
+                        <a href="{{ intervenant.linkedin }}" target="_blank" rel="noopener noreferrer" title="LinkedIn">
                             <i class="fab fa-linkedin"></i>
                         </a>
                         {% endif %}
                         {% if intervenant.twitter %}
-                        <a href="{{ intervenant.twitter }}" target="_blank" title="Twitter">
+                        <a href="{{ intervenant.twitter }}" target="_blank" rel="noopener noreferrer" title="Twitter">
                             <i class="fab fa-twitter"></i>
                         </a>
                         {% endif %}
                         {% if intervenant.website %}
-                        <a href="{{ intervenant.website }}" target="_blank" title="Site web">
+                        <a href="{{ intervenant.website }}" target="_blank" rel="noopener noreferrer" title="Site web">
                             <i class="fas fa-globe"></i>
                         </a>
                         {% endif %}
@@ -548,13 +569,13 @@
         <h3 class="mb-3">Rejoignez-nous pour cet événement</h3>
         <p class="mb-4">Ne manquez pas cette opportunité unique d'échanger et d'apprendre</p>
         {% if event.is_webinar and event.webinar_link %}
-        <a href="{{ event.webinar_link }}" target="_blank" class="btn btn-light btn-lg">
+        <a href="{{ event.webinar_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-light btn-lg">
             <i class="fas fa-video me-2"></i>Rejoindre le webinaire
         </a>
         {% elif not event.is_webinar %}
         <div class="d-flex gap-2 justify-content-center flex-wrap">
             {% if event.lieu_gps %}
-            <a href="{{ event.lieu_gps }}" target="_blank" class="btn btn-light btn-lg">
+            <a href="{{ event.lieu_gps }}" target="_blank" rel="noopener noreferrer" class="btn btn-light btn-lg">
                 <i class="fas fa-directions me-2"></i>Itinéraire
             </a>
             {% endif %}
@@ -564,6 +585,10 @@
     </div>
     {% endif %}
     
+    <div class="text-center mt-4">
+        <a href="{% url 'public_event_list' %}" class="btn btn-outline-primary"><i class="fas fa-arrow-left me-2"></i>Tous les événements</a>
+    </div>
+
     <!-- Événements similaires -->
     {% if similar_events %}
     <div class="similar-events mt-5 pt-5 border-top">
@@ -572,9 +597,9 @@
             {% for similar in similar_events %}
             <div class="col-md-4 mb-4">
                 <div class="card h-100 event-card">
-                    <div class="event-image-container" style="height: 200px;">
+                    <div class="event-image-container" style="height: 200px; min-height: 0;">
                         {% if similar.image %}
-                        <img src="{{ similar.image.url }}" class="event-image" alt="{{ similar.title }}">
+                        <img src="{{ similar.image.url }}" class="event-image" alt="{{ similar.title }}" style="height: 100%; max-height: none;">
                         {% else %}
                         <div class="d-flex align-items-center justify-content-center h-100 bg-light text-muted">
                             <i class="fas fa-calendar-alt fa-2x opacity-25"></i>
@@ -583,10 +608,11 @@
                     </div>
                     <div class="card-body">
                         <span class="badge event-type-badge mb-2">{{ similar.get_event_type_display }}</span>
+                        {% if similar.date < now %}<span class="badge bg-secondary mb-2">Terminé</span>{% endif %}
                         <h5 class="card-title">{{ similar.title }}</h5>
                         <p class="card-text text-muted small">
                             <i class="fas fa-calendar-alt me-1"></i>
-                            {{ similar.date|date:"d M Y" }}
+                            {{ similar.date|date:"j F Y" }}
                         </p>
                         <p class="card-text small">{{ similar.content|striptags|truncatewords:15 }}</p>
                     </div>

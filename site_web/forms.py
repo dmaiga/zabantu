@@ -25,7 +25,8 @@ from .models import ContactMessage
 from captcha.fields import CaptchaField
 
 class ContactForm(forms.ModelForm):
-    captcha = CaptchaField()
+    # Captcha retiré (demande du client) :
+    # captcha = CaptchaField()
     class Meta:
         model = ContactMessage
         fields = ['name', 'last_name', 'phone', 'email', 'subject', 'message']
@@ -56,7 +57,6 @@ class ContactForm(forms.ModelForm):
         self.fields['email'].label = "Email"
         self.fields['subject'].label = "Sujet"
         self.fields['message'].label = "Message"
-        self.fields['captcha'].label = "Vérification"
 
 
 

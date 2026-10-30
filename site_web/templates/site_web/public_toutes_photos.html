@@ -1,150 +1,63 @@
 {% extends 'base_public.html' %}
+{% load photo_tags %}
+
+{% block title %}Toutes les photos - Zabantu{% endblock %}
+{% block banner_title %}Galerie photos{% endblock %}
+{% block banner_subtitle %}Toutes les photos du groupe Zabantu{% endblock %}
+
+{% block extra_css %}{% include 'site_web/includes/photo_viewer_css.html' %}{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Toutes les photos</h1>
-        <div>
-            <a href="{% url 'liste_galeries' %}" class="btn btn-outline-secondary me-2">
-                <i class="fas fa-images"></i> Voir les galeries
-            </a>
-            <a href="{% url 'liste_galeries' %}" class="btn btn-outline-primary">
-                <i class="fas fa-arrow-left"></i> Retour
-            </a>
-        </div>
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <p class="mb-0 text-muted">{{ photos.paginator.count }} photo{{ photos.paginator.count|pluralize }}</p>
+        <a href="{% url 'liste_galeries' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-arrow-left me-1"></i>Retour aux galeries</a>
     </div>
 
+    {% if gallery_filters %}
+    <nav class="page-filters" aria-label="Filtrer par galerie">
+        <a href="{% url 'toutes_photos' %}{% if current_tag %}?tag={{ current_tag }}{% endif %}" class="{% if not current_gallery %}active{% endif %}">Toutes les galeries</a>
+        {% for g in gallery_filters %}
+        <a href="?gallery={{ g.slug }}{% if current_tag %}&tag={{ current_tag }}{% endif %}" class="{% if current_gallery == g.slug %}active{% endif %}">{{ g.title }}</a>
+        {% endfor %}
+    </nav>
+    {% endif %}
+    {% if tag_filters %}
+    <nav class="page-filters" aria-label="Filtrer par mot-clé">
+        <a href="{% url 'toutes_photos' %}{% if current_gallery %}?gallery={{ current_gallery }}{% endif %}" class="{% if not current_tag %}active{% endif %}">Tous les mots-clés</a>
+        {% for t in tag_filters %}
+        <a href="?tag={{ t.slug }}{% if current_gallery %}&gallery={{ current_gallery }}{% endif %}" class="{% if current_tag == t.slug %}active{% endif %}"># {{ t.name }}</a>
+        {% endfor %}
+    </nav>
+    {% endif %}
+
     {% if photos %}
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card bg-light">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-info-circle"></i> Informations</h5>
-                    <p class="card-text">
-                        Visualisez toutes les photos publiées sur le site, classées par date d'ajout.
-                    </p>
-                    <p class="mb-0">
-                        <strong>Total :</strong> {{ photos.paginator.count }} photo{{ photos.paginator.count|pluralize }}
-                    </p>
-                </div>
-            </div>
-        </div>
-        
+    <div class="photo-masonry pswp-gallery">
         {% for photo in photos %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 photo-card">
-                <a href="{{ photo.image.url }}" data-lightbox="all-photos" data-title="{% if photo.title %}{{ photo.title }}{% endif %}{% if photo.gallery %} - {{ photo.gallery.title }}{% endif %}">
-                    <img src="{{ photo.image.url }}" class="card-img-top" alt="{{ photo.title|default:'Photo sans titre' }}" style="height: 200px; object-fit: cover;">
-                </a>
-                <div class="card-body">
-                   
-                    {% if photo.gallery %}
-                    <p class="card-text small text-muted">
-                        <i class="fas fa-folder"></i> 
-                        <a href="{% url 'detail_galerie' photo.gallery.slug %}">
-                            {{ photo.gallery.title }}
-                        </a>
-                    </p>
-                    {% endif %}
-                  
-                </div>
-                <div class="card-footer bg-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">
-                            {{ photo.uploaded_at|date:"d/m/Y" }}
-                        </small>
-                        <a href="{% url 'detail_photo' photo.pk %}" class="btn btn-sm btn-outline-primary">
-                            Voir
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% thumb photo.image 640 as t %}
+        <figure class="photo-tile">
+            <a class="pswp-item" href="{{ photo.image.url }}" data-caption="{% if photo.title %}{{ photo.title }}{% endif %}{% if photo.gallery %}{% if photo.title %} · {% endif %}{{ photo.gallery.title }}{% endif %}"{% if t.src_width %} data-pswp-width="{{ t.src_width }}" data-pswp-height="{{ t.src_height }}"{% endif %}>
+                <img src="{{ t.url }}"{% if t.width %} width="{{ t.width }}" height="{{ t.height }}"{% endif %} alt="{{ photo.title|default:'Photo' }}" loading="lazy">
+            </a>
+            <a class="photo-info" href="{% url 'detail_photo' photo.pk %}" aria-label="Voir la fiche de la photo"><i class="fas fa-circle-info"></i></a>
+            {% if photo.title %}<figcaption>{{ photo.title }}</figcaption>{% endif %}
+        </figure>
         {% endfor %}
     </div>
 
     {% if photos.has_other_pages %}
-    <nav aria-label="Pagination des photos" class="mt-4">
-        <ul class="pagination justify-content-center">
-            {% if photos.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ photos.previous_page_number }}" aria-label="Précédent">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-            {% endif %}
-            
-            {% for num in photos.paginator.page_range %}
-            {% if photos.number == num %}
-            <li class="page-item active">
-                <a class="page-link" href="#">{{ num }}</a>
-            </li>
-            {% else %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-            </li>
-            {% endif %}
-            {% endfor %}
-            
-            {% if photos.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ photos.next_page_number }}" aria-label="Suivant">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-            {% endif %}
+    <nav class="mt-4" aria-label="Pagination des photos">
+        <ul class="pagination justify-content-center flex-wrap">
+            {% if photos.has_previous %}<li class="page-item"><a class="page-link" href="?{% if current_gallery %}gallery={{ current_gallery }}&{% endif %}{% if current_tag %}tag={{ current_tag }}&{% endif %}page={{ photos.previous_page_number }}">Précédent</a></li>{% endif %}
+            <li class="page-item disabled"><span class="page-link">Page {{ photos.number }} sur {{ photos.paginator.num_pages }}</span></li>
+            {% if photos.has_next %}<li class="page-item"><a class="page-link" href="?{% if current_gallery %}gallery={{ current_gallery }}&{% endif %}{% if current_tag %}tag={{ current_tag }}&{% endif %}page={{ photos.next_page_number }}">Suivant</a></li>{% endif %}
         </ul>
     </nav>
     {% endif %}
-
     {% else %}
-    <div class="alert alert-info">
-        <i class="fas fa-info-circle"></i> Aucune photo disponible pour le moment.
-    </div>
+    <div class="text-center py-5 text-muted"><i class="fas fa-images fa-3x mb-3"></i><p class="mb-0">Aucune photo pour cette sélection.</p></div>
     {% endif %}
 </div>
 {% endblock %}
 
-{% block extra_css %}
-<style>
-    .photo-card {
-        transition: all 0.3s ease;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .photo-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-    }
-    .photo-card img {
-        transition: transform 0.5s ease;
-    }
-    .photo-card:hover img {
-        transform: scale(1.05);
-    }
-    .card-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-    }
-    .page-item.active .page-link {
-        background-color: var(--zabantu-primary);
-        border-color: var(--zabantu-primary);
-    }
-    .page-link {
-        color: var(--zabantu-primary);
-    }
-</style>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    lightbox.option({
-        'albumLabel': "Photo %1 sur %2",
-        'wrapAround': true,
-        'fadeDuration': 200,
-        'imageFadeDuration': 200,
-        'resizeDuration': 200
-    });
-</script>
-{% endblock %}
+{% block extra_js %}{% include 'site_web/includes/photo_viewer_js.html' %}{% endblock %}

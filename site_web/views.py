@@ -1,10 +1,16 @@
+from datetime import timedelta, timezone as dt_timezone
+from urllib.parse import urlencode
+from django.http import HttpResponse
+from django.utils.formats import date_format
+from django.utils.html import strip_tags
 from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
 from articles.models import Article,Guelekan
 from events.models import Event
-from gallery.models import Photo,Gallery
+from gallery.models import Photo, Gallery, PhotoTag
 from django.views.generic import TemplateView
 from django.utils import timezone
-from django.db.models import Count, Q, F
+from django.db.models import Count, Q, F, OuterRef, Subquery
 from django.http import Http404
 from users.models import CustomUser
 from django.shortcuts import get_object_or_404
@@ -154,51 +160,65 @@ def membership_thanks(request):
     })
 
 def liste_galeries(request):
-    """Affiche la liste des galeries (version publique)"""
-    galeries_list = Gallery.objects.all().order_by('-created_at')
-    paginator = Paginator(galeries_list, 12)
-    
-    page_number = request.GET.get('page')
-    galeries = paginator.get_page(page_number)
-    
+    """Liste des galeries (seules les galeries contenant des photos sont publiées)"""
+    first_photo = Photo.objects.filter(gallery=OuterRef('pk')).order_by('-uploaded_at').values('image')[:1]
+    galeries_list = (
+        Gallery.objects
+        .annotate(n_photos=Count('photos'), first_photo=Subquery(first_photo))
+        .filter(n_photos__gt=0)
+        .order_by('-is_featured', '-created_at')
+    )
+    galeries = Paginator(galeries_list, 12).get_page(request.GET.get('page'))
+
     return render(request, 'site_web/public_liste_galeries.html', {
         'galeries': galeries,
-        'page_title': "Galerie Photos du Blog"
+        'photos_total': Photo.objects.count(),
+        'page_title': "Galerie photos"
     })
 
 def detail_galerie(request, slug):
     """Affiche une galerie spécifique avec ses photos"""
     galerie = get_object_or_404(Gallery, slug=slug)
     photos = galerie.photos.all().order_by('-uploaded_at')
-    
-    paginator = Paginator(photos, 24)
-    page_number = request.GET.get('page')
-    photos_page = paginator.get_page(page_number)
-    
+    photos_page = Paginator(photos, 24).get_page(request.GET.get('page'))
+
     return render(request, 'site_web/public_detail_galerie.html', {
         'galerie': galerie,
         'photos': photos_page,
+        'photo_total': photos_page.paginator.count,
         'page_title': f"Galerie : {galerie.title}"
     })
 
 def toutes_photos(request):
-    """Affiche toutes les photos du site"""
-    photos_list = Photo.objects.all().order_by('-uploaded_at')
-    paginator = Paginator(photos_list, 36)
-    
-    page_number = request.GET.get('page')
-    photos = paginator.get_page(page_number)
-    
+    """Toutes les photos du site, filtrables par galerie et par mot-clé"""
+    photos_list = Photo.objects.select_related('gallery').order_by('-uploaded_at')
+
+    gallery_slug = request.GET.get('gallery', '')
+    tag_slug = request.GET.get('tag', '')
+    if gallery_slug:
+        photos_list = photos_list.filter(gallery__slug=gallery_slug)
+    if tag_slug:
+        photos_list = photos_list.filter(tags__slug=tag_slug)
+
+    photos = Paginator(photos_list, 36).get_page(request.GET.get('page'))
+
     return render(request, 'site_web/public_toutes_photos.html', {
         'photos': photos,
-        'page_title': "Toutes les photos du blog"
+        'gallery_filters': Gallery.objects.annotate(n=Count('photos')).filter(n__gt=0).order_by('title'),
+        'tag_filters': PhotoTag.objects.annotate(n=Count('photo')).filter(n__gt=0).order_by('name'),
+        'current_gallery': gallery_slug,
+        'current_tag': tag_slug,
+        'page_title': "Toutes les photos"
     })
 
 def detail_photo(request, pk):
-    """Affiche le détail d'une photo spécifique"""
-    photo = get_object_or_404(Photo, pk=pk)
+    """Détail d'une photo, avec navigation vers la précédente et la suivante"""
+    photo = get_object_or_404(Photo.objects.select_related('gallery', 'uploaded_by'), pk=pk)
+    siblings = Photo.objects.filter(gallery=photo.gallery) if photo.gallery_id else Photo.objects.all()
     return render(request, 'site_web/public_detail_photo.html', {
         'photo': photo,
+        'newer_photo': siblings.filter(uploaded_at__gt=photo.uploaded_at).order_by('uploaded_at').first(),
+        'older_photo': siblings.filter(uploaded_at__lt=photo.uploaded_at).order_by('-uploaded_at').first(),
         'page_title': f"Photo : {photo.title}"
     })
 #06_08_2025
@@ -256,6 +276,33 @@ def public_article_list(request):
     search_query = request.GET.get('q')
     sort_option = request.GET.get('sort', 'date_desc')
 
+    guelekan_qs = Guelekan.objects.filter(status='published')
+    guelekan_count = guelekan_qs.count()
+
+    # Gɛlɛkan est un filtre de la page Publications : même liste, même carte
+    if current_filter == 'guelekan':
+        if search_query:
+            guelekan_qs = guelekan_qs.filter(
+                Q(title__icontains=search_query) |
+                Q(subtitle__icontains=search_query) |
+                Q(content__icontains=search_query)
+            )
+        guelekan_qs = guelekan_qs.order_by(F('publish_at').desc(nulls_last=True), '-created_at')
+        page_obj = Paginator(guelekan_qs, 12).get_page(request.GET.get('page'))
+        total_articles = Article.objects.filter(status='published').count()
+        type_counts_qs = Article.objects.filter(status='published').values('article_type').annotate(count=Count('id'))
+        type_counts = {item['article_type']: item['count'] for item in type_counts_qs}
+        return render(request, 'site_web/public_article_list.html', {
+            'articles': [],
+            'guelekans': page_obj,
+            'page_obj': page_obj,
+            'current_filter': current_filter,
+            'search_query': search_query or '',
+            'guelekan_count': guelekan_count,
+            'category_data': [(k, CATEGORY_LABELS[k], type_counts.get(k, 0)) for k in CATEGORY_LABELS],
+            'total_count': total_articles,
+        })
+
     articles = Article.objects.filter(status='published')
 
     # ✅ FILTRE TYPE (clean)
@@ -300,6 +347,8 @@ def public_article_list(request):
 
     return render(request, 'site_web/public_article_list.html', {
         'articles': page_obj,
+        'page_obj': page_obj,
+        'guelekan_count': guelekan_count,
         'current_filter': current_filter,
         'search_query': search_query or '',
         'category_data': category_data,
@@ -331,21 +380,45 @@ def public_article_detail(request, slug):
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from events.models import Event, EventIntervenant
+def _event_when(event):
+    """Date de l'événement lisible : « 12 mai 2026 · 09:00 – 17:00 »."""
+    start = timezone.localtime(event.date)
+    day = date_format(start, "j F Y")
+    if not event.end_date:
+        return f"{day} · {date_format(start, 'H:i')}"
+    end = timezone.localtime(event.end_date)
+    if end.date() == start.date():
+        return f"{day} · {date_format(start, 'H:i')} – {date_format(end, 'H:i')}"
+    return f"{day} {date_format(start, 'H:i')} → {date_format(end, 'j F Y H:i')}"
+
+
 def public_event_list(request):
-    """Liste des événements publics à venir"""
-    upcoming_events = Event.objects.filter(
-        status='published',  
-        date__gte=timezone.now()
-    ).order_by('date')
-    
-    past_events = Event.objects.filter(
-        status='published', 
-        date__lt=timezone.now()
-    ).order_by('-date')[:5]  # Limite à 5 événements passés
-    
+    """Liste des événements publics : à venir, puis passés (paginés)"""
+    now = timezone.now()
+    published = Event.objects.filter(status='published')
+    type_choices = dict(Event.EVENT_TYPE_CHOICES)
+
+    current_type = request.GET.get('type')
+    if current_type not in type_choices:
+        current_type = ''
+
+    upcoming_events = published.filter(date__gte=now).order_by('date')
+    past_qs = published.filter(date__lt=now).order_by('-date')
+    if current_type:
+        upcoming_events = upcoming_events.filter(event_type=current_type)
+        past_qs = past_qs.filter(event_type=current_type)
+
+    past_events = Paginator(past_qs, 9).get_page(request.GET.get('page'))
+
+    counts = {item['event_type']: item['n'] for item in published.values('event_type').annotate(n=Count('id'))}
+    type_filters = [(key, label, counts.get(key, 0)) for key, label in Event.EVENT_TYPE_CHOICES if counts.get(key)]
+
     return render(request, 'site_web/public_event_list.html', {
         'upcoming_events': upcoming_events,
-        'past_events': past_events
+        'past_events': past_events,
+        'current_type': current_type,
+        'type_filters': type_filters,
+        'total_events': published.count(),
     })
 
 def public_event_detail(request, pk):
@@ -367,22 +440,65 @@ def public_event_detail(request, pk):
             intervenants_par_role[role] = []
         intervenants_par_role[role].append(event_intervenant.intervenant)
     
-    # Vérifier si l'événement est passé
-    is_past_event = event.date < timezone.now()
-    
-    # Événements similaires (même type)
+    now = timezone.now()
+    is_past_event = event.date < now
+
+    # Événements similaires (même type) : les plus récents d'abord
     similar_events = Event.objects.filter(
         status='published',  
         event_type=event.event_type
     ).exclude(pk=event.pk).order_by('-date')[:3]
-    
+
+    # Lien « Ajouter à Google Agenda »
+    start_utc = event.date.astimezone(dt_timezone.utc)
+    end_utc = (event.end_date or event.date + timedelta(hours=2)).astimezone(dt_timezone.utc)
+    google_calendar_url = "https://calendar.google.com/calendar/render?" + urlencode({
+        'action': 'TEMPLATE',
+        'text': event.title,
+        'dates': f"{start_utc:%Y%m%dT%H%M%SZ}/{end_utc:%Y%m%dT%H%M%SZ}",
+        'details': strip_tags(event.content or '')[:400] + "\n" + request.build_absolute_uri(),
+        'location': event.location or '',
+    })
+
     return render(request, 'site_web/public_event_detail.html', {
         'event': event,
+        'now': now,
+        'time_range': _event_when(event),
         'is_past_event': is_past_event,
+        'google_calendar_url': google_calendar_url,
         'intervenants_par_role': intervenants_par_role,
         'event_intervenants': event_intervenants,
         'similar_events': similar_events,
     })
+
+
+def _ics_escape(text):
+    return (text.replace('\\', '\\\\').replace(';', '\\;').replace(',', '\\,')
+                .replace('\r\n', '\\n').replace('\n', '\\n'))
+
+
+def public_event_ics(request, pk):
+    """Fichier .ics pour ajouter l'événement à n'importe quel agenda"""
+    event = get_object_or_404(Event, pk=pk, status='published')
+    start = event.date.astimezone(dt_timezone.utc)
+    end = (event.end_date or event.date + timedelta(hours=2)).astimezone(dt_timezone.utc)
+    description = strip_tags(event.content or '')[:500]
+    lines = [
+        'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Zabantu//Evenements//FR', 'CALSCALE:GREGORIAN',
+        'BEGIN:VEVENT',
+        f'UID:event-{event.pk}@zabantu',
+        f'DTSTAMP:{timezone.now().astimezone(dt_timezone.utc):%Y%m%dT%H%M%SZ}',
+        f'DTSTART:{start:%Y%m%dT%H%M%SZ}',
+        f'DTEND:{end:%Y%m%dT%H%M%SZ}',
+        f'SUMMARY:{_ics_escape(event.title)}',
+        f'DESCRIPTION:{_ics_escape(description)}',
+        f'LOCATION:{_ics_escape(event.location or "")}',
+        f'URL:{request.build_absolute_uri(reverse("public_event_detail", args=[event.pk]))}',
+        'END:VEVENT', 'END:VCALENDAR',
+    ]
+    response = HttpResponse('\r\n'.join(lines) + '\r\n', content_type='text/calendar; charset=utf-8')
+    response['Content-Disposition'] = f'attachment; filename="evenement-{event.pk}.ics"'
+    return response
 
 def public_member_list(request):
     """Liste des membres publics"""
@@ -412,11 +528,6 @@ class HomeView(TemplateView):
             date__gte=timezone.now()
         ).order_by('date')[:3]
 
-        # Dernier séminaire en vedette
-        context['featured_seminar'] = Guelekan.objects.filter(
-            status='published',
-        ).order_by('-created_at').first()
-
         # Membres actifs : aperçu de l'équipe et compteur
         members = CustomUser.objects.filter(is_active=True, role__in=['moderateur', 'membre'])
         context['team_members'] = members.order_by('-date_joined')[:4]
@@ -439,19 +550,9 @@ from django.core.paginator import Paginator
 from articles.models import Guelekan
 
 def public_guelekan_list(request):
-    guelekans = Guelekan.objects.filter(
-        status='published',
-        
-    ).order_by('-publish_at')
-    
-    paginator = Paginator(guelekans, 12)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    return render(request, 'site_web/public_guelekan_list.html', {
-        'page_obj': page_obj,
-        'timezone': timezone
-    })
+    """Gɛlɛkan est désormais un filtre de la page Publications."""
+    return redirect(f"{reverse('public_article_list')}?type=guelekan")
+
 
 from django.db.models import Count
 

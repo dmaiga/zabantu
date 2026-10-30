@@ -221,7 +221,7 @@ SITE_URL = env("SITE_URL", default="http://localhost:8000" if DEBUG else "https:
 # Configurations pour le support
 
 # Password reset timeout (24 hours)
-#PASSWORD_RESET_TIMEOUT = 86400
+PASSWORD_RESET_TIMEOUT = 86400
 
 # Sécurité HTTPS : actif uniquement en production.
 # SECURE_SSL_REDIRECT peut être désactivé via .env tant que le certificat n'est pas en place.

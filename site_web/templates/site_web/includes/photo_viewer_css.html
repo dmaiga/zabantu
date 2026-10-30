@@ -1,0 +1,26 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@5.4.4/dist/photoswipe.css">
+<style>
+    /* Grille en maçonnerie : chaque photo est affichée en entier */
+    .photo-masonry { column-width: 240px; column-gap: 14px; }
+    .photo-tile { position: relative; display: inline-block; width: 100%; margin: 0 0 14px; break-inside: avoid; border-radius: 8px; overflow: hidden; background: #eef0e8; }
+    .photo-tile > a.pswp-item { display: block; }
+    .photo-tile img { display: block; width: 100%; height: auto; transition: transform .3s ease; }
+    .photo-tile:hover img { transform: scale(1.03); }
+    .photo-tile .photo-info {
+        position: absolute; top: .5rem; right: .5rem; width: 40px; height: 40px; border-radius: 50%;
+        background: rgba(0,0,0,.55); color: #fff; display: flex; align-items: center; justify-content: center; text-decoration: none;
+        opacity: 0; transition: opacity .2s;
+    }
+    .photo-tile:hover .photo-info, .photo-tile:focus-within .photo-info { opacity: 1; }
+    @media (hover: none) { .photo-tile .photo-info { opacity: 1; } }  /* toujours visible au toucher */
+    .photo-tile figcaption {
+        position: absolute; left: 0; right: 0; bottom: 0; padding: 1.5rem .75rem .6rem; font-size: .85rem; color: #fff; pointer-events: none;
+        background: linear-gradient(transparent, rgba(0,0,0,.65)); opacity: 0; transition: opacity .2s;
+    }
+    .photo-tile:hover figcaption { opacity: 1; }
+    .pswp__custom-caption { position: absolute; left: 0; right: 0; bottom: 0; padding: .75rem 1rem 1rem; color: #fff; text-align: center; font-size: .95rem; background: linear-gradient(transparent, rgba(0,0,0,.6)); pointer-events: none; }
+    .page-filters { display: flex; gap: .5rem; overflow-x: auto; padding-bottom: .5rem; margin-bottom: 1rem; scrollbar-width: none; }
+    .page-filters::-webkit-scrollbar { display: none; }
+    .page-filters a { flex: 0 0 auto; display: inline-flex; align-items: center; gap: .5rem; min-height: 40px; padding: .4rem 1rem; border: 1px solid #d9ddd2; border-radius: 999px; background: #fff; color: var(--zabantu-dark); text-decoration: none; font-size: .92rem; white-space: nowrap; }
+    .page-filters a.active { background: #566a52; border-color: #566a52; color: #fff; }
+</style>
