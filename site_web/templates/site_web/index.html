@@ -1,535 +1,296 @@
 {% extends 'base_public.html' %}
+{% load static %}
 
-{% block banner_title %}
-Bienvenue au Groupe de recherche Zabantu
-{% endblock %}
-
-{% block banner_subtitle %}
-Economy | Conflict | State
-{% endblock %}
+{% block title %}Zabantu - Groupe de recherche : Economy | Conflict | State{% endblock %}
+{% block banner %}{% endblock %}
+{% block main_class %}home-main{% endblock %}
 
 {% block content %}
 <style>
-    .latest-articles .card {
-        border: none;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-        height: 100%;
-    }
-    
-    .latest-articles .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
-    
-    .latest-articles .card-img-top {
-        height: 180px;
-        object-fit: cover;
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
-    }
-    
-    .latest-articles .card-title {
-        color: var(--zabantu-dark);
-        font-weight: 600;
-        min-height: 3rem;
-        font-size: 1.1rem;
-        margin-bottom: 0.75rem;
-    }
-    
-    .upcoming-events .card {
-        border: none;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-        height: 100%;
-        border-left: 4px solid var(--zabantu-secondary);
-    }
-    
-    .upcoming-events .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
-    
-    .upcoming-events .card-img-top {
-        height: 180px;
-        object-fit: cover;
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
-    }
-    
-    .upcoming-events .card-title {
-        color: var(--zabantu-primary);
-        font-weight: 600;
-    }
-    
-    .upcoming-events .card-text {
-        color: #555;
-    }
-    
-    .alert-info {
-        background-color: var(--zabantu-light);
-        border-color: var(--zabantu-accent);
-        color: var(--zabantu-dark);
-        border-radius: 8px;
-    }
-    
-    .section-title {
-        color: var(--zabantu-dark);
-        font-weight: 700;
-        font-size: 2rem;
-        margin-bottom: 2rem;
-        position: relative;
-        padding-bottom: 0.5rem;
-    }
-    
-    .section-title:after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 80px;
-        height: 4px;
-        background: var(--zabantu-secondary);
-        border-radius: 2px;
-    }
-    
-    .btn-primary {
-        background-color: var(--zabantu-secondary);
-        border-color: var(--zabantu-secondary);
-        padding: 0.5rem 1.5rem;
-        border-radius: 30px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-primary:hover {
-        background-color: var(--zabantu-primary);
-        border-color: var(--zabantu-primary);
-        transform: translateY(-2px);
-    }
-    
-    .btn-outline-primary {
-        color: var(--zabantu-secondary);
-        border-color: var(--zabantu-secondary);
-        border-radius: 30px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-outline-primary:hover {
-        background-color: var(--zabantu-secondary);
-        border-color: var(--zabantu-secondary);
-        color: white;
-    }
-    
-    .badge {
-        font-weight: 500;
-        padding: 0.35em 0.65em;
-        border-radius: 4px;
-    }
-    
-    .bg-primary {
-        background-color: var(--zabantu-primary) !important;
-    }
-    
-    .bg-secondary {
-        background-color: var(--zabantu-accent) !important;
-        color: var(--zabantu-dark);
-    }
-    
-    .card-body {
-        padding: 1.5rem;
-    }
-    
-    .card-footer {
-        padding: 1rem 1.5rem;
-        background-color: rgba(0,0,0,0.01);
-    }
-    
-    .text-muted {
-        color: #6c757d !important;
-    }
-    
-    .featured-content {
-        padding: 2rem;
-    }
-    .featured-seminar {
-        background-color: white;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-        border-radius: 10px;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        margin-bottom: 2rem;
-        width: 100%;
-    }
-    
-    .featured-seminar:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    }
-    
-    .seminar-link {
-        display: block;
-        text-decoration: none;
-        color: inherit;
-    }
-    
-    .seminar-content {
-        padding: 1.5rem;
-    }
-    
-    .seminar-image-container {
-        height: 250px;
-        overflow: hidden;
-    }
-    
-    .seminar-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s ease;
-    }
-    
-    .seminar-link:hover .seminar-image {
-        transform: scale(1.03);
-    }
-    
-    .seminar-badge {
-        font-size: 0.8rem;
-        margin-bottom: 0.75rem;
-    }
-    
-    .seminar-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--zabantu-dark);
-        margin-bottom: 0.75rem;
-    }
-    
-    .seminar-meta {
-        font-size: 0.85rem;
-        margin-bottom: 0.75rem;
-    }
-    
-    .seminar-excerpt {
-        font-size: 0.95rem;
-        margin-bottom: 1rem;
-    }
-    
-    .seminar-btn {
-        font-size: 0.9rem;
-        padding: 0.4rem 1rem;
-    }
-    
-    @media (max-width: 768px) {
-        .seminar-image-container {
-            height: 200px;
-        }
-        
-        .seminar-content {
-            padding: 1.25rem;
-        }
-        
-        .seminar-title {
-            font-size: 1.1rem;
-        }
-    }
+    .home-section { padding: 3.5rem 0; }
+    .home-section.alt { background: #fff; }
+    .home-title { color: var(--zabantu-dark); font-weight: 700; font-size: 2rem; margin-bottom: .5rem; text-wrap: balance; }
+    .home-lead { color: #5b6559; max-width: 62ch; margin-bottom: 2rem; }
+    .home-head { display: flex; justify-content: space-between; align-items: end; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.75rem; }
+    .home-head .home-lead { margin-bottom: 0; }
+    .home-more { font-weight: 600; color: var(--zabantu-primary); text-decoration: none; white-space: nowrap; }
+    .home-more:hover { text-decoration: underline; }
 
+    /* Boutons de l'accueil (identité actuelle, avant le design system) */
+    .btn-primary { background-color: var(--zabantu-secondary); border-color: var(--zabantu-secondary); border-radius: 30px; font-weight: 500; transition: all .3s ease; }
+    .btn-primary:hover { background-color: var(--zabantu-primary); border-color: var(--zabantu-primary); transform: translateY(-2px); }
+    .btn-outline-primary { color: var(--zabantu-secondary); border-color: var(--zabantu-secondary); border-radius: 30px; font-weight: 500; }
+    .btn-outline-primary:hover { background-color: var(--zabantu-secondary); border-color: var(--zabantu-secondary); color: #fff; }
 
+    /* 1. Héros */
+    .home-hero { background: linear-gradient(135deg, #fff 0%, var(--zabantu-light) 140%); padding: 3.5rem 0; }
+    .home-eyebrow { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; letter-spacing: .12em; text-transform: uppercase; font-size: .8rem; font-weight: 600; color: var(--zabantu-secondary); margin-bottom: .75rem; }
+    .home-hero h1 { font-size: 2.4rem; font-weight: 700; line-height: 1.2; color: var(--zabantu-dark); text-wrap: balance; margin-bottom: 1rem; }
+    .home-hero p { font-size: 1.1rem; line-height: 1.7; max-width: 60ch; color: #2f3a30; }
+    .home-hero img { width: 100%; max-height: 380px; object-fit: cover; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.12); }
+
+    /* 3. Publications */
+    .home-card { height: 100%; display: flex; flex-direction: column; background: #fff; border: 1px solid #e6e9e0; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.06); transition: box-shadow .2s, transform .2s; }
+    .home-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,.10); transform: translateY(-3px); }
+    .home-card-cover { display: flex; align-items: center; justify-content: center; height: 210px; background: #eef0e8; color: var(--zabantu-primary); font-size: 2.5rem; border-bottom: 1px solid #e6e9e0; }
+    .home-card-cover img { width: 100%; height: 100%; object-fit: contain; }
+    .home-card-body { padding: 1.1rem 1.25rem; flex: 1; display: flex; flex-direction: column; }
+    .home-card-badge { align-self: flex-start; background: rgba(111,130,106,.12); color: var(--zabantu-dark); border-radius: 999px; padding: .15rem .65rem; font-size: .8rem; font-weight: 500; margin-bottom: .5rem; }
+    .home-card-title { font-size: 1.08rem; font-weight: 700; line-height: 1.3; margin-bottom: .5rem; color: var(--zabantu-dark); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .home-card-title a { color: inherit; text-decoration: none; }
+    .home-card-text { font-size: .93rem; color: #4a554a; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .home-card-foot { display: flex; justify-content: space-between; align-items: center; padding: .75rem 1.25rem; border-top: 1px solid #eef0e8; font-size: .85rem; color: #6c757d; }
+
+    /* 4. Activités */
+    .event-row { display: flex; gap: 1rem; align-items: center; background: #fff; border: 1px solid #e6e9e0; border-radius: 10px; padding: .9rem 1rem; margin-bottom: .75rem; text-decoration: none; color: inherit; transition: box-shadow .2s; }
+    .event-row:hover { box-shadow: 0 6px 16px rgba(0,0,0,.08); color: inherit; }
+    .event-date { flex: 0 0 62px; text-align: center; background: var(--zabantu-dark); color: #fff; border-radius: 8px; padding: .4rem 0; line-height: 1.1; }
+    .event-date strong { display: block; font-size: 1.4rem; }
+    .event-date span { font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; }
+    .event-info h3 { font-size: 1.05rem; margin: 0 0 .25rem; color: var(--zabantu-dark); }
+    .event-info p { margin: 0; font-size: .88rem; color: #6c757d; }
+    .events-empty { background: #fff; border: 1px dashed #cfd5c6; border-radius: 10px; padding: 1rem 1.25rem; color: #5b6559; }
+    .seminar-card { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 1.1rem; background: #fff; border: 1px solid #e6e9e0; border-left: 4px solid var(--zabantu-secondary); border-radius: 10px; padding: 1.1rem; text-decoration: none; color: inherit; transition: box-shadow .2s; }
+    .seminar-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,.10); color: inherit; }
+    .seminar-thumb { display: flex; align-items: center; justify-content: center; aspect-ratio: 3 / 4; background: #eef0e8; border-radius: 6px; overflow: hidden; color: var(--zabantu-primary); font-size: 2rem; }
+    .seminar-thumb img { width: 100%; height: 100%; object-fit: contain; }
+    .seminar-kicker { font-size: .8rem; font-weight: 600; color: var(--zabantu-secondary); text-transform: uppercase; letter-spacing: .05em; }
+    .seminar-card h3 { font-size: 1.2rem; line-height: 1.3; margin: .25rem 0 .5rem; color: var(--zabantu-dark); }
+    .seminar-card p { font-size: .92rem; color: #4a554a; margin-bottom: .6rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .seminar-speakers { font-size: .85rem; color: #6c757d; margin-bottom: .6rem; }
+
+    /* 5. Adhésion */
+    .join-band { background: linear-gradient(135deg, var(--zabantu-primary), var(--zabantu-dark)); color: #fff; padding: 3.5rem 0; }
+    .join-band h2 { font-weight: 700; font-size: 1.9rem; text-wrap: balance; }
+    .join-band ul { list-style: none; padding: 0; margin: 1.25rem 0 0; display: grid; gap: .6rem; }
+    .join-band li i { color: var(--zabantu-accent); margin-right: .6rem; }
+    .join-band .btn { min-height: 52px; padding: 0 2rem; display: inline-flex; align-items: center; font-size: 1.05rem; }
+
+    /* 6. Chiffres */
+    .stats-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+    .stat { text-align: center; background: #fff; border: 1px solid #e6e9e0; border-radius: 10px; padding: 1.25rem .5rem; }
+    .stat i { color: var(--zabantu-primary); font-size: 1.3rem; margin-bottom: .4rem; }
+    .stat strong { display: block; font-size: 2rem; line-height: 1.1; color: var(--zabantu-dark); }
+    .stat span { font-size: .88rem; color: #5b6559; }
+
+    /* 7. Équipe */
+    .team-mini { text-align: center; text-decoration: none; color: inherit; display: block; }
+    .team-mini img { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid var(--zabantu-light); margin-bottom: .75rem; background: #eef0e8; }
+    .team-initials { width: 110px; height: 110px; border-radius: 50%; margin: 0 auto .75rem; display: flex; align-items: center; justify-content: center; background: var(--zabantu-primary); color: #fff; font-size: 2rem; font-weight: 600; border: 3px solid var(--zabantu-light); }
+    .team-mini h3 { font-size: 1.05rem; margin: 0 0 .15rem; color: var(--zabantu-dark); }
+    .team-mini p { font-size: .85rem; color: #6c757d; margin: 0; }
+
+    /* 8. Partenaires */
+    .partners-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1.5rem 2.5rem; }
+    .partners-row img { max-height: 64px; max-width: 160px; object-fit: contain; filter: grayscale(1); opacity: .8; transition: all .2s; }
+    .partners-row img:hover { filter: none; opacity: 1; }
+
+    @media (max-width: 767.98px) {
+        .home-section { padding: 2.5rem 0; }
+        .home-hero { padding: 2rem 0; }
+        .home-hero h1 { font-size: 1.8rem; }
+        .home-title { font-size: 1.6rem; }
+        .seminar-card { grid-template-columns: 1fr; }
+        .seminar-thumb { aspect-ratio: 16 / 9; }
+        .join-band h2 { font-size: 1.6rem; }
+    }
 </style>
 
-<!-- Hero Section -->
-<section class="hero-section ">
+<!-- 1. Héros -->
+<section class="home-hero">
     <div class="container">
-        <div class="row align-items-center">
+        <div class="row align-items-center g-4">
             <div class="col-lg-6">
-                <h1 class="display-8 fw-bold mb-1">Vers une recherche ancrée dans les dynamiques économiques et sociales</h1>
-                <p class="lead mb-4">
-                    Zabantu, inspiré d'une plante mandingue, est un groupe de recherche pluridisciplinaire travaillant sur le nexus
-                    Economie-Conflit-Etat. Nos travaux sont principalement axés sur la compréhension des dynamiques économiques, de 
-                    conflit armé, des politiques publiques; dans le paradigme d'une recherche ancrée sur les réalités locales.    
-                </p>
-                <a href="{% url 'membre_liste' %}" class="btn btn-primary btn-lg me-2">Equipes</a>
-                <a href="{% url 'about' %}" class="btn btn-outline-primary btn-lg">Identité</a>
+                <p class="home-eyebrow">Economy | Conflict | State</p>
+                <h1>Vers une recherche ancrée dans les dynamiques économiques et sociales</h1>
+                <p>Zabantu, inspiré d'une plante mandingue, est un groupe de recherche pluridisciplinaire travaillant sur le nexus Économie-Conflit-État. Nos travaux portent sur les dynamiques économiques, les conflits armés et les politiques publiques, dans le paradigme d'une recherche ancrée sur les réalités locales.</p>
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a href="{% url 'membership_apply' %}" class="btn btn-primary btn-lg">Rejoindre Zabantu</a>
+                    <a href="{% url 'public_article_list' %}" class="btn btn-outline-primary btn-lg">Voir les publications</a>
+                </div>
             </div>
             <div class="col-lg-6">
-                <img src="/static/site_web/images/hero-image_2.jpeg" alt="Réunion d'experts" class="img-fluid rounded-3 shadow">
+                <img src="{% static 'site_web/images/hero-image_2.jpeg' %}" alt="Réunion de chercheurs du groupe Zabantu">
             </div>
         </div>
     </div>
 </section>
 
-<!-- Événements à venir -->
-<section id="events" class="upcoming-events  py-3 bg-light">
+<!-- 3. Dernières publications -->
+<section id="publications" class="home-section alt">
     <div class="container">
-        <h2 class="section-title text-center mb-1">Événements à venir</h2>
-        {% if upcoming_events %}
+        <div class="home-head">
+            <div>
+                <h2 class="home-title">Dernières publications</h2>
+                <p class="home-lead">Les travaux récents des membres et partenaires du groupe.</p>
+            </div>
+            <a class="home-more" href="{% url 'public_article_list' %}">Voir toutes les publications <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+        {% if latest_articles %}
         <div class="row g-4">
-            {% for event in upcoming_events %}
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100">
-                    {% if event.image %}
-                    <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}">
-                    {% endif %}
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="badge bg-primary">{{ event.event_type }}</span>
-                            <small class="text-muted">{{ event.date|date:"d F Y" }}</small>
-                        </div>
-                        <h5 class="card-title">{{ event.title }}</h5>
-                        <p class="card-text">{{ event.description|striptags|truncatewords:50 }}</p>
-                        <div class="event-meta mt-3">
-                            <p class="mb-1"><i class="fas fa-clock me-2"></i>{{ event.date|time:"H:i" }}</p>
-                            <p class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>{{ event.location }}</p>
-                            <p class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>{{ event.lieu_gps }}</p>
-                        </div>
+            {% for article in latest_articles %}
+            <div class="col-sm-6 col-lg-3">
+                <article class="home-card">
+                    <a class="home-card-cover" href="{% url 'public_article_detail' article.slug %}" tabindex="-1" aria-hidden="true">
+                        {% if article.article_type == 'independent' and article.independent_cover %}<img src="{{ article.independent_cover.url }}" alt="" loading="lazy">
+                        {% elif article.cover_image %}<img src="{{ article.cover_image.url }}" alt="" loading="lazy">
+                        {% else %}<i class="fas fa-file-lines"></i>{% endif %}
+                    </a>
+                    <div class="home-card-body">
+                        {% if article.category %}<span class="home-card-badge">{{ article.get_category_display }}</span>{% endif %}
+                        <h3 class="home-card-title"><a href="{% url 'public_article_detail' article.slug %}">{{ article.title|striptags|safe }}</a></h3>
+                        <p class="home-card-text">{% if article.resume %}{{ article.resume|striptags|safe|truncatewords:22 }}{% else %}{{ article.content|default_if_none:""|striptags|safe|truncatewords:22 }}{% endif %}</p>
                     </div>
-                    <div class="card-footer bg-white border-0">
-                        <a href="{% url 'public_event_detail' event.pk %}" class="btn btn-primary">Plus d'informations</a>
+                    <div class="home-card-foot">
+                        <time datetime="{{ article.publish_at|default:article.created_at|date:'Y-m-d' }}">{{ article.publish_at|default:article.created_at|date:"j F Y" }}</time>
+                        <a href="{% url 'public_article_detail' article.slug %}" class="btn btn-outline-primary btn-sm">Lire</a>
                     </div>
-                </div>
+                </article>
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <div class="alert alert-info text-center">
-            <i class="fas fa-calendar-check fa-2x mb-3"></i>
-            <h4>Aucun événement à venir pour le moment</h4>
-            <p class="mb-0">Revenez régulièrement pour découvrir nos prochains événements</p>
-        </div>
+        <div class="events-empty">Aucune publication pour le moment.</div>
         {% endif %}
     </div>
 </section>
 
-<!-- Section Séminaire Gɛlɛkan en vedette --><!-- Section Séminaire Gɛlɛkan en vedette -->
-{% if featured_seminar %}
-<div class="container-fluid px-0 mb-5">
-    <a href="{% url 'public_guelekan_detail' featured_seminar.slug %}" class="seminar-link text-decoration-none">
-        <div class="featured-seminar border rounded-3 overflow-hidden shadow-sm hover-shadow">
-            <div class="row g-0">
-                <!-- Image -->
-                <div class="col-lg-4 seminar-image-container">
-                    {% if featured_seminar.cover_image %}
-                    <img src="{{ featured_seminar.cover_image.url }}" 
-                         class="seminar-image w-100 h-100 object-fit-cover" 
-                         alt="{{ featured_seminar.title }}"
-                         loading="lazy">
-                    {% else %}
-                    <div class="bg-light h-100 d-flex align-items-center justify-content-center p-4">
-                        <i class="fas fa-microphone-alt fa-3x text-muted opacity-25"></i>
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <!-- Contenu texte -->
-                <div class="col-lg-8">
-                    <div class="seminar-content p-4 h-100 d-flex flex-column">
-                        <!-- En-tête -->
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <span class="badge bg-primary rounded-pill px-3 py-2 seminar-badge">
-                                <i class="fas fa-chalkboard-teacher me-1"></i>Dernier Séminaire Gɛlɛkan: {{ featured_seminar.title }}
-                            </span>
-
-                            <span class="text-muted small">
-                                <i class="fas fa-calendar-alt me-1"></i>
-                                {{ featured_seminar.created_at|date:"d M Y" }}
-                            </span>
-                        </div>
-                        
-                        <!-- Titre -->
-                        <h4 class="seminar-title h5 fw-bold text-dark mb-3">
-                            {{ featured_seminar.title }}
-                        </h4>
-                          <!-- Extrait -->
-                        <div class="seminar-excerpt mb-3 flex-grow-1">
-                            {% if featured_seminar.content %}
-                               <p class="text-muted mb-0 small">{{ featured_seminar.content|striptags|truncatewords:25 }}</p>
-                            {% else %}
-                           
-                            <p class="text-muted mb-0 small">{{ featured_seminar.subtitle|truncatewords:25 }}</p>
-                            {% endif %}
-                        </div>
-                        <!-- Intervenants -->
-                        {% with intervenants=featured_seminar.intervenants.all %}
-                        {% if intervenants %}
-                        <div class="intervenants-section mb-3">
-                            <div class="d-flex align-items-start">
-                                <span class="text-primary me-2 mt-1">
-                                    <i class="fas fa-users fa-sm"></i>
-                                </span>
-                                <div class="flex-grow-1">
-                                    <span class="small text-muted d-block mb-1">Intervenants :</span>
-                                    <div class="intervenants-list">
-                                        {% for intervenant in intervenants %}
-                                        <span class="badge bg-light text-dark border me-1 mb-1 small">
-                                            {{ intervenant.full_name }}
-                                            {% if intervenant.organization %}
-                                            <span class="text-muted">({{ intervenant.organization }})</span>
-                                            {% endif %}
-                                        </span>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-                        {% endwith %}
-                        
-                      
-                        
-                        <!-- Bouton CTA -->
-                        <div class="mt-auto">
-                            <span class="btn btn-outline-primary btn-sm seminar-btn d-inline-flex align-items-center">
-                                Voir le compte-rendu
-                                <i class="fas fa-arrow-right ms-2 small"></i>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </a>
-</div>
-
-<style>
-    .seminar-link {
-        transition: all 0.3s ease;
-    }
-    
-    .seminar-link:hover {
-        text-decoration: none;
-        transform: translateY(-2px);
-    }
-    
-    .hover-shadow {
-        transition: box-shadow 0.3s ease;
-    }
-    
-    .hover-shadow:hover {
-        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1) !important;
-    }
-    
-    .seminar-image-container {
-        height: 250px;
-    }
-    
-    .object-fit-cover {
-        object-fit: cover;
-    }
-    
-    .seminar-content {
-        background: #fff;
-    }
-    
-    .seminar-badge {
-        font-size: 0.75rem;
-        font-weight: 500;
-    }
-    
-    .intervenants-list {
-        line-height: 1.4;
-    }
-    
-    .seminar-btn {
-        border-width: 1.5px;
-        font-weight: 500;
-        transition: all 0.2s ease;
-    }
-    
-    .seminar-btn:hover {
-        background-color: var(--zabantu-primary);
-        border-color: var(--zabantu-primary);
-        color: white;
-    }
-    
-    /* Responsive */
-    @media (max-width: 992px) {
-        .seminar-image-container {
-            height: 200px;
-        }
-    }
-    
-    @media (max-width: 768px) {
-        .seminar-content {
-            padding: 1.5rem !important;
-        }
-        
-        .seminar-title {
-            font-size: 1.1rem;
-        }
-        
-        .intervenants-list .badge {
-            font-size: 0.7rem;
-            margin-bottom: 0.3rem;
-        }
-    }
-</style>
-{% endif %}
-
-<!-- Dernières publications -->
-<section id="publications" class="latest-articles mb-5 py-5">
+<!-- 4. Activités : événements et dernier séminaire -->
+<section id="events" class="home-section">
     <div class="container">
-        <h2 class="section-title text-center mb-5">Nos dernières publications</h2>
         <div class="row g-4">
-            {% for article in latest_articles %}
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100">
-                    {% if article.cover_image %}
-                    <img src="{{ article.cover_image.url }}" class="card-img-top" alt="{{ article.title }}">
-                    {% else %}
-                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
-                        <i class="fas fa-file-alt fa-3x text-muted"></i>
-                    </div>
-                    {% endif %}
-                    <div class="card-body">
-                        <span class="badge bg-secondary mb-2">{{ article.get_category_display }}</span>
-                        <h5 class="card-title">{{ article.title }}</h5>
-                        <p class="card-text">{{ article.content|striptags|truncatewords:20 }}</p>
-                    </div>
-                    <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
-                        <small class="text-muted">{{ article.created_at|date:"d M Y" }}</small>
-                        <a href="{% url 'public_article_detail' article.slug %}" class="btn btn-outline-primary btn-sm">Lire</a>
-                    </div>
+            <div class="col-lg-5">
+                <div class="home-head">
+                    <h2 class="home-title mb-0">Événements à venir</h2>
+                    <a class="home-more" href="{% url 'public_event_list' %}">Tous <i class="fas fa-arrow-right ms-1"></i></a>
                 </div>
+                {% for event in upcoming_events %}
+                <a class="event-row" href="{% url 'public_event_detail' event.pk %}">
+                    <div class="event-date"><strong>{{ event.date|date:"j" }}</strong><span>{{ event.date|date:"M" }}</span></div>
+                    <div class="event-info">
+                        <h3>{{ event.title }}</h3>
+                        <p>{{ event.get_event_type_display }}{% if event.location %} · {{ event.location }}{% endif %} · {{ event.date|time:"H:i" }}</p>
+                    </div>
+                </a>
+                {% empty %}
+                <div class="events-empty"><i class="fas fa-calendar-check me-2"></i>Aucun événement prévu pour le moment. <a href="{% url 'public_event_list' %}">Voir les événements passés</a>.</div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
-        <div class="text-center mt-5">
-            <a href="{% url 'public_article_list' %}" class="btn btn-primary px-5 py-3">Voir toutes les publications</a>
+            <div class="col-lg-7">
+                <div class="home-head">
+                    <h2 class="home-title mb-0">Séminaire Gɛlɛkan</h2>
+                    <a class="home-more" href="{% url 'public_guelekan_list' %}">Tous les séminaires <i class="fas fa-arrow-right ms-1"></i></a>
+                </div>
+                {% if featured_seminar %}
+                <a class="seminar-card" href="{% url 'public_guelekan_detail' featured_seminar.slug %}">
+                    <div class="seminar-thumb">
+                        {% if featured_seminar.cover_image %}<img src="{{ featured_seminar.cover_image.url }}" alt="" loading="lazy">{% else %}<i class="fas fa-microphone-lines"></i>{% endif %}
+                    </div>
+                    <div>
+                        <span class="seminar-kicker">Dernier séminaire · {{ featured_seminar.publish_at|default:featured_seminar.created_at|date:"j F Y" }}</span>
+                        <h3>{{ featured_seminar.title|striptags|safe }}</h3>
+                        <p>{% if featured_seminar.content %}{{ featured_seminar.content|striptags|safe|truncatewords:28 }}{% else %}{{ featured_seminar.subtitle|truncatewords:28 }}{% endif %}</p>
+                        {% with intervenants=featured_seminar.intervenants.all %}
+                        {% if intervenants %}<div class="seminar-speakers"><i class="fas fa-users me-1"></i>{% for i in intervenants|slice:":3" %}{{ i.full_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if intervenants|length > 3 %} et {{ intervenants|length|add:"-3" }} autre{{ intervenants|length|add:"-3"|pluralize }}{% endif %}</div>{% endif %}
+                        {% endwith %}
+                        <span class="btn btn-outline-primary btn-sm">Voir le compte-rendu <i class="fas fa-arrow-right ms-1"></i></span>
+                    </div>
+                </a>
+                {% else %}
+                <div class="events-empty">Aucun séminaire publié pour le moment.</div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </section>
-<!-- Newsletter Section -->
-<section class="newsletter-section py-5 bg-light">
+
+<!-- 5. Adhésion -->
+<section class="join-band">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <h2>Rejoignez le Groupe de recherche Zabantu</h2>
+                <ul>
+                    <li><i class="fas fa-circle-check"></i>Intégrez un réseau de chercheurs pluridisciplinaire, ouvert à tous les chercheurs du monde.</li>
+                    <li><i class="fas fa-circle-check"></i>Participez aux séminaires Gɛlɛkan et aux activités du groupe.</li>
+                    <li><i class="fas fa-circle-check"></i>Partagez vos travaux et faites connaître votre profil de chercheur(se).</li>
+                </ul>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'membership_apply' %}" class="btn btn-primary">Faire une demande d'adhésion</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 6. Chiffres clés -->
+<section class="home-section">
+    <div class="container">
+        <div class="stats-strip">
+            {% for label, value, icon in stats %}{% if value %}
+            <div class="stat"><i class="fas {{ icon }}"></i><strong>{{ value }}</strong><span>{{ label }}</span></div>
+            {% endif %}{% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- 7. Équipe -->
+{% if team_members %}
+<section class="home-section alt">
+    <div class="container">
+        <div class="home-head">
+            <h2 class="home-title mb-0">Notre équipe</h2>
+            <a class="home-more" href="{% url 'public_member_list' %}">Voir tous les membres <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+        <div class="row g-4">
+            {% for member in team_members %}
+            <div class="col-6 col-lg-3">
+                <a class="team-mini" href="{% url 'public_member_detail' member.pk %}">
+                    {% if member.profile_picture %}<img src="{{ member.profile_picture.url }}" alt="{{ member.get_full_name }}" loading="lazy">
+                    {% else %}<span class="team-initials" aria-hidden="true">{{ member.prenom|slice:":1" }}{{ member.nom|slice:":1" }}</span>{% endif %}
+                    <h3>{{ member.get_full_name }}</h3>
+                    {% if member.job_title %}<p>{{ member.job_title }}</p>{% endif %}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- 8. Partenaires -->
+{% if partenaires %}
+<section class="home-section">
+    <div class="container">
+        <h2 class="home-title text-center mb-4">Nos partenaires</h2>
+        <div class="partners-row">
+            {% for partenaire in partenaires %}<img src="{{ partenaire.logo.url }}" alt="{{ partenaire.name }}" loading="lazy">{% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- 9. Newsletter -->
+<section class="home-section alt">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
-                <h2 class="section-title mb-4">Restez informés</h2>
-                <p class="lead mb-4">Abonnez-vous à notre newsletter pour recevoir nos dernières analyses et invitations aux événements.</p>
-                
+                <h2 class="home-title">Restez informés</h2>
+                <p class="home-lead mx-auto">Abonnez-vous à notre newsletter pour recevoir nos dernières analyses et invitations aux événements.</p>
                 <form method="post" action="{% url 'newsletter_subscribe' %}" class="row g-3 justify-content-center">
                     {% csrf_token %}
                     <div class="col-md-8">
-                        <input type="email" name="email" class="form-control form-control-lg" 
-                               placeholder="Votre email" required>
+                        <label for="newsletter-email" class="visually-hidden">Votre adresse e-mail</label>
+                        <input type="email" id="newsletter-email" name="email" class="form-control form-control-lg" placeholder="Votre e-mail" required>
                     </div>
                     <div class="col-md-4">
-                        <button type="submit" class="btn btn-primary btn-lg w-100">
-                            <i class="fas fa-envelope me-2"></i>S'abonner
-                        </button>
+                        <button type="submit" class="btn btn-primary btn-lg w-100"><i class="fas fa-envelope me-2"></i>S'abonner</button>
                     </div>
                 </form>
-
-                <!-- Zone pour afficher les messages -->
                 {% if messages %}
                 <div class="mt-3 w-100">
                     {% for message in messages %}
-                        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">{{ message }}</div>
                     {% endfor %}
                 </div>
                 {% endif %}
@@ -537,6 +298,4 @@ Economy | Conflict | State
         </div>
     </div>
 </section>
-
-
 {% endblock %}

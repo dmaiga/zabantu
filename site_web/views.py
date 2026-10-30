@@ -4,7 +4,7 @@ from events.models import Event
 from gallery.models import Photo,Gallery
 from django.views.generic import TemplateView
 from django.utils import timezone
-from django.db.models import Count,Q
+from django.db.models import Count, Q, F
 from django.http import Http404
 from users.models import CustomUser
 from django.shortcuts import get_object_or_404
@@ -301,6 +301,7 @@ def public_article_list(request):
     return render(request, 'site_web/public_article_list.html', {
         'articles': page_obj,
         'current_filter': current_filter,
+        'search_query': search_query or '',
         'category_data': category_data,
         'total_count': sum(type_counts.values()),
         'is_paginated': paginator.num_pages > 1,
@@ -399,23 +400,36 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        # Derniers articles publiés - version optimisée
-        context['latest_articles'] = Article.objects.filter(
-            status='published',
-        ).order_by('-created_at')[:4]
-        
-        # Événements à venir - 
+
+        published_articles = Article.objects.filter(status='published')
+        # Dernières publications : par date de publication (création à défaut)
+        context['latest_articles'] = published_articles.order_by(
+            F('publish_at').desc(nulls_last=True), '-created_at')[:4]
+
+        # Événements à venir
         context['upcoming_events'] = Event.objects.filter(
-            status='published',  
+            status='published',
             date__gte=timezone.now()
         ).order_by('date')[:3]
-        
-        # Mise en avant spéciale - version optimisée
+
+        # Dernier séminaire en vedette
         context['featured_seminar'] = Guelekan.objects.filter(
             status='published',
         ).order_by('-created_at').first()
-        
+
+        # Membres actifs : aperçu de l'équipe et compteur
+        members = CustomUser.objects.filter(is_active=True, role__in=['moderateur', 'membre'])
+        context['team_members'] = members.order_by('-date_joined')[:4]
+
+        # Chiffres clés (seules les valeurs non nulles sont affichées)
+        context['stats'] = [
+            ('Publications', published_articles.count(), 'fa-file-lines'),
+            ('Membres', members.count(), 'fa-users'),
+            ('Séminaires Gɛlɛkan', Guelekan.objects.filter(status='published').count(), 'fa-microphone-lines'),
+            ('Événements', Event.objects.filter(status='published').count(), 'fa-calendar-days'),
+        ]
+
+        context['partenaires'] = Partenaire.objects.filter(is_active=True).order_by('order')
         return context
 
 

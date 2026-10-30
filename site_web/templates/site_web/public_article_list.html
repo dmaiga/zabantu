@@ -37,7 +37,15 @@
     }
     .articles-list {
         flex: 1;
+        min-width: 0;
     }
+    .publication-search {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .publication-search .form-control { min-height: 46px; }
+    .publication-search .btn { min-width: 48px; min-height: 46px; }
     .filter-title {
         font-weight: 600;
         color: var(--zabantu-primary);
@@ -101,119 +109,50 @@
         background-color: #ffc107;
         color: #212529;
     }
-    .article-card {
+    /* Carte de publication : couverture entière à gauche, informations hiérarchisées à droite */
+    .pub-card {
         display: grid;
-        grid-template-columns: 220px 1fr;
+        grid-template-columns: 190px minmax(0, 1fr);
         gap: 1.5rem;
-        align-items: start;
-        margin-bottom: 1.5rem;
-        background-color: white;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 1.25rem;
+        padding: 1.25rem;
+        background: #fff;
+        border: 1px solid #e6e9e0;
+        border-radius: 10px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
     }
-    .article-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    .pub-card:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.10); transform: translateY(-2px); }
+    .pub-cover {
+        display: flex; align-items: center; justify-content: center;
+        aspect-ratio: 3 / 4; width: 100%;
+        background: #eef0e8; border: 1px solid #e0e4d8; border-radius: 6px; overflow: hidden;
+        color: var(--zabantu-primary); font-size: 2.5rem; text-decoration: none;
     }
-    /* La couverture est affichée en entier (contain), sans rognage ni voile sombre */
-    .article-image {
-        align-self: stretch;
-        aspect-ratio: 3 / 4;
-        max-height: 300px;
-        width: 100%;
-        background-color: #f4f5ef;
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
+    .pub-cover img { width: 100%; height: 100%; object-fit: contain; display: block; }  /* jamais rogné */
+    .pub-body { display: flex; flex-direction: column; min-width: 0; }
+    .pub-meta-top { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .6rem; margin-bottom: .5rem; font-size: .85rem; }
+    .pub-category {
+        background: var(--zabantu-primary-light); color: var(--zabantu-primary-dark);
+        padding: .2rem .65rem; border-radius: 999px; font-weight: 500;
     }
-    .article-content {
-        padding: 1.25rem 1.5rem 1.25rem 0;
+    .pub-date { color: var(--zabantu-gray); margin-left: auto; white-space: nowrap; }
+    .pub-title {
+        font-size: 1.3rem; font-weight: 700; line-height: 1.3; margin: 0 0 .5rem;
+        color: var(--zabantu-primary-dark); text-wrap: balance;
+        display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
     }
-    .article-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        line-height: 1.25;
-        margin-bottom: 0.4rem;
-        color: var(--zabantu-primary-dark);
+    .pub-title a { color: inherit; text-decoration: none; }
+    .pub-title a:hover { color: var(--zabantu-secondary-dark); }
+    .pub-authors { font-size: .95rem; font-weight: 500; color: var(--zabantu-dark); margin: 0 0 .25rem; }
+    .pub-authors i, .pub-ref i { color: var(--zabantu-gray); width: 1.1rem; }
+    .pub-ref { font-size: .88rem; color: var(--zabantu-gray); margin: 0 0 .5rem; }
+    .pub-excerpt {
+        color: var(--zabantu-dark); line-height: 1.55; margin: .25rem 0 1rem; font-size: .97rem;
+        display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
     }
-    .article-title a {
-        text-decoration: none;
-        color: inherit;
-        transition: color 0.2s;
-    }
-    .article-title a:hover {
-        color: var(--zabantu-secondary);
-    }
-    .article-meta {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 0.4rem;
-        flex-wrap: wrap;
-    }
-    .article-category {
-        background-color: var(--zabantu-primary-light);
-        color: var(--zabantu-primary-dark);
-        padding: 0.25rem 0.75rem;
-        border-radius: 4px;
-        font-size: 0.85rem;
-        font-weight: 500;
-    }
-    .article-date {
-        color: var(--zabantu-gray);
-        font-size: 0.9rem;
-    }
-    .article-authors {
-        margin-bottom: 0.25rem;
-        color: var(--zabantu-dark);
-        font-size: 0.9rem;
-        font-weight: 500;
-    }
-    .article-excerpt {
-        color: var(--zabantu-dark);
-        line-height: 1.5;
-        margin-top: 0.5rem;
-        margin-bottom: 0.9rem;
-    }
-    .article-details {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-        margin-bottom: 0;
-        font-size: 0.9rem;
-        color: var(--zabantu-gray);
-    }
-    .article-journal, .article-publisher, .article-year {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    .article-journal::before {
-        content: "📰";
-    }
-    .article-publisher::before {
-        content: "🏢";
-    }
-    .article-year::before {
-        content: "📅";
-    }
-    .read-more {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        background-color: var(--zabantu-primary);
-        color: white;
-        border-radius: 4px;
-        text-decoration: none;
-        font-weight: 500;
-        transition: all 0.2s;
-    }
-    .read-more:hover {
-        background-color: var(--zabantu-primary-dark);
-    }
+    .pub-actions { margin-top: auto; display: flex; flex-wrap: wrap; gap: .5rem; }
+    .pub-actions .btn { min-height: 40px; display: inline-flex; align-items: center; gap: .4rem; }
     .empty-state {
         text-align: center;
         padding: 3rem;
@@ -326,29 +265,18 @@
     }
 }
     @media (max-width: 992px) {
-        .article-card {
-            grid-template-columns: 160px 1fr;
-        }
+        .pub-card { grid-template-columns: 150px minmax(0, 1fr); gap: 1.1rem; }
     }
     @media (max-width: 768px) {
-        .publication-container {
-            flex-direction: column;
-        }
-        .filter-sidebar {
-            width: 100%;
-            position: static;
-            margin-bottom: 2rem;
-        }
-        .article-card {
-            grid-template-columns: 1fr;
-        }
-        .article-image {
-            aspect-ratio: 16 / 10;
-            max-height: 220px;
-        }
-        .article-content {
-            padding: 0 1.25rem 1.25rem;
-        }
+        .publication-container { flex-direction: column; }
+        .filter-sidebar { width: 100%; position: static; margin-bottom: 2rem; }
+    }
+    @media (max-width: 576px) {
+        .pub-card { grid-template-columns: 1fr; padding: 1rem; }
+        .pub-cover { aspect-ratio: 16 / 10; max-height: 220px; }
+        .pub-title { font-size: 1.2rem; }
+        .pub-date { margin-left: 0; }
+        .pub-actions .btn { flex: 1 1 auto; justify-content: center; }
     }
 </style>
 
@@ -387,127 +315,65 @@
 
         <!-- Liste des articles -->
         <div class="articles-list">
+            <form method="get" action="{% url 'public_article_list' %}" class="publication-search" role="search">
+                {% if current_filter %}<input type="hidden" name="type" value="{{ current_filter }}">{% endif %}
+                <label for="publication-search-input" class="visually-hidden">Rechercher une publication</label>
+                <input id="publication-search-input" type="search" name="q" value="{{ search_query|default:'' }}"
+                       class="form-control" placeholder="Rechercher une publication (titre, résumé, mot-clé)…">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i><span class="visually-hidden">Rechercher</span></button>
+            </form>
             {% if articles %}
                 {% for article in articles %}
-                <div class="article-card">
-                    <!-- Gestion des images de couverture selon le type d'article -->
-                    {% if article.article_type == 'independent' and article.independent_cover %}
-                    <div class="article-image" style="background-image: url('{{ article.independent_cover.url }}')"></div>
-                    {% elif article.cover_image %}
-                    <div class="article-image" style="background-image: url('{{ article.cover_image.url }}')"></div>
-                    {% else %}
-                    <div class="article-image" style="background-color: var(--zabantu-light); display: flex; align-items: center; justify-content: center;">
-                        <svg width="50%" height="50%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity: 0.3;">
-                            <path d="M4 16L8.586 11.414C8.961 11.039 9.47 10.828 10 10.828C10.53 10.828 11.039 11.039 11.414 11.414L16 16M14 14L15.586 12.414C15.961 12.039 16.47 11.828 17 11.828C17.53 11.828 18.039 12.039 18.414 12.414L20 14M14 8H14.01M6 20H18C19.105 20 20 19.105 20 18V6C20 4.895 19.105 4 18 4H6C4.895 4 4 4.895 4 6V18C4 19.105 4.895 20 6 20Z" stroke="var(--zabantu-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    {% endif %}
-                    
-                    <div class="article-content">
-                        <h3 class="article-title">
-                            <a href="{% url 'public_article_detail' article.slug %}">
-                                {{ article.title|safe }}
-                            </a>
-                        </h3>
-                        
-                        <div class="article-meta">
-                            {% if article.category %}
-                                <span class="article-category">
-                                    {{ article.get_category_display }}
-                                </span>
-                            {% endif %}
+                <article class="pub-card">
+                    <a class="pub-cover" href="{% url 'public_article_detail' article.slug %}" tabindex="-1" aria-hidden="true">
+                        {% if article.article_type == 'independent' and article.independent_cover %}
+                        <img src="{{ article.independent_cover.url }}" alt="" loading="lazy">
+                        {% elif article.cover_image %}
+                        <img src="{{ article.cover_image.url }}" alt="" loading="lazy">
+                        {% else %}
+                        <i class="fas fa-file-lines"></i>
+                        {% endif %}
+                    </a>
 
-                            <!-- Badge type d'article -->
-                            {% if article.article_type == 'academic' %}
-                                <span class="badge-type badge-type-academic">Académique</span>
-                            {% elif article.article_type == 'zabantu' %}
-                                <span class="badge-type badge-type-zabantu">Zabantu</span>
-                            {% elif article.article_type == 'independent' %}
-                                <span class="badge-type badge-type-independent">Indépendant</span>
-                            {% endif %}
-
-                            <span class="article-date">{{ article.created_at|date:"d F Y" }}</span>
+                    <div class="pub-body">
+                        <div class="pub-meta-top">
+                            {% if article.article_type == 'academic' %}<span class="badge-type badge-type-academic">Académique</span>
+                            {% elif article.article_type == 'zabantu' %}<span class="badge-type badge-type-zabantu">Zabantu</span>
+                            {% elif article.article_type == 'independent' %}<span class="badge-type badge-type-independent">Indépendant</span>{% endif %}
+                            {% if article.category %}<span class="pub-category">{{ article.get_category_display }}</span>{% endif %}
+                            <time class="pub-date" datetime="{{ article.publish_at|default:article.created_at|date:'Y-m-d' }}">{{ article.publish_at|default:article.created_at|date:"j F Y" }}</time>
                         </div>
-<!-- Affichage des auteurs selon le type d'article -->
-<div class="article-authors">
-    {% if article.article_type == 'academic' %}
-        <!-- D'abord les auteurs Zabantu/Guelekan -->
-        {% if article.authors.all %}
-            Par {% for author in article.authors.all %}
-                {{ author.get_full_name }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-            {% if article.academic_authors %}, {% endif %}
-        {% endif %}
 
-        <!-- Ensuite les auteurs académiques externes -->
-        {% if article.academic_authors %}
-            {{ article.academic_authors }}
-        {% endif %}
+                        <h3 class="pub-title">
+                            <a href="{% url 'public_article_detail' article.slug %}">{{ article.title|striptags|safe }}</a>
+                        </h3>
 
-    {% elif article.article_type == 'independent' and article.external_author %}
-        Par {{ article.external_author }}
+                        {% if article.article_type == 'independent' and article.external_author %}
+                        <p class="pub-authors"><i class="fas fa-user"></i>{{ article.external_author }}</p>
+                        {% elif article.authors.all or article.academic_authors %}
+                        <p class="pub-authors"><i class="fas fa-user"></i>{% for author in article.authors.all %}{{ author.get_full_name }}{% if not forloop.last or article.academic_authors and article.article_type == 'academic' %}, {% endif %}{% endfor %}{% if article.article_type == 'academic' %}{{ article.academic_authors|default:"" }}{% endif %}</p>
+                        {% endif %}
 
-    {% elif article.authors.all %}
-        Par {% for author in article.authors.all %}
-            {{ author.get_full_name }}{% if not forloop.last %}, {% endif %}
-        {% endfor %}
-    {% endif %}
-</div>
+                        {% if article.journal or article.publisher or article.publication_year %}
+                        <p class="pub-ref"><i class="fas fa-book"></i>{% if article.journal %}<em>{{ article.journal }}</em>{% endif %}{% if article.publisher %}{% if article.journal %} · {% endif %}{{ article.publisher }}{% endif %}{% if article.publication_year %}{% if article.journal or article.publisher %} · {% endif %}{{ article.publication_year }}{% endif %}</p>
+                        {% endif %}
 
-                        <!-- Détails supplémentaires pour les articles académiques -->
-{% if article.article_type == 'academic' %}
-<div class="article-details">
-    <div class="d-flex flex-wrap gap-3 align-items-center">
-        {% if article.journal %}
-        <span class="d-flex align-items-center text-muted">
-            <i class="fas fa-book me-2"></i>
-            <strong>Revue :</strong> {{ article.journal }}
-        </span>
-        {% endif %}
-        
-        {% if article.publisher %}
-        <span class="d-flex align-items-center text-muted">
-            <i class="fas fa-building me-2"></i>
-            <strong>Éditeur :</strong> {{ article.publisher }}
-        </span>
-        {% endif %}
-        
-        {% if article.publication_year %}
-        <span class="d-flex align-items-center text-muted">
-            <i class="fas fa-calendar-alt me-2"></i>
-            <strong>Année :</strong> {{ article.publication_year }}
-        </span>
-        {% endif %}
-        
-        {% if article.external_link_academique %}
-        <span class="d-flex align-items-center">
-            <i class="fas fa-external-link-alt me-2 text-primary"></i>
-            <a href="{{ article.external_link_academique }}" target="_blank" class="text-decoration-none">
-                <strong>Lire l'article</strong>
-            </a>
-        </span>
-        {% endif %}
-    </div>
-</div>
-{% endif %}
-
-
-                        <!-- Extrait ou résumé -->
-                        <p class="article-excerpt">
-                            {% if article.article_type == 'academic' and article.abstract %}
-                                {{ article.abstract|safe|truncatewords:15 }}
-                            {% elif article.resume %}
-                                {{ article.resume|safe|truncatewords:20 }}
-                            {% else %}
-                                {{ article.content|safe|striptags|truncatewords:20 }}
-                            {% endif %}
+                        <p class="pub-excerpt">
+                            {% if article.article_type == 'academic' and article.abstract %}{{ article.abstract|striptags|safe|truncatewords:40 }}
+                            {% elif article.resume %}{{ article.resume|striptags|safe|truncatewords:40 }}
+                            {% else %}{{ article.content|default_if_none:""|striptags|safe|truncatewords:40 }}{% endif %}
                         </p>
-                        
-                        <a href="{% url 'public_article_detail' article.slug %}" class="read-more">
-                            Lire la suite
-                        </a>
+
+                        <div class="pub-actions">
+                            <a href="{% url 'public_article_detail' article.slug %}" class="btn btn-primary btn-sm">Lire la suite</a>
+                            {% if article.article_type == 'academic' and article.external_link_academique %}
+                            <a href="{{ article.external_link_academique }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-arrow-up-right-from-square"></i> Article source
+                            </a>
+                            {% endif %}
+                        </div>
                     </div>
-                </div>
+                </article>
                 {% endfor %}
             {% else %}
                 <div class="empty-state">
@@ -520,7 +386,7 @@
                             Aucune publication disponible dans cette catégorie pour le moment.
                         {% endif %}
                     </p>
-                    <a href="{% url 'public_article_list' %}" class="read-more">
+                    <a href="{% url 'public_article_list' %}" class="btn btn-primary">
                         Voir toutes les publications
                     </a>
                 </div>

@@ -7,7 +7,19 @@
 {% block banner_subtitle %}Découvrez les membres du  Groupe de recheche Zabantu{% endblock %}
 
 {% block content %}
+<div class="member-cta">
+    <div>
+        <h2 class="h4 mb-1">Vous partagez nos centres d'intérêt ?</h2>
+        <p class="mb-0">Chercheur(e), enseignant(e), doctorant(e) ou professionnel(le) : rejoignez le Groupe de recherche Zabantu.</p>
+    </div>
+    <a href="{% url 'membership_apply' %}" class="btn btn-primary btn-lg">Rejoindre les membres</a>
+</div>
 <style>
+    .member-cta {
+        display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+        background: var(--zabantu-light); border-left: 4px solid var(--zabantu-primary);
+        border-radius: 8px; padding: 1.25rem 1.5rem; margin-bottom: 2rem;
+    }
     .member-card {
         transition: all 0.3s ease;
         border: none;

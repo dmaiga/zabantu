@@ -408,26 +408,55 @@
 </style>
 
 
+<style>
+    /* Lisibilité : longueur de ligne maîtrisée, texte un peu plus grand, retours à la ligne équilibrés */
+    .identity-card p, .activity-section p {
+        font-size: 1.075rem; line-height: 1.75; max-width: 68ch; color: #2f3a30;
+        hyphens: auto; -webkit-hyphens: auto; text-wrap: pretty; overflow-wrap: break-word;
+    }
+    .group-name, .group-subtitle, .vision-title, .section-title, .activity-title { text-wrap: balance; }
+    .identity-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 2rem; align-items: start; margin: 1.5rem 0 2rem; }
+    .identity-grid .vision-box { margin: 0; }
+    .identity-grid .vision-box .group-subtitle { font-size: 1.35rem; line-height: 1.4; max-width: none; margin-bottom: 0; }
+    .identity-card .section-title { margin-top: .5rem; }
+    .domain-badge { font-size: 1rem; padding: .65rem 1.3rem; }
+    .activity-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 2.5rem; align-items: start; }
+    .activity-grid .lead-text { font-size: 1.2rem; line-height: 1.7; color: var(--zabantu-primary-dark); }
+    .activity-aside {
+        background: var(--zabantu-primary-light); border-left: 4px solid var(--zabantu-primary);
+        border-radius: 12px; padding: 1.5rem; position: sticky; top: 1rem;
+    }
+    .activity-aside h4 { font-size: 1.15rem; margin-bottom: .75rem; color: var(--zabantu-primary-dark); }
+    .activity-aside p { font-size: 1rem; line-height: 1.6; margin-bottom: 1rem; }
+    .activity-aside .btn { display: block; margin-bottom: .5rem; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+    @media (max-width: 992px) {
+        .identity-grid, .activity-grid { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+        .activity-aside { position: static; }
+    }
+    @media (max-width: 576px) {
+        .identity-card, .activity-section { padding: 1.25rem; }
+        .identity-card p, .activity-section p { font-size: 1rem; line-height: 1.7; }
+        .activity-grid .lead-text { font-size: 1.1rem; }
+    }
+</style>
+
 <div class="about-container">
     <!-- Identity Section -->
-    <section class="section">
+    <section class="section" id="presentation">
         <div class="identity-card">
             <h1 class="group-name">Groupe de recherche Zabantu</h1>
             <p class="group-subtitle">« Économie-Guerre-État »</p>
             
-            <p>Nom inspiré d'une plante locale mandingue, Zabantu est un groupe 
-                de chercheurs en sciences sociales travaillant sur le développement
-                 économique et social.C'est de ce fait un groupe pluri et
-                  interdisciplinaire, qui est ouvert à tous les chercheurs et
-                   chercheuses du monde dans l'objectif d'avoir une recherche 
-                   plus inclusive et plus ancrée.</p>
-            
-            <div class="vision-box">
-                <h3 class="vision-title">Vision</h3>
-                <p class="group-subtitle">Vers une recherche ancrée dans les dynamiques économiques et sociales</p>              
+            <div class="identity-grid">
+                <p>Nom inspiré d'une plante locale mandingue, Zabantu est un groupe de chercheurs en sciences sociales travaillant sur le développement économique et social. C'est de ce fait un groupe pluri et interdisciplinaire, qui est ouvert à tous les chercheurs et chercheuses du monde dans l'objectif d'avoir une recherche plus inclusive et plus ancrée.</p>
+
+                <div class="vision-box">
+                    <h3 class="vision-title">Vision</h3>
+                    <p class="group-subtitle">Vers une recherche ancrée dans les dynamiques économiques et sociales</p>
+                </div>
             </div>
-            
-            <h3 class="section-title">Domaines de recherche</h3>
+
+            <h3 class="section-title" id="domaines">Domaines de recherche</h3>
             <div class="research-domains">
                 <span class="domain-badge">Économie politique</span>
                 <span class="domain-badge">Conflits et sécurité</span>
@@ -439,41 +468,31 @@
     </section>
     
     <!-- Activités Section -->
-    <section class="section">
+    <section class="section" id="activites">
         <div class="activity-section">
             <h2 class="section-title">Activités</h2>
             
             <h3 class="activity-title">Séminaire Gɛlɛkan</h3>
-            <p>Gɛlɛkan est une tribune scientifique de collaboration et
-                 de partage d'expérience et de connaissance. Inspiré de 
-                 la tribune de sagesse bamanan réservée aux ainés
-                  (considérés comme des sagesses et des érudits), Gɛlɛkan est 
-                  un espace de communication scientifique permettant aux chercheurs 
-                  de partager les résultats de leurs recherches accomplies ou en 
-                  cours.</p>            
-            <p>Les séminaires Gɛlɛkan portent aussi sur les thématiques de formation
-                 comme la méthodologie de recherche et les astuces de publications
-                  académiques. Il s'agit de partage d'expérience des auteurs bien 
-                  établis dans leurs domaines visant à initier et ou renforcer les 
-                  jeunes chercheurs à la conduite de la recherche scientifique et de
-                   la communication scientifique.</p>            
-            <p>Au-delà de la démarche méthodologique, les séminaires Gɛlɛkan mettent
-                 un accent particulier sur les débats épistémologiques, qui 
-                 déterminent, dans une large mesure, la contribution à la 
-                 connaissance scientifique.</p>
-            
-            <p>La nécessité d'un tel cadre académique réside dans le caractère 
-                collectif de la production de la connaissance. Ainsi, débattre
-                 des résultats de recherche permettent de mettre en évidence leurs
-                  pertinence et limites éventuelles et par conséquent de les
-                   consolider, dans la mesure où ces limites seront adressées
-                    à la communauté scientifique. Dans ce contexte, la communication des résultats de recherche devient plus qu'une nécessité, elle contribue à la validation externe des connaissances et leur diffusion.</p>
+            <div class="activity-grid">
+                <div>
+                    <p class="lead-text">Gɛlɛkan est une tribune scientifique de collaboration et de partage d'expérience et de connaissance. Inspiré de la tribune de sagesse bamanan réservée aux aînés (considérés comme des sagesses et des érudits), Gɛlɛkan est un espace de communication scientifique permettant aux chercheurs de partager les résultats de leurs recherches accomplies ou en cours.</p>
+                    <p>Les séminaires Gɛlɛkan portent aussi sur les thématiques de formation comme la méthodologie de recherche et les astuces de publications académiques. Il s'agit de partage d'expérience des auteurs bien établis dans leurs domaines visant à initier et ou renforcer les jeunes chercheurs à la conduite de la recherche scientifique et de la communication scientifique.</p>
+                    <p>Au-delà de la démarche méthodologique, les séminaires Gɛlɛkan mettent un accent particulier sur les débats épistémologiques, qui déterminent, dans une large mesure, la contribution à la connaissance scientifique.</p>
+                    <p>La nécessité d'un tel cadre académique réside dans le caractère collectif de la production de la connaissance. Ainsi, débattre des résultats de recherche permettent de mettre en évidence leurs pertinence et limites éventuelles et par conséquent de les consolider, dans la mesure où ces limites seront adressées à la communauté scientifique. Dans ce contexte, la communication des résultats de recherche devient plus qu'une nécessité, elle contribue à la validation externe des connaissances et leur diffusion.</p>
+                </div>
+                <aside class="activity-aside">
+                    <h4>Suivre les séminaires</h4>
+                    <p>Retrouvez les séances passées et à venir du séminaire Gɛlɛkan.</p>
+                    <a href="{% url 'public_guelekan_list' %}" class="btn btn-primary">Voir les séminaires</a>
+                    <a href="{% url 'public_event_list' %}" class="btn btn-outline-primary">Événements à venir</a>
+                </aside>
+            </div>
         </div>
     </section>
 </div>
 
 <!-- Section Équipe - Photos indépendantes -->
-<section class="team-section">
+<section class="team-section" id="equipe">
     <div class="about-container">
         <h2 class="section-title">Notre Équipe</h2>
         
@@ -498,14 +517,15 @@
 
         <!-- Lien vers la page complète de l'équipe -->
         <div class="text-center mt-5">
-            <a href="{% url 'membre_liste' %}" class="btn btn-primary">
-                Voir toute l'équipe <i class="fas fa-arrow-right ms-2"></i>
+            <a href="{% url 'public_member_list' %}" class="btn btn-primary me-2 mb-2">
+                Voir tous les membres <i class="fas fa-arrow-right ms-2"></i>
             </a>
+            <a href="{% url 'membership_apply' %}" class="btn btn-outline-primary mb-2">Rejoindre Zabantu</a>
         </div>
     </div>
 </section>
 
-<section class="section">
+<section class="section" id="partenaires">
     <div class="container text-center">
         <h2 class="section-title">Nos Partenaires</h2>
     </div>
