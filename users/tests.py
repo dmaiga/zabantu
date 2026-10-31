@@ -314,3 +314,18 @@ class PartenaireCrudTests(TestCase):
         self.client.force_login(self.moderator)
         r = self.client.get(reverse('partenaire_list'), {'q': 'Fondation'})
         self.assertEqual([p.name for p in r.context['page_obj']], ['Fondation X'])
+
+
+class SidebarOrderTests(TestCase):
+    def test_intervenants_come_before_partenaires_for_moderators(self):
+        from users.testing import make_user
+        self.client.force_login(make_user('moderateur'))
+        html = self.client.get(reverse('dashboard')).content.decode()
+        self.assertLess(html.index('fa-chalkboard-teacher'), html.index('fa-handshake'))
+
+    def test_members_still_see_intervenants_but_not_partenaires(self):
+        from users.testing import make_user
+        self.client.force_login(make_user('membre'))
+        html = self.client.get(reverse('dashboard')).content.decode()
+        self.assertIn('fa-chalkboard-teacher', html)
+        self.assertNotIn('fa-handshake', html)

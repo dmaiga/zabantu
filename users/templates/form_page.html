@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load form_tags %}
+{# Formulaire en assistant : une section = une étape ; formulaire à gauche, sommaire des étapes à droite.
+   Blocs : form_title, form_intro, form_extra. Contexte : form, back_url, back_label, submit_label.
+   Sans JavaScript, toutes les sections s'affichent à la suite. #}
+{% block content %}
+{% with steps=form.grouped_fields %}
+<div class="container-fluid py-4">
+    <a href="{{ back_url }}" class="text-decoration-none small"><i class="fas fa-arrow-left me-1"></i> {{ back_label|default:"Retour" }}</a>
+    <h1 class="h3 mt-2 mb-1">{% block form_title %}{% endblock %}</h1>
+    <p class="text-muted mb-1">{% block form_intro %}{% endblock %}</p>
+    <p class="small text-muted"><span class="text-danger">*</span> Champ obligatoire</p>
+
+    <form method="post" enctype="multipart/form-data" novalidate id="wizard-form" data-wizard="{% if steps|length > 1 %}on{% endif %}" data-editing="{% if form.instance.pk %}yes{% endif %}">
+        {% csrf_token %}
+        {% for field in form.hidden_fields_list %}{{ field }}{% endfor %}
+
+        {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+        {% if form.errors and not form.non_field_errors %}<div class="alert alert-danger" role="alert">Certains champs sont à corriger : l'étape concernée est signalée en rouge.</div>{% endif %}
+
+        <div class="row g-4">
+            <!-- Formulaire -->
+            <div class="col-lg-8 order-2 order-lg-1">
+                <div class="wizard-steps">
+                    {% for title, fields in steps %}
+                    <section class="card mb-4 wizard-step" data-step="{{ forloop.counter0 }}" data-title="{{ title|default:'Informations' }}"{% if fields|has_errors %} data-has-error="yes"{% endif %} aria-labelledby="step-title-{{ forloop.counter0 }}">
+                        <div class="card-header bg-white"><h2 class="h6 mb-0 text-uppercase text-muted" id="step-title-{{ forloop.counter0 }}">{% if steps|length > 1 %}Étape {{ forloop.counter }} sur {{ steps|length }} · {% endif %}{{ title|default:'Informations' }}</h2></div>
+                        <div class="card-body">
+                            {% for field in fields %}{% include 'includes/form_field.html' %}{% endfor %}
+                        </div>
+                    </section>
+                    {% endfor %}
+                </div>
+
+                {% block form_extra %}{% endblock %}
+
+                <div class="d-flex justify-content-between align-items-center gap-2 position-sticky bottom-0 bg-white border rounded p-3 shadow-sm wizard-actions">
+                    <a href="{{ back_url }}" class="btn btn-outline-secondary">Annuler</a>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-secondary" data-prev hidden><i class="fas fa-arrow-left me-1"></i> Précédent</button>
+                        <button type="button" class="btn btn-primary" data-next hidden>Suivant <i class="fas fa-arrow-right ms-1"></i></button>
+                        <button type="submit" class="btn btn-primary" data-submit><i class="fas fa-save me-1"></i> {{ submit_label|default:"Enregistrer" }}</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sommaire des étapes -->
+            {% if steps|length > 1 %}
+            <aside class="col-lg-4 order-1 order-lg-2">
+                <div class="card position-sticky" style="top: 1rem;">
+                    <div class="card-body">
+                        <div class="d-lg-none small text-muted mb-2" data-progress-text></div>
+                        <div class="progress mb-3" style="height: 6px;" role="progressbar" aria-label="Progression"><div class="progress-bar" data-progress-bar style="width: 0"></div></div>
+                        <ol class="list-unstyled mb-0 wizard-stepper d-none d-lg-block">
+                            {% for title, fields in steps %}
+                            <li><button type="button" class="wizard-stepper-item" data-goto="{{ forloop.counter0 }}">
+                                <span class="wizard-stepper-dot">{{ forloop.counter }}</span>
+                                <span class="wizard-stepper-label">{{ title|default:'Informations' }}</span>
+                            </button></li>
+                            {% endfor %}
+                        </ol>
+                    </div>
+                </div>
+            </aside>
+            {% endif %}
+        </div>
+    </form>
+</div>
+{% endwith %}
+
+<style>
+    /* Les étapes inactives restent dans la mise en page (largeur réelle) mais invisibles : les éditeurs de texte riche s'initialisent normalement */
+    #wizard-form[data-wizard="on"].is-ready .wizard-steps { position: relative; }
+    #wizard-form[data-wizard="on"].is-ready .wizard-step:not(.is-active) { position: absolute; left: 0; right: 0; top: 0; height: 0; overflow: hidden; visibility: hidden; margin: 0 !important; border: 0; pointer-events: none; }
+    .wizard-stepper-item { display: flex; align-items: center; gap: .75rem; width: 100%; padding: .5rem; border: 0; background: transparent; text-align: left; border-radius: .5rem; color: inherit; }
+    .wizard-stepper-item:hover { background: rgba(0,0,0,.04); }
+    .wizard-stepper-dot { flex: 0 0 2rem; height: 2rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; background: #e9ecef; color: #495057; }
+    .wizard-stepper-item.is-current .wizard-stepper-dot { background: var(--bs-primary, #0d6efd); color: #fff; }
+    .wizard-stepper-item.is-current .wizard-stepper-label { font-weight: 600; }
+    .wizard-stepper-item.is-done .wizard-stepper-dot { background: #198754; color: #fff; }
+    .wizard-stepper-item.has-error .wizard-stepper-dot { background: #dc3545; color: #fff; }
+    .wizard-stepper-item.has-error .wizard-stepper-label { color: #dc3545; }
+</style>
+
+<script>
+(function () {
+    var form = document.getElementById('wizard-form');
+    if (!form) { return; }
+    var submitBtn = form.querySelector('[data-submit]');
+    form.addEventListener('submit', function () {
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Enregistrement…'; }
+    });
+    if (form.dataset.wizard !== 'on') { return; }
+
+    var steps = Array.prototype.slice.call(form.querySelectorAll('.wizard-step'));
+    var items = Array.prototype.slice.call(form.querySelectorAll('[data-goto]'));
+    var prev = form.querySelector('[data-prev]'), next = form.querySelector('[data-next]');
+    var bar = form.querySelector('[data-progress-bar]'), text = form.querySelector('[data-progress-text]');
+    var editing = form.dataset.editing === 'yes';
+    var current = 0, visited = {};
+
+    function invalidFieldsIn(step) {
+        // Seuls les champs visibles et contrôlables par le navigateur ; les éditeurs de texte riche sont vérifiés par le serveur
+        return Array.prototype.filter.call(step.querySelectorAll('input, select, textarea'), function (el) {
+            return el.willValidate && !el.hidden && el.type !== 'hidden' && !el.checkValidity();
+        });
+    }
+    function show(index) {
+        current = Math.max(0, Math.min(index, steps.length - 1));
+        visited[current] = true;
+        steps.forEach(function (s, i) { s.classList.toggle('is-active', i === current); });
+        items.forEach(function (item, i) {
+            var hasError = steps[i].dataset.hasError === 'yes';
+            item.classList.toggle('is-current', i === current);
+            item.classList.toggle('is-done', visited[i] && i !== current && !hasError);
+            item.classList.toggle('has-error', hasError);
+            if (i === current) { item.setAttribute('aria-current', 'step'); } else { item.removeAttribute('aria-current'); }
+        });
+        var last = current === steps.length - 1;
+        prev.hidden = current === 0;
+        next.hidden = last;
+        submitBtn.hidden = !last && !editing;   // en modification, on peut enregistrer à tout moment
+        if (bar) { bar.style.width = ((current + 1) / steps.length * 100) + '%'; }
+        if (text) { text.textContent = 'Étape ' + (current + 1) + ' sur ' + steps.length + ' · ' + steps[current].dataset.title; }
+        var heading = steps[current].querySelector('h2');
+        if (heading) { heading.scrollIntoView({block: 'nearest', behavior: 'smooth'}); }
+    }
+    function tryAdvance(target) {
+        if (target > current) {
+            var bad = invalidFieldsIn(steps[current]);
+            if (bad.length) { bad[0].reportValidity(); return; }
+        }
+        show(target);
+    }
+
+    prev.addEventListener('click', function () { show(current - 1); });
+    next.addEventListener('click', function () { tryAdvance(current + 1); });
+    items.forEach(function (item, i) { item.addEventListener('click', function () { tryAdvance(i); }); });
+    // « Entrée » dans un champ passe à l'étape suivante au lieu d'envoyer le formulaire trop tôt
+    form.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && e.target.tagName === 'INPUT' && current < steps.length - 1) { e.preventDefault(); tryAdvance(current + 1); }
+    });
+
+    form.classList.add('is-ready');
+    var firstError = steps.findIndex(function (s) { return s.dataset.hasError === 'yes'; });
+    show(firstError >= 0 ? firstError : 0);
+})();
+</script>
+{{ form.media }}
+{% endblock %}

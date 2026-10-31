@@ -163,35 +163,13 @@
                 <span class="badge badge-status bg-{% if event.status == 'published' %}success{% else %}warning text-dark{% endif %}">
                     {{ event.get_status_display }}
                 </span>
+                {% if event.event_type == 'seminaire' %}<span class="badge badge-status bg-dark">Séminaire Gɛlɛkan</span>{% else %}<span class="badge badge-status bg-light text-dark border">{{ event.get_event_type_display }}</span>{% endif %}
                 <span class="badge badge-status bg-light text-dark border">
                     <i class="fas {% if event.is_webinar %}fa-video text-info{% else %}fa-map-marker-alt text-danger{% endif %} me-1"></i>
                     {% if event.is_webinar %}En ligne{% else %}Présentiel{% endif %}
                 </span>
                 <span class="text-muted small">Créé le {{ event.created_at|date:"d/m/Y" }}</span>
             </div>
-        </div>
-        
-        <div class="d-flex flex-wrap gap-2">
-            <a href="{% url 'event_list' %}" class="btn btn-sm btn-outline-secondary">
-                <i class="fas fa-arrow-left me-1"></i> Liste
-            </a>
-            
-            {% if user.is_authenticated %}
-                {% if user == event.author or user.role in 'admin,moderateur'|split:',' %}
-                <a href="{% url 'event_update' event.id %}" class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-edit me-1"></i> Modifier
-                </a>
-                {% endif %}
-
-                {% if user.can_moderate %}
-                    {% if event.status == 'draft' %}
-                    {% url 'event_publish' event.id as action_url %}{% include 'includes/post_action.html' with url=action_url label='Publier' btn_class='btn-sm btn-success' icon='fa-paper-plane' %}
-                    {% elif event.status == 'published' %}
-                    {% url 'event_unpublish' event.id as action_url %}{% include 'includes/post_action.html' with url=action_url label='Dépublier' btn_class='btn-sm btn-warning text-dark' icon='fa-eye-slash' %}
-                    {% endif %}
-                    <a href="{% url 'event_delete' event.id %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash me-1"></i> Supprimer</a>
-                {% endif %}
-            {% endif %}
         </div>
     </div>
 
@@ -280,6 +258,23 @@
         </div>
         
         <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body d-grid gap-2">
+                    {% if user.can_moderate or user == event.author %}
+                    <a href="{% url 'event_update' event.id %}" class="btn btn-primary"><i class="fas fa-pen me-1"></i> Modifier</a>
+                    {% endif %}
+                    {% if user.can_moderate %}
+                        {% if event.status == 'draft' %}
+                        {% url 'event_publish' event.id as action_url %}{% include 'includes/post_action.html' with url=action_url label='Publier' btn_class='btn-success w-100' icon='fa-paper-plane' %}
+                        {% elif event.status == 'published' %}
+                        {% url 'event_unpublish' event.id as action_url %}{% include 'includes/post_action.html' with url=action_url label='Dépublier' btn_class='btn-outline-warning w-100' icon='fa-eye-slash' %}
+                        {% endif %}
+                        <hr class="my-1">
+                        <a href="{% url 'event_delete' event.id %}" class="btn btn-outline-danger"><i class="fas fa-trash me-1"></i> Supprimer</a>
+                    {% endif %}
+                </div>
+            </div>
+
             <div class="card shadow-sm mb-4">
                 <div class="card-header">
                     <h5 class="h6 mb-0 font-weight-bold text-uppercase tracking-wider text-muted">Détails Logistiques</h5>

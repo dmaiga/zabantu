@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from users.permissions import moderator_required
 from django.contrib import messages
+from django.urls import reverse
 from django.utils.text import slugify
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -83,7 +84,8 @@ def article_create(request):
 
     return render(request, 'articles/article_update.html', {
         'form': form,
-        'article_type': article_type
+        'article_type': article_type,
+        'back_url': reverse('article_list'),
     })
 
 @login_required
@@ -115,7 +117,9 @@ def article_update(request, slug):
     return render(request, 'articles/article_update.html', {
         'form': form,
         'is_edit': True,
-        'article_type': article.article_type
+        'article_type': article.article_type,
+        'article': article,
+        'back_url': reverse('article_detail', args=[article.slug]),
     })
 
 # 📃 Liste des articles
@@ -257,7 +261,7 @@ def guelekan_create(request):
     else:
         form = GuelekanForm()
     
-    return render(request, 'articles/guelekan_form.html', {'form': form})
+    return render(request, 'articles/guelekan_form.html', {'form': form, 'back_url': reverse('guelekan_list')})
 
 @login_required
 def guelekan_update(request, slug):
@@ -278,7 +282,8 @@ def guelekan_update(request, slug):
     
     return render(request, 'articles/guelekan_form.html', {
         'form': form,
-        'guelekan': guelekan
+        'guelekan': guelekan,
+        'back_url': reverse('guelekan_detail', args=[guelekan.slug]),
     })
 
 

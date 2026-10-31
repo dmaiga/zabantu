@@ -88,3 +88,30 @@ class ArticleListTests(TestCase):
     def test_status_tabs_show_counts(self):
         r = self.client.get(reverse('article_list'))
         self.assertEqual(dict((v, n) for v, _, n in r.context['status_tabs'])['draft'], 5)
+
+
+class DetailPagesTests(TestCase):
+    def setUp(self):
+        self.client.force_login(make_user('moderateur'))
+
+    def test_article_detail_shows_the_full_content_and_actions_in_the_side_column(self):
+        long_text = ' '.join(f'mot{i}' for i in range(120))
+        article = Article.objects.create(title='Long', status='draft', content=f'<p>{long_text}</p>')
+        r = self.client.get(reverse('article_detail', args=[article.slug]))
+        self.assertContains(r, 'mot119')  # plus de troncature à 30 mots
+        self.assertContains(r, reverse('publish_article', args=[article.slug]))
+        self.assertContains(r, reverse('article_delete', args=[article.slug]))
+
+    def test_member_does_not_see_moderation_buttons(self):
+        article = Article.objects.create(title='Long', status='draft', content='x')
+        self.client.force_login(make_user('membre'))
+        r = self.client.get(reverse('article_detail', args=[article.slug]))
+        self.assertNotContains(r, reverse('publish_article', args=[article.slug]))
+        self.assertNotContains(r, reverse('article_delete', args=[article.slug]))
+
+    def test_guelekan_detail_renders_for_draft_and_published(self):
+        for status in ('draft', 'published'):
+            g = Guelekan.objects.create(title=f'S {status}', content='<p>x</p>', status=status)
+            r = self.client.get(reverse('guelekan_detail', args=[g.slug]))
+            self.assertEqual(r.status_code, 200)
+            self.assertContains(r, 'Gɛlɛkan')

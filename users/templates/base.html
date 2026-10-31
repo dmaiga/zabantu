@@ -224,11 +224,13 @@
                             {% if pending_applications_count %}<span class="badge bg-danger ms-1">{{ pending_applications_count }}</span>{% endif %}
                         </a>
                     </li>
-                    <li class="{% if 'partenaires' in request.path %}active{% endif %}"><a href="{% url 'partenaire_list' %}"><i class="fas fa-handshake"></i> Partenaires</a></li>
                     {% endif %}
-                    <li>
+                    <li class="{% if 'intervenants' in request.path %}active{% endif %}">
                         <a href="{% url 'intervenant_list' %}"><i class="fas fa-chalkboard-teacher"></i> Intervenants</a>
                     </li>
+                    {% if user.can_moderate %}
+                    <li class="{% if 'partenaires' in request.path %}active{% endif %}"><a href="{% url 'partenaire_list' %}"><i class="fas fa-handshake"></i> Partenaires</a></li>
+                    {% endif %}
 
                     {% if user.can_moderate %}
                     <hr class="sidebar-divider">

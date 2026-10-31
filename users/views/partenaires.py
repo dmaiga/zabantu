@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.db.models import Q
+from django.urls import reverse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
@@ -30,7 +31,8 @@ def partenaire_create(request):
         form.save()
         messages.success(request, "Partenaire créé avec succès.")
         return redirect("partenaire_list")
-    return render(request, "users/partenaires/form.html", {"form": form, "title": "Nouveau partenaire"})
+    return render(request, "users/partenaires/form.html", {"form": form, "title": "Nouveau partenaire",
+        "back_url": reverse("partenaire_list")})
 
 
 @moderator_required
@@ -42,7 +44,8 @@ def partenaire_update(request, pk):
         messages.success(request, "Partenaire mis à jour.")
         return redirect("partenaire_list")
     return render(request, "users/partenaires/form.html", {
-        "form": form, "title": f"Modifier {partenaire.name}", "partenaire": partenaire})
+        "form": form, "title": f"Modifier {partenaire.name}", "partenaire": partenaire,
+        "back_url": reverse("partenaire_list")})
 
 
 @moderator_required

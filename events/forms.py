@@ -1,9 +1,17 @@
 from django import forms
+from django_summernote.widgets import SummernoteWidget
+from users.formsupport import SectionedFormMixin
 from django.utils import timezone
 from .models import Event,EventIntervenant
 from intervenants.models import Intervenant
 
-class EventForm(forms.ModelForm):
+class EventForm(SectionedFormMixin, forms.ModelForm):
+    sections = (
+        ('Événement', ('title', 'event_type', 'content', 'image')),
+        ('Date et lieu', ('date', 'end_date', 'is_webinar', 'webinar_link_raw', 'location', 'lieu_gps')),
+        ('Public et thèmes', ('target_audience', 'expected_attendees', 'primary_topic', 'secondary_topics', 'is_featured')),
+    )
+    content = forms.CharField(widget=SummernoteWidget(), required=True, label='Contenu')
     
     # Champ personnalisé pour le lien de webinaire
     webinar_link_raw = forms.CharField(
@@ -27,7 +35,6 @@ class EventForm(forms.ModelForm):
         widgets = {
             'date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
             'end_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
-            'content': forms.Textarea(attrs={'rows': 4, 'class': 'form-control '}),  # Caché, géré par Summernote
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'event_type': forms.Select(attrs={'class': 'form-select'}),
             'location': forms.TextInput(attrs={'class': 'form-control'}),
@@ -85,8 +92,8 @@ class EventForm(forms.ModelForm):
         webinar_link_raw = cleaned_data.get('webinar_link_raw')
         location = cleaned_data.get('location')
         
-        # Validation de la date
-        if date and date < timezone.now():
+        # On ne crée pas un événement dans le passé, mais on peut corriger un événement déjà passé
+        if date and date < timezone.now() and not self.instance.pk:
             raise forms.ValidationError("La date de l'événement ne peut pas être dans le passé")
         
         if end_date and date and end_date < date:

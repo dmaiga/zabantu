@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
+from django.urls import reverse
 from django.shortcuts import get_object_or_404, redirect, render
 from site_web import mailing
 from ..filters import MemberFilterForm
@@ -58,7 +59,7 @@ def create_member_view(request):
             return redirect('user_list')  # ou admin_dashboard
     else:
         form = CustomMemberCreationForm()
-    return render(request, 'users/create_member.html', {'form': form})
+    return render(request, 'users/create_member.html', {'form': form, 'back_url': reverse('user_list')})
 
 
 def _notify_access_granted(request, member):
@@ -99,7 +100,8 @@ def update_user_view(request, pk):
     context = {
         'form': form,
         'user_to_update': user_to_update,
-        'is_self_update': request.user.pk == user_to_update.pk
+        'is_self_update': request.user.pk == user_to_update.pk,
+        'back_url': reverse('profile') if is_self else reverse('user_detail', args=[user_to_update.pk]),
     }
     return render(request, 'users/update_user.html', context)
 

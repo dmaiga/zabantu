@@ -104,3 +104,38 @@ class EventListPageTests(TestCase):
         r = self.client.get(reverse('event_list'), {'sort': 'date'})
         dates = [e.date for e in r.context['page_obj']]
         self.assertEqual(dates, sorted(dates))
+
+
+class EventDetailActionsTests(TestCase):
+    def test_actions_are_grouped_and_hidden_from_plain_members(self):
+        event = make_event()
+        self.client.force_login(make_user('moderateur'))
+        r = self.client.get(reverse('event_detail', args=[event.id]))
+        self.assertContains(r, reverse('event_publish', args=[event.id]))
+        self.assertContains(r, reverse('event_delete', args=[event.id]))
+        self.client.force_login(make_user('membre'))
+        r = self.client.get(reverse('event_detail', args=[event.id]))
+        self.assertNotContains(r, reverse('event_publish', args=[event.id]))
+        self.assertNotContains(r, reverse('event_delete', args=[event.id]))
+
+
+class PastEventDateRuleTests(TestCase):
+    def setUp(self):
+        self.client.force_login(make_user('moderateur'))
+        self.past = timezone.now() - timedelta(days=10)
+
+    def form_data(self, event):
+        return {'title': 'Titre corrigé', 'event_type': event.event_type, 'content': 'x',
+                'location': 'Bamako', 'date': self.past.strftime('%Y-%m-%dT%H:%M')}
+
+    def test_an_already_past_event_can_still_be_corrected(self):
+        event = make_event(date=self.past)
+        r = self.client.post(reverse('event_update', args=[event.id]), self.form_data(event))
+        self.assertRedirects(r, reverse('event_detail', args=[event.id]), fetch_redirect_response=False)
+        event.refresh_from_db()
+        self.assertEqual(event.title, 'Titre corrigé')
+
+    def test_a_new_event_cannot_be_dated_in_the_past(self):
+        data = self.form_data(make_event())
+        r = self.client.post(reverse('event_create'), data)
+        self.assertContains(r, 'ne peut pas être dans le passé')

@@ -1,193 +1,112 @@
 {% extends "base.html" %}
 
+{% block title %}{{ article.title|striptags }}{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>{{ article.title }}</h1>
-        <span class="badge 
-            {% if article.status == 'published' %}bg-success
-            {% elif article.publish_at and article.publish_at > timezone.now %}bg-info
-            {% else %}bg-warning{% endif %}">
-            {{ article.get_status_display }}
-            {% if article.publish_at and article.publish_at > timezone.now %}
-                ({{ article.publish_at|date:"d/m/Y H:i" }})
-            {% endif %}
+<div class="container-fluid py-4">
+    <a href="{% url 'article_list' %}" class="text-decoration-none small"><i class="fas fa-arrow-left me-1"></i> Publications</a>
+
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mt-2 mb-4">
+        <div>
+            <h1 class="h3 mb-1">{{ article.title|striptags }}</h1>
+            {% if article.subtitle %}<p class="text-muted mb-0">{{ article.subtitle }}</p>{% endif %}
+        </div>
+        <span class="badge fs-6 {% if article.status == 'published' %}bg-success{% elif article.status == 'scheduled' %}bg-info text-dark{% else %}bg-warning text-dark{% endif %}">
+            {{ article.get_status_display }}{% if article.status == 'scheduled' %} · {{ article.publish_at|date:"d/m/Y H:i" }}{% endif %}
         </span>
     </div>
 
-    <!-- Boutons d'action en haut -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="d-flex flex-wrap gap-2">
-                <a href="{% url 'article_list' %}" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left"></i> Retour à la liste
-                </a>
-                
-                {% if article.status != 'published' %}
-                <a href="{% url 'article_update' article.slug %}" class="btn btn-outline-primary">
-                    <i class="fas fa-edit"></i> Modifier
-                </a>
-                {% url 'publish_article' article.slug as action_url %}{% include 'includes/post_action.html' with url=action_url label='Publier' btn_class='btn-outline-success' icon='fa-paper-plane' %}
-                {% url 'schedule_article' article.slug as schedule_url %}{% url 'unpublish_article' article.slug as cancel_url %}{% include 'includes/schedule_form.html' with obj=article %}
-                {% endif %}
-                
-                {% if article.status == 'published' %}
-                {% url 'unpublish_article' article.slug as action_url %}{% include 'includes/post_action.html' with url=action_url label='Dépublier' btn_class='btn-outline-warning' icon='fa-eye-slash' %}
-                {% endif %}
-                
-                {% if user.can_moderate %}
-                <a href="{% url 'article_delete' article.slug %}" class="btn btn-outline-danger">
-                    <i class="fas fa-trash"></i> Supprimer
-                </a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card mb-4">
-                {% if article.cover_image %}
-                <img src="{{ article.cover_image.url }}" class="card-img-top article-cover-img" alt="{{ article.title }}">
-                {% endif %}
-                 {% if article.independent_cover %}
-                <img src="{{ article.independent_cover.url }}" class="card-img-top " alt="{{ article.title }}">
-                {% endif %}
-                
+    <div class="row g-4">
+        <!-- Contenu -->
+        <div class="col-lg-8 order-2 order-lg-1">
+            <div class="card">
                 <div class="card-body">
-                    <div class="article-content">
-                      {% if article.article_type == 'academic' and article.abstract %}
-                                {{ article.abstract|safe|truncatewords:30 }}
-                            {% elif article.resume %}
-                                {{ article.resume|safe|truncatewords:30 }}
-                            {% else %}
-                                {{ article.content|safe|striptags|truncatewords:30 }}
-                            {% endif %}
-                    </div>
-                    
+                    {% if article.article_type == 'academic' and article.abstract %}
+                        <h2 class="h6 text-muted text-uppercase">Résumé</h2>
+                        <div class="mb-4">{{ article.abstract|safe }}</div>
+                    {% elif article.resume %}
+                        <h2 class="h6 text-muted text-uppercase">Résumé</h2>
+                        <div class="mb-4">{{ article.resume|safe }}</div>
+                    {% endif %}
+                    {% if article.content %}
+                        <h2 class="h6 text-muted text-uppercase">Contenu</h2>
+                        <div class="article-content">{{ article.content|safe }}</div>
+                    {% endif %}
                     {% if article.pdf_file %}
-                    <div class="mt-4">
-                        <a href="{{ article.pdf_file.url }}" class="btn btn-primary" target="_blank">
-                            <i class="fas fa-file-pdf"></i> Télécharger le PDF
-                        </a>
-                    </div>
+                        <a href="{{ article.pdf_file.url }}" class="btn btn-outline-primary mt-3" target="_blank" rel="noopener"><i class="fas fa-file-pdf me-1"></i> Télécharger le PDF</a>
                     {% endif %}
-                </div>
-                
-                <div class="card-footer text-muted">
-                    Créé le {{ article.created_at|date:"d/m/Y" }} | 
-                    Dernière modification le {{ article.updated_at|date:"d/m/Y" }}
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-4">
-            <div class="card mb-4">
+
+        <!-- Colonne latérale : actions, image, métadonnées -->
+        <div class="col-lg-4 order-1 order-lg-2">
+            <div class="card mb-3">
+                <div class="card-body d-grid gap-2">
+                    {% if article.status != 'published' %}
+                        <a href="{% url 'article_update' article.slug %}" class="btn btn-primary"><i class="fas fa-pen me-1"></i> Modifier</a>
+                    {% endif %}
+                    {% if user.can_moderate %}
+                        {% if article.status == 'published' %}
+                            {% url 'unpublish_article' article.slug as action_url %}{% include 'includes/post_action.html' with url=action_url label='Dépublier' btn_class='btn-outline-warning w-100' icon='fa-eye-slash' %}
+                        {% else %}
+                            {% url 'publish_article' article.slug as action_url %}{% include 'includes/post_action.html' with url=action_url label='Publier maintenant' btn_class='btn-success w-100' icon='fa-paper-plane' %}
+                            <div class="d-flex flex-wrap gap-2 justify-content-between">
+                                {% url 'schedule_article' article.slug as schedule_url %}{% url 'unpublish_article' article.slug as cancel_url %}{% include 'includes/schedule_form.html' with obj=article %}
+                            </div>
+                        {% endif %}
+                        <hr class="my-1">
+                        <a href="{% url 'article_delete' article.slug %}" class="btn btn-outline-danger"><i class="fas fa-trash me-1"></i> Supprimer</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if article.cover_image or article.independent_cover %}
+            <div class="card mb-3">
+                <img src="{% if article.cover_image %}{{ article.cover_image.url }}{% else %}{{ article.independent_cover.url }}{% endif %}" class="card-img-top" alt="" style="max-height: 220px; object-fit: cover;">
+            </div>
+            {% endif %}
+
+            <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Métadonnées</h5>
-                    <dl class="row">
-                        <dt class="col-sm-4">Catégorie</dt>
-                        <dd class="col-sm-8">{{ article.get_category_display }}</dd>
-                        
-                        <dt class="col-sm-4">Auteur(s)</dt>
-<dd class="col-sm-8">
-    <ul class="list-unstyled mb-0">
-
-        {% if article.article_type == "academic" %}
-            <!-- Auteurs internes Zabantu/Guelekan -->
-            {% for author in article.authors.all %}
-                <li>
-                    {% if author.profile_picture %}
-                        <img src="{{ author.profile_picture.url }}" 
-                             class="rounded-circle me-2" width="30" height="30"
-                             alt="{{ author.get_full_name }}">
-                    {% endif %}
-                    <small>{{ author.nom }} {{ author.prenom }}</small>
-                    {% if author.job_title %}
-                        <small class="text-muted d-block">{{ author.job_title }}</small>
-                    {% endif %}
-                </li>
-                {% if not forloop.last %}<hr class="my-2">{% endif %}
-            {% endfor %}
-
-            <!-- Auteurs académiques externes -->
-            {% if article.academic_authors %}
-                <li>
-                    <strong>Auteurs externes :</strong> {{ article.academic_authors }}
-                </li>
-            {% endif %}
-
-            {% if article.journal %}
-                <li><strong>Revue :</strong> {{ article.journal }}</li>
-            {% endif %}
-            {% if article.publisher %}
-                <li><strong>Éditeur :</strong> {{ article.publisher }}</li>
-            {% endif %}
-            {% if article.publication_year %}
-                <li><strong>Année :</strong> {{ article.publication_year }}</li>
-            {% endif %}
-
-            <!-- Lien académique pour les articles académiques -->
-            {% if article.external_link_academique %}
-                <li>
-                    <a href="{{ article.external_link_academique }}" target="_blank">
-                        Consulter l'article en ligne
-                    </a>
-                </li>
-            {% endif %}
-
-        {% elif article.article_type == "independent" %}
-            {% if article.external_author %}
-                <li><strong>Auteur externe :</strong> {{ article.external_author }}</li>
-            {% endif %}
-            {% if article.external_link %}
-                <li>
-                    <a href="{{ article.external_link }}" target="_blank">
-                        Consulter l'article en ligne
-                    </a>
-                </li>
-            {% endif %}
-
-        {% else %}
-            <!-- Articles Zabantu classiques -->
-            {% for author in article.authors.all %}
-                <li>
-                    {% if author.profile_picture %}
-                        <img src="{{ author.profile_picture.url }}" 
-                             class="rounded-circle me-2" width="30" height="30"
-                             alt="{{ author.get_full_name }}">
-                    {% endif %}
-                    <small>{{ author.nom }} {{ author.prenom }}</small>
-                    {% if author.job_title %}
-                        <small class="text-muted d-block">{{ author.job_title }}</small>
-                    {% endif %}
-                </li>
-                {% if not forloop.last %}<hr class="my-2">{% endif %}
-            {% endfor %}
-        {% endif %}
-
-    </ul>
-</dd>
-
-                        
-
+                    <h2 class="h6 text-muted text-uppercase">Informations</h2>
+                    <dl class="row mb-0 small">
+                        <dt class="col-5">Type</dt><dd class="col-7">{{ article.get_article_type_display }}</dd>
+                        <dt class="col-5">Créée le</dt><dd class="col-7">{{ article.created_at|date:"d/m/Y" }}</dd>
+                        <dt class="col-5">Modifiée le</dt><dd class="col-7">{{ article.updated_at|date:"d/m/Y" }}</dd>
+                        {% if article.publish_at and article.status == 'published' %}<dt class="col-5">Publiée le</dt><dd class="col-7">{{ article.publish_at|date:"d/m/Y H:i" }}</dd>{% endif %}
+                        {% if article.journal %}<dt class="col-5">Revue</dt><dd class="col-7">{{ article.journal }}</dd>{% endif %}
+                        {% if article.publisher %}<dt class="col-5">Éditeur</dt><dd class="col-7">{{ article.publisher }}</dd>{% endif %}
+                        {% if article.publication_year %}<dt class="col-5">Année</dt><dd class="col-7">{{ article.publication_year }}</dd>{% endif %}
+                        {% if article.institution %}<dt class="col-5">Institution</dt><dd class="col-7">{{ article.institution }}</dd>{% endif %}
+                        {% if article.working_series %}<dt class="col-5">Série</dt><dd class="col-7">{{ article.working_series }}{% if article.working_number %} n° {{ article.working_number }}{% endif %}</dd>{% endif %}
                     </dl>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h2 class="h6 text-muted text-uppercase">Auteur(s)</h2>
+                    <ul class="list-unstyled mb-0 small">
+                    {% for author in article.get_display_authors %}
+                        <li class="d-flex align-items-center gap-2 mb-2">
+                            {% if author.user and author.user.profile_picture %}<img src="{{ author.user.profile_picture.url }}" class="rounded-circle" width="32" height="32" alt="" style="object-fit: cover;">{% endif %}
+                            <div>
+                                {{ author.name }}
+                                {% if author.type != 'zabantu' %}<span class="badge bg-light text-dark border">externe</span>{% endif %}
+                                {% if author.user and author.user.job_title %}<div class="text-muted">{{ author.user.job_title }}</div>{% endif %}
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li class="text-muted">Aucun auteur renseigné.</li>
+                    {% endfor %}
+                    </ul>
+                    {% if article.external_link or article.external_link_academique %}
+                    <a href="{% if article.external_link %}{{ article.external_link }}{% else %}{{ article.external_link_academique }}{% endif %}" target="_blank" rel="noopener" class="small d-inline-block mt-2"><i class="fas fa-up-right-from-square me-1"></i> Consulter en ligne</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    .article-cover-img {
-        max-height: 400px;
-        object-fit: cover;
-        width: 100%;
-    }
-    
-    /* Style pour les boutons en haut */
-    .gap-2 {
-        gap: 0.5rem;
-    }
-</style>
 {% endblock %}

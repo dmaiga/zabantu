@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from users.permissions import moderator_required
 from django.contrib import messages
+from django.urls import reverse
 from django.http import JsonResponse
 from django.db.models import Q
 from .models import Event,EventIntervenant
@@ -37,11 +38,10 @@ def event_create(request):
             messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
     else:
         form = EventForm()
-    if not form.is_valid():
-        print(form.errors)
     return render(request, 'events/event_form.html', {
         'form': form,
-        'title': 'Créer un événement'
+        'title': 'Créer un événement',
+        'back_url': reverse('event_list'),
     })
 
 # Modifier un événement
@@ -68,7 +68,8 @@ def event_update(request, id):
     return render(request, 'events/event_form.html', {
         'form': form,
         'title': f"Modifier {event.title}",
-        'event': event
+        'event': event,
+        'back_url': reverse('event_detail', args=[event.id]),
     })
 
 # Publier un événement

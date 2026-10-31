@@ -1,4 +1,5 @@
 from django import forms
+from .formsupport import SectionedFormMixin
 from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser
 from django import forms
@@ -42,7 +43,15 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
 
-class CustomMemberCreationForm(forms.ModelForm):
+class CustomMemberCreationForm(SectionedFormMixin, forms.ModelForm):
+    sections = (
+        ('Identité', ('prenom', 'nom', 'email', 'phone_number', 'profile_picture')),
+        ('Fonction', ('job_title', 'department', 'date_started', 'role', 'is_active')),
+        ("Accès à l'espace de gestion", ('backoffice_access',)),
+        ('Biographie', ('bio',)),
+        ('Réseaux et liens', ('social_facebook', 'social_linkedin', 'social_twitter', 'social_instagram',
+                              'scholar_link', 'personal_website')),
+    )
     profile_picture = forms.ImageField(
         required=False,
         widget=forms.FileInput(attrs={'accept': 'image/*'})
@@ -164,7 +173,15 @@ class CustomPasswordChangeForm(PasswordChangeForm):
             field.widget.attrs.update({'class': 'form-control'})
 
 
-class CustomUserUpdateForm(UserChangeForm):
+class CustomUserUpdateForm(SectionedFormMixin, UserChangeForm):
+    sections = (
+        ('Identité', ('prenom', 'nom', 'email', 'phone_number', 'profile_picture')),
+        ('Fonction', ('job_title', 'department', 'date_started', 'role', 'is_active')),
+        ("Accès à l'espace de gestion", ('backoffice_access',)),
+        ('Biographie', ('bio',)),
+        ('Réseaux et liens', ('social_facebook', 'social_linkedin', 'social_twitter', 'social_instagram',
+                              'scholar_link', 'personal_website')),
+    )
     
     
     phone_number = forms.CharField(
@@ -313,7 +330,8 @@ from django import forms
 from .models import Partenaire
 
 
-class PartenaireForm(forms.ModelForm):
+class PartenaireForm(SectionedFormMixin, forms.ModelForm):
+    sections = (('Partenaire', ('name', 'logo')), ('Affichage sur le site', ('is_active', 'order')))
 
     class Meta:
         model = Partenaire
