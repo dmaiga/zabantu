@@ -23,9 +23,9 @@
             
             /* Variables Layout */
             --sidebar-width: 260px;
-            --sidebar-bg: var(--zabantu-dark);
-            --sidebar-color: rgba(255, 255, 255, 0.8);
-            --sidebar-active-bg: var(--zabantu-primary);
+            --sidebar-bg: #f6f7f3;
+            --sidebar-color: #4a554a;
+            --sidebar-active-bg: #e6ecdf;
             --main-bg: #fdfdfb;
             --border-color: #e5e7eb;
         }
@@ -59,16 +59,16 @@
             z-index: 1030;
             display: flex;
             flex-direction: column;
-            box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+            border-right: 1px solid var(--border-color);
         }
 
         .sidebar-header {
             padding: 25px 20px;
             font-weight: 800;
             font-size: 1.4rem;
-            color: var(--zabantu-accent);
+            color: var(--zabantu-dark);
             letter-spacing: 2px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid var(--border-color);
             text-align: center;
             flex-shrink: 0; /* Garder le header fixe */
         }
@@ -91,28 +91,29 @@
         }
 
         #sidebar ul li a:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: #ffffff;
+            background: rgba(44, 62, 44, 0.05);
+            color: var(--zabantu-dark);
         }
 
         #sidebar ul li.active > a {
-            color: #ffffff;
+            color: var(--zabantu-dark);
+            font-weight: 600;
             background: var(--sidebar-active-bg);
-            border-left: 4px solid var(--zabantu-secondary);
+            border-left: 4px solid var(--zabantu-primary);
         }
 
         #sidebar ul li a i { 
             margin-right: 12px; 
             width: 20px; 
             text-align: center;
-            color: var(--zabantu-accent); 
+            color: #8a9786; 
         }
         
-        #sidebar ul li.active a i { color: #ffffff; }
+        #sidebar ul li.active a i { color: var(--zabantu-primary); }
 
-        .sidebar-group { padding: .5rem 1.25rem .25rem; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.45); }
+        .sidebar-group { padding: .5rem 1.25rem .25rem; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: #8a9786; }
         hr.sidebar-divider { 
-            border-top: 1px solid rgba(255,255,255,0.1); 
+            border-top: 1px solid var(--border-color); 
             margin: 10px 20px; 
             opacity: 1; 
         }
@@ -247,8 +248,8 @@
 
                     <hr class="sidebar-divider">
                     <li>
-                        <a href="{% url 'home' %}" target="_blank" style="color: var(--zabantu-secondary);">
-                            <i class="fas fa-globe" style="color: var(--zabantu-secondary);"></i> Voir le site
+                        <a href="{% url 'home' %}" target="_blank" style="color: #7a5427;">
+                            <i class="fas fa-globe" style="color: #7a5427;"></i> Voir le site
                         </a>
                     </li>
                 </ul>
