@@ -106,7 +106,8 @@ def membre_detail(request, user_id):
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import ContactForm, MembershipApplicationForm
+from .forms import ContactForm, MembershipApplicationForm, NewsletterSubscribeForm
+from . import antispam
 
 def contact(request):
     
@@ -116,6 +117,8 @@ def contact(request):
             form.save()  # Enregistre dans la BD
             messages.success(request, "Merci ! Votre message a été enregistré ✅")
             return redirect('contact')  # recharge la page
+        elif antispam.is_bot_rejection(form):
+            antispam.show_antispam_errors(request, form)
         else:
             messages.error(request, "Veuillez corriger les erreurs dans le formulaire.")
     else:
@@ -149,8 +152,12 @@ def membership_apply(request):
             mailing.send_application_received(application)
             request.session['membership_thanks'] = application.full_name
             return redirect('membership_thanks')
-        messages.error(request, "Veuillez corriger les erreurs signalées.")
-        start_step = form.first_error_step()
+        elif antispam.is_bot_rejection(form):
+            antispam.show_antispam_errors(request, form)
+            start_step = form.first_error_step()
+        else:
+            messages.error(request, "Veuillez corriger les erreurs signalées.")
+            start_step = form.first_error_step()
     else:
         form = MembershipApplicationForm()
         start_step = 0
@@ -616,20 +623,20 @@ def newsletter_unsubscribe(request, token):
 def newsletter_subscribe(request):
     """Vue pour s'abonner à la newsletter"""
     if request.method == 'POST':
-        email = request.POST.get('email')
-        if email:
-            # Vérifier si l'email existe déjà
+        form = NewsletterSubscribeForm(request.POST)
+        if form.is_valid():
             subscriber, created = NewsletterSubscriber.objects.get_or_create(
-                email=email,
+                email=form.cleaned_data['email'],
                 defaults={'is_active': True}
             )
-            
-            if not created:
+            if not created and not subscriber.is_active:
                 # Réactiver l'abonné s'il existait déjà
                 subscriber.is_active = True
                 subscriber.save()
-            
             messages.success(request, 'Vous êtes maintenant abonné à notre info-lettre !')
-            return redirect('home')
-    
+        elif antispam.is_bot_rejection(form):
+            antispam.show_antispam_errors(request, form)
+        else:
+            messages.error(request, "Adresse e-mail invalide. Vérifiez-la, puis réessayez.")
+
     return redirect('home')

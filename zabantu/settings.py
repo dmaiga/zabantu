@@ -263,3 +263,14 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = SECURE_HSTS_SECONDS > 0
     SECURE_HSTS_PRELOAD = SECURE_HSTS_SECONDS > 0
     SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Caches. « default » reste le cache en mémoire de Django (les signaux de site_web en dépendent).
+# « antispam » (fichiers, partagé entre les processus de l'hébergeur) garde les compteurs du blocage de la connexion.
+import tempfile  # noqa: E402
+CACHES = {
+    'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'},
+    'antispam': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': env('CACHE_DIR', default=str(Path(tempfile.gettempdir()) / 'zabantu_antispam')),
+    },
+}

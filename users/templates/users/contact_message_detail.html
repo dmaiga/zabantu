@@ -18,6 +18,12 @@
                 Répondu le {{ message.replied_at|date:"d/m/Y" }}
             </span>
             {% endif %}
+            {% if sender_blocked %}
+            <span class="badge bg-dark me-2"><i class="fas fa-ban me-1"></i>Expéditeur bloqué</span>
+            {% url 'contact_message_unblock' message.pk as action_url %}{% include 'includes/post_action.html' with url=action_url label='Débloquer' btn_class='btn-sm btn-outline-secondary' icon='fa-unlock' %}
+            {% else %}
+            {% url 'contact_message_block' message.pk as action_url %}{% include 'includes/post_action.html' with url=action_url label='Bloquer cet expéditeur' btn_class='btn-sm btn-outline-danger' icon='fa-ban' confirm='Bloquer cette adresse e-mail ? Elle ne pourra plus envoyer de message, de demande d\'adhésion ni s\'abonner. Vous pourrez la débloquer ici.' %}
+            {% endif %}
             <a href="{% url 'contact_message_delete' message.pk %}" class="btn btn-sm btn-danger">
                 <i class="fas fa-trash"></i> Supprimer
             </a>

@@ -22,9 +22,9 @@ from django import forms
 from .models import ContactMessage, MembershipApplication
 from django import forms
 from .models import ContactMessage
-from captcha.fields import CaptchaField
+from .antispam import AntiSpamMixin
 
-class ContactForm(forms.ModelForm):
+class ContactForm(AntiSpamMixin, forms.ModelForm):
     # Captcha retiré (demande du client) :
     # captcha = CaptchaField()
     class Meta:
@@ -64,7 +64,7 @@ MAX_WORDS = 100
 MAX_PHOTO_MB = 5
 
 
-class MembershipApplicationForm(forms.ModelForm):
+class MembershipApplicationForm(AntiSpamMixin, forms.ModelForm):
     # Captcha retiré temporairement (demande du client) :
     # captcha = CaptchaField(label="Vérification")
 
@@ -165,3 +165,7 @@ class MembershipApplicationForm(forms.ModelForm):
         if 'autre' in (cleaned.get('how_heard_choices') or []) and not (cleaned.get('how_heard') or '').strip():
             self.add_error('how_heard', "Précisez votre réponse.")
         return cleaned
+
+
+class NewsletterSubscribeForm(AntiSpamMixin, forms.Form):
+    email = forms.EmailField(max_length=254)

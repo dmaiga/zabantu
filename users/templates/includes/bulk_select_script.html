@@ -1,0 +1,30 @@
+{# Sélection multiple d'une liste : formulaire #bulkForm, cases .row-check, case #selectAll, compteur #selectedCount, boutons .bulk-btn (data-confirm facultatif) #}
+<script>
+(function () {
+    var form = document.getElementById('bulkForm');
+    if (!form) return;
+    var all = document.getElementById('selectAll');
+    var rows = Array.prototype.slice.call(form.querySelectorAll('.row-check'));
+    var buttons = Array.prototype.slice.call(form.querySelectorAll('.bulk-btn'));
+    var counter = document.getElementById('selectedCount');
+    function checked() { return rows.filter(function (c) { return c.checked; }).length; }
+    function refresh() {
+        var n = checked();
+        counter.textContent = n;
+        buttons.forEach(function (b) { b.disabled = n === 0; });
+        all.checked = n > 0 && n === rows.length;
+        all.indeterminate = n > 0 && n < rows.length;
+    }
+    all.addEventListener('change', function () { rows.forEach(function (c) { c.checked = all.checked; }); refresh(); });
+    rows.forEach(function (c) { c.addEventListener('change', refresh); });
+    form.addEventListener('submit', function (e) {
+        var btn = e.submitter;
+        if (btn && btn.dataset.confirm && !window.confirm(checked() + ' sélectionné(s) : ' + btn.dataset.confirm)) { e.preventDefault(); return; }
+        // les boutons désactivés n'envoient pas leur valeur : on la garde dans un champ caché
+        if (btn) { var h = document.createElement('input'); h.type = 'hidden'; h.name = 'action'; h.value = btn.value; form.appendChild(h); }
+        buttons.forEach(function (b) { b.disabled = true; });
+        if (btn) btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>En cours…';
+    });
+    refresh();
+})();
+</script>

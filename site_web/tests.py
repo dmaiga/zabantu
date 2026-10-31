@@ -4,6 +4,7 @@ from django.urls import reverse
 
 from .forms import MembershipApplicationForm
 from .models import MembershipApplication
+from .tests_helpers import human
 
 VALID = {
     'full_name': 'Awa Traoré',
@@ -152,25 +153,25 @@ class WizardAndProfileTests(TestCase):
             username='adm', password='x', email='adm@x.org', nom='A', prenom='B', role='admin')
 
     def test_how_heard_requires_choice_and_other_needs_detail(self):
-        self.assertIn('how_heard_choices', MembershipApplicationForm({**VALID, 'how_heard_choices': []}).errors)
-        form = MembershipApplicationForm({**VALID, 'how_heard_choices': ['autre'], 'how_heard': ''})
+        self.assertIn('how_heard_choices', MembershipApplicationForm(human({**VALID, 'how_heard_choices': []})).errors)
+        form = MembershipApplicationForm(human({**VALID, 'how_heard_choices': ['autre'], 'how_heard': ''}))
         self.assertIn('how_heard', form.errors)
-        form = MembershipApplicationForm({**VALID, 'how_heard_choices': ['autre'], 'how_heard': 'Une affiche'})
+        form = MembershipApplicationForm(human({**VALID, 'how_heard_choices': ['autre'], 'how_heard': 'Une affiche'}))
         self.assertTrue(form.is_valid(), form.errors)
 
     def test_first_error_step(self):
-        form = MembershipApplicationForm({**VALID, 'contribution': ''})
+        form = MembershipApplicationForm(human({**VALID, 'contribution': ''}))
         self.assertFalse(form.is_valid())
         self.assertEqual(form.first_error_step(), 2)
 
     def test_submit_redirects_to_thanks_page(self):
-        r = self.client.post(reverse('membership_apply'), VALID)
+        r = self.client.post(reverse('membership_apply'), human(VALID))
         self.assertRedirects(r, reverse('membership_thanks'), fetch_redirect_response=False)
         self.assertContains(self.client.get(reverse('membership_thanks')), 'Awa Traoré')
         self.assertEqual(MembershipApplication.objects.get().how_heard_choices, ['collegue', 'site_web'])
 
     def test_invalid_submit_reopens_wizard_on_error_step(self):
-        r = self.client.post(reverse('membership_apply'), {**VALID, 'contribution': ''})
+        r = self.client.post(reverse('membership_apply'), human({**VALID, 'contribution': ''}))
         self.assertEqual(r.status_code, 200)
         self.assertContains(r, 'data-start="2"')
 
@@ -404,7 +405,7 @@ class ContactPageTests(TestCase):
         self.assertNotIn('href="#"', content)            # plus aucun lien factice dans la page
 
     def test_invalid_post_shows_errors_in_form(self):
-        r = self.client.post(reverse('contact'), {'name': '', 'email': 'pas-un-mail'})
+        r = self.client.post(reverse('contact'), human({'name': '', 'email': 'pas-un-mail'}))
         self.assertEqual(r.status_code, 200)
         self.assertContains(r, 'field-error')
         self.assertContains(r, 'Veuillez corriger les erreurs')
@@ -413,9 +414,9 @@ class ContactPageTests(TestCase):
 class ContactWithoutCaptchaTests(TestCase):
     def test_valid_message_saved_without_captcha(self):
         from .models import ContactMessage
-        r = self.client.post(reverse('contact'), {
+        r = self.client.post(reverse('contact'), human({
             'name': 'Traoré', 'last_name': 'Awa', 'email': 'awa@example.org', 'phone': '',
-            'subject': 'collaboration', 'message': 'Bonjour, une proposition de collaboration.'})
+            'subject': 'collaboration', 'message': 'Bonjour, une proposition de collaboration.'}))
         self.assertRedirects(r, reverse('contact'), fetch_redirect_response=False)
         self.assertEqual(ContactMessage.objects.count(), 1)
 

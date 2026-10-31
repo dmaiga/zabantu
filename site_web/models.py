@@ -381,3 +381,29 @@ class PublicationNotice(models.Model):
         verbose_name = _('annonce de publication')
         verbose_name_plural = _('annonces de publication')
         unique_together = ('content_type', 'object_id')
+
+
+class BlockedSender(models.Model):
+    """Adresse e-mail à qui l'envoi des formulaires publics (contact, adhésion, info-lettre) est refusé."""
+    email = models.EmailField("Adresse e-mail", unique=True)
+    blocked_at = models.DateTimeField("Bloquée le", auto_now_add=True)
+    blocked_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='blocked_senders', verbose_name="Bloquée par")
+
+    class Meta:
+        verbose_name = "Expéditeur bloqué"
+        verbose_name_plural = "Expéditeurs bloqués"
+        ordering = ['-blocked_at']
+
+    def save(self, *args, **kwargs):
+        self.email = self.email.strip().lower()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.email
+
+    @classmethod
+    def is_blocked(cls, email):
+        email = (email or '').strip().lower()
+        return bool(email) and cls.objects.filter(email=email).exists()

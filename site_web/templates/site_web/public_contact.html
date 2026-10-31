@@ -1,4 +1,5 @@
 {% extends 'base_public.html' %}
+{% load antispam_tags %}
 {% load static %}
 
 {% block title %}Contact - Zabantu{% endblock %}
@@ -66,7 +67,7 @@
                 {% endfor %}
 
                 <form method="post" action="#formulaire" novalidate>
-                    {% csrf_token %}
+                    {% csrf_token %}{% antispam_fields %}
                     {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
 
                     <div class="row g-3">

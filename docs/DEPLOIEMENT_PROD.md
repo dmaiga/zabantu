@@ -165,6 +165,15 @@ Les e-mails utilisent uniquement le `.env` : `SITE_URL` (liens des e-mails), le 
 `EMAIL_USE_SSL`, `EMAIL_HOST_USER_MAIN`, `EMAIL_HOST_PASSWORD_MAIN`, `DEFAULT_FROM_EMAIL`) et le compte de l'info-lettre (mêmes noms avec le suffixe
 `_NEWS`). Tester avec `python manage.py shell -c "from django.core.mail import send_mail; send_mail('Test','Bonjour','<expéditeur>',['<destinataire>'])"`.
 
+### 4.9 Protection des formulaires
+
+Les formulaires de contact, d'adhésion et d'info-lettre ont un champ piège invisible et un délai minimal de 3 s (aucune limite
+d'envois, aucune adresse IP). La connexion est bloquée après 5 échecs sur un même identifiant : 5 minutes, puis 10, 15… à chaque
+nouveau blocage (remise à zéro après une connexion réussie). Les compteurs sont dans un cache fichier (aucune migration).
+
+- `CACHE_DIR` (facultatif) : dossier inscriptible pour ces compteurs. Par défaut : le dossier temporaire du système.
+- Pour débloquer quelqu'un tout de suite : supprimer le contenu de ce dossier (`rm -r <CACHE_DIR>/*`).
+
 ## 5. Vérifications après déploiement
 
 Contrôle automatique :

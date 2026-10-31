@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponseRedirect
-from .models import ContactMessage, MessageResponse, MembershipApplication, NewsletterSubscriber
+from .models import BlockedSender, ContactMessage, MessageResponse, MembershipApplication, NewsletterSubscriber
 
 @admin.register(NewsletterSubscriber)
 class NewsletterSubscriberAdmin(admin.ModelAdmin):
@@ -225,3 +225,9 @@ class MembershipApplicationAdmin(admin.ModelAdmin):
     def reset_applications(self, request, queryset):
         self._apply(request, queryset, {self.A, self.R, self.V},
                     lambda a: a.reset_to_pending(), "remise(s) en attente")
+
+
+@admin.register(BlockedSender)
+class BlockedSenderAdmin(admin.ModelAdmin):
+    list_display = ('email', 'blocked_at', 'blocked_by')
+    search_fields = ('email',)

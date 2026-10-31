@@ -9,6 +9,7 @@ from django.urls import reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import DetailView, UpdateView
 from ..forms import CustomPasswordChangeForm, LoginForm, ProfileEditForm
+from site_web import antispam
 from ..models import CustomUser
 
 
@@ -58,12 +59,16 @@ def _valid_credentials_without_access(username, password):
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
-        if form.is_valid():
+        wait = antispam.login_wait_seconds(request.POST.get('username'))
+        if wait:
+            messages.error(request, antispam.login_block_message(wait))
+        elif form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             user = authenticate(request, username=username, password=password)
             
             if user is not None:
+                antispam.login_succeeded(username)
                 login(request, user)
                 messages.success(request, f"Bienvenue {user.get_full_name()} !")
                 
@@ -73,10 +78,14 @@ def login_view(request):
                         next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
                     return redirect(next_url)
                 return redirect('dashboard')
-            elif _valid_credentials_without_access(username, password):
-                messages.error(request, "Votre compte n'a pas accès à l'espace de gestion.")
             else:
-                messages.error(request, "Identifiants invalides")
+                blocked = antispam.login_failed(username)
+                if blocked:
+                    messages.error(request, antispam.login_block_message(blocked))
+                elif _valid_credentials_without_access(username, password):
+                    messages.error(request, "Votre compte n'a pas accès à l'espace de gestion.")
+                else:
+                    messages.error(request, "Identifiants invalides")
         else:
             messages.error(request, "Veuillez corriger les erreurs ci-dessous")
     else:
