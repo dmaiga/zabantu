@@ -193,7 +193,7 @@ def _files_root(name, dev_default):
 
 
 STATIC_ROOT = _files_root('STATIC_ROOT', 'staticfiles')
-MEDIA_URL = '/media/'
+MEDIA_URL = env('MEDIA_URL', default='/media/')
 MEDIA_ROOT = _files_root('MEDIA_ROOT', 'media')
 
 
