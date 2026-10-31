@@ -62,34 +62,45 @@ def _build_message(subscriber, subject, template, context, text):
     return message
 
 
-def _deliver_batch(batch):
-    """Envoie une liste de (clé, message) sur une connexion neuve ; renvoie (clés envoyées, clés en échec)."""
+def _short_error(exc):
+    return f"{exc.__class__.__name__}: {exc}"[:255]
+
+
+def _deliver_batch(batch, errors=None):
+    """Envoie une liste de (clé, message) sur une connexion neuve ; renvoie (clés envoyées, clés en échec).
+
+    `errors`, s'il est fourni, reçoit {clé: cause} pour chaque échec."""
     sent, failed = [], []
+    errors = {} if errors is None else errors
     connection = newsletter_connection()
     try:
         connection.open()
-    except Exception:
+    except Exception as exc:
         logger.exception("Connexion au serveur d'info-lettre impossible")
+        errors.update({key: _short_error(exc) for key, _ in batch})
         return sent, [key for key, _ in batch]
     try:
         for key, message in batch:
             message.connection = connection
             try:
                 delivered = message.send()
-            except Exception:
+            except Exception as exc:
                 logger.exception("Échec d'envoi à %s", message.to)
+                errors[key] = _short_error(exc)
                 delivered = 0
+            if not delivered:
+                errors.setdefault(key, "Le serveur n'a pas accepté le message")
             (sent if delivered else failed).append(key)
     finally:
         connection.close()
     return sent, failed
 
 
-def _deliver(messages):
+def _deliver(messages, errors=None):
     """Envoie {clé: message} par lots (NEWSLETTER_BATCH_SIZE), avec une pause entre deux lots (NEWSLETTER_BATCH_PAUSE).
 
     Chaque lot ouvre sa propre connexion : une coupure du serveur n'affecte que son lot et le débit reste sous les
-    limites des hébergeurs. Renvoie (clés envoyées, clés en échec).
+    limites des hébergeurs. Renvoie (clés envoyées, clés en échec) ; `errors` reçoit {clé: cause} des échecs.
     """
     items = list(messages.items())
     size = max(1, settings.NEWSLETTER_BATCH_SIZE)
@@ -97,7 +108,7 @@ def _deliver(messages):
     for start in range(0, len(items), size):
         if start:
             time.sleep(settings.NEWSLETTER_BATCH_PAUSE)
-        batch_sent, batch_failed = _deliver_batch(items[start:start + size])
+        batch_sent, batch_failed = _deliver_batch(items[start:start + size], errors)
         sent += batch_sent
         failed += batch_failed
     return sent, failed
@@ -164,10 +175,12 @@ def send_pending():
         messages[delivery.pk] = _publication_message(delivery, obj)
         notices.add(notice.pk)
 
-    sent, failed = _deliver(messages)
+    errors = {}
+    sent, failed = _deliver(messages, errors)
     now = timezone.now()
-    PublicationDelivery.objects.filter(pk__in=sent).update(sent_at=now, attempts=F('attempts') + 1)
-    PublicationDelivery.objects.filter(pk__in=failed).update(attempts=F('attempts') + 1)
+    PublicationDelivery.objects.filter(pk__in=sent).update(sent_at=now, attempts=F('attempts') + 1, last_error='')
+    for pk in failed:
+        PublicationDelivery.objects.filter(pk=pk).update(attempts=F('attempts') + 1, last_error=errors.get(pk, ''))
     for notice in PublicationNotice.objects.filter(pk__in=notices):
         notice.sent_count = notice.deliveries.exclude(sent_at=None).count()
         notice.save(update_fields=['sent_count'])
@@ -175,27 +188,39 @@ def send_pending():
 
 
 def send_campaign(campaign):
-    """Envoie la campagne aux destinataires actifs et met à jour son statut. Renvoie (envoyés, échecs)."""
+    """Envoie la campagne aux destinataires actifs qui ne l'ont pas encore reçue et met à jour son statut.
+
+    Rappelée sur une campagne partielle, elle ne renvoie qu'aux échecs. Renvoie (envoyés, échecs)."""
     campaign.status = 'sending'
     campaign.save(update_fields=['status'])
 
     recipients = {r.pk: r for r in campaign.recipients.select_related('subscriber')
-                  .filter(subscriber__is_active=True)}
+                  .filter(subscriber__is_active=True, sent_at=None)}
     context = {'title': campaign.title, 'body': campaign.content}
     text = strip_tags(campaign.content)
     messages = {pk: _build_message(r.subscriber, campaign.subject, 'emails/campaign.html', context, text)
                 for pk, r in recipients.items()}
 
-    sent, failed = _deliver(messages)
+    errors = {}
+    sent, failed = _deliver(messages, errors)
     now = timezone.now()
     for pk in sent:
         recipients[pk].sent_at = now
-        recipients[pk].save(update_fields=['sent_at'])
+        recipients[pk].attempts += 1
+        recipients[pk].last_error = ''
+        recipients[pk].save(update_fields=['sent_at', 'attempts', 'last_error'])
+    for pk in failed:
+        recipients[pk].attempts += 1
+        recipients[pk].last_error = errors.get(pk, '')
+        recipients[pk].save(update_fields=['attempts', 'last_error'])
 
-    campaign.status = 'failed' if not sent else 'partial' if failed else 'sent'
+    delivered = campaign.recipients.exclude(sent_at=None).exists()
+    pending = campaign.recipients.filter(sent_at=None, subscriber__is_active=True).exists()
+    campaign.status = 'failed' if not delivered else 'partial' if pending else 'sent'
     campaign.sent_at = now
     campaign.save(update_fields=['status', 'sent_at'])
     return len(sent), len(failed)
+
 
 
 def send_html(to, subject, html_body):

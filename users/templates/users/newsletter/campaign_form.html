@@ -1,227 +1,49 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="container-fluid px-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mt-4">{{ title }}</h1>
-        <a href="{% url 'newsletter_campaign_list' %}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left me-1"></i> Retour à la liste
-        </a>
-    </div>
-
-    {% if messages %}
-    <div class="mb-4">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <i class="fas fa-edit me-1"></i>
-            {{ title }}
-        </div>
-        <div class="card-body">
-            <form method="post" enctype="multipart/form-data" id="campaign-form">
-                {% csrf_token %}
-                
-                {% if form.errors %}
-                <div class="alert alert-danger">
-                    <strong>Veuillez corriger les erreurs ci-dessous :</strong>
-                    <ul>
-                        {% for field, errors in form.errors.items %}
-                            {% for error in errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
-                
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>
-                        {{ form.title }}
-                    </div>
-                    <div class="col-md-6">
-                        <label for="{{ form.subject.id_for_label }}" class="form-label">{{ form.subject.label }}</label>
-                        {{ form.subject }}
-                    </div>
-                </div>
-                
-               <!-- campaign_form.html - Ajouter ceci dans le formulaire -->
-
-                <div class="mb-3">
-                    <label for="{{ form.content.id_for_label }}" class="form-label">{{ form.content.label }}</label>
-                    {{ form.content }}
-                </div>
-                
-                <div class="card mt-4">
-                    <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
-                        <div>
-                            <i class="fas fa-users me-1"></i>
-                            Destinataires
-                            <span class="badge bg-light text-dark ms-2" id="selected-count">0</span>
-                        </div>
-                        <div class="form-check">
-                            {{ form.select_all }}
-                            <label class="form-check-label text-white" for="{{ form.select_all.id_for_label }}">
-                                {{ form.select_all.label }}
-                            </label>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <input type="text" id="subscriber-search" class="form-control" placeholder="Rechercher un abonné...">
-                        </div>
-                        <div class="checkbox-list" id="subscribers-list">
-                            {{ form.subscribers }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group mt-4">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Enregistrer
-                    </button>
-                    <a href="{% url 'newsletter_campaign_list' %}" class="btn btn-secondary">Annuler</a>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
+{% extends 'form_page.html' %}
+{% block title %}{{ title }} | Zabantu Backoffice{% endblock %}
+{% block form_title %}{{ title }}{% endblock %}
+{% block form_intro %}Rédigez le message, puis choisissez à qui l'envoyer. L'enregistrement crée un brouillon : rien n'est envoyé avant que vous le demandiez depuis la page Info-lettre.{% endblock %}
+{% block form_extra %}
 <style>
-    .checkbox-list {
-        max-height: 300px;
-        overflow-y: auto;
-        border: 1px solid #ced4da;
-        border-radius: 0.375rem;
-        padding: 15px;
-    }
-    
-    .checkbox-list ul {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-    }
-    
-    .checkbox-list li {
-        margin-bottom: 8px;
-        padding: 5px;
-        border-radius: 4px;
-        transition: background-color 0.2s;
-    }
-    
-    .checkbox-list li:hover {
-        background-color: #f8f9fa;
-    }
-    
-    .checkbox-list li label {
-        display: flex;
-        align-items: center;
-        margin-bottom: 0;
-        cursor: pointer;
-    }
-    
-    .checkbox-list input[type="checkbox"] {
-        margin-right: 10px;
-    }
-    
-    .subscriber-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    
-    .subscriber-email {
-        flex-grow: 1;
-    }
-    
-    .subscriber-date {
-        font-size: 0.8rem;
-        color: #6c757d;
-    }
-    
-    input[type="text"],
-    input[type="datetime-local"],
-    textarea {
-        width: 100%;
-        padding: 0.375rem 0.75rem;
-        border: 1px solid #ced4da;
-        border-radius: 0.375rem;
-        font-size: 1rem;
-    }
-    
-    input[type="text"]:focus,
-    input[type="datetime-local"]:focus,
-    textarea:focus {
-        border-color: #86b7fe;
-        outline: 0;
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-    }
-    
-    .form-label {
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-    }
+    #id_subscribers { max-height: 18rem; overflow-y: auto; border: 1px solid #dee2e6; border-radius: .5rem; padding: .5rem; }
+    #id_subscribers > div { padding: .25rem .5rem; border-radius: .25rem; }
+    #id_subscribers > div:hover { background: #f6f7f3; }
+    #id_subscribers label { cursor: pointer; width: 100%; }
+    #id_subscribers input { margin-right: .5rem; }
+    #id_audience > div { margin-bottom: .25rem; }
+    #id_audience input { margin-right: .5rem; }
 </style>
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Sélectionner/désélectionner tous les abonnés
-    const selectAllCheckbox = document.getElementById('{{ form.select_all.id_for_label }}');
-    const subscriberCheckboxes = document.querySelectorAll('#subscribers-list input[type="checkbox"]');
-    const selectedCount = document.getElementById('selected-count');
-    const searchInput = document.getElementById('subscriber-search');
-    
-    // Fonction pour mettre à jour le compteur
-    function updateSelectedCount() {
-        const selected = document.querySelectorAll('#subscribers-list input[type="checkbox"]:checked').length;
-        selectedCount.textContent = selected;
+(function () {
+    var list = document.getElementById('id_subscribers');
+    var audience = document.querySelectorAll('input[name="audience"]');
+    if (!list || !audience.length) { return; }
+    var wrapper = list.closest('.mb-3');
+    var boxes = Array.prototype.slice.call(list.querySelectorAll('input[type="checkbox"]'));
+
+    var tools = document.createElement('div');
+    tools.className = 'd-flex gap-2 align-items-center mb-2 flex-wrap';
+    tools.innerHTML = '<input type="search" class="form-control form-control-sm" style="max-width:18rem" placeholder="Rechercher une adresse…" aria-label="Rechercher une adresse">'
+        + '<button type="button" class="btn btn-sm btn-outline-secondary" data-all>Tout cocher</button>'
+        + '<button type="button" class="btn btn-sm btn-outline-secondary" data-none>Tout décocher</button>'
+        + '<span class="text-muted small ms-auto"><strong data-count>0</strong> / ' + boxes.length + ' choisi(s)</span>';
+    list.parentNode.insertBefore(tools, list);
+    var count = tools.querySelector('[data-count]');
+
+    function refresh() { count.textContent = boxes.filter(function (b) { return b.checked; }).length; }
+    function sync() {
+        var chosen = document.querySelector('input[name="audience"]:checked');
+        wrapper.hidden = !(chosen && chosen.value === 'selected');
     }
-    
-    // Événement pour sélectionner/désélectionner tous
-    selectAllCheckbox.addEventListener('change', function() {
-        subscriberCheckboxes.forEach(checkbox => {
-            checkbox.checked = selectAllCheckbox.checked;
-        });
-        updateSelectedCount();
+    function visible(box) { return box.closest('div').style.display !== 'none'; }
+    tools.querySelector('input').addEventListener('input', function () {
+        var term = this.value.trim().toLowerCase();
+        boxes.forEach(function (b) { b.closest('div').style.display = b.closest('label').textContent.toLowerCase().indexOf(term) >= 0 ? '' : 'none'; });
     });
-    
-    // Événement pour chaque checkbox d'abonné
-    subscriberCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', updateSelectedCount);
-    });
-    
-    // Recherche d'abonnés
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        const labels = document.querySelectorAll('#subscribers-list label');
-        
-        labels.forEach(label => {
-            const email = label.querySelector('.subscriber-email')?.textContent.toLowerCase() || '';
-            const listItem = label.closest('li');
-            
-            if (email.includes(searchTerm)) {
-                listItem.style.display = 'block';
-            } else {
-                listItem.style.display = 'none';
-            }
-        });
-    });
-    
-    // Initialiser le compteur
-    updateSelectedCount();
-    
-    // Formater les dates d'abonnement
-    document.querySelectorAll('.subscriber-date').forEach(element => {
-        const date = new Date(element.textContent);
-        element.textContent = date.toLocaleDateString('fr-FR');
-    });
-});
+    tools.querySelector('[data-all]').addEventListener('click', function () { boxes.forEach(function (b) { if (visible(b)) { b.checked = true; } }); refresh(); });
+    tools.querySelector('[data-none]').addEventListener('click', function () { boxes.forEach(function (b) { b.checked = false; }); refresh(); });
+    boxes.forEach(function (b) { b.addEventListener('change', refresh); });
+    audience.forEach(function (r) { r.addEventListener('change', sync); });
+    refresh(); sync();
+})();
 </script>
 {% endblock %}

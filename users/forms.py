@@ -280,57 +280,54 @@ class ContactReplyForm(forms.Form):
     )
 
 
-class NewsletterCampaignForm(forms.ModelForm):
+class NewsletterCampaignForm(SectionedFormMixin, forms.ModelForm):
+    sections = (
+        ('Message', ('title', 'subject', 'content')),
+        ('Destinataires', ('audience', 'subscribers')),
+    )
+
+    content = forms.CharField(label='Contenu', widget=SummernoteWidget(), required=True)
+    audience = forms.ChoiceField(
+        label='Qui reçoit cette info-lettre ?',
+        choices=(('all', 'Tous les abonnés actifs'), ('selected', 'Seulement les abonnés que je choisis')),
+        widget=forms.RadioSelect, initial='all')
     subscribers = forms.ModelMultipleChoiceField(
-        queryset=NewsletterSubscriber.objects.filter(is_active=True)
-                       .order_by('email'),
-        widget=forms.CheckboxSelectMultiple(attrs={'class': 'checkbox-select-multiple'}),
-        required=False,
-        label='Abonnés'
-    )
-    
-    # Ajout d'un champ pour sélectionner tous les abonnés
-    select_all = forms.BooleanField(
-        required=False,
-        label='Sélectionner tous les abonnés',
-        widget=forms.CheckboxInput(attrs={'id': 'select-all'})
-    )
-    
+        queryset=NewsletterSubscriber.objects.filter(is_active=True).order_by('email'),
+        widget=forms.CheckboxSelectMultiple, required=False, label='Abonnés choisis')
+
     class Meta:
         model = NewsletterCampaign
-        fields = ['title', 'subject', 'content', 'subscribers', 'select_all']
-        widgets = {
-            'content': forms.Textarea(attrs={'rows': 10, 'class': 'form-control'}),
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'subject': forms.TextInput(attrs={'class': 'form-control'}),
+        fields = ['title', 'subject', 'content']
+        labels = {'title': 'Titre interne', 'subject': "Objet de l'e-mail"}
+        help_texts = {
+            'title': "Pour vous repérer dans la liste ; les abonnés ne le voient pas.",
+            'subject': "Ce que les abonnés lisent dans leur boîte de réception.",
         }
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk:
-            # Récupérer les abonnés déjà sélectionnés
-            selected_subscribers = self.instance.recipients.values_list('subscriber_id', flat=True)
-            self.fields['subscribers'].initial = selected_subscribers
-    
+        if self.instance.pk:
+            chosen = list(self.instance.recipients.values_list('subscriber_id', flat=True))
+            self.fields['subscribers'].initial = chosen
+            everyone = NewsletterSubscriber.objects.filter(is_active=True).count()
+            self.fields['audience'].initial = 'all' if len(chosen) >= everyone else 'selected'
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get('audience') == 'selected' and not cleaned.get('subscribers'):
+            self.add_error('subscribers', "Choisissez au moins un abonné, ou envoyez à tous les abonnés actifs.")
+        return cleaned
+
     def save(self, commit=True):
-        campaign = super().save(commit=False)
-        
+        campaign = super().save(commit=commit)
         if commit:
-            campaign.save()
-            
-            # Mettre à jour les destinataires
-            selected_subscribers = self.cleaned_data.get('subscribers', [])
-            
-            # Supprimer les anciennes relations
+            audience = self.cleaned_data['audience']
+            chosen = (NewsletterSubscriber.objects.filter(is_active=True) if audience == 'all'
+                      else self.cleaned_data['subscribers'])
             campaign.recipients.all().delete()
-            
-            # Créer de nouvelles relations
-            for subscriber in selected_subscribers:
-                from site_web.models import NewsletterRecipient
-                NewsletterRecipient.objects.create(campaign=campaign, subscriber=subscriber)
-        
+            NewsletterRecipient.objects.bulk_create(
+                NewsletterRecipient(campaign=campaign, subscriber=s) for s in chosen)
         return campaign
-    
 
 
 from django import forms

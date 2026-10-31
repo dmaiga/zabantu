@@ -228,7 +228,7 @@ class SuperuserAccessTests(TestCase):
 
 class ManagementScreensAccessTests(TestCase):
     """Les écrans de gestion (membres, messages, info-lettre, adhésions, partenaires) sont réservés aux modérateurs."""
-    NAMES = ['user_list', 'create_member', 'newsletter_list', 'newsletter_campaign_list',
+    NAMES = ['user_list', 'create_member', 'newsletter_list', 'email_delivery_list',
              'contact_message_list', 'sent_messages_list', 'membership_application_list', 'partenaire_list']
 
     def test_anonymous_is_sent_to_login(self):

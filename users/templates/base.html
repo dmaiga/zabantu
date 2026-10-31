@@ -244,6 +244,9 @@
                             {% if unread_messages_count %}<span class="badge bg-danger">{{ unread_messages_count }}</span>{% endif %}
                         </a>
                     </li>
+                    <li class="{% if request.resolver_match.url_name == 'email_delivery_list' %}active{% endif %}">
+                        <a href="{% url 'email_delivery_list' %}"><i class="fas fa-paper-plane"></i> Envois e-mail</a>
+                    </li>
                     {% endif %}
 
                     <hr class="sidebar-divider">

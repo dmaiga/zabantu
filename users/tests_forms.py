@@ -271,13 +271,13 @@ class CommunicationSectionTests(TestCase):
         self.client.force_login(make_user('moderateur'))
 
     def test_every_communication_screen_shares_the_same_tabs(self):
-        for name in ('contact_message_list', 'sent_messages_list', 'newsletter_list', 'newsletter_campaign_list'):
+        for name in ('contact_message_list', 'sent_messages_list', 'newsletter_list'):
             r = self.client.get(reverse(name))
             self.assertContains(r, 'Messages reçus', msg_prefix=name)
-            self.assertContains(r, "Campagnes d'info-lettre", msg_prefix=name)
+            self.assertContains(r, 'Info-lettre', msg_prefix=name)
 
     def test_the_word_newsletter_is_gone_from_the_backoffice(self):
-        for name in ('contact_message_list', 'newsletter_list', 'newsletter_campaign_list', 'dashboard'):
+        for name in ('contact_message_list', 'newsletter_list', 'email_delivery_list', 'dashboard'):
             html = self.client.get(reverse(name)).content.decode()
             visible = re.sub(r'(href|action|class|id|name)="[^"]*"', '', html)
             self.assertNotIn('Newsletter', visible, name)

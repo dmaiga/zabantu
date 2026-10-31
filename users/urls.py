@@ -6,7 +6,7 @@ from .views import ProfileView, ProfileEditView, CustomPasswordChangeView
 from .views import (
     newsletter_campaign_list, newsletter_campaign_create, 
     newsletter_campaign_edit, newsletter_campaign_send,
-    newsletter_campaign_preview, newsletter_campaign_delete,
+    newsletter_campaign_preview, newsletter_campaign_delete, newsletter_campaign_detail,
     
 )
 
@@ -41,9 +41,12 @@ urlpatterns = [
     path('contact-messages/<int:pk>/delete/', views.contact_message_delete, name='contact_message_delete'),
     path('contact-messages/<int:pk>/reply/', views.contact_message_reply, name='contact_message_reply'),
     
+    path('emails/', views.email_delivery_list, name='email_delivery_list'),
+    path('emails/retry/', views.email_delivery_retry, name='email_delivery_retry'),
     path('newsletter/subscribers/bulk/', views.newsletter_subscriber_bulk, name='newsletter_subscriber_bulk'),
     path('newsletter/campaigns/', newsletter_campaign_list, name='newsletter_campaign_list'),
     path('newsletter/campaigns/create/', newsletter_campaign_create, name='newsletter_campaign_create'),
+    path('newsletter/campaigns/<int:pk>/', newsletter_campaign_detail, name='newsletter_campaign_detail'),
     path('newsletter/campaigns/<int:pk>/edit/', newsletter_campaign_edit, name='newsletter_campaign_edit'),
     path('newsletter/campaigns/<int:pk>/send/', newsletter_campaign_send, name='newsletter_campaign_send'),
     path('newsletter/campaigns/<int:pk>/preview/', newsletter_campaign_preview, name='newsletter_campaign_preview'),

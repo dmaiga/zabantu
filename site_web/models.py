@@ -97,7 +97,9 @@ class NewsletterRecipient(models.Model):
     subscriber = models.ForeignKey('site_web.NewsletterSubscriber', on_delete=models.CASCADE)
     sent_at = models.DateTimeField(_('envoyé le'), null=True, blank=True)
     opened_at = models.DateTimeField(_('ouvert le'), null=True, blank=True)
-    
+    attempts = models.PositiveSmallIntegerField(_('tentatives'), default=0)
+    last_error = models.CharField(_('dernière erreur'), max_length=255, blank=True)
+
     class Meta:
         verbose_name = _("destinataire d'info-lettre")
         verbose_name_plural = _("destinataires d'info-lettre")
@@ -390,6 +392,7 @@ class PublicationDelivery(models.Model):
     subscriber = models.ForeignKey(NewsletterSubscriber, on_delete=models.CASCADE, related_name='deliveries')
     sent_at = models.DateTimeField(_('envoyé le'), null=True, blank=True)
     attempts = models.PositiveSmallIntegerField(_('tentatives'), default=0)
+    last_error = models.CharField(_('dernière erreur'), max_length=255, blank=True)
 
     class Meta:
         verbose_name = _("envoi d'annonce")

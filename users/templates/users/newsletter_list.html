@@ -1,218 +1,158 @@
 {% extends 'base.html' %}
 
-{% block title %}Abonnés à l'info-lettre | Zabantu Backoffice{% endblock %}
+{% block title %}Info-lettre | Zabantu Backoffice{% endblock %}
 
 {% block content %}
 <div class="container-fluid pt-4 pb-0">{% include 'includes/communication_tabs.html' %}</div>
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h4 class="mb-0" style="color: black;">
-            <i class="fas fa-envelope me-2"></i>
-            Abonnés à l'info-lettre
-        </h4>
-        <div>
-            <span class="badge bg-primary me-2">{{ total_count }} abonnés</span>
-            <a href="{% url 'newsletter_campaign_create' %}" class="btn btn-success btn-sm">
-                <i class="fas fa-plus me-1"></i> Créer une campagne
-            </a>
-            <a href="{% url 'newsletter_campaign_list' %}" class="btn btn-info btn-sm">
-                <i class="fas fa-list me-1"></i> Voir les campagnes
-            </a>
-        </div>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <div>
+        <h1 class="h3 mb-1">Info-lettre</h1>
+        <p class="text-muted small mb-0">
+            <strong>{{ stats.total }}</strong> abonné{{ stats.total|pluralize }} ·
+            <strong>{{ stats.active }}</strong> actif{{ stats.active|pluralize }} ·
+            <strong>{{ stats.blocked }}</strong> bloqué{{ stats.blocked|pluralize }} ·
+            <strong>{{ campaigns|length }}</strong> campagne{{ campaigns|length|pluralize }}
+        </p>
     </div>
-    <div class="card-body">
-        <!-- En-tête avec statistiques et actions rapides -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card bg-primary text-white text-center p-3">
-                    <h5 class="mb-0">{{ total_count }}</h5>
-                    <small>Total abonnés</small>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card bg-success text-white text-center p-3">
-                    <h5 class="mb-0">{{ active_count }}</h5>
-                    <small>Abonnés actifs</small>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card bg-info text-white text-center p-3">
-                    <h5 class="mb-0">{{ campaigns_count }}</h5>
-                    <small>Campagnes créées</small>
-                </div>
-            </div>
-        </div>
+    <a href="{% url 'newsletter_campaign_create' %}" class="btn btn-primary"><i class="fas fa-plus me-1"></i> Nouvelle campagne</a>
+</div>
 
-        <!-- Actions rapides -->
-        <div class="d-flex gap-2 mb-4 flex-wrap">
-            <a href="{% url 'newsletter_campaign_create' %}" class="btn btn-primary">
-                <i class="fas fa-plus me-1"></i> Nouvelle campagne
-            </a>
-            <a href="{% url 'newsletter_campaign_list' %}" class="btn btn-outline-primary">
-                <i class="fas fa-list me-1"></i> Gérer les campagnes
-            </a>
-            <a href="#" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#exportModal">
-                <i class="fas fa-download me-1"></i> Exporter la liste
-            </a>
-        </div>
+<div class="row g-4">
+    <!-- Abonnés -->
+    <div class="col-xl-7">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h2 class="h6 mb-3 text-uppercase text-muted"><i class="fas fa-users me-1"></i> Abonnés</h2>
+                <form method="get" class="d-flex flex-wrap gap-2">
+                    <input type="search" name="q" value="{{ query }}" class="form-control form-control-sm" style="max-width:16rem" placeholder="Rechercher une adresse…" aria-label="Rechercher une adresse">
+                    {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+                    <button class="btn btn-sm btn-outline-secondary" type="submit"><i class="fas fa-search"></i></button>
+                    <div class="btn-group btn-group-sm ms-auto" role="group" aria-label="Filtrer par statut">
+                        <a href="?{% if query %}q={{ query }}{% endif %}" class="btn btn-outline-primary {% if not status_filter %}active{% endif %}">Tous <span class="badge bg-light text-dark">{{ stats.total }}</span></a>
+                        <a href="?status=active{% if query %}&q={{ query }}{% endif %}" class="btn btn-outline-success {% if status_filter == 'active' %}active{% endif %}">Actifs <span class="badge bg-light text-dark">{{ stats.active }}</span></a>
+                        <a href="?status=inactive{% if query %}&q={{ query }}{% endif %}" class="btn btn-outline-secondary {% if status_filter == 'inactive' %}active{% endif %}">Inactifs</a>
+                        <a href="?status=blocked{% if query %}&q={{ query }}{% endif %}" class="btn btn-outline-dark {% if status_filter == 'blocked' %}active{% endif %}">Bloqués <span class="badge bg-light text-dark">{{ stats.blocked }}</span></a>
+                    </div>
+                </form>
+            </div>
 
-        <div class="btn-group mb-3" role="group" aria-label="Filtrer par statut">
-            <a href="?" class="btn btn-outline-primary {% if not status_filter %}active{% endif %}">Tous</a>
-            <a href="?status=active" class="btn btn-outline-success {% if status_filter == 'active' %}active{% endif %}">Actifs</a>
-            <a href="?status=inactive" class="btn btn-outline-secondary {% if status_filter == 'inactive' %}active{% endif %}">Inactifs</a>
-        </div>
-
-        {% if subscribers %}
+            {% if subscribers %}
             <form method="post" action="{% url 'newsletter_subscriber_bulk' %}" id="bulkForm">
-            {% csrf_token %}
-            <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-                <span class="text-muted me-2"><span id="selectedCount">0</span> sélectionné(s)</span>
-                <button type="submit" name="action" value="deactivate" class="btn btn-sm btn-outline-secondary bulk-btn" disabled>
-                    <i class="fas fa-pause me-1"></i>Désactiver</button>
-                <button type="submit" name="action" value="activate" class="btn btn-sm btn-outline-success bulk-btn" disabled>
-                    <i class="fas fa-play me-1"></i>Réactiver</button>
-                <button type="submit" name="action" value="deactivate_block" class="btn btn-sm btn-outline-dark bulk-btn" disabled
-                        data-confirm="Désactiver ces abonnés ET bloquer leurs adresses ? Elles ne pourront plus se réinscrire ni envoyer de formulaire. Vous pourrez les débloquer ici.">
-                    <i class="fas fa-ban me-1"></i>Désactiver et bloquer</button>
-                <button type="submit" name="action" value="unblock" class="btn btn-sm btn-outline-dark bulk-btn" disabled>
-                    <i class="fas fa-unlock me-1"></i>Débloquer</button>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover table-striped">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width:2.5rem"><input type="checkbox" class="form-check-input" id="selectAll" aria-label="Tout sélectionner sur cette page"></th>
-                            <th>Email</th>
-                            <th>Date d'inscription</th>
-                            <th>Statut</th>
-                           
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for subscriber in subscribers %}
-                        <tr>
-                            <td><input type="checkbox" class="form-check-input row-check" name="selected" value="{{ subscriber.pk }}" aria-label="Sélectionner {{ subscriber.email }}"></td>
-                            <td>
-                                <i class="fas fa-envelope text-muted me-2"></i>
-                                {{ subscriber.email }}{% if subscriber.email|lower in blocked_emails %} <span class="badge bg-dark" title="Cette adresse ne peut plus s'inscrire ni envoyer de formulaire"><i class="fas fa-ban me-1"></i>Bloqué</span>{% endif %}
-                            </td>
-                            <td>{{ subscriber.subscribed_at|date:"d/m/Y H:i" }}</td>
-                            <td>
-                                <span class="badge bg-{% if subscriber.is_active %}success{% else %}secondary{% endif %}">
-                                    {% if subscriber.is_active %}Actif{% else %}Inactif{% endif %}
-                                </span>
-                            </td>
-                          
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            </form>
-            
-            <!-- Pagination -->
-            {% if subscribers.has_other_pages %}
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center mt-4">
-                    {% if subscribers.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ subscribers.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">
-                            <i class="fas fa-chevron-left"></i> Précédent
-                        </a>
-                    </li>
-                    {% endif %}
-                    
-                    {% for num in subscribers.paginator.page_range %}
-                        {% if subscribers.number == num %}
-                        <li class="page-item active">
-                            <span class="page-link">{{ num }}</span>
-                        </li>
-                        {% elif num > subscribers.number|add:'-3' and num < subscribers.number|add:'3' %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ num }}{% if status_filter %}&status={{ status_filter }}{% endif %}">{{ num }}</a>
-                        </li>
-                        {% endif %}
-                    {% endfor %}
-                    
-                    {% if subscribers.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ subscribers.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}">
-                            Suivant <i class="fas fa-chevron-right"></i>
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-            {% endif %}
-        {% else %}
-            <div class="text-center py-5">
-                <i class="fas fa-envelope-open-text fa-3x text-muted mb-3"></i>
-                <h5 class="text-muted">Aucun abonné à l'info-lettre</h5>
-                <p class="text-muted">Commencez par créer votre première campagne d'info-lettre.</p>
-                <a href="{% url 'newsletter_campaign_create' %}" class="btn btn-primary mt-3">
-                    <i class="fas fa-plus me-1"></i> Créer une campagne
-                </a>
-            </div>
-        {% endif %}
-    </div>
-</div>
-
-<!-- Modal d'exportation -->
-<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exportModalLabel">Exporter la liste des abonnés</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Sélectionnez le format d'exportation :</p>
-                <div class="d-grid gap-2">
-                    <a href="#" class="btn btn-outline-primary">
-                        <i class="fas fa-file-csv me-2"></i> CSV (Excel)
-                    </a>
-                    <a href="#" class="btn btn-outline-secondary">
-                        <i class="fas fa-file-alt me-2"></i> JSON
-                    </a>
-                    <a href="#" class="btn btn-outline-success">
-                        <i class="fas fa-file-excel me-2"></i> Excel
-                    </a>
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <div class="d-flex flex-wrap align-items-center gap-2 px-3 py-2 border-bottom bg-light">
+                    <span class="text-muted small me-1"><span id="selectedCount">0</span> sélectionné(s)</span>
+                    <button type="submit" name="action" value="deactivate" class="btn btn-sm btn-outline-secondary bulk-btn" disabled><i class="fas fa-pause me-1"></i>Désactiver</button>
+                    <button type="submit" name="action" value="activate" class="btn btn-sm btn-outline-success bulk-btn" disabled><i class="fas fa-play me-1"></i>Réactiver</button>
+                    <button type="submit" name="action" value="deactivate_block" class="btn btn-sm btn-outline-dark bulk-btn" disabled
+                            data-confirm="Désactiver ces abonnés ET bloquer leurs adresses ? Elles ne pourront plus se réinscrire ni envoyer de formulaire. Vous pourrez les débloquer ici."><i class="fas fa-ban me-1"></i>Désactiver et bloquer</button>
+                    <button type="submit" name="action" value="unblock" class="btn btn-sm btn-outline-dark bulk-btn" disabled><i class="fas fa-unlock me-1"></i>Débloquer</button>
                 </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width:2.5rem"><input type="checkbox" class="form-check-input" id="selectAll" aria-label="Tout sélectionner sur cette page"></th>
+                                <th>Adresse</th>
+                                <th>Inscrit le</th>
+                                <th>Statut</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for subscriber in subscribers %}
+                            <tr>
+                                <td><input type="checkbox" class="form-check-input row-check" name="selected" value="{{ subscriber.pk }}" aria-label="Sélectionner {{ subscriber.email }}"></td>
+                                <td class="text-break">{{ subscriber.email }}</td>
+                                <td class="text-nowrap small">{{ subscriber.subscribed_at|date:"d/m/Y H:i" }}</td>
+                                <td class="text-nowrap">
+                                    <span class="badge bg-{% if subscriber.is_active %}success{% else %}secondary{% endif %}">{% if subscriber.is_active %}Actif{% else %}Inactif{% endif %}</span>
+                                    {% if subscriber.email|lower in blocked_emails %}<span class="badge bg-dark" title="Cette adresse ne peut plus s'inscrire ni envoyer de formulaire"><i class="fas fa-ban me-1"></i>Bloqué</span>{% endif %}
+                                </td>
+                                <td class="text-end text-nowrap">
+                                    <div class="btn-group btn-group-sm">
+                                        {% if subscriber.is_active %}
+                                        <button type="submit" form="row-{{ subscriber.pk }}" name="action" value="deactivate" class="btn btn-outline-secondary" title="Désactiver" aria-label="Désactiver {{ subscriber.email }}"><i class="fas fa-pause"></i></button>
+                                        {% else %}
+                                        <button type="submit" form="row-{{ subscriber.pk }}" name="action" value="activate" class="btn btn-outline-success" title="Réactiver" aria-label="Réactiver {{ subscriber.email }}"><i class="fas fa-play"></i></button>
+                                        {% endif %}
+                                        {% if subscriber.email|lower in blocked_emails %}
+                                        <button type="submit" form="row-{{ subscriber.pk }}" name="action" value="unblock" class="btn btn-outline-dark" title="Débloquer l'adresse" aria-label="Débloquer {{ subscriber.email }}"><i class="fas fa-unlock"></i></button>
+                                        {% else %}
+                                        <button type="submit" form="row-{{ subscriber.pk }}" name="action" value="deactivate_block" class="btn btn-outline-dark" title="Désactiver et bloquer l'adresse" aria-label="Bloquer {{ subscriber.email }}" onclick="return confirm('Désactiver {{ subscriber.email|escapejs }} et bloquer son adresse ? Elle ne pourra plus se réinscrire ni envoyer de formulaire.')"><i class="fas fa-ban"></i></button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+            {# un formulaire par ligne, hors du formulaire des actions groupées (les formulaires ne s'imbriquent pas) #}
+            {% for subscriber in subscribers %}
+            <form id="row-{{ subscriber.pk }}" method="post" action="{% url 'newsletter_subscriber_bulk' %}" hidden>
+                {% csrf_token %}
+                <input type="hidden" name="single" value="{{ subscriber.pk }}">
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            </form>
+            {% endfor %}
+            {% include 'includes/pagination.html' %}
+            {% else %}
+            <div class="card-body text-center py-5 text-muted">
+                <i class="fas fa-envelope-open-text fa-2x mb-3"></i>
+                <p class="mb-0">{% if query or status_filter %}Aucun abonné ne correspond à ce filtre.{% else %}Aucun abonné pour le moment.{% endif %}</p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Campagnes -->
+    <div class="col-xl-5">
+        <div class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h2 class="h6 mb-0 text-uppercase text-muted"><i class="fas fa-bullhorn me-1"></i> Campagnes</h2>
+                <a href="{% url 'newsletter_campaign_create' %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-plus me-1"></i>Nouvelle</a>
             </div>
+            <ul class="list-group list-group-flush">
+                {% for campaign in campaigns %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start gap-2">
+                        <div class="min-w-0">
+                            <a href="{% url 'newsletter_campaign_detail' campaign.pk %}" class="fw-semibold text-decoration-none">{{ campaign.title }}</a>
+                            <div class="small text-muted text-truncate" style="max-width:22rem">{{ campaign.subject }}</div>
+                        </div>
+                        <span class="badge bg-{% if campaign.status == 'draft' %}secondary{% elif campaign.status == 'sent' %}success{% elif campaign.status == 'sending' %}warning text-dark{% elif campaign.status == 'partial' %}warning text-dark{% else %}danger{% endif %}">{{ campaign.get_status_display }}</span>
+                    </div>
+                    <div class="small text-muted mt-1">
+                        <i class="fas fa-user-friends me-1"></i>{{ campaign.total }} destinataire{{ campaign.total|pluralize }}
+                        {% if campaign.status != 'draft' %}· <span class="text-success">{{ campaign.delivered }} reçu{{ campaign.delivered|pluralize }}</span>{% if campaign.failed %} · <span class="text-danger">{{ campaign.failed }} échec{{ campaign.failed|pluralize }}</span>{% endif %}{% endif %}
+                        · {{ campaign.created_at|date:"d/m/Y" }}
+                    </div>
+                    <div class="d-flex flex-wrap gap-1 mt-2">
+                        <a href="{% url 'newsletter_campaign_detail' campaign.pk %}" class="btn btn-sm btn-outline-secondary"><i class="fas fa-list me-1"></i>Destinataires</a>
+                        <a href="{% url 'newsletter_campaign_preview' campaign.pk %}" class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener"><i class="fas fa-eye me-1"></i>Aperçu</a>
+                        {% if campaign.status == 'draft' %}
+                        <a href="{% url 'newsletter_campaign_edit' campaign.pk %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit me-1"></i>Modifier</a>
+                        {% url 'newsletter_campaign_send' campaign.pk as action_url %}{% include 'includes/post_action.html' with url=action_url label='Envoyer' btn_class='btn-sm btn-success' icon='fa-paper-plane' confirm='Envoyer cette campagne à ses destinataires actifs ?' %}
+                        {% elif campaign.status == 'partial' or campaign.status == 'failed' %}
+                        {% url 'newsletter_campaign_send' campaign.pk as action_url %}{% include 'includes/post_action.html' with url=action_url label='Réessayer les échecs' btn_class='btn-sm btn-warning' icon='fa-redo' confirm='Renvoyer la campagne aux destinataires qui ne l ont pas reçue ?' %}
+                        {% endif %}
+                        {% url 'newsletter_campaign_delete' campaign.pk as action_url %}{% include 'includes/post_action.html' with url=action_url label='' title='Supprimer' btn_class='btn-sm btn-outline-danger' icon='fa-trash' confirm='Supprimer cette campagne ? Ses envois ne seront plus consultables.' %}
+                    </div>
+                </li>
+                {% empty %}
+                <li class="list-group-item text-center text-muted py-5">
+                    <i class="fas fa-bullhorn fa-2x mb-3 d-block"></i>
+                    Aucune campagne pour le moment.
+                    <div class="mt-3"><a href="{% url 'newsletter_campaign_create' %}" class="btn btn-primary btn-sm">Créer la première campagne</a></div>
+                </li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
 </div>
-
-<style>
-    .card-header {
-        background: linear-gradient(45deg, #f8f9fa, #e9ecef);
-        border-bottom: 1px solid rgba(0,0,0,0.125);
-    }
-    
-    .table th {
-        border-top: none;
-        font-weight: 600;
-        background-color: #f8f9fa;
-    }
-    
-    .btn-group-sm .btn {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-    }
-</style>
 
 {% include 'includes/bulk_select_script.html' %}
-<script>
-    // Activation des tooltips Bootstrap
-    document.addEventListener('DOMContentLoaded', function() {
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-    })
-</script>
 {% endblock %}

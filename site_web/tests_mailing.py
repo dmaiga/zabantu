@@ -4,6 +4,7 @@ from unittest import mock
 
 from django.core.management import call_command
 
+from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -314,3 +315,98 @@ class SeedDemoSafetyTests(TestCase):
         with self.assertRaises(CommandError):
             call_command('seed_demo', stdout=StringIO())
         self.assertEqual(Article.objects.count(), 1)
+
+
+class DeliveryTrackingTests(TestCase):
+    """Suivi des échecs : cause conservée, relance depuis le backoffice, campagne partielle renvoyée aux seuls échecs."""
+
+    def setUp(self):
+        self.admin = make_user('admin')
+        self.client.force_login(self.admin)
+
+    def _campaign(self, *emails):
+        campaign = NewsletterCampaign.objects.create(title='T', subject='S', content='<p>c</p>', created_by=self.admin)
+        for email in emails:
+            sub = NewsletterSubscriber.objects.create(email=email)
+            NewsletterRecipient.objects.create(campaign=campaign, subscriber=sub)
+        return campaign
+
+    def test_failed_campaign_recipient_keeps_the_cause_and_only_failures_are_retried(self):
+        campaign = self._campaign('ok@test.org', 'ko@test.org')
+        ids = {r.subscriber.email: r.pk for r in campaign.recipients.select_related('subscriber')}
+
+        def one_failure(messages, errors=None):
+            errors[ids['ko@test.org']] = 'SMTPException: boom'
+            return [ids['ok@test.org']], [ids['ko@test.org']]
+        with mock.patch.object(mailing, '_deliver', side_effect=one_failure):
+            campaign.send()
+        campaign.refresh_from_db()
+        self.assertEqual(campaign.status, 'partial')
+        ko = campaign.recipients.get(subscriber__email='ko@test.org')
+        self.assertEqual((ko.attempts, ko.last_error), (1, 'SMTPException: boom'))
+
+        mail.outbox.clear()
+        campaign.send()
+        campaign.refresh_from_db()
+        self.assertEqual(campaign.status, 'sent')
+        self.assertEqual([m.to for m in mail.outbox], [['ko@test.org']])
+
+    def test_retry_puts_failed_deliveries_back_in_the_queue(self):
+        notice = PublicationNotice.objects.create(content_type=ContentType.objects.get_for_model(Article), object_id=1)
+        sub = NewsletterSubscriber.objects.create(email='a@test.org')
+        failed = PublicationDelivery.objects.create(notice=notice, subscriber=sub, attempts=5, last_error='boom')
+        self.assertContains(self.client.get(reverse('email_delivery_list') + '?state=abandoned'), 'a@test.org')
+        self.client.post(reverse('email_delivery_retry'), {'selected': [failed.pk]})
+        failed.refresh_from_db()
+        self.assertEqual((failed.attempts, failed.last_error), (0, ''))
+        self.assertContains(self.client.get(reverse('email_delivery_list') + '?state=pending'), 'a@test.org')
+
+
+class CampaignScreensTests(TestCase):
+    def setUp(self):
+        self.client.force_login(make_user('admin'))
+        self.a = NewsletterSubscriber.objects.create(email='a@test.org')
+        self.b = NewsletterSubscriber.objects.create(email='b@test.org')
+
+    def test_create_for_everyone_then_for_a_selection(self):
+        r = self.client.get(reverse('newsletter_campaign_create'))
+        self.assertContains(r, "Objet de l&#x27;e-mail")
+        self.client.post(reverse('newsletter_campaign_create'),
+                         {'title': 'T', 'subject': 'S', 'content': '<p>x</p>', 'audience': 'all'})
+        campaign = NewsletterCampaign.objects.get()
+        self.assertEqual(campaign.recipients.count(), 2)
+        self.client.post(reverse('newsletter_campaign_edit', args=[campaign.pk]),
+                         {'title': 'T', 'subject': 'S', 'content': '<p>x</p>', 'audience': 'selected', 'subscribers': [self.a.pk]})
+        self.assertEqual(list(campaign.recipients.values_list('subscriber__email', flat=True)), ['a@test.org'])
+
+    def test_selection_without_subscribers_is_refused(self):
+        r = self.client.post(reverse('newsletter_campaign_create'),
+                             {'title': 'T', 'subject': 'S', 'content': '<p>x</p>', 'audience': 'selected'})
+        self.assertContains(r, 'Choisissez au moins un abonné')
+        self.assertFalse(NewsletterCampaign.objects.exists())
+
+    def test_one_page_lists_subscribers_and_campaigns_and_detail_shows_recipients(self):
+        self.client.post(reverse('newsletter_campaign_create'),
+                         {'title': 'Ma campagne', 'subject': 'S', 'content': '<p>x</p>', 'audience': 'all'})
+        campaign = NewsletterCampaign.objects.get()
+        page = self.client.get(reverse('newsletter_list'))
+        self.assertContains(page, 'a@test.org')
+        self.assertContains(page, 'Ma campagne')
+        self.assertContains(self.client.get(reverse('newsletter_campaign_detail', args=[campaign.pk])), 'b@test.org')
+        self.assertContains(self.client.get(reverse('newsletter_list') + '?q=b@'), 'b@test.org')
+        self.assertNotContains(self.client.get(reverse('newsletter_list') + '?q=b@'), 'a@test.org')
+
+    def test_row_action_deactivates_a_single_subscriber(self):
+        self.client.post(reverse('newsletter_subscriber_bulk'), {'single': self.a.pk, 'action': 'deactivate'})
+        self.a.refresh_from_db(); self.b.refresh_from_db()
+        self.assertEqual((self.a.is_active, self.b.is_active), (False, True))
+
+
+class CampaignPreviewTests(TestCase):
+    def test_rich_text_is_rendered_as_html_not_escaped(self):
+        self.client.force_login(make_user('admin'))
+        campaign = NewsletterCampaign.objects.create(
+            title='T', subject='S', content='<p>Bonjour <strong>vous</strong></p>', created_by=make_user('admin'))
+        r = self.client.get(reverse('newsletter_campaign_preview', args=[campaign.pk]))
+        self.assertContains(r, '<p>Bonjour <strong>vous</strong></p>', html=True)
+        self.assertNotContains(r, '&lt;p&gt;')

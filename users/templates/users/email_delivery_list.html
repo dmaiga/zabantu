@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Envois e-mail | Zabantu Backoffice{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+        <div>
+            <h1 class="h3 mb-1">Envois e-mail</h1>
+            <p class="text-muted small mb-0">Les e-mails qui annoncent vos nouvelles publications et événements aux abonnés. Ils partent automatiquement, quelques minutes après la publication. Si un envoi échoue, le site réessaie tout seul jusqu'à {{ max_attempts }} fois, puis abandonne : vous pouvez alors le relancer ici.</p>
+        </div>
+        {% if retryable %}
+        <form method="post" action="{% url 'email_delivery_retry' %}" onsubmit="return confirm('Remettre en file les {{ retryable }} envoi(s) non réussis ?')">
+            {% csrf_token %}
+            <input type="hidden" name="scope" value="all">
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button class="btn btn-warning"><i class="fas fa-redo me-1"></i> Tout relancer ({{ retryable }})</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <div class="btn-group btn-group-sm mb-3 flex-wrap" role="group" aria-label="Filtrer par état">
+        <a href="?" class="btn btn-outline-primary {% if not state %}active{% endif %}">Tous</a>
+        <a href="?state=sent" class="btn btn-outline-success {% if state == 'sent' %}active{% endif %}">Reçus <span class="badge bg-light text-dark">{{ counts.sent }}</span></a>
+        <a href="?state=pending" class="btn btn-outline-secondary {% if state == 'pending' %}active{% endif %}">En attente <span class="badge bg-light text-dark">{{ counts.pending }}</span></a>
+        <a href="?state=failed" class="btn btn-outline-warning {% if state == 'failed' %}active{% endif %}">Échecs, nouvelle tentative <span class="badge bg-light text-dark">{{ counts.failed }}</span></a>
+        <a href="?state=abandoned" class="btn btn-outline-danger {% if state == 'abandoned' %}active{% endif %}">Abandonnés <span class="badge bg-light text-dark">{{ counts.abandoned }}</span></a>
+    </div>
+
+    <div class="card">
+        {% if deliveries %}
+        <form method="post" action="{% url 'email_delivery_retry' %}" id="bulkForm">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <div class="d-flex align-items-center gap-2 px-3 py-2 border-bottom bg-light">
+                <span class="text-muted small"><span id="selectedCount">0</span> sélectionné(s)</span>
+                <button type="submit" name="action" value="retry" class="btn btn-sm btn-outline-warning bulk-btn" disabled><i class="fas fa-redo me-1"></i>Relancer</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light"><tr>
+                        <th style="width:2.5rem"><input type="checkbox" class="form-check-input" id="selectAll" aria-label="Tout sélectionner sur cette page"></th>
+                        <th>Destinataire</th><th>Contenu annoncé</th><th>État</th><th>Tentatives</th><th>Envoyé le</th><th>Dernière erreur</th>
+                    </tr></thead>
+                    <tbody>
+                        {% for d in deliveries %}
+                        <tr>
+                            <td>{% if not d.sent_at and d.attempts %}<input type="checkbox" class="form-check-input row-check" name="selected" value="{{ d.pk }}" aria-label="Sélectionner {{ d.subscriber.email }}">{% endif %}</td>
+                            <td class="text-break">{{ d.subscriber.email }}{% if not d.subscriber.is_active %} <span class="badge bg-secondary">Inactif</span>{% endif %}</td>
+                            <td class="small">{{ d.notice.content_object|default:"(contenu supprimé)" }}<div class="text-muted">annoncé le {{ d.notice.created_at|date:"d/m/Y H:i" }}</div></td>
+                            <td>
+                                {% if d.sent_at %}<span class="badge bg-success">Reçu</span>
+                                {% elif not d.attempts %}<span class="badge bg-secondary">En attente</span>
+                                {% elif d.attempts >= max_attempts %}<span class="badge bg-danger">Abandonné</span>
+                                {% else %}<span class="badge bg-warning text-dark">Échec</span>{% endif %}
+                            </td>
+                            <td>{{ d.attempts }} / {{ max_attempts }}</td>
+                            <td class="small text-nowrap">{{ d.sent_at|date:"d/m/Y H:i"|default:"—" }}</td>
+                            <td class="small text-danger">{{ d.last_error }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </form>
+        {% include 'includes/pagination.html' %}
+        {% else %}
+        <div class="card-body text-center text-muted py-5"><i class="fas fa-paper-plane fa-2x mb-3 d-block"></i>Aucun envoi pour ce filtre.</div>
+        {% endif %}
+    </div>
+</div>
+{% include 'includes/bulk_select_script.html' %}
+{% endblock %}
