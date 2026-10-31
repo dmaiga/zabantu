@@ -8,15 +8,14 @@ from django.http import JsonResponse
 from django.db.models import Q
 from .models import Event,EventIntervenant
 from .forms import EventForm,EventIntervenantForm
+from .filters import EventFilterForm
+from users.listing import paginate
  
 from site_web.mailing import notify_publication
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-
-
-EVENT_SORTS = {'date', '-date', 'title', '-title', 'created_at', '-created_at'}
 
 
 # Créer un événement (toujours en mode brouillon)
@@ -134,40 +133,15 @@ def event_delete(request, id):
 # Liste des événements avec filtres
 @login_required
 def event_list(request):
-    events = Event.objects.all()
-
-    status = request.GET.get('status', 'all')
-    event_type = request.GET.get('type', 'all')
-    if status in dict(Event.STATUS_CHOICES):
-        events = events.filter(status=status)
-    if event_type in dict(Event.EVENT_TYPE_CHOICES):
-        events = events.filter(event_type=event_type)
-
-    # Recherche
-    search_query = request.GET.get('q', '')
-    if search_query:
-        events = events.filter(
-            Q(title__icontains=search_query) |
-            Q(content__icontains=search_query) |
-            Q(location__icontains=search_query) |
-            Q(primary_topic__icontains=search_query)
-        )
-    
-    # Tri
-    sort = request.GET.get('sort')
-    if sort not in EVENT_SORTS:
-        sort = '-date'
-    events = events.order_by(sort)
-    
-    context = {
-        'events': events,
-        'current_status': status,
-        'current_type': event_type,
-        'search_query': search_query,
-        'current_sort': sort,
-    }
-    
-    return render(request, 'events/event_list.html', context)
+    form = EventFilterForm(request.GET)
+    page_obj, querystring = paginate(request, form.apply(Event.objects.select_related('author')))
+    return render(request, 'events/event_list.html', {
+        'form': form,
+        'page_obj': page_obj,
+        'querystring': querystring,
+        'type_choices': Event.EVENT_TYPE_CHOICES,
+        'status_choices': Event.STATUS_CHOICES,
+    })
 
 # Détail d’un événement
 @login_required

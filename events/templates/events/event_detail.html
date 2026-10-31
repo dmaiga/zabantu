@@ -189,6 +189,7 @@
                     {% elif event.status == 'published' %}
                     {% url 'event_unpublish' event.id as action_url %}{% include 'includes/post_action.html' with url=action_url label='Dépublier' btn_class='btn-sm btn-warning text-dark' icon='fa-eye-slash' %}
                     {% endif %}
+                    <a href="{% url 'event_delete' event.id %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash me-1"></i> Supprimer</a>
                 {% endif %}
             {% endif %}
         </div>

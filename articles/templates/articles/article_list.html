@@ -1,202 +1,83 @@
-{% extends "base.html" %}
-{% load static %}
+{% extends 'list_base.html' %}
 
-{% block content %}
-<div class="container py-4">
+{% block title %}Publications{% endblock %}
+{% block list_title %}Publications{% endblock %}
+{% block list_noun %}publication(s){% endblock %}
 
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Publications</h2>
-
-        <!-- CREATE -->
-        <div class="btn-group">
-            <button class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
-                Nouvelle publication
-            </button>
-            <ul class="dropdown-menu">
-                <li class="dropdown-header">Editorial</li>
-                <li><a class="dropdown-item" href="{% url 'article_create' %}?type=zabantu">Zabantu</a></li>
-                <li><a class="dropdown-item" href="{% url 'article_create' %}?type=analyse">Analyse</a></li>
-                <li><a class="dropdown-item" href="{% url 'article_create' %}?type=article">Article</a></li>
-                <li><a class="dropdown-item" href="{% url 'article_create' %}?type=policy">Policy Brief</a></li>
-                <li><a class="dropdown-item" href="{% url 'article_create' %}?type=rapport">Rapport</a></li>
-                <li><a class="dropdown-item" href="{% url 'article_create' %}?type=ouvrage">Ouvrage</a></li>
-
-                <li><hr></li>
-
-                <li class="dropdown-header">Scientifique</li>
-                <li><a class="dropdown-item" href="{% url 'article_create' %}?type=academic">Académique</a></li>
-                <li><a class="dropdown-item" href="{% url 'article_create' %}?type=working">Working Paper</a></li>
-
-                <li><hr></li>
-
-                <li class="dropdown-header">Externe</li>
-                <li><a class="dropdown-item" href="{% url 'article_create' %}?type=independent">Indépendant</a></li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- FILTRES -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" class="row g-3">
-
-                <div class="col-md-4">
-                    <input type="text" name="search" class="form-control"
-                           placeholder="Rechercher..."
-                           value="">
-                </div>
-
-                <div class="col-md-3">
-                    <select class="form-select" name="type">
-                        <option value="">Tous les types</option>
-
-                        <optgroup label="Editorial">
-                            <option value="zabantu">Zabantu</option>
-                            <option value="analyse">Analyse</option>
-                            <option value="article">Article</option>
-                            <option value="policy">Policy</option>
-                            <option value="rapport">Rapport</option>
-                            <option value="ouvrage">Ouvrage</option>
-                        </optgroup>
-
-                        <optgroup label="Scientifique">
-                            <option value="academic">Académique</option>
-                            <option value="working">Working Paper</option>
-                        </optgroup>
-
-                        <optgroup label="Externe">
-                            <option value="independent">Indépendant</option>
-                        </optgroup>
-
-                    </select>
-                </div>
-
-                <div class="col-md-2">
-                    <select class="form-select" name="status">
-                        <option value="">Tous</option>
-                        {% for value, label in status_choices %}
-                            <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>
-                                {{ label }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="col-md-3 d-flex gap-2">
-                    <button class="btn btn-primary w-100">Filtrer</button>
-                    <a href="{% url 'article_list' %}" class="btn btn-outline-secondary w-100">Reset</a>
-                </div>
-
-            </form>
-        </div>
-    </div>
-
-    <!-- LISTE -->
-    <div class="card">
-        <div class="card-header">
-            <strong>{{ articles.count }} publication(s)</strong>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table align-middle mb-0">
-
-                <thead>
-                    <tr>
-                        <th>Publication</th>
-                        <th>Type</th>
-                        <th>Statut</th>
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                {% for article in articles %}
-                    <tr>
-
-                        <!-- CONTENU -->
-                        <td>
-                            <div class="d-flex gap-3">
-
-                                {% if article.cover_image %}
-                                    <img src="{{ article.cover_image.url }}"
-                                         width="60" height="60"
-                                         class="rounded"
-                                         style="object-fit: cover;">
-                                {% else %}
-                                    <div class="bg-light border rounded d-flex align-items-center justify-content-center"
-                                         style="width:60px;height:60px;">
-                                        <small class="text-muted">N/A</small>
-                                    </div>
-                                {% endif %}
-
-                                <div>
-                                    <div class="fw-semibold">
-                                        {{ article.title }}
-                                    </div>
-
-                                    {% if article.subtitle %}
-                                        <div class="text-muted small">
-                                            {{ article.subtitle|truncatewords:8 }}
-                                        </div>
-                                    {% endif %}
-
-                                    <div class="text-muted small mt-1">
-                                        {{ article.created_at|date:"d/m/Y" }}
-                                    </div>
-                                </div>
-
-                            </div>
-                        </td>
-
-                        <!-- TYPE -->
-                        <td class="text-muted small">
-                            {{ article.get_article_type_display }}
-                        </td>
-
-                        <!-- STATUT -->
-                        <td>
-                            <span class="badge 
-                                {% if article.status == 'published' %}bg-success
-                                {% else %}bg-warning text-dark{% endif %}">
-                                {{ article.get_status_display }}
-                            </span>
-                        </td>
-
-                        <!-- ACTIONS -->
-                        <td>
-                            <div class="d-flex gap-2">
-
-                                <a href="{% url 'article_detail' article.slug %}"
-                                   class="btn btn-sm btn-outline-primary">
-                                    Voir
-                                </a>
-
-                                <a href="{% url 'article_update' article.slug %}"
-                                   class="btn btn-sm btn-outline-secondary">
-                                    Modifier
-                                </a>
-
-                                {% if article.status == 'draft' %}
-                                {% url 'publish_article' article.slug as action_url %}{% include 'includes/post_action.html' with url=action_url label='Publier' btn_class='btn-sm btn-outline-success' icon='' %}
-                                {% endif %}
-
-                            </div>
-                        </td>
-
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="4" class="text-center py-4 text-muted">
-                            Aucune publication trouvée
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-
-            </table>
-        </div>
-    </div>
-
+{% block list_actions %}
+<div class="btn-group">
+    <button class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-plus me-1"></i> Nouvelle publication</button>
+    <ul class="dropdown-menu dropdown-menu-end">
+        {% for value, label in article_types %}
+        <li><a class="dropdown-item" href="{% url 'article_create' %}?type={{ value }}">{{ label }}</a></li>
+        {% endfor %}
+    </ul>
 </div>
+{% endblock %}
+
+{% block list_filters %}
+<ul class="nav nav-pills mb-3">
+    <li class="nav-item"><a class="nav-link {% if not current_status %}active{% endif %}" href="?{% if form.q.value %}q={{ form.q.value|urlencode }}{% endif %}">Toutes <span class="badge bg-light text-dark">{{ total_count }}</span></a></li>
+    {% for value, label, count in status_tabs %}
+    <li class="nav-item"><a class="nav-link {% if current_status == value %}active{% endif %}" href="?status={{ value }}{% if form.q.value %}&q={{ form.q.value|urlencode }}{% endif %}">{{ label }}s <span class="badge bg-light text-dark">{{ count }}</span></a></li>
+    {% endfor %}
+</ul>
+<form method="get" class="card card-body mb-3 row g-2 flex-row align-items-end">
+    {% if current_status %}<input type="hidden" name="status" value="{{ current_status }}">{% endif %}
+    <div class="col-md-5"><input type="search" name="q" class="form-control" placeholder="Rechercher un titre, un contenu…" value="{{ form.q.value|default:'' }}"></div>
+    <div class="col-md-3">
+        <select name="type" class="form-select" aria-label="Type">
+            <option value="">Tous les types</option>
+            {% for value, label in article_types %}<option value="{{ value }}" {% if form.type.value == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2"><input type="date" name="date_from" class="form-control" aria-label="Depuis" value="{{ form.date_from.value|default:'' }}"></div>
+    <div class="col-md-2 d-flex gap-2">
+        <button class="btn btn-primary flex-fill">Filtrer</button>
+        <a href="{% url 'article_list' %}" class="btn btn-outline-secondary" title="Réinitialiser" aria-label="Réinitialiser"><i class="fas fa-rotate-left"></i></a>
+    </div>
+</form>
+{% endblock %}
+
+{% block list_table %}
+<table class="table align-middle mb-0">
+    <thead><tr><th>Publication</th><th>Type</th><th>Statut</th><th class="text-end">Actions</th></tr></thead>
+    <tbody>
+    {% for article in page_obj %}
+        <tr>
+            <td>
+                <div class="d-flex gap-3 align-items-center">
+                    {% if article.cover_image %}
+                        <img src="{{ article.cover_image.url }}" alt="" width="48" height="48" class="rounded" style="object-fit: cover;">
+                    {% else %}
+                        <div class="bg-light border rounded d-flex align-items-center justify-content-center" style="width:48px;height:48px;"><i class="fas fa-file-lines text-muted"></i></div>
+                    {% endif %}
+                    <div>
+                        <a href="{% url 'article_detail' article.slug %}" class="fw-semibold text-decoration-none text-dark">{{ article.title }}</a>
+                        <div class="text-muted small">
+                            {% if article.subtitle %}{{ article.subtitle|truncatewords:8 }} · {% endif %}{{ article.created_at|date:"d/m/Y" }}
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td class="text-muted small">{{ article.get_article_type_display }}</td>
+            <td>
+                <span class="badge {% if article.status == 'published' %}bg-success{% elif article.status == 'scheduled' %}bg-info text-dark{% else %}bg-warning text-dark{% endif %}">{{ article.get_status_display }}</span>
+                {% if article.status == 'scheduled' %}<div class="small text-muted">{{ article.publish_at|date:"d/m/Y H:i" }}</div>{% endif %}
+            </td>
+            <td class="text-end">
+                <div class="d-inline-flex gap-1">
+                    {% url 'article_detail' article.slug as detail_url %}{% include 'includes/icon_action.html' with url=detail_url icon='fa-eye' title='Voir' variant='primary' %}
+                    {% url 'article_update' article.slug as edit_url %}{% include 'includes/icon_action.html' with url=edit_url icon='fa-pen' title='Modifier' variant='secondary' %}
+                    {% if user.can_moderate and article.status == 'draft' %}
+                    {% url 'publish_article' article.slug as action_url %}{% include 'includes/post_action.html' with url=action_url label='' title='Publier' btn_class='btn-sm btn-outline-success' icon='fa-paper-plane' %}
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="4" class="text-center py-5 text-muted">Aucune publication ne correspond à ces critères.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

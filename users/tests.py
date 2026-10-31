@@ -224,3 +224,93 @@ class SuperuserAccessTests(TestCase):
         get_user_model().objects.filter(username='su').update(role='membre')
         su = get_user_model().objects.get(username='su')
         self.assertTrue(su.can_access_backoffice and su.can_moderate)
+
+
+class ManagementScreensAccessTests(TestCase):
+    """Les écrans de gestion (membres, messages, infolettre, adhésions, partenaires) sont réservés aux modérateurs."""
+    NAMES = ['user_list', 'create_member', 'newsletter_list', 'newsletter_campaign_list',
+             'contact_message_list', 'sent_messages_list', 'membership_application_list', 'partenaire_list']
+
+    def test_anonymous_is_sent_to_login(self):
+        for name in self.NAMES:
+            r = self.client.get(reverse(name))
+            self.assertEqual(r.status_code, 302, name)
+            self.assertIn('/auth/', r.url, name)
+
+    def test_member_with_access_is_refused(self):
+        from users.testing import make_user
+        other = make_user('membre')
+        self.client.force_login(make_user('membre'))
+        for name in self.NAMES:
+            self.assertEqual(self.client.get(reverse(name)).status_code, 403, name)
+        self.assertEqual(self.client.get(reverse('user_detail', args=[other.pk])).status_code, 403)
+        self.assertEqual(self.client.post(reverse('user_delete', args=[other.pk]), {'confirmation': 'SUPPRIMER'}).status_code, 403)
+        self.assertTrue(get_user_model().objects.filter(pk=other.pk).exists())
+
+    def test_moderator_can_open_them(self):
+        from users.testing import make_user
+        self.client.force_login(make_user('moderateur'))
+        for name in self.NAMES:
+            self.assertEqual(self.client.get(reverse(name)).status_code, 200, name)
+
+
+class MemberListTests(TestCase):
+    def setUp(self):
+        from users.testing import make_user
+        self.client.force_login(make_user('moderateur'))
+        for i in range(24):
+            make_user('membre', backoffice_access=(i % 4 == 0), prenom=f'Prenom{i:02d}')
+
+    def test_list_is_called_members_paginated_and_shows_names_in_normal_case(self):
+        r = self.client.get(reverse('user_list'))
+        self.assertContains(r, '<h1 class="h3 mb-0">Membres</h1>', html=True)
+        self.assertEqual(len(r.context['page_obj']), 20)
+        self.assertContains(r, 'Test</a>')  # « TEST » est stocké en majuscules, affiché en casse normale
+        self.assertNotContains(r, 'TEST</a>')
+
+    def test_access_filter(self):
+        yes = self.client.get(reverse('user_list'), {'access': 'yes'}).context['page_obj']
+        self.assertTrue(all(m.can_access_backoffice for m in yes))
+        no = self.client.get(reverse('user_list'), {'access': 'no'}).context['page_obj']
+        self.assertTrue(no and not any(m.can_access_backoffice for m in no))
+
+    def test_search_by_name_and_invalid_role_ignored(self):
+        r = self.client.get(reverse('user_list'), {'q': 'Prenom07', 'role': 'nope'})
+        self.assertEqual(r.context['page_obj'].paginator.count, 1)
+
+    def test_list_has_no_delete_action(self):
+        r = self.client.get(reverse('user_list'))
+        self.assertNotContains(r, '/users/delete/')
+
+
+class PartenaireCrudTests(TestCase):
+    def setUp(self):
+        from users.models import Partenaire
+        from users.testing import make_user
+        self.p = Partenaire.objects.create(name='Fondation X', logo='partenaires/x.png', order=2)
+        self.moderator = make_user('moderateur')
+
+    def test_moderator_edits_a_partner(self):
+        self.client.force_login(self.moderator)
+        r = self.client.post(reverse('partenaire_update', args=[self.p.pk]), {'name': 'Fondation Y', 'order': 5, 'is_active': 'on'})
+        self.assertRedirects(r, reverse('partenaire_list'))
+        self.p.refresh_from_db()
+        self.assertEqual((self.p.name, self.p.order), ('Fondation Y', 5))
+
+    def test_delete_needs_post_and_a_moderator(self):
+        from users.models import Partenaire
+        from users.testing import make_user
+        url = reverse('partenaire_delete', args=[self.p.pk])
+        self.client.force_login(make_user('membre'))
+        self.assertEqual(self.client.post(url).status_code, 403)
+        self.client.force_login(self.moderator)
+        self.assertEqual(self.client.get(url).status_code, 405)
+        self.client.post(url)
+        self.assertFalse(Partenaire.objects.filter(pk=self.p.pk).exists())
+
+    def test_list_searches_by_name(self):
+        from users.models import Partenaire
+        Partenaire.objects.create(name='Autre', logo='partenaires/y.png')
+        self.client.force_login(self.moderator)
+        r = self.client.get(reverse('partenaire_list'), {'q': 'Fondation'})
+        self.assertEqual([p.name for p in r.context['page_obj']], ['Fondation X'])

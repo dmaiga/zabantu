@@ -107,6 +107,7 @@
         
         #sidebar ul li.active a i { color: #ffffff; }
 
+        .sidebar-group { padding: .5rem 1.25rem .25rem; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.45); }
         hr.sidebar-divider { 
             border-top: 1px solid rgba(255,255,255,0.1); 
             margin: 10px 20px; 
@@ -195,55 +196,51 @@
             <div class="sidebar-scroll">
                 <ul class="list-unstyled components">
                     <li class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                        <a href="{% url 'dashboard' %}"><i class="fas fa-chart-pie"></i> Dashboard</a>
+                        <a href="{% url 'dashboard' %}"><i class="fas fa-chart-pie"></i> Tableau de bord</a>
                     </li>
+
                     <hr class="sidebar-divider">
-                    
-                    {# Correction des URL dynamiques pour matcher /articles/ #}
+                    <li class="sidebar-group">Contenus</li>
                     <li class="{% if request.resolver_match.url_name == 'article_list' or 'articles/article/' in request.path %}active{% endif %}">
                         <a href="{% url 'article_list' %}"><i class="fas fa-file-alt"></i> Publications</a>
                     </li>
                     <li class="{% if 'articles/guelekan' in request.path %}active{% endif %}">
-                        <a href="{% url 'guelekan_list' %}"><i class="fas fa-book"></i> Gelekan</a>
+                        <a href="{% url 'guelekan_list' %}"><i class="fas fa-microphone-lines"></i> Gɛlɛkan</a>
                     </li>
                     <li class="{% if 'events' in request.path %}active{% endif %}">
                         <a href="{% url 'event_list' %}"><i class="fas fa-calendar-day"></i> Événements</a>
                     </li>
-
-                    <hr class="sidebar-divider">
-                   
-                    <li><a href="{% url 'user_list' %}"><i class="fas fa-users"></i> Membres</a></li>
-                    <li><a href="{% url 'partenaire_list' %}"><i class="fas fa-handshake"></i> Paternaires</a></li>
-                                          
-
-                    <li>
-                        <a href="{% url 'intervenant_list' %}">
-                            <i class="fas fa-chalkboard-teacher"></i> Intervenants
-                        </a>
-                    </li>
                     <li class="{% if 'galleries' in request.path %}active{% endif %}">
                         <a href="{% url 'gallery_list' %}"><i class="fas fa-images"></i> Galeries</a>
                     </li>
+
                     <hr class="sidebar-divider">
-                    
-                    {% if user.role == 'admin' or user.role == 'moderateur' %}
+                    <li class="sidebar-group">Réseau</li>
+                    {% if user.can_moderate %}
+                    <li class="{% if request.resolver_match.url_name == 'user_list' %}active{% endif %}"><a href="{% url 'user_list' %}"><i class="fas fa-users"></i> Membres</a></li>
                     <li class="{% if 'adhesions' in request.path %}active{% endif %}">
                         <a href="{% url 'membership_application_list' %}">
                             <i class="fas fa-user-check"></i> Adhésions
                             {% if pending_applications_count %}<span class="badge bg-danger ms-1">{{ pending_applications_count }}</span>{% endif %}
                         </a>
                     </li>
+                    <li class="{% if 'partenaires' in request.path %}active{% endif %}"><a href="{% url 'partenaire_list' %}"><i class="fas fa-handshake"></i> Partenaires</a></li>
                     {% endif %}
-                    <li><a href="{% url 'contact_message_list' %}"><i class="fas fa-comments"></i> Messages</a></li>
-                    
                     <li>
-                        <a href="{% url 'newsletter_list' %}">
-                            <i class="fas fa-envelope"></i> Newsletter
-                        </a>
+                        <a href="{% url 'intervenant_list' %}"><i class="fas fa-chalkboard-teacher"></i> Intervenants</a>
                     </li>
+
+                    {% if user.can_moderate %}
+                    <hr class="sidebar-divider">
+                    <li class="sidebar-group">Communication</li>
+                    <li><a href="{% url 'contact_message_list' %}"><i class="fas fa-comments"></i> Messages</a></li>
+                    <li><a href="{% url 'newsletter_list' %}"><i class="fas fa-envelope"></i> Infolettre</a></li>
+                    {% endif %}
+
+                    <hr class="sidebar-divider">
                     <li>
                         <a href="{% url 'home' %}" target="_blank" style="color: var(--zabantu-secondary);">
-                            <i class="fas fa-globe" style="color: var(--zabantu-secondary);"></i> Voir le Site
+                            <i class="fas fa-globe" style="color: var(--zabantu-secondary);"></i> Voir le site
                         </a>
                     </li>
                 </ul>

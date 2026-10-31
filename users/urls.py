@@ -52,6 +52,8 @@ urlpatterns = [
     path("partenaires/", views.partenaire_list, name="partenaire_list"),
     path("partenaires/create/", views.partenaire_create, name="partenaire_create"),
     path("partenaires/<int:pk>/", views.partenaire_detail, name="partenaire_detail"),
+    path("partenaires/<int:pk>/edit/", views.partenaire_update, name="partenaire_update"),
+    path("partenaires/<int:pk>/delete/", views.partenaire_delete, name="partenaire_delete"),
     path("partenaires/<int:pk>/toggle/", views.partenaire_toggle, name="partenaire_toggle"), 
 
 ]

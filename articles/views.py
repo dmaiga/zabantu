@@ -9,6 +9,8 @@ from django.utils.dateparse import parse_datetime
 from django.db.models import Value, CharField
 from .models import Article,Guelekan
 from .forms import ArticleForm,GuelekanForm
+from .filters import ArticleFilterForm, GuelekanFilterForm
+from users.listing import paginate
 from .media_library import list_media_files  
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -16,7 +18,7 @@ from site_web.mailing import notify_publication
 
 from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
-from django.db.models import Q
+from django.db.models import Count, Q
 from datetime import datetime
 
 
@@ -120,52 +122,18 @@ def article_update(request, slug):
 # views.py
 @login_required
 def article_list(request):
-    articles = Article.objects.all().order_by('-created_at')
-    
-    # Filtrage
-    status = request.GET.get('status')
-    article_type = request.GET.get('type')
-    date_from = request.GET.get('date_from')
-    date_to = request.GET.get('date_to')
-    search_query = request.GET.get('search')
-    
-    if status:
-        articles = articles.filter(status=status)
-    
-    if article_type:
-        articles = articles.filter(article_type=article_type)
-    
-    if date_from:
-        try:
-            date_from = datetime.strptime(date_from, '%Y-%m-%d').date()
-            articles = articles.filter(created_at__date__gte=date_from)
-        except ValueError:
-            pass
-    
-    if date_to:
-        try:
-            date_to = datetime.strptime(date_to, '%Y-%m-%d').date()
-            articles = articles.filter(created_at__date__lte=date_to)
-        except ValueError:
-            pass
-    
-    if search_query:
-        articles = articles.filter(
-            Q(title__icontains=search_query) | 
-            Q(content__icontains=search_query) |
-            Q(subtitle__icontains=search_query)
-        )
-    
+    form = ArticleFilterForm(request.GET)
+    articles = form.apply(Article.objects.all().order_by('-created_at'))
+    page_obj, querystring = paginate(request, articles)
+    counts = {row['status']: row['n'] for row in Article.objects.values('status').annotate(n=Count('id'))}
     return render(request, 'articles/article_list.html', {
-        'articles': articles,
-      
-        'status_choices': Article.STATUS_CHOICES,
+        'form': form,
+        'page_obj': page_obj,
+        'querystring': querystring,
         'article_types': Article.ARTICLE_TYPE_CHOICES,
-        'selected_status': status,
-        'selected_type': article_type,
-        'date_from': date_from,
-        'date_to': date_to,
-        'search_query': search_query,
+        'status_tabs': [(value, label, counts.get(value, 0)) for value, label in Article.STATUS_CHOICES],
+        'total_count': sum(counts.values()),
+        'current_status': form.cleaned_data.get('status', ''),
     })
 
 
@@ -257,13 +225,19 @@ def generate_guelekan_slug(title):
 
 @login_required
 def guelekan_list(request):
-    guelekans = Guelekan.objects.all().order_by('-created_at')
+    form = GuelekanFilterForm(request.GET)
+    seminars = form.apply(Guelekan.objects.annotate(
+        n_guests=Count('intervenants', distinct=True), n_galleries=Count('galleries', distinct=True),
+    ).order_by('-created_at'))
+    page_obj, querystring = paginate(request, seminars)
+    counts = {row['status']: row['n'] for row in Guelekan.objects.values('status').annotate(n=Count('id'))}
     return render(request, 'articles/guelekan_list.html', {
-        'guelekans': guelekans,
-        'status_classes': {
-            'draft': 'text-warning',
-            'published': 'text-success',
-        }
+        'form': form,
+        'page_obj': page_obj,
+        'querystring': querystring,
+        'status_choices': Guelekan.STATUS_CHOICES,
+        'counts': counts,
+        'total_count': sum(counts.values()),
     })
 
 

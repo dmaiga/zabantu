@@ -54,3 +54,37 @@ class GuelekanBackofficeTests(TestCase):
         self.client.post(url)
         self.seminar.refresh_from_db()
         self.assertEqual(self.seminar.status, 'published')
+
+
+class ArticleListTests(TestCase):
+    def setUp(self):
+        self.client.force_login(make_user('moderateur'))
+        for i in range(25):
+            Article.objects.create(title=f'Etude {i:02d}', status='published' if i % 5 else 'draft',
+                                   article_type='analyse' if i % 2 else 'rapport', content='x')
+
+    def test_list_is_paginated(self):
+        r = self.client.get(reverse('article_list'))
+        self.assertEqual(len(r.context['page_obj']), 20)
+        self.assertEqual(r.context['page_obj'].paginator.count, 25)
+        self.assertEqual(len(self.client.get(reverse('article_list'), {'page': 2}).context['page_obj']), 5)
+
+    def test_filters_combine_and_survive_pagination(self):
+        r = self.client.get(reverse('article_list'), {'type': 'rapport', 'status': 'published'})
+        titles = [a.title for a in r.context['page_obj']]
+        self.assertTrue(titles)
+        self.assertTrue(all(a.article_type == 'rapport' and a.status == 'published' for a in r.context['page_obj']))
+        self.assertIn('type=rapport', r.context['querystring'])
+
+    def test_search_matches_the_title(self):
+        r = self.client.get(reverse('article_list'), {'q': 'Etude 07'})
+        self.assertEqual([a.title for a in r.context['page_obj']], ['Etude 07'])
+
+    def test_invalid_values_are_ignored_not_fatal(self):
+        r = self.client.get(reverse('article_list'), {'type': 'nope', 'date_from': 'pas-une-date', 'page': 'x'})
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.context['page_obj'].paginator.count, 25)
+
+    def test_status_tabs_show_counts(self):
+        r = self.client.get(reverse('article_list'))
+        self.assertEqual(dict((v, n) for v, _, n in r.context['status_tabs'])['draft'], 5)

@@ -1,54 +1,59 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="container mt-4">
-  <h2>Liste des utilisateurs</h2>
-   <a href="{% url 'create_member' %}" class="btn btn-success">
-              <i class="fas fa-plus me-1"></i> Créer
-            </a>
+{% extends 'list_base.html' %}
 
+{% block title %}Membres{% endblock %}
+{% block list_title %}Membres{% endblock %}
+{% block list_noun %}membre(s){% endblock %}
 
-  </a>          
-  <table class="table table-bordered table-striped mt-3">
-    <thead class="table-light">
-      <tr>
-        <th>Nom complet</th>
-        <th>Tel</th>
-        <th>Email</th>
-        <th>Rôle</th>
-        <th>Connexion</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
+{% block list_actions %}
+<a href="{% url 'create_member' %}" class="btn btn-primary"><i class="fas fa-plus me-1"></i> Nouveau membre</a>
+{% endblock %}
+
+{% block list_filters %}
+<form method="get" class="card card-body mb-3 row g-2 flex-row">
+    <div class="col-md-5"><input type="search" name="q" class="form-control" placeholder="Nom, prénom, e-mail, département…" value="{{ form.q.value|default:'' }}"></div>
+    <div class="col-md-2">
+        <select name="role" class="form-select" aria-label="Rôle">
+            <option value="">Tous les rôles</option>
+            {% for value, label in role_choices %}<option value="{{ value }}" {% if form.role.value == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select name="access" class="form-select" aria-label="Connexion">
+            <option value="">Connexion : tous</option>
+            <option value="yes" {% if form.access.value == 'yes' %}selected{% endif %}>Connexion autorisée</option>
+            <option value="no" {% if form.access.value == 'no' %}selected{% endif %}>Sans accès</option>
+        </select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+        <button class="btn btn-primary flex-fill">Filtrer</button>
+        <a href="{% url 'user_list' %}" class="btn btn-outline-secondary" title="Réinitialiser" aria-label="Réinitialiser"><i class="fas fa-rotate-left"></i></a>
+    </div>
+</form>
+{% endblock %}
+
+{% block list_table %}
+<table class="table align-middle mb-0">
+    <thead><tr><th>Membre</th><th>Contact</th><th>Rôle</th><th>Connexion</th><th class="text-end">Actions</th></tr></thead>
     <tbody>
-      {% for user in users %}
-      <tr>
-        <td>{{ user.nom }} {{ user.prenom }}</td>
-        <td>{{ user.phone_number }}</td>
-        <td>{{ user.email }}</td>
-        <td>{{ user.get_role_display }}</td>
-        <td>{% if user.can_access_backoffice %}<span class="badge bg-success">Autorisée</span>{% else %}<span class="badge bg-secondary">Sans accès</span>{% endif %}</td>
-        <td>
-        <div class="btn-group btn-group-sm">
-            <a href="{% url 'user_detail' user.id %}" class="btn btn-outline-info" title="Voir">
-                <i class="fas fa-eye"></i>
-            </a>
-            <a href="{% url 'update_user' user.id %}" class="btn btn-outline-primary" title="Modifier">
-                <i class="fas fa-edit"></i>
-            </a>
-            {% if user.role != 'admin' or request.user.role == 'admin' %}
-            <a href="{% url 'user_delete' user.id %}" class="btn btn-outline-danger" title="Supprimer">
-                <i class="fas fa-trash"></i>
-            </a>
-            {% endif %}
-        </div>
-    </td>
-</tr>
-      {% empty %}
-      <tr>
-        <td colspan="6">Aucun utilisateur trouvé.</td>
-      </tr>
-      {% endfor %}
+    {% for member in page_obj %}
+        <tr>
+            <td>
+                <a href="{% url 'user_detail' member.id %}" class="fw-semibold text-decoration-none text-dark">{{ member.prenom }} {{ member.nom|title }}</a>
+                {% if member.job_title %}<div class="small text-muted">{{ member.job_title }}</div>{% endif %}
+            </td>
+            <td class="small">{{ member.email }}{% if member.phone_number %}<div class="text-muted">{{ member.phone_number }}</div>{% endif %}</td>
+            <td><span class="badge bg-light text-dark border">{{ member.get_role_display }}</span></td>
+            <td>{% if member.can_access_backoffice %}<span class="badge bg-success">Autorisée</span>{% else %}<span class="badge bg-secondary">Sans accès</span>{% endif %}</td>
+            <td class="text-end">
+                <div class="d-inline-flex gap-1">
+                    {% url 'user_detail' member.id as detail_url %}{% include 'includes/icon_action.html' with url=detail_url icon='fa-eye' title='Voir' variant='primary' %}
+                    {% url 'update_user' member.id as edit_url %}{% include 'includes/icon_action.html' with url=edit_url icon='fa-pen' title='Modifier' variant='secondary' %}
+                </div>
+            </td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="5" class="text-center py-5 text-muted">Aucun membre ne correspond à ces critères.</td></tr>
+    {% endfor %}
     </tbody>
-  </table>
-</div>
+</table>
 {% endblock %}

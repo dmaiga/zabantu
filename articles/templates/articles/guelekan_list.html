@@ -1,56 +1,67 @@
-{% extends "base.html" %}
+{% extends 'list_base.html' %}
 
-{% block content %}
-<div class="container mt-4">
-    <h1 class="mb-4">Liste des Guelekan</h1>
-    
-    <a href="{% url 'guelekan_create' %}" class="btn btn-primary mb-3">
-        <i class="fas fa-plus"></i> Nouveau Guelekan
-    </a>
+{% block title %}Gɛlɛkan{% endblock %}
+{% block list_title %}Séminaires Gɛlɛkan{% endblock %}
+{% block list_noun %}séminaire(s){% endblock %}
 
-    <div class="table-responsive">
-        <table class="table table-hover">
-            <thead class="thead-light">
-                <tr>
-                    <th>Titre</th>
-                    <th>Statut</th>
-                    <th>Date</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for guelekan in guelekans %}
-                <tr>
-                    <td>{{ guelekan.title }}</td>
-                    <td>
-                        <span class="badge 
-                            {% if guelekan.status == 'published' %}bg-success
-                            {% else %}bg-warning{% endif %}">
-                            {{ guelekan.get_status_display }}
-                        </span>
-                    </td>
-                    <td>{{ guelekan.created_at|date:"d/m/Y" }}</td>
-                    <td>
-                        <div class="btn-group">
-                            <a href="{% url 'guelekan_detail' guelekan.slug %}" class="btn btn-sm btn-outline-primary">
-                               Voir
-                            </a>
-                            <a href="{% url 'guelekan_update' guelekan.slug %}" class="btn btn-sm btn-outline-secondary">
-                                Modifier
-                            </a>
-                            {% if guelekan.status == 'draft' %}
-                                {% url 'publish_guelekan' guelekan.slug as action_url %}{% include 'includes/post_action.html' with url=action_url label='Publier' btn_class='btn-sm btn-outline-success' icon='' %}
-                            {% endif %}
-                        </div>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" class="text-center">Aucun Guelekan trouvé</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+{% block list_actions %}
+<a href="{% url 'guelekan_create' %}" class="btn btn-primary"><i class="fas fa-plus me-1"></i> Nouveau séminaire</a>
+{% endblock %}
+
+{% block list_kpis %}
+<div class="row g-3 mb-3">
+    <div class="col-6 col-md-3"><div class="card card-body py-2"><small class="text-muted">Total</small><strong class="fs-4">{{ total_count }}</strong></div></div>
+    {% for value, label in status_choices %}
+    <div class="col-6 col-md-3"><div class="card card-body py-2"><small class="text-muted">{{ label }}s</small><strong class="fs-4">{% for key, n in counts.items %}{% if key == value %}{{ n }}{% endif %}{% empty %}0{% endfor %}{% if value not in counts %}0{% endif %}</strong></div></div>
+    {% endfor %}
 </div>
+{% endblock %}
+
+{% block list_filters %}
+<form method="get" class="card card-body mb-3 row g-2 flex-row">
+    <div class="col-md-7"><input type="search" name="q" class="form-control" placeholder="Rechercher un séminaire…" value="{{ form.q.value|default:'' }}"></div>
+    <div class="col-md-3">
+        <select name="status" class="form-select" aria-label="Statut">
+            <option value="">Tous les statuts</option>
+            {% for value, label in status_choices %}<option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+        <button class="btn btn-primary flex-fill">Filtrer</button>
+        <a href="{% url 'guelekan_list' %}" class="btn btn-outline-secondary" title="Réinitialiser" aria-label="Réinitialiser"><i class="fas fa-rotate-left"></i></a>
+    </div>
+</form>
+{% endblock %}
+
+{% block list_table %}
+<table class="table align-middle mb-0">
+    <thead><tr><th>Séminaire</th><th>Invités</th><th>Galeries</th><th>Statut</th><th class="text-end">Actions</th></tr></thead>
+    <tbody>
+    {% for guelekan in page_obj %}
+        <tr>
+            <td>
+                <a href="{% url 'guelekan_detail' guelekan.slug %}" class="fw-semibold text-decoration-none text-dark">{{ guelekan.title }}</a>
+                <div class="text-muted small">{% if guelekan.subtitle %}{{ guelekan.subtitle|truncatewords:8 }} · {% endif %}{{ guelekan.created_at|date:"d/m/Y" }}</div>
+            </td>
+            <td>{{ guelekan.n_guests }}</td>
+            <td>{{ guelekan.n_galleries }}</td>
+            <td>
+                <span class="badge {% if guelekan.status == 'published' %}bg-success{% elif guelekan.status == 'scheduled' %}bg-info text-dark{% else %}bg-warning text-dark{% endif %}">{{ guelekan.get_status_display }}</span>
+                {% if guelekan.status == 'scheduled' %}<div class="small text-muted">{{ guelekan.publish_at|date:"d/m/Y H:i" }}</div>{% endif %}
+            </td>
+            <td class="text-end">
+                <div class="d-inline-flex gap-1">
+                    {% url 'guelekan_detail' guelekan.slug as detail_url %}{% include 'includes/icon_action.html' with url=detail_url icon='fa-eye' title='Voir' variant='primary' %}
+                    {% url 'guelekan_update' guelekan.slug as edit_url %}{% include 'includes/icon_action.html' with url=edit_url icon='fa-pen' title='Modifier' variant='secondary' %}
+                    {% if user.can_moderate and guelekan.status == 'draft' %}
+                    {% url 'publish_guelekan' guelekan.slug as action_url %}{% include 'includes/post_action.html' with url=action_url label='' title='Publier' btn_class='btn-sm btn-outline-success' icon='fa-paper-plane' %}
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="5" class="text-center py-5 text-muted">Aucun séminaire ne correspond à ces critères.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

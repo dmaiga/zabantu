@@ -25,17 +25,18 @@ class EventListFilterTests(TestCase):
     def test_status_filter_does_not_crash_and_filters(self):
         r = self.client.get(reverse('event_list'), {'status': 'published'})
         self.assertEqual(r.status_code, 200)
-        self.assertEqual([e.title for e in r.context['events']], ['En ligne'])
+        self.assertEqual([e.title for e in r.context['page_obj']], ['En ligne'])
 
     def test_unknown_status_and_type_are_ignored(self):
         r = self.client.get(reverse('event_list'), {'status': 'nope', 'type': 'nope'})
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(len(r.context['events']), 2)
+        self.assertEqual(len(r.context['page_obj']), 2)
 
     def test_invalid_sort_falls_back_to_default(self):
         r = self.client.get(reverse('event_list'), {'sort': 'author__password'})
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.context['current_sort'], '-date')
+        dates = [e.date for e in r.context['page_obj']]
+        self.assertEqual(dates, sorted(dates, reverse=True))
 
 
 class EventPermissionTests(TestCase):
@@ -72,3 +73,34 @@ class EventPermissionTests(TestCase):
         r = self.client.post(reverse('event_publish', args=[self.event.id]))
         self.assertEqual(r.status_code, 302)
         self.assertIn('/auth/', r.url)
+
+
+class EventListPageTests(TestCase):
+    def setUp(self):
+        self.client.force_login(make_user('moderateur'))
+        for i in range(23):
+            make_event(title=f'Rencontre {i:02d}', status='published' if i % 2 else 'draft',
+                       event_type='conference' if i % 3 else 'seminaire',
+                       date=timezone.now() + timedelta(days=i - 10))
+
+    def test_single_paginated_table_without_grid_toggle(self):
+        r = self.client.get(reverse('event_list'))
+        self.assertEqual(len(r.context['page_obj']), 20)
+        self.assertNotContains(r, 'viewGrid')
+
+    def test_period_status_and_type_filters(self):
+        upcoming = self.client.get(reverse('event_list'), {'when': 'upcoming'}).context['page_obj'].paginator.count
+        past = self.client.get(reverse('event_list'), {'when': 'past'}).context['page_obj'].paginator.count
+        self.assertEqual(upcoming + past, 23)
+        r = self.client.get(reverse('event_list'), {'status': 'published', 'type': 'conference'})
+        self.assertTrue(all(e.status == 'published' and e.event_type == 'conference' for e in r.context['page_obj']))
+
+    def test_list_offers_no_delete_but_detail_does(self):
+        event = Event.objects.first()
+        self.assertNotContains(self.client.get(reverse('event_list')), reverse('event_delete', args=[event.id]))
+        self.assertContains(self.client.get(reverse('event_detail', args=[event.id])), reverse('event_delete', args=[event.id]))
+
+    def test_sort_oldest_first(self):
+        r = self.client.get(reverse('event_list'), {'sort': 'date'})
+        dates = [e.date for e in r.context['page_obj']]
+        self.assertEqual(dates, sorted(dates))

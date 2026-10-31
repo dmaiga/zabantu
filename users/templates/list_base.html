@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{# Modèle commun des listes du backoffice : en-tête, indicateurs, filtres, tableau paginé #}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div>
+            <h1 class="h3 mb-0">{% block list_title %}{% endblock %}</h1>
+            <p class="text-muted mb-0">{{ page_obj.paginator.count }} {% block list_noun %}élément(s){% endblock %}</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">{% block list_actions %}{% endblock %}</div>
+    </div>
+
+    {% block list_kpis %}{% endblock %}
+    {% block list_filters %}{% endblock %}
+
+    <div class="card">
+        <div class="table-responsive">{% block list_table %}{% endblock %}</div>
+        {% include 'includes/pagination.html' %}
+    </div>
+</div>
+{% endblock %}

@@ -1,388 +1,79 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'list_base.html' %}
 
-{% block title %}Événements - Zabantu{% endblock %}
+{% block title %}Événements{% endblock %}
+{% block list_title %}Événements{% endblock %}
+{% block list_noun %}événement(s){% endblock %}
 
-{% block extra_css %}
-<style>
-    .event-card { 
-        transition: transform 0.2s; 
-        height: 100%;
-        background: rgba(15, 23, 42, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .event-card:hover { 
-        transform: translateY(-5px); 
-        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-        border-color: rgba(99, 102, 241, 0.3);
-    }
-    .badge-webinar { 
-        background: var(--gradient-accent) !important; 
-    }
-    .badge-inperson { 
-        background: var(--gradient-primary) !important; 
-    }
-    .filter-section { 
-        background: rgba(15, 23, 42, 0.6); 
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px; 
-        padding: 20px; 
-        margin-bottom: 25px; 
-    }
-    .card-img-container {
-        height: 200px;
-        overflow: hidden;
-        background: rgba(15, 23, 42, 0.8);
-    }
-    .card-img-container img {
-        object-fit: cover;
-        width: 100%;
-        height: 100%;
-    }
-    .event-meta {
-        font-size: 0.9rem;
-        color: var(--bs-muted);
-    }
-    .event-actions {
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        padding-top: 15px;
-        margin-top: auto;
-        background: rgba(15, 23, 42, 0.8);
-    }
-    .form-control, .form-select {
-        background: rgba(15, 23, 42, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: var(--bs-light);
-    }
-    .form-control:focus, .form-select:focus {
-        background: rgba(15, 23, 42, 0.9);
-        border-color: var(--bs-primary);
-        box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
-        color: var(--bs-light);
-    }
-    .input-group-text {
-        background: rgba(15, 23, 42, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: var(--bs-muted);
-    }
-    .list-group-item {
-        background: rgba(15, 23, 42, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: var(--bs-light);
-    }
-    .list-group-item:hover {
-        background: rgba(15, 23, 42, 0.8);
-        border-color: rgba(99, 102, 241, 0.3);
-    }
-</style>
+{% block list_actions %}
+<a href="{% url 'event_create' %}" class="btn btn-primary"><i class="fas fa-plus me-1"></i> Nouvel événement</a>
 {% endblock %}
 
-{% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-calendar-alt me-2"></i>Gestion des Événements</h2>
-        {% if user.is_authenticated and user.is_staff %}
-        <a href="{% url 'event_create' %}" class="btn btn-primary">
-            <i class="fas fa-plus me-1"></i> Créer un événement
-        </a>
-        {% endif %}
+{% block list_filters %}
+<form method="get" class="card card-body mb-3 row g-2 flex-row align-items-end">
+    <div class="col-lg-3"><input type="search" name="q" class="form-control" placeholder="Rechercher…" value="{{ form.q.value|default:'' }}"></div>
+    <div class="col-lg-2">
+        <select name="type" class="form-select" aria-label="Type">
+            <option value="">Tous les types</option>
+            {% for value, label in type_choices %}<option value="{{ value }}" {% if form.type.value == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
     </div>
-
-    <!-- Filtres -->
-    <div class="filter-section">
-        <h5 class="mb-3"><i class="fas fa-filter me-2"></i>Filtres</h5>
-        <div class="row g-3">
-            <div class="col-md-3">
-                <label class="form-label small text-muted mb-1">Statut</label>
-                <select class="form-select" id="statusFilter">
-                    <option value="">Tous les statuts</option>
-                    <option value="published">Publiés</option>
-                    <option value="draft">Brouillons</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label small text-muted mb-1">Type</label>
-                <select class="form-select" id="typeFilter">
-                    <option value="">Tous les types</option>
-                    <option value="conference">Conférence</option>
-                    <option value="formation">Formation</option>
-                    <option value="seminaire">Séminaire</option>
-                    <option value="webinaire">Webinaire</option>
-                    <option value="atelier">Atelier</option>
-                    <option value="autre">Autre</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label small text-muted mb-1">Format</label>
-                <select class="form-select" id="formatFilter">
-                    <option value="">Tous les formats</option>
-                    <option value="webinar">En ligne</option>
-                    <option value="inperson">Présentiel</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label small text-muted mb-1">Recherche</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input type="text" class="form-control" id="searchInput" placeholder="Titre, lieu, thème...">
-                </div>
-            </div>
-        </div>
+    <div class="col-lg-2">
+        <select name="status" class="form-select" aria-label="Statut">
+            <option value="">Tous les statuts</option>
+            {% for value, label in status_choices %}<option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
     </div>
-
-    <!-- Compteur de résultats -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <span class="text-muted" id="resultsCount">
-            {{ events|length }} événement{{ events|length|pluralize:"s" }} trouvé{{ events|length|pluralize:"s" }}
-        </span>
-        <div class="btn-group btn-group-sm" role="group">
-            <button type="button" class="btn btn-outline-secondary active" id="viewGrid">
-                <i class="fas fa-th"></i>
-            </button>
-            <button type="button" class="btn btn-outline-secondary" id="viewList">
-                <i class="fas fa-list"></i>
-            </button>
-        </div>
+    <div class="col-lg-2">
+        <select name="when" class="form-select" aria-label="Période">
+            <option value="">Toutes les dates</option>
+            <option value="upcoming" {% if form.when.value == 'upcoming' %}selected{% endif %}>À venir</option>
+            <option value="past" {% if form.when.value == 'past' %}selected{% endif %}>Passés</option>
+        </select>
     </div>
-
-    <!-- Vue Grille -->
-    <div class="row" id="gridView">
-        {% for event in events %}
-        <div class="col-xl-4 col-lg-6 col-md-6 mb-4 event-item" 
-             data-status="{% if event.is_published %}published{% else %}draft{% endif %}" 
-             data-type="{{ event.event_type }}"
-             data-format="{% if event.is_webinar %}webinar{% else %}inperson{% endif %}"
-             data-title="{{ event.title|lower }}"
-             data-content="{{ event.content|lower }}"
-             data-location="{{ event.location|lower }}"
-             data-topic="{{ event.primary_topic|lower }}">
-            
-            <div class="card h-100 event-card">
-                <div class="card-img-container">
-                    {% if event.image %}
-                    <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}">
-                    {% else %}
-                    <div class="d-flex align-items-center justify-content-center h-100 text-muted">
-                        <i class="fas fa-calendar-alt fa-4x opacity-25"></i>
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <div class="card-body d-flex flex-column">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <div>
-                            <span class="badge bg-{% if event.is_published %}success{% else %}warning{% endif %} me-1">
-                                {% if event.is_published %}Publié{% else %}Brouillon{% endif %}
-                            </span>
-                            <span class="badge {% if event.is_webinar %}badge-webinar{% else %}badge-inperson{% endif %}">
-                                {% if event.is_webinar %}En ligne{% else %}Présentiel{% endif %}
-                            </span>
-                        </div>
-                        <span class="badge bg-secondary">{{ event.get_event_type_display }}</span>
-                    </div>
-                    
-                    <h5 class="card-title">{{ event.title }}</h5>
-                    
-                    <div class="event-meta mb-3">
-                        <div class="mb-1">
-                            <i class="fas fa-calendar-alt text-primary me-2"></i>
-                            <small>{{ event.date|date:"d/m/Y H:i" }}</small>
-                        </div>
-                        <div class="mb-1">
-                            <i class="fas fa-map-marker-alt text-primary me-2"></i>
-                            <small>
-                                {% if event.is_webinar %}
-                                <span class="text-muted">Webinaire</span>
-                                {% else %}
-                                {{ event.location|default:"Lieu non spécifié"|truncatewords:3 }}
-                                {% endif %}
-                            </small>
-                        </div>
-                        <div class="mb-1">
-                            <i class="fas fa-users text-primary me-2"></i>
-                            <small>{{ event.intervenants.count }} intervenant{{ event.intervenants.count|pluralize }}</small>
-                        </div>
-                    </div>
-                    
-                    {% if event.primary_topic %}
-                    <div class="mt-auto">
-                        <span class="badge bg-light text-dark">{{ event.primary_topic }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <!-- Dans la section des actions de chaque carte -->
-<div class="card-footer event-actions">
-    <div class="d-flex justify-content-between">
-        <a href="{% url 'event_detail' event.id %}" class="btn btn-sm btn-outline-primary">
-            <i class="fas fa-eye me-1"></i> Détails
-        </a>
-        {% if user.can_moderate %}
-        <div class="btn-group">
-            <a href="{% url 'event_update' event.id %}" class="btn btn-sm btn-outline-secondary">
-                <i class="fas fa-edit me-1"></i> Modifier
-            </a>
-            
-            <!-- Boutons de publication/dépublication -->
-            {% if event.is_published %}
-            {% url 'event_unpublish' event.id as action_url %}{% include 'includes/post_action.html' with url=action_url label='Dépublier' btn_class='btn-sm btn-outline-warning' icon='' %}
-            {% else %}
-            {% url 'event_publish' event.id as action_url %}{% include 'includes/post_action.html' with url=action_url label='Publier' btn_class='btn-sm btn-outline-success' icon='' %}
-            {% endif %}
-            
-            <a href="{% url 'event_delete' event.id %}" class="btn btn-sm btn-outline-danger">
-                <i class="fas fa-trash"></i>
-            </a>
-        </div>
-        {% endif %}
+    <div class="col-lg-3 d-flex gap-2">
+        <select name="sort" class="form-select" aria-label="Tri">
+            <option value="-date" {% if form.sort.value != 'date' %}selected{% endif %}>Plus récents</option>
+            <option value="date" {% if form.sort.value == 'date' %}selected{% endif %}>Plus anciens</option>
+        </select>
+        <button class="btn btn-primary">Filtrer</button>
+        <a href="{% url 'event_list' %}" class="btn btn-outline-secondary" title="Réinitialiser" aria-label="Réinitialiser"><i class="fas fa-rotate-left"></i></a>
     </div>
-</div>
-            </div>
-        </div>
-        {% empty %}
-        <div class="col-12">
-            <div class="text-center py-5">
-                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                <h4 class="text-muted">Aucun événement disponible</h4>
-                <p class="text-muted">Aucun événement n'a été créé pour le moment.</p>
-                {% if user.can_moderate %}
-                <a href="{% url 'event_create' %}" class="btn btn-primary mt-2">
-                    <i class="fas fa-plus me-1"></i> Créer le premier événement
-                </a>
-                {% endif %}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <!-- Vue Liste (cachée par défaut) -->
-    <div class="d-none" id="listView">
-        <div class="list-group">
-            {% for event in events %}
-            <div class="list-group-item event-item"
-                 data-status="{% if event.is_published %}published{% else %}draft{% endif %}" 
-                 data-type="{{ event.event_type }}"
-                 data-format="{% if event.is_webinar %}webinar{% else %}inperson{% endif %}"
-                 data-title="{{ event.title|lower }}"
-                 data-content="{{ event.content|lower }}"
-                 data-location="{{ event.location|lower }}"
-                 data-topic="{{ event.primary_topic|lower }}">
-                
-                <div class="d-flex justify-content-between align-items-start">
-                    <div class="flex-grow-1">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-{% if event.is_published %}success{% else %}warning{% endif %} me-2">
-                                {% if event.is_published %}Publié{% else %}Brouillon{% endif %}
-                            </span>
-                            <span class="badge {% if event.is_webinar %}badge-webinar{% else %}badge-inperson{% endif %} me-2">
-                                {% if event.is_webinar %}En ligne{% else %}Présentiel{% endif %}
-                            </span>
-                            <span class="badge bg-secondary me-2">{{ event.get_event_type_display }}</span>
-                        </div>
-                        
-                        <h5 class="mb-1">{{ event.title }}</h5>
-                        
-                        <div class="event-meta text-muted mb-2">
-                            <small>
-                                <i class="fas fa-calendar-alt me-1"></i>{{ event.date|date:"d/m/Y H:i" }} • 
-                                <i class="fas fa-map-marker-alt me-1"></i>
-                                {% if event.is_webinar %}Webinaire{% else %}{{ event.location|default:"Lieu non spécifié" }}{% endif %} • 
-                                <i class="fas fa-users me-1"></i>{{ event.intervenants.count }} intervenant{{ event.intervenants.count|pluralize }}
-                            </small>
-                        </div>
-                        
-                        {% if event.primary_topic %}
-                        <span class="badge bg-light text-dark">{{ event.primary_topic }}</span>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="btn-group ms-3">
-                        <a href="{% url 'event_detail' event.id %}" class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        {% if user.can_moderate %}
-                        <a href="{% url 'event_update' event.id %}" class="btn btn-sm btn-outline-secondary">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a href="{% url 'event_delete' event.id %}" class="btn btn-sm btn-outline-danger">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
+</form>
 {% endblock %}
 
-{% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Filtrage des événements
-        function filterEvents() {
-            const status = document.getElementById('statusFilter').value;
-            const type = document.getElementById('typeFilter').value;
-            const format = document.getElementById('formatFilter').value;
-            const searchText = document.getElementById('searchInput').value.toLowerCase();
-            
-            let visibleCount = 0;
-            
-            document.querySelectorAll('.event-item').forEach(item => {
-                const itemStatus = item.getAttribute('data-status');
-                const itemType = item.getAttribute('data-type');
-                const itemFormat = item.getAttribute('data-format');
-                const itemTitle = item.getAttribute('data-title');
-                const itemContent = item.getAttribute('data-content');
-                const itemLocation = item.getAttribute('data-location');
-                const itemTopic = item.getAttribute('data-topic');
-                
-                let show = true;
-                
-                if (status && itemStatus !== status) show = false;
-                if (type && itemType !== type) show = false;
-                if (format && itemFormat !== format) show = false;
-                if (searchText && 
-                    !itemTitle.includes(searchText) && 
-                    !itemContent.includes(searchText) &&
-                    !itemLocation.includes(searchText) &&
-                    !itemTopic.includes(searchText)) {
-                    show = false;
-                }
-                
-                item.style.display = show ? '' : 'none';
-                if (show) visibleCount++;
-            });
-            
-            // Mettre à jour le compteur de résultats
-            document.getElementById('resultsCount').textContent = 
-                visibleCount + ' événement' + (visibleCount !== 1 ? 's' : '') + ' trouvé' + (visibleCount !== 1 ? 's' : '');
-        }
-        
-        // Basculer entre les vues grille/liste
-        document.getElementById('viewGrid').addEventListener('click', function() {
-            document.getElementById('gridView').classList.remove('d-none');
-            document.getElementById('listView').classList.add('d-none');
-            this.classList.add('active');
-            document.getElementById('viewList').classList.remove('active');
-        });
-        
-        document.getElementById('viewList').addEventListener('click', function() {
-            document.getElementById('gridView').classList.add('d-none');
-            document.getElementById('listView').classList.remove('d-none');
-            this.classList.add('active');
-            document.getElementById('viewGrid').classList.remove('active');
-        });
-        
-        // Appliquer les filtres
-        document.getElementById('statusFilter').addEventListener('change', filterEvents);
-        document.getElementById('typeFilter').addEventListener('change', filterEvents);
-        document.getElementById('formatFilter').addEventListener('change', filterEvents);
-        document.getElementById('searchInput').addEventListener('input', filterEvents);
-        
-        // Initialiser le compteur
-        filterEvents();
-    });
-</script>
+{% block list_table %}
+<table class="table align-middle mb-0">
+    <thead><tr><th>Date</th><th>Événement</th><th>Type</th><th>Lieu</th><th>Statut</th><th class="text-end">Actions</th></tr></thead>
+    <tbody>
+    {% for event in page_obj %}
+        <tr>
+            <td class="text-nowrap"><strong>{{ event.date|date:"d/m/Y" }}</strong><div class="small text-muted">{{ event.date|time:"H:i" }}</div></td>
+            <td>
+                <a href="{% url 'event_detail' event.id %}" class="fw-semibold text-decoration-none text-dark">{{ event.title }}</a>
+                {% if event.is_featured %}<span class="badge bg-warning text-dark ms-1">À la une</span>{% endif %}
+            </td>
+            <td class="small">{% if event.event_type == 'seminaire' %}<span class="badge bg-dark">Gɛlɛkan</span>{% else %}{{ event.get_event_type_display }}{% endif %}</td>
+            <td class="small text-muted">{% if event.is_webinar %}En ligne{% else %}{{ event.location|default:"—" }}{% endif %}</td>
+            <td><span class="badge {% if event.status == 'published' %}bg-success{% elif event.status == 'archived' %}bg-secondary{% else %}bg-warning text-dark{% endif %}">{{ event.get_status_display }}</span></td>
+            <td class="text-end">
+                <div class="d-inline-flex gap-1">
+                    {% url 'event_detail' event.id as detail_url %}{% include 'includes/icon_action.html' with url=detail_url icon='fa-eye' title='Voir' variant='primary' %}
+                    {% if user.can_moderate or user == event.author %}
+                    {% url 'event_update' event.id as edit_url %}{% include 'includes/icon_action.html' with url=edit_url icon='fa-pen' title='Modifier' variant='secondary' %}
+                    {% endif %}
+                    {% if user.can_moderate %}
+                        {% if event.status == 'published' %}
+                        {% url 'event_unpublish' event.id as action_url %}{% include 'includes/post_action.html' with url=action_url label='' title='Dépublier' btn_class='btn-sm btn-outline-warning' icon='fa-eye-slash' %}
+                        {% elif event.status == 'draft' %}
+                        {% url 'event_publish' event.id as action_url %}{% include 'includes/post_action.html' with url=action_url label='' title='Publier' btn_class='btn-sm btn-outline-success' icon='fa-paper-plane' %}
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="6" class="text-center py-5 text-muted">Aucun événement ne correspond à ces critères.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

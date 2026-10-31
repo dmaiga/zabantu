@@ -1,52 +1,44 @@
-{% extends "base.html" %}
-{% block title %}Gestion des Partenaires{% endblock %}
+{% extends 'list_base.html' %}
 
-{% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="h4 fw-bold text-dark">Nos Partenaires</h2>
-    <a href="{% url 'partenaire_create' %}" class="btn btn-primary px-4 shadow-sm">
-        <i class="fas fa-plus me-2"></i> Ajouter un partenaire
-    </a>
-</div>
+{% block title %}Partenaires{% endblock %}
+{% block list_title %}Partenaires{% endblock %}
+{% block list_noun %}partenaire(s){% endblock %}
 
-<div class="row g-4">
-    {% for p in partenaires %}
-    <div class="col-md-4 col-lg-3">
-        <div class="card h-100 border-0 shadow-sm overflow-hidden text-center p-3">
-            <div class="d-flex justify-content-center align-items-center mb-3" style="height: 100px;">
-                {% if p.logo %}
-                    <img src="{{ p.logo.url }}" class="img-fluid rounded" style="max-height: 80px; object-fit: contain;">
-                {% else %}
-                    <div class="bg-light rounded d-flex align-items-center justify-content-center w-100 h-100">
-                        <i class="fas fa-image fa-2x text-muted"></i>
-                    </div>
-                {% endif %}
-            </div>
-            
-            <h5 class="card-title h6 fw-bold mb-1">{{ p.name }}</h5>
-            <p class="text-muted small mb-3">Ordre d'affichage : <strong>{{ p.order }}</strong></p>
-            
-            <div class="mb-3">
-                {% if p.is_active %}
-                    <span class="badge bg-success-subtle text-success px-3 rounded-pill">Actif</span>
-                {% else %}
-                    <span class="badge bg-danger-subtle text-danger px-3 rounded-pill">Inactif</span>
-                {% endif %}
-            </div>
+{% block list_actions %}
+<a href="{% url 'partenaire_create' %}" class="btn btn-primary"><i class="fas fa-plus me-1"></i> Nouveau partenaire</a>
+{% endblock %}
 
-            <div class="d-flex gap-2 justify-content-center border-top pt-3">
-                <a href="{% url 'partenaire_detail' p.pk %}" class="btn btn-sm btn-light border" title="Détails">
-                    Detail
-                </a>
-                {% url 'partenaire_toggle' p.pk as action_url %}{% include 'includes/post_action.html' with url=action_url label=p.is_active|yesno:'Désactiver,Activer' btn_class='btn-sm btn-outline-secondary' icon='fa-power-off' %}
-               
-            </div>
-        </div>
+{% block list_filters %}
+<form method="get" class="card card-body mb-3 row g-2 flex-row">
+    <div class="col-md-10"><input type="search" name="q" class="form-control" placeholder="Rechercher un partenaire…" value="{{ query }}"></div>
+    <div class="col-md-2 d-flex gap-2">
+        <button class="btn btn-primary flex-fill">Filtrer</button>
+        <a href="{% url 'partenaire_list' %}" class="btn btn-outline-secondary" title="Réinitialiser" aria-label="Réinitialiser"><i class="fas fa-rotate-left"></i></a>
     </div>
+</form>
+{% endblock %}
+
+{% block list_table %}
+<table class="table align-middle mb-0">
+    <thead><tr><th>Logo</th><th>Partenaire</th><th>Ordre</th><th>Visibilité</th><th class="text-end">Actions</th></tr></thead>
+    <tbody>
+    {% for p in page_obj %}
+        <tr>
+            <td style="width:96px;">{% if p.logo %}<img src="{{ p.logo.url }}" alt="" style="max-height:44px; max-width:84px; object-fit:contain;">{% else %}<span class="text-muted">—</span>{% endif %}</td>
+            <td><a href="{% url 'partenaire_detail' p.pk %}" class="fw-semibold text-decoration-none text-dark">{{ p.name }}</a></td>
+            <td>{{ p.order }}</td>
+            <td><span class="badge {% if p.is_active %}bg-success{% else %}bg-secondary{% endif %}">{% if p.is_active %}Affiché sur le site{% else %}Masqué{% endif %}</span></td>
+            <td class="text-end">
+                <div class="d-inline-flex gap-1">
+                    {% url 'partenaire_update' p.pk as edit_url %}{% include 'includes/icon_action.html' with url=edit_url icon='fa-pen' title='Modifier' variant='secondary' %}
+                    {% url 'partenaire_toggle' p.pk as action_url %}{% include 'includes/post_action.html' with url=action_url label='' title=p.is_active|yesno:'Masquer sur le site,Afficher sur le site' btn_class='btn-sm btn-outline-warning' icon='fa-power-off' %}
+                    {% url 'partenaire_delete' p.pk as action_url %}{% include 'includes/post_action.html' with url=action_url label='' title='Supprimer' btn_class='btn-sm btn-outline-danger' icon='fa-trash' confirm='Supprimer ce partenaire ? Cette action est définitive.' %}
+                </div>
+            </td>
+        </tr>
     {% empty %}
-    <div class="col-12 text-center py-5">
-        <div class="text-muted">Aucun partenaire enregistré.</div>
-    </div>
+        <tr><td colspan="5" class="text-center py-5 text-muted">Aucun partenaire.</td></tr>
     {% endfor %}
-</div>
+    </tbody>
+</table>
 {% endblock %}
