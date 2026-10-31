@@ -1,0 +1,16 @@
+{% extends 'emails/base_email.html' %}
+{% block title %}Accès à l'espace de gestion{% endblock %}
+{% block heading %}Votre accès est activé{% endblock %}
+{% block body %}
+<p style="margin:0 0 16px;">Bonjour {{ name }},</p>
+<p style="margin:0 0 16px;">L'équipe Zabantu vous a donné accès à l'espace de gestion du site.</p>
+{% if password_url %}
+<p style="margin:0 0 16px;">Pour vous connecter, commencez par choisir votre mot de passe :</p>
+<p style="text-align:center; margin:24px 0;">
+    <a href="{{ password_url }}" style="display:inline-block; background:#bf9264; color:#ffffff; text-decoration:none; padding:12px 28px; border-radius:30px; font-weight:bold;">Choisir mon mot de passe</a>
+</p>
+<p style="margin:0; font-size:14px;">Ce lien est valable quelques jours. Une fois votre mot de passe choisi, connectez-vous depuis <a href="{{ login_url }}" style="color:#6f826a;">la page de connexion</a>.</p>
+{% else %}
+<p style="margin:0;">Vous pouvez vous connecter depuis <a href="{{ login_url }}" style="color:#6f826a;">la page de connexion</a>.</p>
+{% endif %}
+{% endblock %}

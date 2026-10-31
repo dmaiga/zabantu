@@ -1,0 +1,9 @@
+{% extends 'emails/base_email.html' %}
+{% block title %}Adhésion validée{% endblock %}
+{% block heading %}Bienvenue chez Zabantu{% endblock %}
+{% block body %}
+<p style="margin:0 0 16px;">Bonjour {{ name }},</p>
+<p style="margin:0 0 16px;">Bonne nouvelle : votre adhésion au groupe de recherche Zabantu est validée. Votre profil figure désormais parmi <a href="{{ members_url }}" style="color:#6f826a;">les membres sur le site</a>.</p>
+<p style="margin:0 0 16px;">Nous vous tiendrons informé de nos séminaires Gɛlɛkan, de nos événements et de nos publications.</p>
+<p style="margin:0;">Bienvenue parmi nous,<br>L'équipe Zabantu</p>
+{% endblock %}

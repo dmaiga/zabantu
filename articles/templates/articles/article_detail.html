@@ -28,6 +28,7 @@
                     <i class="fas fa-edit"></i> Modifier
                 </a>
                 {% url 'publish_article' article.slug as action_url %}{% include 'includes/post_action.html' with url=action_url label='Publier' btn_class='btn-outline-success' icon='fa-paper-plane' %}
+                {% url 'schedule_article' article.slug as schedule_url %}{% url 'unpublish_article' article.slug as cancel_url %}{% include 'includes/schedule_form.html' with obj=article %}
                 {% endif %}
                 
                 {% if article.status == 'published' %}

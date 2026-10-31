@@ -1,0 +1,11 @@
+{# Programmation de la publication. Paramètres : obj, schedule_url, cancel_url #}
+{% if obj.status == 'scheduled' %}
+    <span class="badge bg-info text-dark align-self-center">Programmé le {{ obj.publish_at|date:"d/m/Y à H:i" }}</span>
+    {% include 'includes/post_action.html' with url=cancel_url label='Annuler la programmation' btn_class='btn-outline-secondary' icon='fa-xmark' %}
+{% else %}
+    <form method="post" action="{{ schedule_url }}" class="d-inline-flex gap-2 align-items-center">
+        {% csrf_token %}
+        <input type="datetime-local" name="publish_at" class="form-control" required aria-label="Date et heure de publication">
+        <button type="submit" class="btn btn-outline-info text-nowrap"><i class="fas fa-clock"></i> Programmer</button>
+    </form>
+{% endif %}

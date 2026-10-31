@@ -1,0 +1,9 @@
+{# Case « accès au backoffice » : présente seulement pour ceux qui peuvent la modifier #}
+{% if form.backoffice_access %}
+<div class="form-check form-switch mb-3 p-3 ps-5 border rounded bg-light">
+    {{ form.backoffice_access }}
+    <label class="form-check-label fw-semibold" for="{{ form.backoffice_access.id_for_label }}">{{ form.backoffice_access.label }}</label>
+    <div class="form-text">Désactivé par défaut. Modifiable à tout moment : retirer l'accès coupe aussi les sessions ouvertes. Les administrateurs et modérateurs se connectent toujours.</div>
+    {% for error in form.backoffice_access.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+</div>
+{% endif %}

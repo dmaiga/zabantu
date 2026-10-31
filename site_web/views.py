@@ -132,12 +132,16 @@ def contact(request):
     }
     return render(request, 'site_web/public_contact.html', context)
 
+from . import mailing
+
+
 def membership_apply(request):
     """Formulaire public de demande d'adhésion (assistant en plusieurs étapes)"""
     if request.method == 'POST':
         form = MembershipApplicationForm(request.POST, request.FILES)
         if form.is_valid():
             application = form.save()
+            mailing.send_application_received(application)
             request.session['membership_thanks'] = application.full_name
             return redirect('membership_thanks')
         messages.error(request, "Veuillez corriger les erreurs signalées.")
@@ -600,9 +604,9 @@ from django.http import HttpResponse
 from .models import NewsletterSubscriber
 from django.contrib import messages
 
-def newsletter_unsubscribe(request, subscriber_id):
-    """Vue pour gérer le désabonnement de la newsletter"""
-    subscriber = get_object_or_404(NewsletterSubscriber, id=subscriber_id)
+def newsletter_unsubscribe(request, token):
+    """Désabonnement de l'infolettre, via le jeton propre à chaque abonné"""
+    subscriber = get_object_or_404(NewsletterSubscriber, token=token)
     
     if request.method == 'POST':
         # Désabonnement confirmé

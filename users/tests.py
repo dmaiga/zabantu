@@ -114,3 +114,92 @@ class PartenaireBackofficeTests(TestCase):
         self.client.post(url)
         self.partenaire.refresh_from_db()
         self.assertFalse(self.partenaire.is_active)
+
+
+class BackofficeAccessTests(TestCase):
+    PASSWORD = 'secret-pass-123'
+
+    def login(self, user):
+        return self.client.post(reverse('login'), {'username': user.username, 'password': self.PASSWORD})
+
+    def test_member_cannot_log_in_by_default(self):
+        from users.testing import make_user
+        member = make_user('membre', backoffice_access=False)
+        r = self.login(member)
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, 'pas accès')
+        self.assertNotIn('_auth_user_id', self.client.session)
+
+    def test_wrong_password_still_says_invalid_credentials(self):
+        from users.testing import make_user
+        member = make_user('membre', backoffice_access=False)
+        r = self.client.post(reverse('login'), {'username': member.username, 'password': 'faux'})
+        self.assertContains(r, 'Identifiants invalides')
+
+    def test_allowed_member_moderator_and_admin_can_log_in(self):
+        from users.testing import make_user
+        for role, flag in (('membre', True), ('moderateur', False), ('admin', False)):
+            self.client.logout()
+            user = make_user(role, backoffice_access=flag)
+            self.assertRedirects(self.login(user), reverse('dashboard'), fetch_redirect_response=False, msg_prefix=role)
+
+    def test_removing_access_cuts_the_open_session(self):
+        from users.testing import make_user
+        member = make_user('membre')
+        self.login(member)
+        self.assertEqual(self.client.get(reverse('dashboard')).status_code, 200)
+        member.backoffice_access = False
+        member.save()
+        r = self.client.get(reverse('dashboard'))
+        self.assertEqual(r.status_code, 302)
+        self.assertIn('/auth/', r.url)
+
+    def test_creating_a_member_defaults_to_no_access_and_sends_no_email(self):
+        from users.testing import make_user
+        self.client.force_login(make_user('moderateur'))
+        data = {'email': 'nouveau@test.org', 'nom': 'Doe', 'prenom': 'Jane'}
+        self.client.post(reverse('create_member'), data)
+        member = get_user_model().objects.get(email='nouveau@test.org')
+        self.assertFalse(member.backoffice_access)
+        self.assertEqual(mail.outbox, [])
+
+    def test_granting_access_at_creation_emails_a_password_link_that_works(self):
+        from users.testing import make_user
+        self.client.force_login(make_user('moderateur'))
+        self.client.post(reverse('create_member'), {
+            'email': 'acces@test.org', 'nom': 'Doe', 'prenom': 'Jane', 'backoffice_access': 'on'})
+        self.assertEqual([m.to for m in mail.outbox], [['acces@test.org']])
+        html = mail.outbox[0].alternatives[0][0]
+        link = html.split('/password-reset-confirm/')[1].split('"')[0]
+        r = self.client.get('/password-reset-confirm/' + link, follow=True)
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, 'password')
+
+    def test_moderator_can_grant_then_revoke_access_on_an_existing_member(self):
+        from users.testing import make_user
+        member = make_user('membre', backoffice_access=False)
+        self.client.force_login(make_user('moderateur'))
+        url = reverse('update_user', args=[member.pk])
+        base = {'nom': 'Test', 'prenom': 'Membre', 'email': member.email}
+        self.client.post(url, {**base, 'backoffice_access': 'on'})
+        member.refresh_from_db()
+        self.assertTrue(member.backoffice_access)
+        self.client.post(url, base)
+        member.refresh_from_db()
+        self.assertFalse(member.backoffice_access)
+
+    def test_member_cannot_edit_someone_else_or_grant_access(self):
+        from users.testing import make_user
+        other = make_user('membre', backoffice_access=False)
+        me = make_user('membre')
+        self.client.force_login(me)
+        self.assertEqual(self.client.get(reverse('update_user', args=[other.pk])).status_code, 403)
+        r = self.client.get(reverse('update_user', args=[me.pk]))
+        self.assertEqual(r.status_code, 200)
+        self.assertNotIn('backoffice_access', r.context['form'].fields)
+
+    def test_moderator_cannot_edit_an_admin(self):
+        from users.testing import make_user
+        admin = make_user('admin')
+        self.client.force_login(make_user('moderateur'))
+        self.assertEqual(self.client.get(reverse('update_user', args=[admin.pk])).status_code, 403)

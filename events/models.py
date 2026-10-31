@@ -100,6 +100,10 @@ class Event(models.Model):
     @property
     def is_published(self):
         return self.status == 'published'
+
+    def get_public_url(self):
+        from django.urls import reverse
+        return reverse('public_event_detail', args=[self.pk])
     
     def __str__(self):
         return f"{self.title} ({self.get_status_display()})"

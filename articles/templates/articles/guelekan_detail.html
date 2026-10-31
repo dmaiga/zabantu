@@ -31,6 +31,7 @@
                         {% url 'unpublish_guelekan' guelekan.slug as action_url %}{% include 'includes/post_action.html' with url=action_url label='Dépublier' btn_class='btn-outline-warning' icon='fa-eye-slash' %}
                     {% else %}
                         {% url 'publish_guelekan' guelekan.slug as action_url %}{% include 'includes/post_action.html' with url=action_url label='Publier' btn_class='btn-outline-success' icon='fa-paper-plane' %}
+                        {% url 'schedule_guelekan' guelekan.slug as schedule_url %}{% url 'unpublish_guelekan' guelekan.slug as cancel_url %}{% include 'includes/schedule_form.html' with obj=guelekan %}
                     {% endif %}
                     {% if user.can_moderate %}
                     <a href="{% url 'guelekan_delete' guelekan.slug %}" class="btn btn-outline-danger">

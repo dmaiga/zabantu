@@ -5,14 +5,14 @@ from users.permissions import moderator_required
 from django.contrib import messages
 from django.utils.text import slugify
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.db.models import Value, CharField
 from .models import Article,Guelekan
 from .forms import ArticleForm,GuelekanForm
 from .media_library import list_media_files  
 from django.conf import settings
 from django.template.loader import render_to_string
-from site_web.models import NewsletterSubscriber
-from site_web.email_utils import send_newsletter_email
+from site_web.mailing import notify_publication
 
 from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
@@ -188,6 +188,33 @@ def article_delete(request, slug):
     return render(request, 'articles/article_confirm_delete.html', {'article': article})
 
 # articles/views.py
+def _schedule(request, obj, label, redirect_name):
+    """Programme la publication de `obj` à la date postée (datetime-local)."""
+    when = parse_datetime(request.POST.get('publish_at', ''))
+    if when is not None and timezone.is_naive(when):
+        when = timezone.make_aware(when)
+    if when is None or when <= timezone.now():
+        messages.error(request, "Indiquez une date et une heure de publication dans le futur.")
+    else:
+        obj.status = 'scheduled'
+        obj.publish_at = when
+        obj.save()
+        messages.success(request, f"{label} « {obj.title} » sera publié(e) le {timezone.localtime(when):%d/%m/%Y à %H:%M}.")
+    return redirect(redirect_name, slug=obj.slug)
+
+
+@require_POST
+@moderator_required
+def schedule_article(request, slug):
+    return _schedule(request, get_object_or_404(Article, slug=slug), "La publication", 'article_detail')
+
+
+@require_POST
+@moderator_required
+def schedule_guelekan(request, slug):
+    return _schedule(request, get_object_or_404(Guelekan, slug=slug), "Le Gɛlɛkan", 'guelekan_detail')
+
+
 @require_POST
 @moderator_required
 def publish_article(request, slug):
@@ -196,9 +223,7 @@ def publish_article(request, slug):
         article.status = 'published'
         article.publish_at = timezone.now()  # Date de publication actuelle
         article.save()
-        # Envoyer une newsletter si configuré
-        if settings.SEND_NEWSLETTER_ON_PUBLISH:
-            send_content_published_newsletter(article, "Nouvelle publication")
+        notify_publication(article)
 
         messages.success(request, f"L'article « {article.title} » a été publié.")
     return redirect('article_detail', slug=slug)
@@ -208,11 +233,11 @@ def publish_article(request, slug):
 @moderator_required
 def unpublish_article(request, slug):
     article = get_object_or_404(Article, slug=slug)
-    if article.is_published():
+    if article.status in ('published', 'scheduled'):
         article.status = 'draft'
         article.publish_at = None  # Réinitialiser la date de publication
         article.save()
-        messages.warning(request, f"L'article « {article.title} » a été dépublié.")
+        messages.warning(request, f"La publication « {article.title} » est repassée en brouillon.")
     return redirect('article_detail', slug=slug)
 
 #
@@ -250,7 +275,9 @@ def guelekan_create(request):
         if form.is_valid():
            
             guelekan = form.save()
-            
+            if guelekan.status == 'published':
+                notify_publication(guelekan)
+
             messages.success(request, 'Séminaire créé avec succès!')
             return redirect('guelekan_detail', slug=guelekan.slug)
     else:
@@ -267,7 +294,9 @@ def guelekan_update(request, slug):
         if form.is_valid():
             
             guelekan = form.save()
-            
+            if guelekan.status == 'published':
+                notify_publication(guelekan)
+
             messages.success(request, 'Séminaire mis à jour!')
             return redirect('guelekan_detail', slug=guelekan.slug)
     else:
@@ -309,8 +338,9 @@ def guelekan_delete(request, slug):
 @moderator_required
 def unpublish_guelekan(request, slug):
     guelekan = get_object_or_404(Guelekan, slug=slug)
-    if guelekan.is_published():
+    if guelekan.status in ('published', 'scheduled'):
         guelekan.status = 'draft'
+        guelekan.publish_at = None
         guelekan.save()
         messages.warning(request, f"Le Gɛlɛkan « {guelekan.title} » a été dépublié.")
     return redirect('guelekan_detail', slug=slug)
@@ -323,40 +353,6 @@ def publish_guelekan(request, slug):
     if not guelekan.is_published():
         guelekan.status = 'published'
         guelekan.save()
-        
-        # Envoyer une newsletter si configuré
-        if settings.SEND_NEWSLETTER_ON_PUBLISH:
-            send_content_published_newsletter(guelekan, "Nouvelle publication")
-            
+        notify_publication(guelekan)
         messages.success(request, f"Le Gɛlɛkan « {guelekan.title} » a été publié.")
     return redirect('guelekan_detail', slug=slug)
-
-
-def send_content_published_newsletter(content, content_type):
-    """Envoyer une newsletter pour un nouveau contenu publié"""
-    subscribers = NewsletterSubscriber.objects.all()
-    success_count = 0
-    error_count = 0
-    
-    for subscriber in subscribers:
-        try:
-            # Créer le contenu HTML
-            html_content = render_to_string('emails/content_published.html', {
-                'content': content,
-                'content_type': content_type,
-                'unsubscribe_url': f"{settings.SITE_URL}/newsletter/unsubscribe/{subscriber.id}/"
-            })
-            
-            # Envoyer l'email
-            subject = f"{content_type} : {content.title}"
-            if send_newsletter_email(subject, html_content, [subscriber.email]):
-                success_count += 1
-            else:
-                error_count += 1
-            
-        except Exception as e:
-            error_count += 1
-            # Loguer l'erreur
-            print(f"Erreur lors de l'envoi à {subscriber.email}: {e}")
-    
-    return success_count, error_count

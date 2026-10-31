@@ -49,9 +49,7 @@
                                     <a href="{% url 'newsletter_campaign_edit' campaign.pk %}" class="btn btn-primary" title="Modifier">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="{% url 'newsletter_campaign_send' campaign.pk %}" class="btn btn-success" title="Envoyer" onclick="return confirm('Êtes-vous sûr de vouloir envoyer cette campagne ?')">
-                                        <i class="fas fa-paper-plane"></i>
-                                    </a>
+                                    {% url 'newsletter_campaign_send' campaign.pk as action_url %}{% include 'includes/post_action.html' with url=action_url label='Envoyer' btn_class='btn-success' icon='fa-paper-plane' confirm='Envoyer cette campagne à tous ses destinataires ?' %}
                                     {% endif %}
                                     <form action="{% url 'newsletter_campaign_delete' campaign.pk %}" method="post" class="d-inline">
                                         {% csrf_token %}

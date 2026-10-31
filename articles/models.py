@@ -18,6 +18,7 @@ def article_upload_path(instance, filename):
 class Article(models.Model):
     STATUS_CHOICES = (
         ('draft', 'Brouillon'),
+        ('scheduled', 'Programmé'),
         ('published', 'Publié'),
     )
     
@@ -102,6 +103,9 @@ class Article(models.Model):
         """Vérifie si l'article est publié"""
         return self.status == 'published'
 
+    def get_public_url(self):
+        return reverse('public_article_detail', args=[self.slug])
+
     def save(self, *args, **kwargs):
         # Génération automatique du slug
         if not self.slug:
@@ -120,7 +124,9 @@ class Article(models.Model):
         # Date de publication automatique
         if self.status == 'published' and not self.publish_at:
             self.publish_at = timezone.now()
-        elif self.status != 'published':
+        elif self.status == 'scheduled' and not self.publish_at:
+            self.status = 'draft'  # une programmation sans date n'a pas de sens
+        elif self.status == 'draft':
             self.publish_at = None
 
         super().save(*args, **kwargs)
@@ -193,6 +199,7 @@ def guelekan_upload_path(instance, filename):
 class Guelekan(models.Model):
     STATUS_CHOICES = (
         ('draft', 'Brouillon'),
+        ('scheduled', 'Programmé'),
         ('published', 'Publié'),
     )
 
@@ -272,8 +279,14 @@ class Guelekan(models.Model):
             description_source = self.subtitle if self.subtitle else clean_content
             self.meta_description = Truncator(description_source).chars(160)
 
+        if self.status == 'scheduled' and not self.publish_at:
+            self.status = 'draft'  # une programmation sans date n'a pas de sens
+
         super().save(*args, **kwargs)
     
+    def get_public_url(self):
+        return reverse('public_guelekan_detail', args=[self.slug])
+
     def is_visible(self):
         """Vérifie si l'article est publié ET que la date de publication est passée"""
         return (self.status == 'published' and 

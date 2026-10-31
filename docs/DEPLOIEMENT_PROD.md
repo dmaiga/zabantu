@@ -126,6 +126,18 @@ for u in U.objects.filter(is_superuser=True, role='membre'): u.save(); print('co
 Redémarrer le processus Django (gunicorn, Passenger ou équivalent). C'est obligatoire : les nouvelles bibliothèques de balises de gabarit
 (`photo_tags`) ne sont détectées qu'au redémarrage.
 
+### 4.8 Publications programmées (tâche cron)
+Une publication ou un Gɛlɛkan « Programmé » est publié, puis annoncé aux abonnés, par une commande à lancer régulièrement.
+Ajouter une tâche cron (toutes les 5 minutes suffisent), avec les chemins du serveur :
+```cron
+*/5 * * * * cd /chemin/vers/zabantu && /chemin/vers/.venv/bin/python manage.py publish_scheduled >> /chemin/vers/logs/publish_scheduled.log 2>&1
+```
+Tester à la main avant d'activer le cron : `python manage.py publish_scheduled` (affiche « 0 contenu(s) publié(s) » s'il n'y a rien à faire).
+La commande peut être relancée sans risque : un contenu n'est publié et annoncé qu'une fois.
+
+Variables d'environnement utiles aux e-mails : `SITE_URL` (liens des e-mails), `EMAIL_HOST_USER_MAIN` / `EMAIL_HOST_PASSWORD_MAIN`
+(réponses, accusés de réception, admissions) et `EMAIL_HOST_USER_NEWS` / `EMAIL_HOST_PASSWORD_NEWS` (infolettre et annonces).
+
 ## 5. Vérifications après déploiement
 
 Contrôle automatique :

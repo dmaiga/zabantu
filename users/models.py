@@ -25,6 +25,9 @@ class CustomUser(AbstractUser):
     )
     date_started = models.DateField(_('date de début'), null=True, blank=True)
     is_active = models.BooleanField(_('actif'), default=True)
+    backoffice_access = models.BooleanField(
+        _('accès au backoffice'), default=False,
+        help_text=_("Autorise ce membre à se connecter. Les administrateurs et modérateurs se connectent toujours."))
     
     # Contact
     email = models.EmailField(_('email'), unique=True, blank=False)
@@ -113,6 +116,11 @@ class CustomUser(AbstractUser):
     @property
     def is_moderator(self):
         return self.role == 'moderateur'
+
+    @property
+    def can_access_backoffice(self):
+        """Seuls les administrateurs, les modérateurs et les membres explicitement autorisés peuvent se connecter."""
+        return self.role in ('admin', 'moderateur') or self.backoffice_access
 
     @property
     def can_moderate(self):

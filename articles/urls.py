@@ -10,6 +10,7 @@ urlpatterns = [
     path('article/<slug:slug>/delete/', views.article_delete, name='article_delete'),
     path('article/<slug:slug>/publish/', views.publish_article, name='publish_article'),
     path('article/<slug:slug>/unpublish/', views.unpublish_article, name='unpublish_article'),
+    path('article/<slug:slug>/schedule/', views.schedule_article, name='schedule_article'),
     #--------------------------------------------------------------------------
     #
     #                                Guelekan URLs
@@ -22,6 +23,7 @@ urlpatterns = [
     path('guelekan/<slug:slug>/delete/', views.guelekan_delete, name='guelekan_delete'),
     path('guelekan/<slug:slug>/publish/', views.publish_guelekan, name='publish_guelekan'),
     path('guelekan/<slug:slug>/unpublish/', views.unpublish_guelekan, name='unpublish_guelekan'),
+    path('guelekan/<slug:slug>/schedule/', views.schedule_guelekan, name='schedule_guelekan'),
 
        path('summernote/', include('django_summernote.urls')),
 ]

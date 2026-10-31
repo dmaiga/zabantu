@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Zabantu{% endblock %}</title>
+</head>
+<body style="margin:0; padding:0; background:#f8f9fa; font-family: Arial, sans-serif; line-height:1.5; color:#2c3e2c;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f8f9fa">
+    <tr><td align="center">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%;">
+            <tr>
+                <td bgcolor="#6f826a" style="padding:28px 20px; text-align:center;">
+                    <h1 style="margin:0; font-size:26px; color:#ffffff;">{% block heading %}Zabantu{% endblock %}</h1>
+                </td>
+            </tr>
+            <tr>
+                <td bgcolor="#ffffff" style="padding:30px 20px;">
+                    {% block body %}{% endblock %}
+                </td>
+            </tr>
+            <tr>
+                <td bgcolor="#2c3e2c" style="padding:22px 20px; text-align:center; font-size:14px; color:#f0f1c5;">
+                    <a href="https://www.facebook.com/zabantu.ecs" style="color:#bbd8a3; text-decoration:none;">Facebook</a> |
+                    <a href="https://www.linkedin.com/company/zabantu-ecs/about/" style="color:#bbd8a3; text-decoration:none;">LinkedIn</a>
+                    <p style="margin:12px 0;">&copy; {% now "Y" %} Zabantu. Tous droits réservés.</p>
+                    {% if unsubscribe_url %}
+                    <p style="margin:0; color:#bbd8a3;">
+                        Vous recevez cet e-mail parce que vous êtes abonné à l'infolettre de Zabantu.<br>
+                        <a href="{{ unsubscribe_url }}" style="color:#bbd8a3; text-decoration:underline;">Se désabonner</a>
+                    </p>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </td></tr>
+</table>
+</body>
+</html>

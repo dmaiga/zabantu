@@ -78,9 +78,11 @@ class CustomMemberCreationForm(forms.ModelForm):
             'phone_number', 'profile_picture',
             'bio', 'job_title', 'department', 'date_started',
             'social_facebook', 'social_linkedin', 'social_twitter',
-            'scholar_link','personal_website'
+            'scholar_link','personal_website', 'backoffice_access'
         ]
+        labels = {'backoffice_access': _("Autoriser la connexion à l'espace de gestion")}
         widgets = {
+            'backoffice_access': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'date_started': forms.DateInput(attrs={'type': 'date'}),
         }
 
@@ -215,29 +217,32 @@ class CustomUserUpdateForm(UserChangeForm):
             'social_linkedin',
             'social_twitter',
             'social_instagram',
-              'scholar_link','personal_website'
+              'scholar_link','personal_website', 'backoffice_access'
         ]
         labels = {
             'is_active': _('Compte actif'),
+            'backoffice_access': _("Autoriser la connexion à l'espace de gestion"),
             'date_started': _('Date de début'),
         }
         widgets = {
+            'backoffice_access': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'bio': forms.Textarea(attrs={'rows': 3}),
             'date_started': forms.DateInput(attrs={'type': 'date'}),
         }
     
-    def __init__(self, *args, **kwargs):
+    PRIVILEGED_FIELDS = ('role', 'is_active', 'date_started', 'backoffice_access')
+
+    def __init__(self, *args, editor=None, **kwargs):
         super().__init__(*args, **kwargs)
-        # Personnalisation des champs
         self.fields['email'].widget.attrs.update({'class': 'form-control'})
         self.fields['role'].widget.attrs.update({'class': 'form-select'})
-        
-        # Si l'utilisateur n'est pas admin, on restreint les champs modifiables
-        if not self.instance.is_admin and not kwargs.get('initial', {}).get('is_admin', False):
-            self.fields.pop('role')
-            self.fields.pop('is_active')
-            self.fields.pop('date_started')
 
+        # Rôle, statut et accès : réservés aux modérateurs ; le rôle seulement aux administrateurs
+        if editor is None or not editor.can_moderate:
+            for name in self.PRIVILEGED_FIELDS:
+                self.fields.pop(name)
+        elif not editor.is_admin:
+            self.fields.pop('role')
 
 
 class ContactReplyForm(forms.Form):

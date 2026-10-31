@@ -20,6 +20,7 @@ from articles.models import Article, Guelekan
 from events.models import Event
 from gallery.models import Gallery, Photo
 from intervenants.models import Intervenant
+from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.utils import timezone
 from site_web.models import NewsletterSubscriber, ContactMessage
@@ -73,7 +74,7 @@ from site_web.models import NewsletterCampaign, NewsletterRecipient, NewsletterS
 import logging
 from .forms import NewsletterCampaignForm
 from .permissions import moderator_required
-from .email_utils import send_newsletter_email  # Import de notre utilitaire
+from site_web import mailing
 
 logger = logging.getLogger(__name__)
 
@@ -118,6 +119,13 @@ class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
         return super().form_valid(form)
 #_______________________________________________________________
 
+def _valid_credentials_without_access(username, password):
+    """Vrai si l'identifiant et le mot de passe sont corrects mais que le compte n'a pas l'accès."""
+    candidate = CustomUser.objects.filter(is_active=True).filter(
+        Q(username__iexact=username) | Q(email__iexact=username)).first()
+    return bool(candidate and candidate.check_password(password) and not candidate.can_access_backoffice)
+
+
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -136,6 +144,8 @@ def login_view(request):
                         next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
                     return redirect(next_url)
                 return redirect('dashboard')
+            elif _valid_credentials_without_access(username, password):
+                messages.error(request, "Votre compte n'a pas accès à l'espace de gestion.")
             else:
                 messages.error(request, "Identifiants invalides")
         else:
@@ -230,24 +240,40 @@ def create_member_view(request):
     if request.method == 'POST':
         form = CustomMemberCreationForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            member = form.save()
             messages.success(request, "Le membre a été créé avec succès.")
+            if member.backoffice_access:
+                _notify_access_granted(request, member)
             return redirect('user_list')  # ou admin_dashboard
     else:
         form = CustomMemberCreationForm()
     return render(request, 'users/create_member.html', {'form': form})
 
 
+def _notify_access_granted(request, member):
+    if mailing.send_access_granted(member):
+        messages.info(request, f"{member.get_full_name()} a reçu un e-mail pour activer son accès.")
+    else:
+        messages.warning(request, f"L'e-mail d'accès à {member.get_full_name()} n'a pas pu être envoyé.")
+
+
 @login_required
 def update_user_view(request, pk):
     user_to_update = get_object_or_404(CustomUser, pk=pk)
-    
-    # Vérification des permissions
-    
+
+    # On modifie son propre profil ; seuls les modérateurs modifient celui des autres,
+    # et seuls les administrateurs touchent à un compte administrateur.
+    is_self = request.user.pk == user_to_update.pk
+    if not is_self and (not request.user.can_moderate or (user_to_update.is_admin and not request.user.is_admin)):
+        raise PermissionDenied
+
     if request.method == 'POST':
-        form = CustomUserUpdateForm(request.POST, request.FILES, instance=user_to_update)
+        had_access = user_to_update.backoffice_access
+        form = CustomUserUpdateForm(request.POST, request.FILES, instance=user_to_update, editor=request.user)
         if form.is_valid():
             updated_user = form.save()
+            if updated_user.backoffice_access and not had_access and not is_self:
+                _notify_access_granted(request, updated_user)
             
             # Message différent selon qui est modifié
             if request.user.pk == user_to_update.pk:
@@ -257,7 +283,7 @@ def update_user_view(request, pk):
             
             return redirect('user_list')
     else:
-        form = CustomUserUpdateForm(instance=user_to_update)
+        form = CustomUserUpdateForm(instance=user_to_update, editor=request.user)
     
     context = {
         'form': form,
@@ -370,29 +396,12 @@ def contact_message_reply(request, pk):
                 'site_name': 'Zabantu',  # Ajoutez le nom de votre site
             }
 
-            # Génération du contenu HTML + version texte
             html_content = render_to_string('emails/contact_reply.html', context)
-            text_content = strip_tags(html_content)
-
-            try:
-                # Création de l'email multi-format
-                email = EmailMultiAlternatives(
-                    subject=subject,
-                    body=text_content,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[message.email],
-                    reply_to=[settings.DEFAULT_FROM_EMAIL], 
-                )
-                # Ajouter la version HTML
-                email.attach_alternative(html_content, "text/html")
-                email.send()
-
-                # Mettre à jour le statut d'envoi
+            if mailing.send_reply(message.email, subject, html_content):
                 response.email_sent = True
                 response.sent_at = timezone.now()
                 response.save()
-                
-                # Mettre à jour le message principal
+
                 message.replied_by = request.user
                 message.replied_at = timezone.now()
                 message.save()
@@ -400,11 +409,10 @@ def contact_message_reply(request, pk):
                 messages.success(request, f'Réponse envoyée à {message.email} avec succès.')
                 return redirect('contact_message_detail', pk=message.pk)
 
-            except Exception as e:
-                messages.error(request, f'Erreur lors de l\'envoi de l\'email: {str(e)}')
-                # Garder la réponse même si l'email n'a pas pu être envoyé
-                response.save()
-    
+            # La réponse reste dans l'historique même si l'e-mail n'est pas parti
+            messages.error(request, "L'e-mail n'a pas pu être envoyé ; la réponse est conservée dans l'historique.")
+            response.save()
+
     else:
         form = ContactReplyForm(initial={
             'reply_content': f"\n\n--- Message original ---\nDe: {message.full_name} ({message.email})\nSujet: {message.subject}\nMessage:\n{message.message}"
@@ -495,8 +503,8 @@ def newsletter_campaign_edit(request, pk):
         'title': 'Modifier la campagne'
     })
 
-@login_required
-@user_passes_test(lambda u: u.role in ['admin', 'moderateur'])
+@require_POST
+@moderator_required
 def newsletter_campaign_send(request, pk):
     campaign = get_object_or_404(NewsletterCampaign, pk=pk)
     
@@ -509,79 +517,20 @@ def newsletter_campaign_send(request, pk):
         messages.error(request, "Aucun destinataire sélectionné pour cette campagne.")
         return redirect('newsletter_campaign_edit', pk=pk)
     
-    # Mettre à jour le statut de la campagne
-    campaign.status = 'sending'
-    campaign.save()
-    
-    # Envoyer la newsletter
-    success_count = 0
-    error_count = 0
-    error_details = []
-    
-    for recipient in campaign.recipients.all():
-        try:
-            # Créer le contenu HTML
-            html_content = render_to_string('emails/content_published.html', {
-                'content': campaign.content,
-                'subject': campaign.subject,
-                'unsubscribe_url': f"{settings.SITE_URL}/newsletter/unsubscribe/{recipient.subscriber.token}/"
-            })
-            
-            # Envoyer l'email
-            if send_newsletter_email(campaign.subject, html_content, [recipient.subscriber.email]):
-                # Marquer comme envoyé
-                recipient.sent_at = timezone.now()
-                recipient.save()
-                success_count += 1
-                logger.info(f"Email envoyé avec succès à {recipient.subscriber.email}")
-            else:
-                error_count += 1
-                error_details.append(f"Échec d'envoi à {recipient.subscriber.email}")
-                logger.error(f"Échec d'envoi à {recipient.subscriber.email}")
-                
-        except Exception as e:
-            error_count += 1
-            error_details.append(f"Erreur avec {recipient.subscriber.email}: {str(e)}")
-            logger.error(f"Erreur lors de l'envoi à {recipient.subscriber.email}: {e}")
-    
-    # Mettre à jour le statut de la campagne en fonction du résultat
-    if error_count == 0:
-        campaign.status = 'sent'
-        messages.success(request, f"Newsletter envoyée avec succès à {success_count} destinataires.")
-    elif success_count > 0:
-        campaign.status = 'partial'
-        messages.warning(
-            request, 
-            f"Newsletter partiellement envoyée: {success_count} succès, {error_count} échecs. " +
-            "Certains emails n'ont pas pu être envoyés."
-        )
+    sent, failed = campaign.send()
+    if not failed:
+        messages.success(request, f"Infolettre envoyée à {sent} destinataire(s).")
+    elif sent:
+        messages.warning(request, f"Infolettre partiellement envoyée : {sent} réussi(s), {failed} échec(s).")
     else:
-        campaign.status = 'failed'
-        messages.error(
-            request, 
-            f"Échec complet de l'envoi: {error_count} échecs. " +
-            "Aucun email n'a pu être envoyé. Vérifiez la configuration email."
-        )
-    
-    campaign.sent_at = timezone.now()
-    campaign.save()
-    
-    # Enregistrer les détails d'erreur dans les logs
-    if error_details:
-        logger.error(f"Détails des erreurs d'envoi pour la campagne {campaign.id}:")
-        for error in error_details:
-            logger.error(f"  - {error}")
-    
+        messages.error(request, "Aucun e-mail n'a pu être envoyé. Vérifiez la configuration e-mail.")
+
     return redirect('newsletter_campaign_list')
 
 @login_required
 def newsletter_campaign_preview(request, pk):
     campaign = get_object_or_404(NewsletterCampaign, pk=pk)
-    return render(request, 'emails/newsletter_preview.html', {
-        'content': campaign.content,
-        'subject': campaign.subject,
-        'campaign': campaign
-    })
+    return render(request, 'emails/campaign.html', {'title': campaign.title, 'body': campaign.content})
 
 @require_POST
 @login_required
@@ -738,7 +687,10 @@ def membership_application_action(request, pk, action):
 
     if action == 'approve' and application.status in (Status.PENDING, Status.REJECTED, Status.REVOKED):
         application.approve(request.user)
-        messages.success(request, f"L'adhésion de {name} a été validée.")
+        if mailing.send_application_approved(application):
+            messages.success(request, f"L'adhésion de {name} a été validée et un e-mail de bienvenue lui a été envoyé.")
+        else:
+            messages.warning(request, f"L'adhésion de {name} a été validée, mais l'e-mail de bienvenue n'a pas pu être envoyé.")
     elif action == 'reject' and application.status == Status.PENDING:
         application.reject(request.user)
         messages.success(request, f"La demande de {name} a été refusée.")

@@ -9,7 +9,7 @@ from django.db.models import Q
 from .models import Event,EventIntervenant
 from .forms import EventForm,EventIntervenantForm
  
-from articles.views import send_content_published_newsletter
+from site_web.mailing import notify_publication
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -78,27 +78,17 @@ def event_update(request, id):
 def event_publish(request, id):
     event = get_object_or_404(Event, id=id)
     
-    if event.status != 'published':
-        event.status = 'published'
-        event.save()
-        
-        # Envoyer la newsletter seulement si configuré et si l'événement est à venir
-        if settings.SEND_NEWSLETTER_ON_PUBLISH:
-            
-            try:
-                send_content_published_newsletter(event, "Nouvel Événement")
-                messages.success(request, f"L'événement « {event.title} » a été publié et envoyé aux abonnés.")
-            except Exception as e:
-                # Logger l'erreur mais continuer
-                import logging
-                logger = logging.getLogger(__name__)
-                logger.error(f"Erreur lors de l'envoi de la newsletter: {e}")
-                messages.warning(request, f"L'événement a été publié mais l'envoi de la newsletter a échoué.")
-        else:
-            messages.success(request, f"L'événement « {event.title} » a été publié avec succès.")
-    else:
+    if event.status == 'published':
         messages.info(request, f"L'événement « {event.title} » est déjà publié.")
-    
+        return redirect('event_detail', id=event.id)
+
+    event.status = 'published'
+    event.save()
+    result = notify_publication(event)
+    if result and result[0]:
+        messages.success(request, f"L'événement « {event.title} » a été publié et annoncé à {result[0]} abonné(s).")
+    else:
+        messages.success(request, f"L'événement « {event.title} » a été publié.")
     return redirect('event_detail', id=event.id)
 
 # Dépublier un événement (mettre en brouillon)

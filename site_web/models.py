@@ -19,7 +19,6 @@ from zabantu import settings
 from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 from django.template.loader import render_to_string
-from users.email_utils import send_newsletter_email
 
 class NewsletterSubscriber(models.Model):
     email = models.EmailField(_('email'), unique=True)
@@ -70,43 +69,10 @@ class NewsletterCampaign(models.Model):
         return self.recipients.count()
     
     def send(self):
-        """Envoie réellement la newsletter"""
-        self.status = 'sending'
-        self.save()
-        
-        success_count = 0
-        error_count = 0
-        
-        for recipient in self.recipients.all():
-            try:
-                # Créer le contenu HTML
-                html_content = render_to_string('emails/content_published.html', {
-                    'content': self.content,
-                    'subject': self.subject,
-                    'unsubscribe_url': f"{settings.SITE_URL}/newsletter/unsubscribe/{recipient.subscriber.id}/"
-                })
-                
-                # Envoyer l'email
-                if send_newsletter_email(self.subject, html_content, [recipient.subscriber.email]):
-                    # Marquer comme envoyé
-                    recipient.sent_at = timezone.now()
-                    recipient.save()
-                    success_count += 1
-                else:
-                    error_count += 1
-                    
-            except Exception as e:
-                error_count += 1
-                # Loguer l'erreur
-                print(f"Erreur lors de l'envoi à {recipient.subscriber.email}: {e}")
-        
-        # Mettre à jour le statut de la campagne
-        self.status = 'sent'
-        self.sent_at = timezone.now()
-        self.save()
-        
-        return success_count, error_count
-    
+        """Envoie la campagne aux destinataires encore abonnés ; renvoie (envoyés, échecs)."""
+        from .mailing import send_campaign
+        return send_campaign(self)
+
     class Meta:
         verbose_name = _('campagne de newsletter')
         verbose_name_plural = _('campagnes de newsletter')
@@ -402,3 +368,16 @@ class MembershipApplication(models.Model):
         self.revocation_reason = ''
         self._deactivate_member()
         self.save()
+
+
+class PublicationNotice(models.Model):
+    """Trace l'annonce d'un contenu aux abonnés : un contenu n'est annoncé qu'une fois."""
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    sent_count = models.PositiveIntegerField(_('envoyés'), default=0)
+    created_at = models.DateTimeField(_('annoncé le'), auto_now_add=True)
+
+    class Meta:
+        verbose_name = _('annonce de publication')
+        verbose_name_plural = _('annonces de publication')
+        unique_together = ('content_type', 'object_id')

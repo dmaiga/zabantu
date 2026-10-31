@@ -55,7 +55,7 @@ urlpatterns = [
     path('photo/<int:pk>/', detail_photo, name='detail_photo'),
    #16_08
     path('newsletter/subscribe/', newsletter_subscribe, name='newsletter_subscribe'),
-    path('newsletter/unsubscribe/<int:subscriber_id>/', newsletter_unsubscribe, name='newsletter_unsubscribe'),
+    path('newsletter/unsubscribe/<uuid:token>/', newsletter_unsubscribe, name='newsletter_unsubscribe'),
     
 
 ]

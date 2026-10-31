@@ -25,6 +25,7 @@ env = environ.Env(
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 AUTH_USER_MODEL = 'users.CustomUser'
+AUTHENTICATION_BACKENDS = ['users.backends.BackofficeBackend']
 
 
 LOGIN_URL = 'login'
