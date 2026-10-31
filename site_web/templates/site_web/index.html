@@ -50,6 +50,30 @@
     .event-info h3 { font-size: 1.05rem; margin: 0 0 .25rem; color: var(--zabantu-dark); }
     .event-info p { margin: 0; font-size: .88rem; color: #6c757d; }
     .events-empty { background: #fff; border: 1px dashed #cfd5c6; border-radius: 10px; padding: 1rem 1.25rem; color: #5b6559; }
+
+    /* Gɛlɛkan : programme phare, distinct des publications et événements */
+    .gk-band { background: linear-gradient(135deg, var(--zabantu-dark), #1f2d1f); color: #fff; padding: 3.5rem 0; border-top: 4px solid var(--zabantu-secondary); border-bottom: 4px solid var(--zabantu-secondary); }
+    .gk-eyebrow { display: inline-flex; align-items: center; gap: .5rem; letter-spacing: .12em; text-transform: uppercase; font-size: .8rem; font-weight: 600; color: var(--zabantu-secondary); font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin-bottom: .6rem; }
+    .gk-band h2 { font-weight: 700; font-size: 2rem; margin-bottom: .5rem; text-wrap: balance; }
+    .gk-lead { color: #d6dfd0; max-width: 62ch; margin-bottom: 0; }
+    .gk-next { display: flex; gap: 1.25rem; align-items: center; background: rgba(255,255,255,.08); border: 1px solid rgba(191,146,100,.6); border-radius: 12px; padding: 1.25rem; margin: 1.75rem 0; color: #fff; text-decoration: none; }
+    .gk-next:hover { background: rgba(255,255,255,.13); color: #fff; }
+    .gk-next .gk-date { flex: 0 0 76px; text-align: center; background: var(--zabantu-secondary); color: #2c1c0c; border-radius: 10px; padding: .55rem 0; line-height: 1.1; }
+    .gk-next .gk-date strong { display: block; font-size: 1.9rem; }
+    .gk-next .gk-date span { font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; }
+    .gk-next small { color: var(--zabantu-secondary); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
+    .gk-next h3 { font-size: 1.35rem; margin: .2rem 0 .3rem; }
+    .gk-next p { margin: 0; color: #d6dfd0; font-size: .95rem; }
+    .gk-card { height: 100%; display: flex; flex-direction: column; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); border-radius: 10px; overflow: hidden; transition: transform .2s, border-color .2s; }
+    .gk-card:hover { transform: translateY(-3px); border-color: var(--zabantu-secondary); }
+    .gk-card-cover { height: 170px; background: #1f2d1f; display: flex; align-items: center; justify-content: center; color: var(--zabantu-secondary); font-size: 2.2rem; }
+    .gk-card-cover img { width: 100%; height: 100%; object-fit: cover; }
+    .gk-card-body { padding: 1rem 1.15rem; flex: 1; }
+    .gk-card-body h3 { font-size: 1.05rem; line-height: 1.35; margin-bottom: .5rem; }
+    .gk-card-body h3 a { color: #fff; text-decoration: none; }
+    .gk-guests { font-size: .85rem; color: #c3cfbc; margin: 0; }
+    .gk-band .btn-gk { background: var(--zabantu-secondary); border-color: var(--zabantu-secondary); color: #2c1c0c; font-weight: 600; border-radius: 30px; }
+    .gk-band .btn-gk:hover { background: #d3a979; border-color: #d3a979; color: #2c1c0c; }
     /* 5. Adhésion */
     .join-band { background: linear-gradient(135deg, var(--zabantu-primary), var(--zabantu-dark)); color: #fff; padding: 3.5rem 0; }
     .join-band h2 { font-weight: 700; font-size: 1.9rem; text-wrap: balance; }
@@ -104,6 +128,51 @@
         </div>
     </div>
 </section>
+
+<!-- Gɛlɛkan : programme phare -->
+{% if gelekan_next or latest_guelekans %}
+<section id="guelekan" class="gk-band">
+    <div class="container">
+        <div class="home-head">
+            <div>
+                <div class="gk-eyebrow"><i class="fas fa-microphone-lines"></i>Programme phare</div>
+                <h2>Séminaires Gɛlɛkan</h2>
+                <p class="gk-lead">Nos grands rendez-vous de réflexion : chercheurs, professeurs et invités de renom réunis autour d'un même sujet.</p>
+            </div>
+            <a class="btn btn-gk" href="{% url 'public_article_list' %}?type=guelekan">Toutes les éditions <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+
+        {% if gelekan_next %}
+        <a class="gk-next" href="{% url 'public_event_detail' gelekan_next.pk %}">
+            <div class="gk-date"><strong>{{ gelekan_next.date|date:"j" }}</strong><span>{{ gelekan_next.date|date:"M Y" }}</span></div>
+            <div>
+                <small>Prochain séminaire</small>
+                <h3>{{ gelekan_next.title }}</h3>
+                <p>{{ gelekan_next.date|time:"H:i" }}{% if gelekan_next.is_webinar %} · En ligne{% elif gelekan_next.location %} · {{ gelekan_next.location }}{% endif %}</p>
+            </div>
+        </a>
+        {% endif %}
+
+        {% if latest_guelekans %}
+        <div class="row g-4">
+            {% for gk in latest_guelekans %}
+            <div class="col-md-4">
+                <article class="gk-card">
+                    <a class="gk-card-cover" href="{% url 'public_guelekan_detail' gk.slug %}" tabindex="-1" aria-hidden="true">
+                        {% if gk.cover_image %}<img src="{{ gk.cover_image.url }}" alt="" loading="lazy">{% else %}<i class="fas fa-microphone-lines"></i>{% endif %}
+                    </a>
+                    <div class="gk-card-body">
+                        <h3><a href="{% url 'public_guelekan_detail' gk.slug %}">{{ gk.title }}</a></h3>
+                        {% with guests=gk.intervenants.all %}{% if guests %}<p class="gk-guests"><i class="fas fa-users me-1"></i>{% for g in guests|slice:":3" %}{{ g.full_name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if guests|length > 3 %} et {{ guests|length|add:"-3" }} autres{% endif %}</p>{% endif %}{% endwith %}
+                    </div>
+                </article>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
 
 <!-- 3. Dernières publications -->
 <section id="publications" class="home-section alt">

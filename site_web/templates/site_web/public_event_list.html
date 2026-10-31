@@ -41,21 +41,85 @@
     .ev-past p { margin: 0; font-size: .85rem; color: #5b6559; }
     .ev-empty { text-align: center; background: #fff; border: 1px dashed #cfd5c6; border-radius: 10px; padding: 2.5rem 1rem; color: #5b6559; }
     .ev-empty i { font-size: 2rem; margin-bottom: .75rem; color: var(--zabantu-primary); }
+
+    /* Gɛlɛkan : programme phare, présenté à part des autres événements */
+    .ev-filters a.gk { border-color: var(--zabantu-secondary); color: #7a5427; font-weight: 600; }
+    .ev-filters a.gk.active { background: var(--zabantu-secondary); border-color: var(--zabantu-secondary); color: #2c1c0c; }
+    .gk-block { background: linear-gradient(135deg, var(--zabantu-dark), #1f2d1f); border-top: 4px solid var(--zabantu-secondary); border-radius: 12px; padding: 1.75rem; color: #fff; margin-bottom: 3rem; }
+    .gk-block h2 { font-size: 1.7rem; font-weight: 700; margin: 0; }
+    .gk-block .gk-eyebrow { display: inline-flex; align-items: center; gap: .5rem; letter-spacing: .12em; text-transform: uppercase; font-size: .78rem; font-weight: 600; color: var(--zabantu-secondary); font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; margin-bottom: .4rem; }
+    .gk-block .gk-lead { color: #d6dfd0; margin: .4rem 0 0; max-width: 62ch; }
+    .gk-block h3.gk-sub { font-size: .85rem; text-transform: uppercase; letter-spacing: .08em; color: var(--zabantu-secondary); margin: 1.5rem 0 .75rem; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
+    .gk-item { display: flex; gap: 1rem; align-items: center; background: rgba(255,255,255,.08); border: 1px solid rgba(191,146,100,.5); border-radius: 10px; padding: 1rem; color: #fff; text-decoration: none; height: 100%; transition: background .2s; }
+    .gk-item:hover { background: rgba(255,255,255,.14); color: #fff; }
+    .gk-item.past { border-color: rgba(255,255,255,.15); }
+    .gk-item .ev-date { background: var(--zabantu-secondary); color: #2c1c0c; flex: 0 0 64px; }
+    .gk-item.past .ev-date { background: rgba(255,255,255,.2); color: #fff; }
+    .gk-item h3 { font-size: 1.08rem; margin: 0 0 .25rem; line-height: 1.3; }
+    .gk-item p { margin: 0; font-size: .87rem; color: #c3cfbc; }
+    .gk-foot { margin-top: 1.25rem; }
+    .gk-foot a { color: var(--zabantu-secondary); font-weight: 600; text-decoration: none; }
+    .gk-foot a:hover { text-decoration: underline; }
 </style>
 
 <div class="container">
-    {% if type_filters %}
+    {% if type_filters or gelekan_total %}
     <nav class="ev-filters" aria-label="Filtrer par type d'événement">
-        <a href="{% url 'public_event_list' %}" class="{% if not current_type %}active{% endif %}">Tous <span class="n">{{ total_events }}</span></a>
+        <a href="{% url 'public_event_list' %}" class="{% if not current_type %}active{% endif %}">Tous</a>
+        {% if gelekan_total %}<a href="?type=seminaire" class="gk {% if current_type == 'seminaire' %}active{% endif %}"><i class="fas fa-microphone-lines"></i>Séminaires Gɛlɛkan <span class="n">{{ gelekan_total }}</span></a>{% endif %}
         {% for key, label, count in type_filters %}
         <a href="?type={{ key }}" class="{% if current_type == key %}active{% endif %}">{{ label }} <span class="n">{{ count }}</span></a>
         {% endfor %}
     </nav>
     {% endif %}
 
+    {% if gelekan_upcoming or gelekan_past %}
+    <section class="gk-block" id="guelekan">
+        <div class="gk-eyebrow"><i class="fas fa-microphone-lines"></i>Programme phare</div>
+        <h2>Séminaires Gɛlɛkan</h2>
+        <p class="gk-lead">De grands séminaires réunissant professeurs, chercheurs et invités autour d'un thème. À ne pas confondre avec nos autres événements ci-dessous.</p>
+
+        {% if gelekan_upcoming %}
+        <h3 class="gk-sub">À venir</h3>
+        <div class="row g-3">
+            {% for event in gelekan_upcoming %}
+            <div class="col-lg-6">
+                <a class="gk-item" href="{% url 'public_event_detail' event.pk %}">
+                    <div class="ev-date"><strong>{{ event.date|date:"j" }}</strong><span>{{ event.date|date:"M Y" }}</span></div>
+                    <div>
+                        <h3>{{ event.title }}</h3>
+                        <p>{{ event.date|time:"H:i" }}{% if event.is_webinar %} · En ligne{% elif event.location %} · {{ event.location }}{% endif %}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if gelekan_past %}
+        <h3 class="gk-sub">Éditions passées</h3>
+        <div class="row g-3">
+            {% for event in gelekan_past %}
+            <div class="col-lg-4 col-md-6">
+                <a class="gk-item past" href="{% url 'public_event_detail' event.pk %}">
+                    <div class="ev-date"><strong>{{ event.date|date:"j" }}</strong><span>{{ event.date|date:"M Y" }}</span></div>
+                    <div>
+                        <h3>{{ event.title }}</h3>
+                        <p>{% if event.is_webinar %}En ligne{% elif event.location %}{{ event.location }}{% endif %}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <p class="gk-foot mb-0"><a href="{% url 'public_article_list' %}?type=guelekan">Retrouver les comptes rendus des séminaires <i class="fas fa-arrow-right ms-1"></i></a></p>
+    </section>
+    {% endif %}
+
+    {% if current_type != 'seminaire' %}
     <!-- Événements à venir -->
     <section class="mb-5">
-        <h2 class="ev-title">Événements à venir <small>{{ upcoming_events|length }}</small></h2>
+        <h2 class="ev-title">{% if gelekan_upcoming or gelekan_past %}Autres événements à venir{% else %}Événements à venir{% endif %} <small>{{ upcoming_events|length }}</small></h2>
         {% if upcoming_events %}
         <div class="row g-4">
             {% for event in upcoming_events %}
@@ -96,7 +160,7 @@
 
     <!-- Événements passés -->
     <section class="mb-5">
-        <h2 class="ev-title">Événements passés <small>{{ past_events.paginator.count }}</small></h2>
+        <h2 class="ev-title">{% if gelekan_upcoming or gelekan_past %}Autres événements passés{% else %}Événements passés{% endif %} <small>{{ past_events.paginator.count }}</small></h2>
         {% if past_events %}
         <div class="row g-3">
             {% for event in past_events %}
@@ -125,5 +189,6 @@
         <div class="ev-empty"><i class="fas fa-clock-rotate-left"></i><p class="mb-0">Aucun événement passé à afficher pour le moment.</p></div>
         {% endif %}
     </section>
+    {% endif %}
 </div>
 {% endblock %}

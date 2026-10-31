@@ -402,23 +402,40 @@ def public_event_list(request):
     if current_type not in type_choices:
         current_type = ''
 
-    upcoming_events = published.filter(date__gte=now).order_by('date')
-    past_qs = published.filter(date__lt=now).order_by('-date')
-    if current_type:
+    # Les séminaires Gɛlɛkan (programme phare) sont présentés à part
+    gelekan_events = published.filter(event_type='seminaire')
+    others = published.exclude(event_type='seminaire')
+
+    upcoming_events = others.filter(date__gte=now).order_by('date')
+    past_qs = others.filter(date__lt=now).order_by('-date')
+    if current_type == 'seminaire':
+        upcoming_events = upcoming_events.none()
+        past_qs = past_qs.none()
+    elif current_type:
         upcoming_events = upcoming_events.filter(event_type=current_type)
         past_qs = past_qs.filter(event_type=current_type)
 
+    show_gelekan = current_type in ('', 'seminaire')
+    gelekan_upcoming = gelekan_events.filter(date__gte=now).order_by('date') if show_gelekan else []
+    gelekan_past = gelekan_events.filter(date__lt=now).order_by('-date') if show_gelekan else []
+    if show_gelekan and not current_type:
+        gelekan_past = gelekan_past[:3]
+
     past_events = Paginator(past_qs, 9).get_page(request.GET.get('page'))
 
-    counts = {item['event_type']: item['n'] for item in published.values('event_type').annotate(n=Count('id'))}
-    type_filters = [(key, label, counts.get(key, 0)) for key, label in Event.EVENT_TYPE_CHOICES if counts.get(key)]
+    counts = {item['event_type']: item['n'] for item in others.values('event_type').annotate(n=Count('id'))}
+    type_filters = [(key, label, counts.get(key, 0)) for key, label in Event.EVENT_TYPE_CHOICES
+                    if key != 'seminaire' and counts.get(key)]
 
     return render(request, 'site_web/public_event_list.html', {
         'upcoming_events': upcoming_events,
         'past_events': past_events,
+        'gelekan_upcoming': gelekan_upcoming,
+        'gelekan_past': gelekan_past,
+        'gelekan_total': gelekan_events.count(),
         'current_type': current_type,
         'type_filters': type_filters,
-        'total_events': published.count(),
+        'total_events': others.count(),
     })
 
 def public_event_detail(request, pk):
@@ -523,10 +540,13 @@ class HomeView(TemplateView):
             F('publish_at').desc(nulls_last=True), '-created_at')[:4]
 
         # Événements à venir
-        context['upcoming_events'] = Event.objects.filter(
-            status='published',
-            date__gte=timezone.now()
-        ).order_by('date')[:3]
+        now = timezone.now()
+        upcoming = Event.objects.filter(status='published', date__gte=now).order_by('date')
+        # Les séminaires Gɛlɛkan ont leur propre section, distincte des événements
+        context['upcoming_events'] = upcoming.exclude(event_type='seminaire')[:3]
+        context['gelekan_next'] = upcoming.filter(event_type='seminaire').first()
+        context['latest_guelekans'] = Guelekan.objects.filter(status='published').prefetch_related(
+            'intervenants').order_by(F('publish_at').desc(nulls_last=True), '-created_at')[:3]
 
         # Membres actifs : aperçu de l'équipe et compteur
         members = CustomUser.objects.filter(is_active=True, role__in=['moderateur', 'membre'])

@@ -73,66 +73,23 @@
 
     /* Footer & Banner standard... */
     .zabantu-banner { background: linear-gradient(135deg, var(--zabantu-primary), var(--zabantu-dark)); padding: 1rem 0; color: white; text-align: center; }
-    .zabantu-footer { background-color: var(--zabantu-dark); color: white; margin-top: 3rem; text-align: center; }
-  /* 🔥 LIENS FOOTER */
-.zabantu-footer a {
-    color: #ffffff;
-    text-decoration: none;
-    transition: 0.3s;
-}
-
-/* 🔥 HOVER */
-.zabantu-footer a:hover {
-    color: var(--zabantu-accent);
-}
-.zabantu-footer a:hover {
-    text-decoration: underline;
-}
-/* 🔥 NAVIGATION */
-.footer-navigation li {
-    margin-bottom: 6px;
-}
-
-.zabantu-footer a {
-    color: #ffffff;
-    text-decoration: none;
-    transition: 0.3s;
-}
-
-.zabantu-footer a:hover {
-    color: var(--zabantu-accent);
-}
-
-/* 🔥 SOCIAL */
-.footer-social {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.footer-social a {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.95rem;
-}
-
-/* ICON STYLE */
-.footer-social i {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.3s;
-}
-
-/* HOVER */
-.footer-social a:hover i {
-    background: var(--zabantu-secondary);
-}
+    .zabantu-footer { background: var(--zabantu-dark); color: #d6dfd0; margin-top: 3rem; border-top: 4px solid var(--zabantu-secondary); text-align: left; }
+    .zabantu-footer h5 { color: #fff; font-size: .85rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; margin-bottom: 1rem; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; }
+    .zabantu-footer a { color: #d6dfd0; text-decoration: none; transition: color .2s; }
+    .zabantu-footer a:hover { color: var(--zabantu-secondary); }
+    .footer-brand { display: flex; align-items: center; gap: .75rem; margin-bottom: .9rem; }
+    .footer-brand img { height: 48px; width: 48px; object-fit: cover; border-radius: 8px; background: #fff; }
+    .footer-brand strong { color: #fff; font-size: 1.35rem; }
+    .footer-tagline { font-size: .92rem; line-height: 1.6; max-width: 34ch; }
+    .footer-navigation li { margin-bottom: .5rem; font-size: .95rem; }
+    .footer-contact li { display: flex; gap: .7rem; margin-bottom: .7rem; font-size: .93rem; }
+    .footer-contact i { color: var(--zabantu-secondary); width: 1rem; margin-top: .2rem; text-align: center; }
+    .footer-social { display: flex; gap: .6rem; margin-top: 1.1rem; }
+    .footer-social a { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center; font-size: 1.05rem; color: #fff; transition: background .2s, transform .2s; }
+    .footer-social a:hover { background: var(--zabantu-secondary); color: #2c1c0c; transform: translateY(-2px); }
+    .footer-cta { display: inline-block; margin-top: .5rem; padding: .5rem 1.2rem; border: 1px solid var(--zabantu-secondary); border-radius: 30px; color: #fff !important; font-size: .9rem; }
+    .footer-cta:hover { background: var(--zabantu-secondary); color: #2c1c0c !important; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,.12); margin-top: 2.25rem; padding-top: 1.25rem; font-size: .85rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem; }
   </style>
   {% block extra_css %}{% endblock %}
 </head>
@@ -233,64 +190,58 @@
     {% block content %}{% endblock %}
   </main>
 
-<footer class="zabantu-footer text-white py-5">
+<footer class="zabantu-footer py-5">
   <div class="container">
     <div class="row gy-4">
 
-      <!-- COL 1 -->
-      <div class="col-md-4">
-        <h5 class="mb-3">Zabantu</h5>
-        <p class="small text-light">
-          Vers une recherche ancrée dans les dynamiques économiques et sociales.
-        </p>
+      <div class="col-lg-4 col-md-6">
+        <div class="footer-brand">
+          <img src="/static/site_web/images/zabantu_logo.jpg" alt="">
+          <strong>Zabantu</strong>
+        </div>
+        <p class="footer-tagline">Groupe de recherche : Economy, Conflict, State. Vers une recherche ancrée dans les dynamiques économiques et sociales.</p>
+        <div class="footer-social">
+          <a href="https://www.linkedin.com/company/zabantu-ecs/about/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="https://www.facebook.com/zabantu.ecs" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        </div>
       </div>
 
-      <!-- COL 2 -->
-      <div class="col-md-4">
-        <h5 class="mb-3">Navigation</h5>
+      <div class="col-lg-2 col-md-3 col-6">
+        <h5>Explorer</h5>
         <ul class="list-unstyled footer-navigation">
           <li><a href="{% url 'home' %}">Accueil</a></li>
+          <li><a href="{% url 'about' %}">À propos</a></li>
           <li><a href="{% url 'public_member_list' %}">Membres</a></li>
           <li><a href="{% url 'public_article_list' %}">Publications</a></li>
+          <li><a href="{% url 'public_article_list' %}?type=guelekan">Séminaires Gɛlɛkan</a></li>
           <li><a href="{% url 'public_event_list' %}">Événements</a></li>
+          <li><a href="{% url 'liste_galeries' %}">Galerie</a></li>
         </ul>
       </div>
 
-      <!-- COL 3 -->
-      <div class="col-md-4">
-        <h5 class="mb-3">Contact</h5>
+      <div class="col-lg-3 col-md-3 col-6">
+        <h5>Participer</h5>
+        <ul class="list-unstyled footer-navigation">
+          <li><a href="{% url 'membership_apply' %}">Devenir membre</a></li>
+          <li><a href="{% url 'contact' %}">Nous écrire</a></li>
+        </ul>
+        <a class="footer-cta" href="{% url 'membership_apply' %}">Rejoindre Zabantu</a>
+      </div>
 
-        <p class="small mb-2">
-          <strong>Campus universitaire de Badalabougou</strong>
-        </p>
-
-        <p class="small mb-1">
-          <i class="fas fa-envelope me-2"></i> Info@zabantu.net
-        </p>
-
-        <p class="small mb-3">
-          <i class="fas fa-phone me-2"></i> 77941470
-        </p>
-
-        
-          <a href="https://www.linkedin.com/company/zabantu-ecs/about/" target="_blank">
-            <i class="fab fa-linkedin"></i>
-            <span>LinkedIn</span>
-          </a> <br>
-
-          <a href="https://www.facebook.com/zabantu.ecs" target="_blank">
-            <i class="fab fa-facebook"></i>
-            <span>Facebook</span>
-          </a>
-  
+      <div class="col-lg-3 col-md-6">
+        <h5>Contact</h5>
+        <ul class="list-unstyled footer-contact">
+          <li><i class="fas fa-location-dot"></i><span>Campus universitaire de Badalabougou</span></li>
+          <li><i class="fas fa-envelope"></i><a href="mailto:Info@zabantu.net">Info@zabantu.net</a></li>
+          <li><i class="fas fa-phone"></i><a href="tel:77941470">77941470</a></li>
+        </ul>
       </div>
 
     </div>
 
-    <hr class="my-4 bg-light" />
-
-    <div class="text-center small">
-      &copy; {% now "Y" %} Groupe de recherche Zabantu. Tous droits réservés.
+    <div class="footer-bottom">
+      <span>&copy; {% now "Y" %} Groupe de recherche Zabantu. Tous droits réservés.</span>
+      <a href="{% url 'contact' %}">Contact</a>
     </div>
   </div>
 </footer>
