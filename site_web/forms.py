@@ -25,8 +25,6 @@ from .models import ContactMessage
 from .antispam import AntiSpamMixin
 
 class ContactForm(AntiSpamMixin, forms.ModelForm):
-    # Captcha retiré (demande du client) :
-    # captcha = CaptchaField()
     class Meta:
         model = ContactMessage
         fields = ['name', 'last_name', 'phone', 'email', 'subject', 'message']
@@ -65,9 +63,6 @@ MAX_PHOTO_MB = 5
 
 
 class MembershipApplicationForm(AntiSpamMixin, forms.ModelForm):
-    # Captcha retiré temporairement (demande du client) :
-    # captcha = CaptchaField(label="Vérification")
-
     how_heard_choices = forms.MultipleChoiceField(
         label="Comment avez-vous entendu parler de Zabantu ?",
         choices=MembershipApplication.HowHeard.choices,

@@ -18,8 +18,6 @@ from .views import (
     contact,
     membership_apply,
     membership_thanks,
-    membre_liste,
-    membre_detail,
     newsletter_subscribe,
     newsletter_unsubscribe,
    
@@ -42,8 +40,6 @@ urlpatterns = [
     #05_08
     path('about/', about_view, name='about'),
     #06_08
-    path('membres/', membre_liste, name='membre_liste'),
-    path('membres/<int:user_id>/', membre_detail, name='membre_detail'),
     
     path('contact/', contact, name='contact'),
     path('adhesion/', membership_apply, name='membership_apply'),

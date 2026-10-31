@@ -107,7 +107,7 @@ class CustomUser(AbstractUser):
     
     def get_public_profile(self):
         """Retourne l'URL publique du profil du membre."""
-        return reverse('membre_detail', args=[self.pk])
+        return reverse('public_member_detail', args=[self.pk])
     
     @property
     def is_admin(self):

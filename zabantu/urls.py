@@ -36,7 +36,6 @@ urlpatterns = [
     path('events/', include('events.urls')),
     path('gallery/', include('gallery.urls')),
     path('intervenants/', include('intervenants.urls')),
-    path('captcha/', include('captcha.urls')),
     
  path('password-reset/', 
          auth_views.PasswordResetView.as_view(

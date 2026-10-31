@@ -79,7 +79,6 @@ INSTALLED_APPS = [
     'events',
     'gallery',
     'intervenants',
-    'captcha',
  
 ]
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"

@@ -37,8 +37,7 @@ Principe : **rien ne doit modifier ou supprimer de données existantes**. Toute 
 2. **Sauvegarder le dossier `media/`** (copie ou archive). Les miniatures n'y modifient rien, mais c'est la bonne pratique.
 3. **Ne pas copier `db_v3.sqlite3`** sur le serveur : l'application n'utilise plus SQLite (PostgreSQL partout) ; ce fichier n'a rien à faire en ligne.
 4. **Noter la version actuellement en ligne** (date, archive) pour pouvoir revenir en arrière.
-5. **Code `articles` de la production** : il est déjà repris dans le dépôt (migrations `0008` à `0010`, champs et formulaire « ouvrage », voir
-   `PLAN_IMPLEMENTATION.md` §5.1). Vérifier avant de déployer que le dossier `articles/` du serveur n'a **pas changé depuis** la copie faite le
+5. **Code `articles` de la production** : il est déjà repris dans le dépôt (migrations `0008` à `0010`, champs et formulaire « ouvrage »). Vérifier avant de déployer que le dossier `articles/` du serveur n'a **pas changé depuis** la copie faite le
    31 octobre 2026 (comparer `articles/migrations/` : mêmes fichiers `0001` à `0010`). Sinon, reprendre les nouveautés avant de continuer.
 6. **Choisir qui garde l'accès à la connexion** : les comptes « membre » n'ont plus accès au backoffice par défaut. Cocher « Autoriser la connexion »
    sur les membres concernés après la mise en ligne (la copie locale ne comptait aucun membre ayant déjà utilisé la connexion).

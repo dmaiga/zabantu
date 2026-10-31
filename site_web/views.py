@@ -61,47 +61,6 @@ from django.shortcuts import render, get_object_or_404
 from users.models import CustomUser
 from articles.models import Article
 
-def membre_liste(request):
-    # Récupérer tous les membres actifs
-    membres = CustomUser.objects.filter(is_active=True).order_by('nom')
-    
-    # Préparer les données pour chaque membre
-    membres_data = []
-    for membre in membres:
-        publications_recentes = Article.objects.filter(
-            authors=membre,
-            status='published'
-        ).order_by(*PUBLICATION_ORDER)[:3]  # 3 publications les plus récentes
-        
-        membres_data.append({
-            'membre': membre,
-            'publications_count': Article.objects.filter(authors=membre, status='published').count(),
-            'publications_recentes': publications_recentes,
-        })
-    
-    context = {
-        'membres': membres_data,
-        'title': 'Notre équipe de recherche'
-    }
-    return render(request, 'site_web/public_membre_liste.html', context)
-
-def membre_detail(request, user_id):
-    membre = get_object_or_404(CustomUser, id=user_id, is_active=True)
-    
-    # Récupérer toutes les publications publiées du membre
-    publications = Article.objects.filter(
-        authors=membre,
-        status='published'
-    ).order_by(*PUBLICATION_ORDER)
-    
-    context = {
-        'membre': membre,
-        'publications': publications,
-        'title': f'Profil de {membre.prenom} {membre.nom}'
-    }
-    return render(request, 'site_web/public_membre_detail.html', context)
-
-
 # site_web/views.py
 
 from django.shortcuts import render, redirect
