@@ -30,6 +30,9 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
     def get_object(self):
         return self.request.user
 
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(back_url=reverse_lazy('profile'), back_label='Mon profil', **kwargs)
+
     def form_valid(self, form):
         messages.success(self.request, "Votre profil a été mis à jour avec succès.")
         return super().form_valid(form)

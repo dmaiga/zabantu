@@ -609,7 +609,7 @@ from .models import NewsletterSubscriber
 from django.contrib import messages
 
 def newsletter_unsubscribe(request, token):
-    """Désabonnement de l'infolettre, via le jeton propre à chaque abonné"""
+    """Désabonnement de l'info-lettre, via le jeton propre à chaque abonné"""
     subscriber = get_object_or_404(NewsletterSubscriber, token=token)
     
     if request.method == 'POST':
@@ -639,7 +639,7 @@ def newsletter_subscribe(request):
                 subscriber.is_active = True
                 subscriber.save()
             
-            messages.success(request, 'Vous êtes maintenant abonné à notre newsletter!')
+            messages.success(request, 'Vous êtes maintenant abonné à notre info-lettre !')
             return redirect('home')
     
     return redirect('home')

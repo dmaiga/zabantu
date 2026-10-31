@@ -34,6 +34,9 @@
                         <a href="{% url 'intervenant_update' intervenant.id %}" class="btn btn-outline-primary">
                             Modifier
                         </a>
+                        {% if user.can_moderate %}
+                        {% url 'intervenant_delete' intervenant.id as action_url %}{% include 'includes/post_action.html' with url=action_url label='Supprimer' btn_class='btn-outline-danger w-100' icon='fa-trash' confirm='Supprimer cet intervenant ? Il sera retiré des événements auxquels il est associé.' %}
+                        {% endif %}
                     </div>
                 </div>
                 

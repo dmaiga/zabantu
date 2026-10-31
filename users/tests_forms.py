@@ -1,3 +1,4 @@
+import re
 from datetime import timedelta
 
 from django.test import TestCase
@@ -200,3 +201,90 @@ class RequiredFieldsAreAnnouncedTests(TestCase):
         self.assertIn('au moins un auteur', str(form.non_field_errors()).lower())
         self.assertIn('Au moins un auteur', AcademicForm().fields['academic_authors'].help_text)
         self.assertIn('Au moins un auteur', AcademicForm().fields['authors'].help_text)
+
+
+class RemainingScreensTests(TestCase):
+    """Intervenants, galeries, profil : mêmes listes, formulaires et droits que le reste du backoffice."""
+
+    def setUp(self):
+        self.moderator = make_user('moderateur')
+        self.client.force_login(self.moderator)
+
+    def person(self, n=0, **kw):
+        from intervenants.models import Intervenant
+        return Intervenant.objects.create(first_name=f'Prenom{n}', last_name=f'Nom{n}', email=f'i{n}@t.org',
+                                          organization='Université', bio='b', intervenant_type='speaker', **kw)
+
+    def test_intervenant_list_is_paginated_filtered_and_searchable(self):
+        for i in range(23):
+            self.person(i, is_available=(i % 2 == 0))
+        r = self.client.get(reverse('intervenant_list'))
+        self.assertEqual((len(r.context['page_obj']), r.context['page_obj'].paginator.count), (20, 23))
+        free = self.client.get(reverse('intervenant_list'), {'availability': 'available'}).context['page_obj']
+        self.assertTrue(all(p.is_available for p in free))
+        found = self.client.get(reverse('intervenant_list'), {'q': 'Nom7', 'type': 'nope'}).context['page_obj']
+        self.assertEqual([p.last_name for p in found], ['Nom7'])
+
+    def test_intervenant_form_uses_the_wizard_and_creates(self):
+        r = self.client.get(reverse('intervenant_create'))
+        self.assertContains(r, 'data-goto=', count=4)
+        r = self.client.post(reverse('intervenant_create'), {
+            'first_name': 'Aminata', 'last_name': 'Cissé', 'email': 'a@t.org', 'organization': 'U',
+            'bio': 'bio', 'intervenant_type': 'expert', 'is_available': 'on'})
+        from intervenants.models import Intervenant
+        self.assertTrue(Intervenant.objects.filter(email='a@t.org').exists())
+
+    def test_deleting_an_intervenant_needs_post_and_a_moderator(self):
+        from intervenants.models import Intervenant
+        person = self.person()
+        url = reverse('intervenant_delete', args=[person.id])
+        self.assertEqual(self.client.get(url).status_code, 405)
+        self.client.force_login(make_user('membre'))
+        self.assertEqual(self.client.post(url).status_code, 403)
+        self.client.force_login(self.moderator)
+        self.client.post(url)
+        self.assertFalse(Intervenant.objects.filter(pk=person.pk).exists())
+
+    def test_gallery_form_and_permissions(self):
+        from gallery.models import Gallery
+        r = self.client.post(reverse('gallery_create'), {'title': 'Ma galerie', 'description': 'd'})
+        gallery = Gallery.objects.get(title='Ma galerie')
+        self.assertEqual(self.client.get(reverse('gallery_update', args=[gallery.slug])).status_code, 200)
+        self.client.force_login(make_user('membre'))
+        self.assertEqual(self.client.post(reverse('gallery_delete', args=[gallery.slug])).status_code, 403)
+        self.client.logout()
+        self.assertEqual(self.client.get(reverse('gallery_update', args=[gallery.slug])).status_code, 302)
+
+    def test_a_moderator_can_edit_a_galery_created_by_someone_else(self):
+        from gallery.models import Gallery
+        gallery = Gallery.objects.create(title='Des autres', created_by=make_user('membre'))
+        self.assertEqual(self.client.get(reverse('gallery_update', args=[gallery.slug])).status_code, 200)
+
+    def test_profile_edit_uses_the_common_form(self):
+        r = self.client.get(reverse('profile_edit'))
+        self.assertContains(r, 'data-goto=', count=4)
+        self.assertContains(r, 'Champ obligatoire')
+
+
+class CommunicationSectionTests(TestCase):
+    def setUp(self):
+        self.client.force_login(make_user('moderateur'))
+
+    def test_every_communication_screen_shares_the_same_tabs(self):
+        for name in ('contact_message_list', 'sent_messages_list', 'newsletter_list', 'newsletter_campaign_list'):
+            r = self.client.get(reverse(name))
+            self.assertContains(r, 'Messages reçus', msg_prefix=name)
+            self.assertContains(r, "Campagnes d'info-lettre", msg_prefix=name)
+
+    def test_the_word_newsletter_is_gone_from_the_backoffice(self):
+        for name in ('contact_message_list', 'newsletter_list', 'newsletter_campaign_list', 'dashboard'):
+            html = self.client.get(reverse(name)).content.decode()
+            visible = re.sub(r'(href|action|class|id|name)="[^"]*"', '', html)
+            self.assertNotIn('Newsletter', visible, name)
+
+    def test_unread_count_shows_in_the_menu_and_tabs(self):
+        from site_web.models import ContactMessage
+        ContactMessage.objects.create(name='A', last_name='B', email='a@b.org', subject='S', message='m')
+        html = self.client.get(reverse('dashboard')).content.decode()
+        self.assertIn('Messages et info-lettre', html)
+        self.assertIn('badge bg-danger ms-1">1<', html.replace('\n', '').replace('  ', ''))

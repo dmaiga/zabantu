@@ -136,7 +136,7 @@ Tester à la main avant d'activer le cron : `python manage.py publish_scheduled`
 La commande peut être relancée sans risque : un contenu n'est publié et annoncé qu'une fois.
 
 Variables d'environnement utiles aux e-mails : `SITE_URL` (liens des e-mails), `EMAIL_HOST_USER_MAIN` / `EMAIL_HOST_PASSWORD_MAIN`
-(réponses, accusés de réception, admissions) et `EMAIL_HOST_USER_NEWS` / `EMAIL_HOST_PASSWORD_NEWS` (infolettre et annonces).
+(réponses, accusés de réception, admissions) et `EMAIL_HOST_USER_NEWS` / `EMAIL_HOST_PASSWORD_NEWS` (info-lettre et annonces).
 
 ## 5. Vérifications après déploiement
 

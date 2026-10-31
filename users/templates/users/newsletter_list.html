@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
 
-{% block title %}Abonnés Newsletter | Zabantu Backoffice{% endblock %}
+{% block title %}Abonnés à l'info-lettre | Zabantu Backoffice{% endblock %}
 
 {% block content %}
+<div class="container-fluid pt-4 pb-0">{% include 'includes/communication_tabs.html' %}</div>
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h4 class="mb-0" style="color: black;">
             <i class="fas fa-envelope me-2"></i>
-            Abonnés Newsletter
+            Abonnés à l'info-lettre
         </h4>
         <div>
             <span class="badge bg-primary me-2">{{ total_count }} abonnés</span>
@@ -123,8 +124,8 @@
         {% else %}
             <div class="text-center py-5">
                 <i class="fas fa-envelope-open-text fa-3x text-muted mb-3"></i>
-                <h5 class="text-muted">Aucun abonné à la newsletter</h5>
-                <p class="text-muted">Commencez par créer votre première campagne de newsletter.</p>
+                <h5 class="text-muted">Aucun abonné à l'info-lettre</h5>
+                <p class="text-muted">Commencez par créer votre première campagne d'info-lettre.</p>
                 <a href="{% url 'newsletter_campaign_create' %}" class="btn btn-primary mt-3">
                     <i class="fas fa-plus me-1"></i> Créer une campagne
                 </a>

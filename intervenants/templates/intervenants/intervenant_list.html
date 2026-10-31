@@ -1,148 +1,66 @@
-{% extends 'base.html' %}
+{% extends 'list_base.html' %}
 
-{% block title %}Intervenants - Zabantu{% endblock %}
+{% block title %}Intervenants{% endblock %}
+{% block list_title %}Intervenants{% endblock %}
+{% block list_noun %}intervenant(s){% endblock %}
 
+{% block list_actions %}
+<a href="{% url 'intervenant_create' %}" class="btn btn-primary"><i class="fas fa-plus me-1"></i> Nouvel intervenant</a>
+{% endblock %}
 
-{% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-chalkboard-teacher me-2"></i>Gestion des Intervenants</h2>
-        <a href="{% url 'intervenant_create' %}" class="btn btn-primary">
-            <i class="fas fa-plus me-1"></i> Nouvel intervenant
-        </a>
+{% block list_filters %}
+<form method="get" class="card card-body mb-3 row g-2 flex-row">
+    <div class="col-md-5"><input type="search" name="q" class="form-control" placeholder="Nom, organisation, expertise…" value="{{ form.q.value|default:'' }}"></div>
+    <div class="col-md-3">
+        <select name="type" class="form-select" aria-label="Type">
+            <option value="">Tous les types</option>
+            {% for value, label in type_choices %}<option value="{{ value }}" {% if form.type.value == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
     </div>
+    <div class="col-md-2">
+        <select name="availability" class="form-select" aria-label="Disponibilité">
+            <option value="">Toutes disponibilités</option>
+            <option value="available" {% if form.availability.value == 'available' %}selected{% endif %}>Disponibles</option>
+            <option value="unavailable" {% if form.availability.value == 'unavailable' %}selected{% endif %}>Indisponibles</option>
+        </select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+        <button class="btn btn-primary flex-fill">Filtrer</button>
+        <a href="{% url 'intervenant_list' %}" class="btn btn-outline-secondary" title="Réinitialiser" aria-label="Réinitialiser"><i class="fas fa-rotate-left"></i></a>
+    </div>
+</form>
+{% endblock %}
 
-    <!-- Filtres -->
-    <div class="card mb-4 filter-card">
-        <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label small text-muted">Type d'intervenant</label>
-                    <select name="type" class="form-select" onchange="this.form.submit()">
-                        <option value="">Tous les types</option>
-                        <option value="moderator" {% if type_filter == 'moderator' %}selected{% endif %}>Modérateur</option>
-                        <option value="speaker" {% if type_filter == 'speaker' %}selected{% endif %}>Intervenant</option>
-                        <option value="trainer" {% if type_filter == 'trainer' %}selected{% endif %}>Formateur</option>
-                        <option value="panelist" {% if type_filter == 'panelist' %}selected{% endif %}>Panéliste</option>
-                        <option value="expert" {% if type_filter == 'expert' %}selected{% endif %}>Expert</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label small text-muted">Disponibilité</label>
-                    <select name="disponibility" class="form-select" onchange="this.form.submit()">
-                        <option value="">Tous</option>
-                        <option value="available" {% if disponibility_filter == 'available' %}selected{% endif %}>Disponible</option>
-                        <option value="unavailable" {% if disponibility_filter == 'unavailable' %}selected{% endif %}>Non disponible</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label small text-muted">Recherche</label>
-                    <div class="input-group">
-                        <input type="text" name="q" class="form-control" placeholder="Nom, organisation..." value="{{ search_query }}">
-                        <button type="submit" class="btn btn-outline-secondary">
-                            <i class="fas fa-search"></i>
-                        </button>
+{% block list_table %}
+<table class="table align-middle mb-0">
+    <thead><tr><th>Intervenant</th><th>Organisation</th><th>Type</th><th>Interventions</th><th>Disponibilité</th><th class="text-end">Actions</th></tr></thead>
+    <tbody>
+    {% for person in page_obj %}
+        <tr>
+            <td>
+                <div class="d-flex gap-3 align-items-center">
+                    {% if person.photo %}<img src="{{ person.photo.url }}" alt="" width="40" height="40" class="rounded-circle" style="object-fit: cover;">
+                    {% else %}<div class="rounded-circle bg-light border d-flex align-items-center justify-content-center" style="width:40px;height:40px;"><i class="fas fa-user text-muted"></i></div>{% endif %}
+                    <div>
+                        <a href="{% url 'intervenant_detail' person.id %}" class="fw-semibold text-decoration-none text-dark">{{ person.full_name }}</a>
+                        <div class="small text-muted">{{ person.email }}</div>
                     </div>
                 </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Liste des intervenants -->
-    <div class="row">
-        {% for intervenant in intervenants %}
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100 intervenant-card">
-                <div class="card-body">
-<div class="d-flex align-items-center mb-3" style="min-width: 0;">
-    <div class="flex-shrink-0" style="width: 60px; height: 60px;">
-        {% if intervenant.photo %}
-            <img src="{{ intervenant.photo.url }}" 
-                 class="rounded-circle" 
-                 style="width: 60px; height: 60px; object-fit: cover; border: 2px solid var(--bs-accent);" 
-                 alt="{{ intervenant.full_name }}">
-        {% else %}
-            <div class="avatar-placeholder">
-                {{ intervenant.first_name|first }}{{ intervenant.last_name|first }}
-            </div>
-        {% endif %}
-    </div>
-    
-    <div class="ms-3 flex-grow-1" style="min-width: 0;">
-        <h5 class="card-title mb-0 text-truncate" style="font-size: 1.1rem;">{{ intervenant.full_name }}</h5>
-        <p class="text-muted mb-0 small text-truncate">{{ intervenant.organization }}</p>
-    </div>
-</div>
-                    
-                    <div class="mt-3">
-                        {% if intervenant.position %}
-                        <p class="card-text text-muted small mb-1">
-                            <i class="fas fa-briefcase me-1"></i>{{ intervenant.position }}
-                        </p>
-                        {% endif %}
-                        
-                        {% if intervenant.expertise %}
-                        <p class="card-text text-muted small">
-                            <i class="fas fa-star me-1"></i>{{ intervenant.expertise|truncatewords:8 }}
-                        </p>
-                        {% endif %}
-                    </div>
+            </td>
+            <td class="small">{{ person.organization }}{% if person.position %}<div class="text-muted">{{ person.position }}</div>{% endif %}</td>
+            <td><span class="badge bg-light text-dark border">{{ person.type_display }}</span></td>
+            <td>{{ person.n_events }}</td>
+            <td><span class="badge {% if person.is_available %}bg-success{% else %}bg-secondary{% endif %}">{% if person.is_available %}Disponible{% else %}Indisponible{% endif %}</span></td>
+            <td class="text-end">
+                <div class="d-inline-flex gap-1">
+                    {% url 'intervenant_detail' person.id as detail_url %}{% include 'includes/icon_action.html' with url=detail_url icon='fa-eye' title='Voir' variant='primary' %}
+                    {% url 'intervenant_update' person.id as edit_url %}{% include 'includes/icon_action.html' with url=edit_url icon='fa-pen' title='Modifier' variant='secondary' %}
                 </div>
-                <div class="card-footer">
-                    <div class="d-flex gap-2">
-                        <a href="{% url 'intervenant_detail' intervenant.id %}" class="btn btn-sm btn-outline-primary flex-fill">
-                            <i class="fas fa-eye me-1"></i> Détails
-                        </a>
-                        <a href="{% url 'intervenant_update' intervenant.id %}" class="btn btn-sm btn-outline-secondary flex-fill">
-                            <i class="fas fa-edit me-1"></i> Modifier
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info text-center py-4">
-                <i class="fas fa-users fa-2x mb-3"></i>
-                <h4 class="alert-heading">Aucun intervenant trouvé</h4>
-                <p class="mb-0">Aucun intervenant ne correspond à vos critères de recherche.</p>
-                <a href="{% url 'intervenant_create' %}" class="alert-link mt-2 d-block">
-                    <i class="fas fa-plus me-1"></i> Ajouter le premier intervenant
-                </a>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <!-- Pagination -->
-    {% if is_paginated %}
-    <nav aria-label="Page navigation" class="mt-4">
-        <ul class="pagination justify-content-center">
-            {% if page_obj.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if disponibility_filter %}&disponibility={{ disponibility_filter }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-            {% endif %}
-            
-            {% for num in page_obj.paginator.page_range %}
-            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-                <a class="page-link" href="?page={{ num }}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if disponibility_filter %}&disponibility={{ disponibility_filter }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">
-                    {{ num }}
-                </a>
-            </li>
-            {% endfor %}
-            
-            {% if page_obj.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if type_filter %}&type={{ type_filter }}{% endif %}{% if disponibility_filter %}&disponibility={{ disponibility_filter }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-            {% endif %}
-        </ul>
-    </nav>
-    {% endif %}
-</div>
+            </td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="6" class="text-center py-5 text-muted">Aucun intervenant ne correspond à ces critères.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

@@ -235,8 +235,11 @@
                     {% if user.can_moderate %}
                     <hr class="sidebar-divider">
                     <li class="sidebar-group">Communication</li>
-                    <li><a href="{% url 'contact_message_list' %}"><i class="fas fa-comments"></i> Messages</a></li>
-                    <li><a href="{% url 'newsletter_list' %}"><i class="fas fa-envelope"></i> Infolettre</a></li>
+                    <li class="{% if 'contact-messages' in request.path or 'newsletter' in request.path %}active{% endif %}">
+                        <a href="{% url 'contact_message_list' %}"><i class="fas fa-comments"></i> Messages et info-lettre
+                            {% if unread_messages_count %}<span class="badge bg-danger ms-1">{{ unread_messages_count }}</span>{% endif %}
+                        </a>
+                    </li>
                     {% endif %}
 
                     <hr class="sidebar-divider">

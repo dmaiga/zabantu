@@ -112,7 +112,14 @@ class CustomMemberCreationForm(SectionedFormMixin, forms.ModelForm):
 
 
 
-class ProfileEditForm(forms.ModelForm):
+class ProfileEditForm(SectionedFormMixin, forms.ModelForm):
+    sections = (
+        ('Identité', ('prenom', 'nom', 'email', 'phone_number', 'profile_picture')),
+        ('Fonction', ('job_title', 'department')),
+        ('Biographie', ('bio',)),
+        ('Réseaux et liens', ('social_facebook', 'social_linkedin', 'social_twitter', 'social_instagram',
+                              'scholar_link', 'personal_website')),
+    )
     
     
     phone_number = forms.CharField(

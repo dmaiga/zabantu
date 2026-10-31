@@ -1,7 +1,7 @@
 """Envoi des e-mails du site : un seul point d'entrée pour la connexion, le rendu et le journal.
 
 - notify_publication(obj)  : annonce une publication ou un événement aux abonnés actifs
-- send_campaign(campaign)  : envoie une campagne d'infolettre à ses destinataires
+- send_campaign(campaign)  : envoie une campagne d'info-lettre à ses destinataires
 - send_reply(...)          : réponse à un message de contact
 """
 import html
@@ -35,7 +35,7 @@ def unsubscribe_url(subscriber):
 
 
 def newsletter_connection():
-    """Connexion SMTP dédiée à l'infolettre (le backend suit EMAIL_BACKEND : console en dev, mémoire en test)."""
+    """Connexion SMTP dédiée à l'info-lettre (le backend suit EMAIL_BACKEND : console en dev, mémoire en test)."""
     return get_connection(
         host=settings.EMAIL_HOST_NEWS,
         port=settings.EMAIL_PORT_NEWS,
@@ -66,7 +66,7 @@ def _deliver(messages):
     try:
         connection.open()
     except Exception:
-        logger.exception("Connexion au serveur d'infolettre impossible")
+        logger.exception("Connexion au serveur d'info-lettre impossible")
         return sent, list(messages)
     try:
         for key, message in messages.items():

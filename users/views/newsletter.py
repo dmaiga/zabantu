@@ -34,7 +34,7 @@ def newsletter_campaign_list(request):
     campaigns = NewsletterCampaign.objects.all().order_by('-created_at')
     return render(request, 'users/newsletter/campaign_list.html', {
         'campaigns': campaigns,
-        'title': 'Campagnes de newsletter'
+        'title': 'Campagnes d\'info-lettre'
     })
 
 
@@ -94,9 +94,9 @@ def newsletter_campaign_send(request, pk):
     
     sent, failed = campaign.send()
     if not failed:
-        messages.success(request, f"Infolettre envoyée à {sent} destinataire(s).")
+        messages.success(request, f"Info-lettre envoyée à {sent} destinataire(s).")
     elif sent:
-        messages.warning(request, f"Infolettre partiellement envoyée : {sent} réussi(s), {failed} échec(s).")
+        messages.warning(request, f"Info-lettre partiellement envoyée : {sent} réussi(s), {failed} échec(s).")
     else:
         messages.error(request, "Aucun e-mail n'a pu être envoyé. Vérifiez la configuration e-mail.")
 

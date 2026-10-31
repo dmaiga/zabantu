@@ -30,8 +30,8 @@ class NewsletterSubscriber(models.Model):
         return self.email
 
     class Meta:
-        verbose_name = _('abonné à la newsletter')
-        verbose_name_plural = _('abonnés à la newsletter')
+        verbose_name = _("abonné à l'info-lettre")
+        verbose_name_plural = _("abonnés à l'info-lettre")
 
 class NewsletterCampaign(models.Model):
     STATUS_CHOICES = (
@@ -58,8 +58,8 @@ class NewsletterCampaign(models.Model):
     content_object = GenericForeignKey('content_type', 'object_id')
     
     class Meta:
-        verbose_name = _('campagne de newsletter')
-        verbose_name_plural = _('campagnes de newsletter')
+        verbose_name = _("campagne d'info-lettre")
+        verbose_name_plural = _("campagnes d'info-lettre")
         ordering = ['-created_at']
     
     def __str__(self):
@@ -74,8 +74,8 @@ class NewsletterCampaign(models.Model):
         return send_campaign(self)
 
     class Meta:
-        verbose_name = _('campagne de newsletter')
-        verbose_name_plural = _('campagnes de newsletter')
+        verbose_name = _("campagne d'info-lettre")
+        verbose_name_plural = _("campagnes d'info-lettre")
         ordering = ['-created_at']
 
 
@@ -88,8 +88,8 @@ class NewsletterLog(models.Model):
     token = models.UUIDField(_('token de suivi'), default=uuid.uuid4, editable=False, unique=True)
     
     class Meta:
-        verbose_name = _('log de newsletter')
-        verbose_name_plural = _('logs de newsletter')
+        verbose_name = _("journal d'info-lettre")
+        verbose_name_plural = _("journaux d'info-lettre")
         unique_together = ('campaign', 'subscriber')
 
 class NewsletterRecipient(models.Model):
@@ -99,8 +99,8 @@ class NewsletterRecipient(models.Model):
     opened_at = models.DateTimeField(_('ouvert le'), null=True, blank=True)
     
     class Meta:
-        verbose_name = _('destinataire de newsletter')
-        verbose_name_plural = _('destinataires de newsletter')
+        verbose_name = _("destinataire d'info-lettre")
+        verbose_name_plural = _("destinataires d'info-lettre")
         unique_together = ['campaign', 'subscriber']
                              
 

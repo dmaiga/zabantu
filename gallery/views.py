@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator
 from django.contrib import messages
+from django.urls import reverse
+from users.permissions import moderator_required
 from .models import Gallery, Photo
 from .forms import GalleryForm, PhotoForm
 
@@ -46,14 +48,15 @@ def gallery_create(request):
     else:
         form = GalleryForm()
     
-    return render(request, 'gallery/gallery_form.html', {'form': form})
+    return render(request, 'gallery/gallery_form.html', {'form': form, 'back_url': reverse('gallery_list')})
 
+@login_required
 @login_required
 def gallery_update(request, slug):
     gallery = get_object_or_404(Gallery, slug=slug)
-    
-    # Autoriser l'admin ou le staff à modifier toutes les galeries
-    if not (request.user == gallery.created_by or request.user.is_staff):
+
+    # Le créateur, les modérateurs et les administrateurs peuvent modifier une galerie
+    if not (request.user == gallery.created_by or request.user.can_moderate):
         messages.error(request, "Permission refusée")
         return redirect('gallery_detail', slug=slug)
     
@@ -69,10 +72,11 @@ def gallery_update(request, slug):
     return render(request, 'gallery/gallery_form.html', {
         'form': form,
         'gallery': gallery,
-        'is_update': True
+        'is_update': True,
+        'back_url': reverse('gallery_detail', args=[gallery.slug]),
     })
 
-@login_required
+@moderator_required
 def gallery_delete(request, slug):
     gallery = get_object_or_404(Gallery, slug=slug)
     
@@ -154,7 +158,7 @@ def photo_update(request, pk):
         'is_update': True
     })
 
-@login_required
+@moderator_required
 def photo_delete(request, pk):
     photo = get_object_or_404(Photo, pk=pk)
     

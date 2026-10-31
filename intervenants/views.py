@@ -2,45 +2,29 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.http import JsonResponse
-from django.db.models import Q
+from django.db.models import Count, Q
+from django.urls import reverse
+from django.views.decorators.http import require_POST
+from users.listing import paginate
+from users.permissions import moderator_required
+from .filters import IntervenantFilterForm
 from .models import Intervenant
 from .forms import IntervenantForm
 
 
 @login_required
 def intervenant_list(request):
-    """Liste de tous les intervenants"""
-    intervenants = Intervenant.objects.all().order_by('last_name', 'first_name')
-    
-    # Filtres
-    type_filter = request.GET.get('type', '')
-    disponibility_filter = request.GET.get('disponibility', '')
-    search_query = request.GET.get('q', '')
-    
-    if type_filter:
-        intervenants = intervenants.filter(intervenant_type=type_filter)
-    
-    if disponibility_filter:
-        if disponibility_filter == 'available':
-            intervenants = intervenants.filter(is_available=True)
-        elif disponibility_filter == 'unavailable':
-            intervenants = intervenants.filter(is_available=False)
-    
-    if search_query:
-        intervenants = intervenants.filter(
-            Q(first_name__icontains=search_query) |
-            Q(last_name__icontains=search_query) |
-            Q(organization__icontains=search_query) |
-            Q(expertise__icontains=search_query)
-        )
-    
-    context = {
-        'intervenants': intervenants,
-        'type_filter': type_filter,
-        'disponibility_filter': disponibility_filter,
-        'search_query': search_query,
-    }
-    return render(request, 'intervenants/intervenant_list.html', context)
+    """Liste des intervenants, avec filtres et pagination"""
+    form = IntervenantFilterForm(request.GET)
+    intervenants = form.apply(
+        Intervenant.objects.annotate(n_events=Count('eventintervenant')).order_by('last_name', 'first_name'))
+    page_obj, querystring = paginate(request, intervenants)
+    return render(request, 'intervenants/intervenant_list.html', {
+        'form': form,
+        'page_obj': page_obj,
+        'querystring': querystring,
+        'type_choices': Intervenant.TYPE_INTERVENANT_CHOICES,
+    })
 
 @login_required
 def intervenant_detail(request, id):
@@ -73,7 +57,8 @@ def intervenant_create(request):
     
     context = {
         'form': form,
-        'title': 'Nouvel intervenant'
+        'title': 'Nouvel intervenant',
+        'back_url': reverse('intervenant_list'),
     }
     return render(request, 'intervenants/intervenant_form.html', context)
 
@@ -96,25 +81,20 @@ def intervenant_update(request, id):
     context = {
         'form': form,
         'intervenant': intervenant,
-        'title': f"Modifier {intervenant.full_name()}"
+        'title': f"Modifier {intervenant.full_name()}",
+        'back_url': reverse('intervenant_detail', args=[intervenant.id]),
     }
     return render(request, 'intervenants/intervenant_form.html', context)
 
-@login_required
+@require_POST
+@moderator_required
 def intervenant_delete(request, id):
-    """Supprimer un intervenant"""
+    """Supprimer un intervenant (depuis sa fiche, avec confirmation)"""
     intervenant = get_object_or_404(Intervenant, id=id)
-    
-    if request.method == 'POST':
-        intervenant_name = intervenant.full_name()
-        intervenant.delete()
-        messages.success(request, f"L'intervenant {intervenant_name} a été supprimé avec succès.")
-        return redirect('intervenant_list')
-    
-    context = {
-        'intervenant': intervenant
-    }
-    return render(request, 'intervenants/intervenant_delete.html', context)
+    name = intervenant.full_name()
+    intervenant.delete()
+    messages.success(request, f"L'intervenant {name} a été supprimé avec succès.")
+    return redirect('intervenant_list')
 
 @login_required
 def search_intervenants_ajax(request):

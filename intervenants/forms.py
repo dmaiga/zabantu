@@ -1,8 +1,15 @@
 from django import forms
+from users.formsupport import SectionedFormMixin
 from .models import Intervenant
 import re
 
-class IntervenantForm(forms.ModelForm):
+class IntervenantForm(SectionedFormMixin, forms.ModelForm):
+    sections = (
+        ('Identité', ('first_name', 'last_name', 'email', 'phone', 'photo')),
+        ('Profil', ('organization', 'position', 'intervenant_type', 'expertise', 'bio')),
+        ('Liens', ('linkedin', 'facebook', 'website')),
+        ('Disponibilité et notes', ('is_available', 'note_internal')),
+    )
     class Meta:
         model = Intervenant
         fields = [

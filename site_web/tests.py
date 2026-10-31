@@ -87,7 +87,7 @@ class BackofficeApplicationTests(TestCase):
     def test_submission_appears_in_dashboard_and_sidebar(self):
         self.client.force_login(self.admin)
         r = self.client.get(reverse('dashboard'))
-        self.assertContains(r, "demande d'adhésion en attente")
+        self.assertContains(r, "demande d&#x27;adhésion à examiner")
         self.assertContains(r, reverse('membership_application_list'))
         self.assertContains(self.client.get(reverse('membership_application_list')), 'Awa Traoré')
 

@@ -1,7 +1,9 @@
 from django import forms
+from users.formsupport import SectionedFormMixin
 from .models import Gallery, Photo
 
-class GalleryForm(forms.ModelForm):
+class GalleryForm(SectionedFormMixin, forms.ModelForm):
+    sections = (('Galerie', ('title', 'description', 'cover_image')), ('Mise en avant', ('is_featured',)))
     class Meta:
         model = Gallery
         fields = ['title', 'description', 'cover_image', 'is_featured']

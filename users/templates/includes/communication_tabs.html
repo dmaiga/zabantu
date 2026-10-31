@@ -1,0 +1,9 @@
+{# Onglets de la section Communication : messages reçus et info-lettre #}
+{% with name=request.resolver_match.url_name %}
+<ul class="nav nav-tabs mb-4">
+    <li class="nav-item"><a class="nav-link {% if name == 'contact_message_list' or name == 'contact_message_detail' or name == 'contact_message_reply' %}active{% endif %}" href="{% url 'contact_message_list' %}">Messages reçus{% if unread_messages_count %} <span class="badge bg-danger">{{ unread_messages_count }}</span>{% endif %}</a></li>
+    <li class="nav-item"><a class="nav-link {% if name == 'sent_messages_list' %}active{% endif %}" href="{% url 'sent_messages_list' %}">Réponses envoyées</a></li>
+    <li class="nav-item"><a class="nav-link {% if name == 'newsletter_list' %}active{% endif %}" href="{% url 'newsletter_list' %}">Abonnés à l'info-lettre</a></li>
+    <li class="nav-item"><a class="nav-link {% if 'newsletter_campaign' in name %}active{% endif %}" href="{% url 'newsletter_campaign_list' %}">Campagnes d'info-lettre</a></li>
+</ul>
+{% endwith %}
