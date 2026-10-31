@@ -203,3 +203,24 @@ class BackofficeAccessTests(TestCase):
         admin = make_user('admin')
         self.client.force_login(make_user('moderateur'))
         self.assertEqual(self.client.get(reverse('update_user', args=[admin.pk])).status_code, 403)
+
+
+class SuperuserAccessTests(TestCase):
+    def test_createsuperuser_account_can_log_in_and_moderate(self):
+        from django.core.management import call_command
+        call_command('createsuperuser', interactive=False, username='root', email='root@test.org',
+                     nom='Root', prenom='Super', verbosity=0)
+        root = get_user_model().objects.get(username='root')
+        root.set_password('secret-pass-123')
+        root.save()
+        self.assertEqual(root.role, 'admin')
+        self.assertTrue(root.can_access_backoffice and root.can_moderate)
+        r = self.client.post(reverse('login'), {'username': 'root', 'password': 'secret-pass-123'})
+        self.assertRedirects(r, reverse('dashboard'), fetch_redirect_response=False)
+
+    def test_superuser_keeps_access_even_if_role_was_changed_in_bulk(self):
+        get_user_model().objects.create_superuser(
+            username='su', email='su@test.org', password='x', nom='S', prenom='U')
+        get_user_model().objects.filter(username='su').update(role='membre')
+        su = get_user_model().objects.get(username='su')
+        self.assertTrue(su.can_access_backoffice and su.can_moderate)

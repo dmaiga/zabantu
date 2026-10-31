@@ -120,12 +120,12 @@ class CustomUser(AbstractUser):
     @property
     def can_access_backoffice(self):
         """Seuls les administrateurs, les modérateurs et les membres explicitement autorisés peuvent se connecter."""
-        return self.role in ('admin', 'moderateur') or self.backoffice_access
+        return self.is_superuser or self.role in ('admin', 'moderateur') or self.backoffice_access
 
     @property
     def can_moderate(self):
         """Peut publier, dépublier et supprimer les contenus du site."""
-        return self.role in ('admin', 'moderateur')
+        return self.is_superuser or self.role in ('admin', 'moderateur')
     
     @property
     def has_academic_profile(self):
