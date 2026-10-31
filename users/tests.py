@@ -92,3 +92,25 @@ class PasswordResetFlowTests(TestCase):
     def test_invalid_link_page(self):
         r = self.client.get(reverse('password_reset_confirm', args=['abc', 'token-invalide']))
         self.assertContains(r, 'Lien invalide')
+
+
+class PartenaireBackofficeTests(TestCase):
+    def setUp(self):
+        from users.models import Partenaire
+        from users.testing import make_user
+        self.partenaire = Partenaire.objects.create(name='Fondation X', logo='partenaires/x.png')
+        self.member = make_user('membre')
+        self.moderator = make_user('moderateur')
+
+    def test_member_cannot_see_or_toggle_partners(self):
+        self.client.force_login(self.member)
+        self.assertEqual(self.client.get(reverse('partenaire_list')).status_code, 403)
+        self.assertEqual(self.client.post(reverse('partenaire_toggle', args=[self.partenaire.pk])).status_code, 403)
+
+    def test_toggle_requires_post_and_flips_status(self):
+        self.client.force_login(self.moderator)
+        url = reverse('partenaire_toggle', args=[self.partenaire.pk])
+        self.assertEqual(self.client.get(url).status_code, 405)
+        self.client.post(url)
+        self.partenaire.refresh_from_db()
+        self.assertFalse(self.partenaire.is_active)

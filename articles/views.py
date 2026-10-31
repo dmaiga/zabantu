@@ -1,5 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from users.permissions import moderator_required
 from django.contrib import messages
 from django.utils.text import slugify
 from django.utils import timezone
@@ -121,15 +123,11 @@ def article_list(request):
     articles = Article.objects.all().order_by('-created_at')
     
     # Filtrage
-    category = request.GET.get('category')
     status = request.GET.get('status')
     article_type = request.GET.get('type')
     date_from = request.GET.get('date_from')
     date_to = request.GET.get('date_to')
     search_query = request.GET.get('search')
-    
-    if category:
-        articles = articles.filter(category=category)
     
     if status:
         articles = articles.filter(status=status)
@@ -163,7 +161,6 @@ def article_list(request):
       
         'status_choices': Article.STATUS_CHOICES,
         'article_types': Article.ARTICLE_TYPE_CHOICES,
-        'selected_category': category,
         'selected_status': status,
         'selected_type': article_type,
         'date_from': date_from,
@@ -179,7 +176,7 @@ def article_detail(request, slug):
     return render(request, 'articles/article_detail.html', {'article': article})
 
 # 🗑️ Supprimer un article
-@login_required
+@moderator_required
 def article_delete(request, slug):
     article = get_object_or_404(Article, slug=slug)
 
@@ -191,7 +188,8 @@ def article_delete(request, slug):
     return render(request, 'articles/article_confirm_delete.html', {'article': article})
 
 # articles/views.py
-@login_required
+@require_POST
+@moderator_required
 def publish_article(request, slug):
     article = get_object_or_404(Article, slug=slug)
     if not article.is_published():
@@ -200,13 +198,14 @@ def publish_article(request, slug):
         article.save()
         # Envoyer une newsletter si configuré
         if settings.SEND_NEWSLETTER_ON_PUBLISH:
-            send_content_published_newsletter(article, "Nouveau Article")
+            send_content_published_newsletter(article, "Nouvelle publication")
 
         messages.success(request, f"L'article « {article.title} » a été publié.")
     return redirect('article_detail', slug=slug)
 
 
-@login_required
+@require_POST
+@moderator_required
 def unpublish_article(request, slug):
     article = get_object_or_404(Article, slug=slug)
     if article.is_published():
@@ -226,7 +225,7 @@ def generate_guelekan_slug(title):
     base_slug = slugify(title)
     slug = base_slug
     i = 1
-    while Guelekan.objects.filter(slug=slug).exists():
+    while Gɛlɛkan.objects.filter(slug=slug).exists():
         slug = f"{base_slug}-{i}"
         i += 1
     return slug
@@ -294,29 +293,31 @@ def guelekan_detail(request, slug):
     })
 
 
-@login_required
+@moderator_required
 def guelekan_delete(request, slug):
     guelekan = get_object_or_404(Guelekan, slug=slug)
 
     if request.method == 'POST':
         guelekan.delete()
-        messages.success(request, "Le Guelekan a été supprimé avec succès.")
+        messages.success(request, "Le Gɛlɛkan a été supprimé avec succès.")
         return redirect('guelekan_list')
 
     return render(request, 'articles/guelekan_confirm_delete.html', {'guelekan': guelekan})
 
 
-@login_required
+@require_POST
+@moderator_required
 def unpublish_guelekan(request, slug):
     guelekan = get_object_or_404(Guelekan, slug=slug)
     if guelekan.is_published():
         guelekan.status = 'draft'
         guelekan.save()
-        messages.warning(request, f"Le Guelekan « {guelekan.title} » a été dépublié.")
+        messages.warning(request, f"Le Gɛlɛkan « {guelekan.title} » a été dépublié.")
     return redirect('guelekan_detail', slug=slug)
 
 
-@login_required
+@require_POST
+@moderator_required
 def publish_guelekan(request, slug):
     guelekan = get_object_or_404(Guelekan, slug=slug)
     if not guelekan.is_published():
@@ -325,9 +326,9 @@ def publish_guelekan(request, slug):
         
         # Envoyer une newsletter si configuré
         if settings.SEND_NEWSLETTER_ON_PUBLISH:
-            send_content_published_newsletter(guelekan, "Nouveau Guelekan")
+            send_content_published_newsletter(guelekan, "Nouvelle publication")
             
-        messages.success(request, f"Le Guelekan « {guelekan.title} » a été publié.")
+        messages.success(request, f"Le Gɛlɛkan « {guelekan.title} » a été publié.")
     return redirect('guelekan_detail', slug=slug)
 
 

@@ -38,9 +38,7 @@
                 <a href="{% url 'partenaire_detail' p.pk %}" class="btn btn-sm btn-light border" title="Détails">
                     Detail
                 </a>
-                <a href="{% url 'partenaire_toggle' p.pk %}" class="btn btn-sm {% if p.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}" title="Changer statut">
-                    <i class="fas fa-power-off"></i>
-                </a>
+                {% url 'partenaire_toggle' p.pk as action_url %}{% include 'includes/post_action.html' with url=action_url label=p.is_active|yesno:'Désactiver,Activer' btn_class='btn-sm btn-outline-secondary' icon='fa-power-off' %}
                
             </div>
         </div>

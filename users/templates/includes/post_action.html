@@ -1,0 +1,7 @@
+{# Action qui modifie des données : toujours un POST (jamais un lien). Paramètres : url, label, btn_class, icon, confirm #}
+<form method="post" action="{{ url }}" class="d-inline">
+    {% csrf_token %}
+    <button type="submit" class="btn {{ btn_class }}"{% if confirm %} onclick="return confirm('{{ confirm|escapejs }}')"{% endif %}>
+        {% if icon %}<i class="fas {{ icon }}"></i> {% endif %}{{ label }}
+    </button>
+</form>

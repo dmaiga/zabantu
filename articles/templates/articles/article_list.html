@@ -178,10 +178,7 @@
                                 </a>
 
                                 {% if article.status == 'draft' %}
-                                <a href="{% url 'publish_article' article.slug %}"
-                                   class="btn btn-sm btn-outline-success">
-                                    Publier
-                                </a>
+                                {% url 'publish_article' article.slug as action_url %}{% include 'includes/post_action.html' with url=action_url label='Publier' btn_class='btn-sm btn-outline-success' icon='' %}
                                 {% endif %}
 
                             </div>

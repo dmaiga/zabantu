@@ -72,6 +72,7 @@ from django.utils import timezone
 from site_web.models import NewsletterCampaign, NewsletterRecipient, NewsletterSubscriber
 import logging
 from .forms import NewsletterCampaignForm
+from .permissions import moderator_required
 from .email_utils import send_newsletter_email  # Import de notre utilitaire
 
 logger = logging.getLogger(__name__)
@@ -637,7 +638,7 @@ from .models import Partenaire
 from .forms import PartenaireForm
 
 
-@login_required
+@moderator_required
 def partenaire_list(request):
     partenaires = Partenaire.objects.all()
 
@@ -646,7 +647,7 @@ def partenaire_list(request):
     })
 
 
-@login_required
+@moderator_required
 def partenaire_create(request):
     form = PartenaireForm(request.POST or None, request.FILES or None)
 
@@ -661,7 +662,7 @@ def partenaire_create(request):
     })
 
 
-@login_required
+@moderator_required
 def partenaire_detail(request, pk):
     partenaire = get_object_or_404(Partenaire, pk=pk)
 
@@ -670,7 +671,8 @@ def partenaire_detail(request, pk):
     })
 
 
-@login_required
+@require_POST
+@moderator_required
 def partenaire_toggle(request, pk):
     partenaire = get_object_or_404(Partenaire, pk=pk)
 

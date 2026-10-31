@@ -1,6 +1,8 @@
 # views.py
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from users.permissions import moderator_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.db.models import Q
@@ -12,6 +14,9 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+
+
+EVENT_SORTS = {'date', '-date', 'title', '-title', 'created_at', '-created_at'}
 
 
 # Créer un événement (toujours en mode brouillon)
@@ -68,8 +73,8 @@ def event_update(request, id):
     })
 
 # Publier un événement
-@login_required
-@user_passes_test(lambda u: u.role in ['admin', 'moderateur'])
+@require_POST
+@moderator_required
 def event_publish(request, id):
     event = get_object_or_404(Event, id=id)
     
@@ -97,8 +102,8 @@ def event_publish(request, id):
     return redirect('event_detail', id=event.id)
 
 # Dépublier un événement (mettre en brouillon)
-@login_required
-@user_passes_test(lambda u: u.role in ['admin', 'moderateur'])
+@require_POST
+@moderator_required
 def event_unpublish(request, id):
     event = get_object_or_404(Event, id=id)
     
@@ -112,8 +117,8 @@ def event_unpublish(request, id):
     return redirect('event_detail', id=event.id)
 
 # Archiver un événement
-@login_required
-@user_passes_test(lambda u: u.role in ['admin', 'moderateur'])
+@require_POST
+@moderator_required
 def event_archive(request, id):
     event = get_object_or_404(Event, id=id)
     
@@ -127,7 +132,7 @@ def event_archive(request, id):
     return redirect('event_list')
 
 # Supprimer un événement
-@login_required
+@moderator_required
 def event_delete(request, id):
     event = get_object_or_404(Event, id=id)
     if request.method == 'POST':
@@ -140,19 +145,14 @@ def event_delete(request, id):
 @login_required
 def event_list(request):
     events = Event.objects.all()
-    
-    # Filtres
+
     status = request.GET.get('status', 'all')
     event_type = request.GET.get('type', 'all')
-    
-    if status == 'published':
-        events = events.filter(is_published=True)
-    elif status == 'draft':
-        events = events.filter(is_published=False)
-    
-    if event_type != 'all':
+    if status in dict(Event.STATUS_CHOICES):
+        events = events.filter(status=status)
+    if event_type in dict(Event.EVENT_TYPE_CHOICES):
         events = events.filter(event_type=event_type)
-    
+
     # Recherche
     search_query = request.GET.get('q', '')
     if search_query:
@@ -164,7 +164,9 @@ def event_list(request):
         )
     
     # Tri
-    sort = request.GET.get('sort', '-date')
+    sort = request.GET.get('sort')
+    if sort not in EVENT_SORTS:
+        sort = '-date'
     events = events.order_by(sort)
     
     context = {

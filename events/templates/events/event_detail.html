@@ -183,15 +183,11 @@
                 </a>
                 {% endif %}
 
-                {% if perms.events.publish_event %}
+                {% if user.can_moderate %}
                     {% if event.status == 'draft' %}
-                    <a href="{% url 'event_publish' event.id %}" class="btn btn-sm btn-success">
-                        <i class="fas fa-paper-plane me-1"></i> Publier
-                    </a>
+                    {% url 'event_publish' event.id as action_url %}{% include 'includes/post_action.html' with url=action_url label='Publier' btn_class='btn-sm btn-success' icon='fa-paper-plane' %}
                     {% elif event.status == 'published' %}
-                    <a href="{% url 'event_unpublish' event.id %}" class="btn btn-sm btn-warning text-dark">
-                        <i class="fas fa-eye-slash me-1"></i> Dépublier
-                    </a>
+                    {% url 'event_unpublish' event.id as action_url %}{% include 'includes/post_action.html' with url=action_url label='Dépublier' btn_class='btn-sm btn-warning text-dark' icon='fa-eye-slash' %}
                     {% endif %}
                 {% endif %}
             {% endif %}

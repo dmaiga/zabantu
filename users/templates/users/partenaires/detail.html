@@ -35,9 +35,7 @@
                 </div>
 
                 <div class="d-flex justify-content-center gap-2">
-                    <a href="{% url 'partenaire_toggle' partenaire.pk %}" class="btn btn-outline-dark px-4">
-                        {% if partenaire.is_active %}Désactiver{% else %}Activer{% endif %}
-                    </a>
+                    {% url 'partenaire_toggle' partenaire.pk as action_url %}{% include 'includes/post_action.html' with url=action_url label=partenaire.is_active|yesno:'Désactiver,Activer' btn_class='btn-outline-dark px-4' %}
                 </div>
             </div>
         </div>

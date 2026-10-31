@@ -217,7 +217,7 @@
         <a href="{% url 'event_detail' event.id %}" class="btn btn-sm btn-outline-primary">
             <i class="fas fa-eye me-1"></i> Détails
         </a>
-        {% if user.is_staff %}
+        {% if user.can_moderate %}
         <div class="btn-group">
             <a href="{% url 'event_update' event.id %}" class="btn btn-sm btn-outline-secondary">
                 <i class="fas fa-edit me-1"></i> Modifier
@@ -225,15 +225,9 @@
             
             <!-- Boutons de publication/dépublication -->
             {% if event.is_published %}
-            <a href="{% url 'event_unpublish' event.id %}" class="btn btn-sm btn-outline-warning" 
-               title="Dépublier l'événement">
-                Dépublier
-            </a>
+            {% url 'event_unpublish' event.id as action_url %}{% include 'includes/post_action.html' with url=action_url label='Dépublier' btn_class='btn-sm btn-outline-warning' icon='' %}
             {% else %}
-            <a href="{% url 'event_publish' event.id %}" class="btn btn-sm btn-outline-success" 
-               title="Publier l'événement">
-                publier
-            </a>
+            {% url 'event_publish' event.id as action_url %}{% include 'includes/post_action.html' with url=action_url label='Publier' btn_class='btn-sm btn-outline-success' icon='' %}
             {% endif %}
             
             <a href="{% url 'event_delete' event.id %}" class="btn btn-sm btn-outline-danger">
@@ -251,7 +245,7 @@
                 <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
                 <h4 class="text-muted">Aucun événement disponible</h4>
                 <p class="text-muted">Aucun événement n'a été créé pour le moment.</p>
-                {% if user.is_staff %}
+                {% if user.can_moderate %}
                 <a href="{% url 'event_create' %}" class="btn btn-primary mt-2">
                     <i class="fas fa-plus me-1"></i> Créer le premier événement
                 </a>
@@ -306,7 +300,7 @@
                         <a href="{% url 'event_detail' event.id %}" class="btn btn-sm btn-outline-primary">
                             <i class="fas fa-eye"></i>
                         </a>
-                        {% if user.is_staff %}
+                        {% if user.can_moderate %}
                         <a href="{% url 'event_update' event.id %}" class="btn btn-sm btn-outline-secondary">
                             <i class="fas fa-edit"></i>
                         </a>

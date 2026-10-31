@@ -113,6 +113,11 @@ class CustomUser(AbstractUser):
     @property
     def is_moderator(self):
         return self.role == 'moderateur'
+
+    @property
+    def can_moderate(self):
+        """Peut publier, dépublier et supprimer les contenus du site."""
+        return self.role in ('admin', 'moderateur')
     
     @property
     def has_academic_profile(self):

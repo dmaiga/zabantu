@@ -27,20 +27,18 @@
                 <a href="{% url 'article_update' article.slug %}" class="btn btn-outline-primary">
                     <i class="fas fa-edit"></i> Modifier
                 </a>
-                <a href="{% url 'publish_article' article.slug %}" class="btn btn-outline-success">
-                    <i class="fas fa-paper-plane"></i> Publier
-                </a>
+                {% url 'publish_article' article.slug as action_url %}{% include 'includes/post_action.html' with url=action_url label='Publier' btn_class='btn-outline-success' icon='fa-paper-plane' %}
                 {% endif %}
                 
                 {% if article.status == 'published' %}
-                <a href="{% url 'unpublish_article' article.slug %}" class="btn btn-outline-warning">
-                    <i class="fas fa-eye-slash"></i> Dépublier
-                </a>
+                {% url 'unpublish_article' article.slug as action_url %}{% include 'includes/post_action.html' with url=action_url label='Dépublier' btn_class='btn-outline-warning' icon='fa-eye-slash' %}
                 {% endif %}
                 
+                {% if user.can_moderate %}
                 <a href="{% url 'article_delete' article.slug %}" class="btn btn-outline-danger">
                     <i class="fas fa-trash"></i> Supprimer
                 </a>
+                {% endif %}
             </div>
         </div>
     </div>
