@@ -16,7 +16,8 @@ class BaseArticleForm(SectionedFormMixin, forms.ModelForm):
         ('Contenu', ('title', 'subtitle', 'resume', 'abstract', 'content')),
         ('Auteurs', ('authors', 'academic_authors', 'external_author')),
         ('Références', ('journal', 'publisher', 'publication_year', 'institution', 'working_series',
-                        'working_number', 'working_year', 'external_link', 'external_link_academique')),
+                        'working_number', 'working_year', 'external_link', 'external_link_academique',
+                        'publisher_book', 'publication_place', 'page_count', 'publication_date')),
         ('Image et fichier', ('cover_image', 'independent_cover', 'pdf_file')),
     )
 
@@ -37,6 +38,9 @@ class BaseArticleForm(SectionedFormMixin, forms.ModelForm):
         if 'authors' in self.fields:
             self.fields['authors'].queryset = CustomUser.objects.exclude(role='admin')
         if self.at_least_one_author:
+            # La règle est « l'un ou l'autre » : le champ des membres ne doit pas être obligatoire à lui seul
+            if 'authors' in self.fields:
+                self.fields['authors'].required = False
             hint = "Au moins un auteur est requis : membre Zabantu ou auteur externe."
             for name in ('authors', 'academic_authors'):
                 if name in self.fields:
@@ -76,6 +80,27 @@ class AcademicForm(BaseArticleForm):
             'publisher',
             'external_link_academique',
             'abstract'
+        ]
+        labels = {'external_link_academique': "Lien vers l'article"}
+
+
+class OuvrageForm(BaseArticleForm):
+    required_fields = ('publisher_book', 'publication_date')
+    at_least_one_author = True
+    resume = forms.CharField(widget=SummernoteWidget(), required=False, label='Résumé')
+    publication_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'), label='Date de publication')
+
+    class Meta(BaseArticleForm.Meta):
+        fields = BaseArticleForm.Meta.fields + [
+            'subtitle',
+            'authors',
+            'academic_authors',
+            'publisher_book',
+            'publication_place',
+            'page_count',
+            'publication_date',
+            'resume',
         ]
 
 

@@ -60,7 +60,7 @@
                     </div>
                 </div>
             </td>
-            <td class="text-muted small">{{ article.get_article_type_display }}</td>
+            <td class="text-muted small">{{ article.type_label }}</td>
             <td>
                 <span class="badge {% if article.status == 'published' %}bg-success{% elif article.status == 'scheduled' %}bg-info text-dark{% else %}bg-warning text-dark{% endif %}">{{ article.get_status_display }}</span>
                 {% if article.status == 'scheduled' %}<div class="small text-muted">{{ article.publish_at|date:"d/m/Y H:i" }}</div>{% endif %}

@@ -6,7 +6,15 @@ from django.utils import timezone
 from django.shortcuts import render, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponseRedirect
-from .models import ContactMessage, MessageResponse, MembershipApplication
+from .models import ContactMessage, MessageResponse, MembershipApplication, NewsletterSubscriber
+
+@admin.register(NewsletterSubscriber)
+class NewsletterSubscriberAdmin(admin.ModelAdmin):
+    list_display = ('email', 'is_active', 'subscribed_at')
+    list_filter = ('is_active', 'subscribed_at')
+    search_fields = ('email',)
+    ordering = ('-subscribed_at',)
+
 
 @admin.register(ContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):

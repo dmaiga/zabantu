@@ -250,3 +250,13 @@ class CampaignSendTests(TestCase):
         self.assertEqual(self.client.get(url).status_code, 405)
         self.client.force_login(make_user('membre'))
         self.assertEqual(self.client.post(url).status_code, 403)
+
+
+class SeedDemoSafetyTests(TestCase):
+    def test_refuses_to_mix_fake_data_into_a_database_with_real_content(self):
+        from django.core.management import call_command
+        from django.core.management.base import CommandError
+        Article.objects.create(title='Vraie publication', content='x', status='published')
+        with self.assertRaises(CommandError):
+            call_command('seed_demo', stdout=StringIO())
+        self.assertEqual(Article.objects.count(), 1)

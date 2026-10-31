@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -6,7 +7,8 @@
   <title>{% block title %}Zabantu - Analyses et Séminaires{% endblock %}</title>
     <meta name="description" content="Blog Zabantu - un groupe de chercheurs en sciences sociales travaillant sur le développement économique et social.">
   <!-- Favicon -->
-  <link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
+  <link rel="icon" type="image/png" href="{% static 'site_web/images/zabantu_logo.jpg' %}" />
+  <link rel="apple-touch-icon" href="{% static 'site_web/images/zabantu_logo.jpg' %}" />
 
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -127,25 +129,13 @@
         <li><a class="dropdown-item fw-semibold" href="{% url 'public_article_list' %}?type=guelekan">Séminaire Gɛlɛkan</a></li>
         <li><hr class="dropdown-divider"></li>
 
-        <li class="dropdown-submenu">
-            <a class="dropdown-item submenu-toggle" href="#" role="button" aria-expanded="false">Éditorial</a>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=zabantu">Zabantu</a></li>
-                <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=article">Articles</a></li>
-                <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=analyse">Analyses</a></li>
-                <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=policy">Policy Briefs</a></li>
-                <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=rapport">Rapports</a></li>
-                <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=ouvrage">Ouvrages</a></li>
-            </ul>
-        </li>
-        <li class="dropdown-submenu">
-            <a class="dropdown-item submenu-toggle" href="#" role="button" aria-expanded="false">Scientifique</a>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=academic">Publications académiques</a></li>
-                <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=working">Working Papers</a></li>
-            </ul>
-        </li>
-        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=independent">Publications indépendantes</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=analyse">Analyses</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=academic">Articles</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=ouvrage">Ouvrages</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=policy">Policy Briefs</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=independent">Indépendantes</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=rapport">Rapports</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=working">Working Papers</a></li>
     </ul>
 </li>
               <li class="nav-item">

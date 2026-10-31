@@ -365,9 +365,10 @@
 
                     <div class="pub-body">
                         <div class="pub-meta-top">
-                            {% if article.article_type == 'academic' %}<span class="badge-type badge-type-academic">Académique</span>
+                            {% if article.article_type == 'academic' %}<span class="badge-type badge-type-academic">{{ article.type_label }}</span>
                             {% elif article.article_type == 'zabantu' %}<span class="badge-type badge-type-zabantu">Zabantu</span>
-                            {% elif article.article_type == 'independent' %}<span class="badge-type badge-type-independent">Indépendant</span>{% endif %}
+                            {% elif article.article_type == 'independent' %}<span class="badge-type badge-type-independent">Indépendant</span>
+                            {% else %}<span class="badge-type">{{ article.type_label }}</span>{% endif %}
                             {% if article.category %}<span class="pub-category">{{ article.get_category_display }}</span>{% endif %}
                             <time class="pub-date" datetime="{{ article.publish_at|default:article.created_at|date:'Y-m-d' }}">{{ article.publish_at|default:article.created_at|date:"j F Y" }}</time>
                         </div>
@@ -380,6 +381,10 @@
                         <p class="pub-authors"><i class="fas fa-user"></i>{{ article.external_author }}</p>
                         {% elif article.authors.all or article.academic_authors %}
                         <p class="pub-authors"><i class="fas fa-user"></i>{% for author in article.authors.all %}{{ author.get_full_name }}{% if not forloop.last or article.academic_authors and article.article_type == 'academic' %}, {% endif %}{% endfor %}{% if article.article_type == 'academic' %}{{ article.academic_authors|default:"" }}{% endif %}</p>
+                        {% endif %}
+
+                        {% if article.article_type == 'ouvrage' and article.publisher_book or article.article_type == 'ouvrage' and article.publication_date %}
+                        <p class="pub-ref"><i class="fas fa-book"></i>{% if article.publisher_book %}{{ article.publisher_book }}{% endif %}{% if article.publication_date %}{% if article.publisher_book %} · {% endif %}{{ article.publication_date|date:"d F Y" }}{% endif %}</p>
                         {% endif %}
 
                         {% if article.journal or article.publisher or article.publication_year %}

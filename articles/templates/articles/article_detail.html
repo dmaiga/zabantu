@@ -71,10 +71,14 @@
                 <div class="card-body">
                     <h2 class="h6 text-muted text-uppercase">Informations</h2>
                     <dl class="row mb-0 small">
-                        <dt class="col-5">Type</dt><dd class="col-7">{{ article.get_article_type_display }}</dd>
+                        <dt class="col-5">Type</dt><dd class="col-7">{{ article.type_label }}</dd>
                         <dt class="col-5">Créée le</dt><dd class="col-7">{{ article.created_at|date:"d/m/Y" }}</dd>
                         <dt class="col-5">Modifiée le</dt><dd class="col-7">{{ article.updated_at|date:"d/m/Y" }}</dd>
                         {% if article.publish_at and article.status == 'published' %}<dt class="col-5">Publiée le</dt><dd class="col-7">{{ article.publish_at|date:"d/m/Y H:i" }}</dd>{% endif %}
+                        {% if article.publisher_book %}<dt class="col-5">Maison d'édition</dt><dd class="col-7">{{ article.publisher_book }}</dd>{% endif %}
+                        {% if article.publication_place %}<dt class="col-5">Lieu</dt><dd class="col-7">{{ article.publication_place }}</dd>{% endif %}
+                        {% if article.publication_date %}<dt class="col-5">Paru le</dt><dd class="col-7">{{ article.publication_date|date:"j F Y" }}</dd>{% endif %}
+                        {% if article.page_count %}<dt class="col-5">Pages</dt><dd class="col-7">{{ article.page_count }}</dd>{% endif %}
                         {% if article.journal %}<dt class="col-5">Revue</dt><dd class="col-7">{{ article.journal }}</dd>{% endif %}
                         {% if article.publisher %}<dt class="col-5">Éditeur</dt><dd class="col-7">{{ article.publisher }}</dd>{% endif %}
                         {% if article.publication_year %}<dt class="col-5">Année</dt><dd class="col-7">{{ article.publication_year }}</dd>{% endif %}

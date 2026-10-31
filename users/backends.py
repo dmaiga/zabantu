@@ -10,7 +10,7 @@ class SupportEmailBackend(EmailBackend):
     """
     def __init__(self, *args, **kwargs):
         # Utiliser les variables d'environnement ou les valeurs par défaut
-        host = getattr(settings, 'EMAIL_HOST_SUPPORT', os.getenv('EMAIL_HOST_SUPPORT', 'mail.zabantu.net'))
+        host = getattr(settings, 'EMAIL_HOST_SUPPORT', os.getenv('EMAIL_HOST_SUPPORT', settings.EMAIL_HOST))
         port = getattr(settings, 'EMAIL_PORT_SUPPORT', os.getenv('EMAIL_PORT_SUPPORT', 587))
         username = os.getenv('EMAIL_HOST_USER_SUPPORT')
         password = os.getenv('EMAIL_HOST_PASSWORD_SUPPORT')

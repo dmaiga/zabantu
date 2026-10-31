@@ -34,8 +34,8 @@ LOGOUT_REDIRECT_URL = 'login'
 
 
 
-# Pour réception des messages du formulaire
-CONTACT_EMAIL = "info@zabantu.net" 
+# Adresse qui reçoit les messages du formulaire de contact (définie dans .env)
+CONTACT_EMAIL = env('CONTACT_EMAIL', default='')
 SEND_COPY_TO_VISITOR = True
 
 
@@ -86,6 +86,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # sert les fichiers statiques (comme en production)
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -120,29 +121,22 @@ WSGI_APPLICATION = 'zabantu.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 
-# En debug : SQLite locale. En production : PostgreSQL (variables DB_* obligatoires).
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / env('SQLITE_NAME', default='db_v3.sqlite3'),
-        }
+# PostgreSQL partout (développement comme production) : les variables DB_* du .env sont obligatoires.
+# Les tests utilisent une base à part, voir zabantu/settings_test.py.
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST', default='localhost'),
+        'PORT': env('DB_PORT', default='5432'),
+        'OPTIONS': {
+            'connect_timeout': 30,
+        },
+        'CONN_MAX_AGE': 600,
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': env('DB_NAME'),
-            'USER': env('DB_USER'),
-            'PASSWORD': env('DB_PASSWORD'),
-            'HOST': env('DB_HOST', default='localhost'),
-            'PORT': env('DB_PORT', default='5432'),
-            'OPTIONS': {
-                'connect_timeout': 30,
-            },
-            'CONN_MAX_AGE': 600,
-        }
-    }
+}
 
 #
 # Password validation
@@ -179,6 +173,14 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
+# Empreintes dans les noms de fichiers en production (comme avant) ; en développement, stockage simple.
+STORAGES = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {
+        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage' if DEBUG
+        else 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 STATIC_ROOT = env('STATIC_ROOT', default=str(BASE_DIR / 'staticfiles'))
 MEDIA_URL = '/media/'
 MEDIA_ROOT = env('MEDIA_ROOT', default=str(BASE_DIR / 'media'))
@@ -189,37 +191,51 @@ MEDIA_ROOT = env('MEDIA_ROOT', default=str(BASE_DIR / 'media'))
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Server EMAIL
-
-## Configuration EMAIL principale (celle que Django utilise par défaut)
-# En debug sans identifiants SMTP, les e-mails sont affichés dans la console.
+# E-mail : tout vient du .env (rien de propre au serveur n'est écrit ici).
+# En développement (DEBUG=True) les e-mails s'affichent dans la console. Dès que le backend est SMTP,
+# les réglages du serveur deviennent obligatoires : le démarrage échoue avec un message clair s'il en manque.
 EMAIL_BACKEND = env(
     "EMAIL_BACKEND",
     default="django.core.mail.backends.console.EmailBackend" if DEBUG
     else "django.core.mail.backends.smtp.EmailBackend",
 )
-EMAIL_HOST = "mail.zabantu.net" 
-EMAIL_PORT = 587  # ou 465 
-EMAIL_USE_TLS = True 
-EMAIL_USE_SSL = False  
+_SMTP = EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend"
+
+
+def _mail(name, neutral):
+    """Valeur du .env ; obligatoire en SMTP, valeur neutre sinon (console, tests)."""
+    return env(name, default=environ.Env.NOTSET if _SMTP else neutral)
+
+
+def _mail_bool(name, neutral):
+    return env.bool(name, default=environ.Env.NOTSET if _SMTP else neutral)
+
+
+def _mail_int(name, neutral):
+    return env.int(name, default=environ.Env.NOTSET if _SMTP else neutral)
+
+
+# Compte principal : réponses aux messages, accusés de réception, admissions
+EMAIL_HOST = _mail("EMAIL_HOST", "localhost")
+EMAIL_PORT = _mail_int("EMAIL_PORT", 25)
+EMAIL_USE_TLS = _mail_bool("EMAIL_USE_TLS", False)
+EMAIL_USE_SSL = _mail_bool("EMAIL_USE_SSL", False)
 EMAIL_HOST_USER = env("EMAIL_HOST_USER_MAIN", default="")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD_MAIN", default="")
-DEFAULT_FROM_EMAIL = "Zabantu <info@zabantu.net>"  
+DEFAULT_FROM_EMAIL = _mail("DEFAULT_FROM_EMAIL", "Zabantu <noreply@localhost>")
 
-# Configurations supplémentaires pour les newsletters
-EMAIL_HOST_NEWS = "mail.zabantu.net"
-EMAIL_PORT_NEWS = 587
-EMAIL_USE_TLS_NEWS = True
-EMAIL_USE_SSL_NEWS = False
+# Compte de l'info-lettre : annonces de publications et campagnes
+EMAIL_HOST_NEWS = _mail("EMAIL_HOST_NEWS", "localhost")
+EMAIL_PORT_NEWS = _mail_int("EMAIL_PORT_NEWS", 25)
+EMAIL_USE_TLS_NEWS = _mail_bool("EMAIL_USE_TLS_NEWS", False)
+EMAIL_USE_SSL_NEWS = _mail_bool("EMAIL_USE_SSL_NEWS", False)
 EMAIL_HOST_USER_NEWS = env("EMAIL_HOST_USER_NEWS", default="")
 EMAIL_HOST_PASSWORD_NEWS = env("EMAIL_HOST_PASSWORD_NEWS", default="")
-DEFAULT_FROM_EMAIL_NEWS = "zabantu_newsletter@zabantu.net"
-SEND_NEWSLETTER_ON_PUBLISH = True
-#
-SITE_URL = env("SITE_URL", default="http://localhost:8000" if DEBUG else "https://zabantu.net")
+DEFAULT_FROM_EMAIL_NEWS = _mail("DEFAULT_FROM_EMAIL_NEWS", "Zabantu <newsletter@localhost>")
+SEND_NEWSLETTER_ON_PUBLISH = env.bool("SEND_NEWSLETTER_ON_PUBLISH", default=True)
 
-
-# Configurations pour le support
+# Adresse publique du site, utilisée dans les liens des e-mails (obligatoire en production)
+SITE_URL = env("SITE_URL", default="http://localhost:8000" if DEBUG else environ.Env.NOTSET)
 
 # Password reset timeout (24 hours)
 PASSWORD_RESET_TIMEOUT = 86400

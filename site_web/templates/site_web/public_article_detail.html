@@ -51,11 +51,13 @@
         {% if article.subtitle %}<div class="article-subtitle">{{ article.subtitle }}</div>{% endif %}
         
         <div class="article-meta">
-            <span class="article-category">{{ article.get_article_type_display }}</span>
+            <span class="article-category">{{ article.type_label }}</span>
             <span class="article-date">
                 <i class="fas fa-calendar-alt me-1"></i>
                 {% if article.article_type == 'academic' and article.publication_year %}
                     {{ article.publication_year }}
+                {% elif article.article_type == 'ouvrage' and article.publication_date %}
+                    {{ article.publication_date|date:"d F Y" }}
                 {% elif article.article_type == 'working' and article.working_year %}
                     {{ article.working_year }}
                 {% else %}
@@ -100,7 +102,7 @@
                 <div class="metadata-grid">
                     <div class="metadata-item">
                         <span class="metadata-label">Type</span>
-                        <span class="metadata-value">{{ article.get_article_type_display }}</span>
+                        <span class="metadata-value">{{ article.type_label }}</span>
                     </div>
 
                     {# Champs spécifiques Working Papers #}
@@ -123,6 +125,14 @@
                     {% if article.article_type == 'academic' %}
                         {% if article.journal %}<div class="metadata-item"><span class="metadata-label">Revue</span><span class="metadata-value">{{ article.journal }}</span></div>{% endif %}
                         {% if article.publisher %}<div class="metadata-item"><span class="metadata-label">Éditeur</span><span class="metadata-value">{{ article.publisher }}</span></div>{% endif %}
+                    {% endif %}
+
+                    {# Champs spécifiques Ouvrages #}
+                    {% if article.article_type == 'ouvrage' %}
+                        {% if article.publisher_book %}<div class="metadata-item"><span class="metadata-label">Maison d’édition</span><span class="metadata-value">{{ article.publisher_book }}</span></div>{% endif %}
+                        {% if article.publication_place %}<div class="metadata-item"><span class="metadata-label">Lieu de publication</span><span class="metadata-value">{{ article.publication_place }}</span></div>{% endif %}
+                        {% if article.page_count %}<div class="metadata-item"><span class="metadata-label">Nombre de pages</span><span class="metadata-value">{{ article.page_count }}</span></div>{% endif %}
+                        {% if article.publication_date %}<div class="metadata-item"><span class="metadata-label">Date de publication</span><span class="metadata-value">{{ article.publication_date|date:"d F Y" }}</span></div>{% endif %}
                     {% endif %}
 
                     {# Liens Externes #}

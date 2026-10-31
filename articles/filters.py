@@ -7,7 +7,7 @@ from .models import Article, Guelekan
 class ArticleFilterForm(forms.Form):
     """Filtres de la liste des publications ; une valeur invalide est simplement ignorée."""
     q = forms.CharField(required=False)
-    type = forms.ChoiceField(required=False, choices=Article.ARTICLE_TYPE_CHOICES)
+    type = forms.ChoiceField(required=False, choices=Article.TYPE_MENU)
     status = forms.ChoiceField(required=False, choices=Article.STATUS_CHOICES)
     date_from = forms.DateField(required=False)
     date_to = forms.DateField(required=False)

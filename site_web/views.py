@@ -267,16 +267,15 @@ def about_view(request):
 
 #05_08
 #______________________________________________________________________________
+# Catégories de la production : « Zabantu » a été retiré et « académique » s'appelle « Articles »
 CATEGORY_LABELS = {
-    'zabantu': 'Zabantu',
     'analyse': 'Analyses',
-    'article': 'Articles',
-    'policy': 'Policy Briefs',
+    'academic': 'Articles',
     'ouvrage': 'Ouvrages',
+    'policy': 'Policy Briefs',
     'rapport': 'Rapports',
-    'academic': 'Publications académiques',
-    'independent': 'Publications indépendantes',
     'working': 'Working Papers',
+    'independent': 'Publications indépendantes',
 }
 
 

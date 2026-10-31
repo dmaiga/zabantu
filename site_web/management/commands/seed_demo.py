@@ -13,7 +13,7 @@ from datetime import timedelta
 
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils import timezone
 from PIL import Image, ImageDraw, ImageFont
@@ -181,9 +181,17 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--reset', action='store_true',
                             help="Supprime d'abord les données de démonstration existantes.")
+        parser.add_argument('--force', action='store_true',
+                            help="Autorise l'ajout de données fictives dans une base qui contient déjà du vrai contenu.")
 
     @transaction.atomic
     def handle(self, *args, **options):
+        real_content = Article.objects.exclude(slug__startswith='demo-').count() + Event.objects.exclude(
+            slug__startswith='demo-').count()
+        if real_content and not options['force']:
+            raise CommandError(
+                f"Cette base contient déjà du vrai contenu ({real_content} publication(s) ou événement(s)) : "
+                "les données fictives s'y mélangeraient. Utilisez une base vide, ou --force si c'est voulu.")
         if options['reset']:
             self.reset()
         self.stdout.write('Création des données de démonstration…')

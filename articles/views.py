@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.db.models import Value, CharField
 from .models import Article,Guelekan
-from .forms import ArticleForm,GuelekanForm
+from .forms import ArticleForm,GuelekanForm, OuvrageForm
 from .filters import ArticleFilterForm, GuelekanFilterForm
 from users.listing import paginate
 from .media_library import list_media_files  
@@ -46,7 +46,7 @@ FORM_MAPPING = {
     'analyse': ArticleForm,
     'article': ArticleForm,
     'policy': ArticleForm,
-    'ouvrage': ArticleForm,
+    'ouvrage': OuvrageForm,
     'rapport': ArticleForm,
 
     'academic': AcademicForm,
@@ -134,7 +134,7 @@ def article_list(request):
         'form': form,
         'page_obj': page_obj,
         'querystring': querystring,
-        'article_types': Article.ARTICLE_TYPE_CHOICES,
+        'article_types': Article.TYPE_MENU,
         'status_tabs': [(value, label, counts.get(value, 0)) for value, label in Article.STATUS_CHOICES],
         'total_count': sum(counts.values()),
         'current_status': form.cleaned_data.get('status', ''),

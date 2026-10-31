@@ -1,8 +1,8 @@
 # Déploiement en production — liste de contrôle
 
-Date : 30 octobre 2026
-Périmètre : mise en production des évolutions faites depuis le premier commit (configuration par environnement,
-formulaire d'adhésion, refonte du site public, miniatures de photos).
+Date : 31 octobre 2026
+Périmètre : mise en production des évolutions faites depuis le premier commit (configuration par environnement, PostgreSQL partout,
+formulaire d'adhésion, refonte du site public, backoffice, e-mails, publications programmées).
 
 Ce document est une **liste de contrôle**, pas un script à exécuter aveuglément. Les valeurs entre `< >` sont à
 remplacer. Il n'a pas été testé sur le serveur réel : les détails d'hébergement (chemins, gestionnaire de
@@ -16,7 +16,10 @@ Principe : **rien ne doit modifier ou supprimer de données existantes**. Toute 
 
 | Changement | Touche les données existantes ? |
 |------------|---------------------------------|
-| Migrations `site_web` 0003, 0004, 0005 (demandes d'adhésion) | Non : elles **ajoutent** une table et des champs. |
+| Migrations `site_web` 0003 à 0007, `users` 0003, `articles` 0011 | Non : elles **ajoutent** des tables, un champ (`backoffice_access`, faux par défaut) ou ne changent que des libellés. |
+| Déploiement du code | Ne touche **pas** la base : seul `migrate` la modifie, et uniquement par ajouts. |
+| Connexion réservée (admins, modérateurs, membres autorisés) | Les comptes « membre » existants ne pourront plus se connecter tant qu'on ne leur donne pas l'accès. |
+| Réglages d'e-mail dans le `.env` (serveur, port, TLS, expéditeurs) | Le site **refuse de démarrer** si l'une de ces variables manque. |
 | Miniatures de photos (`media/cache/thumbs/`) | Non : fichiers séparés, aucune base touchée, originaux intacts. |
 | Réglages par variables d'environnement (`.env`) | Non, mais le site **refuse de démarrer** si une variable obligatoire manque. |
 | `LANGUAGE_CODE = 'fr'` | Non : dates et administration en français. |
@@ -32,8 +35,13 @@ Principe : **rien ne doit modifier ou supprimer de données existantes**. Toute 
    ```
    Vérifier que le fichier n'est pas vide et le conserver hors du serveur.
 2. **Sauvegarder le dossier `media/`** (copie ou archive). Les miniatures n'y modifient rien, mais c'est la bonne pratique.
-3. **Ne pas copier `db_v3.sqlite3`** sur le serveur : c'est une base de développement, exclue du suivi git. Elle ne remplacerait pas la base PostgreSQL de production, mais elle contient des données de test et n'a rien à faire en ligne.
+3. **Ne pas copier `db_v3.sqlite3`** sur le serveur : l'application n'utilise plus SQLite (PostgreSQL partout) ; ce fichier n'a rien à faire en ligne.
 4. **Noter la version actuellement en ligne** (date, archive) pour pouvoir revenir en arrière.
+5. **Code `articles` de la production** : il est déjà repris dans le dépôt (migrations `0008` à `0010`, champs et formulaire « ouvrage », voir
+   `PLAN_IMPLEMENTATION.md` §5.1). Vérifier avant de déployer que le dossier `articles/` du serveur n'a **pas changé depuis** la copie faite le
+   31 octobre 2026 (comparer `articles/migrations/` : mêmes fichiers `0001` à `0010`). Sinon, reprendre les nouveautés avant de continuer.
+6. **Choisir qui garde l'accès à la connexion** : les comptes « membre » n'ont plus accès au backoffice par défaut. Cocher « Autoriser la connexion »
+   sur les membres concernés après la mise en ligne (la copie locale ne comptait aucun membre ayant déjà utilisé la connexion).
 
 ## 3. Fichier `.env` de production
 
@@ -41,7 +49,7 @@ Créer ou compléter `.env` **sur le serveur** (jamais dans le dépôt). Avec `D
 
 ```
 DEBUG=False
-SECRET_KEY=<clé longue et aléatoire, ≥ 50 caractères>
+SECRET_KEY=<NOUVELLE clé longue et aléatoire, ≥ 50 caractères : celle du code actuel commence par « django-insecure- »>
 ALLOWED_HOSTS=zabantu.net,www.zabantu.net
 CSRF_TRUSTED_ORIGINS=https://zabantu.net,https://www.zabantu.net
 SITE_URL=https://zabantu.net
@@ -52,14 +60,30 @@ DB_PASSWORD=<mot de passe>
 DB_HOST=localhost
 DB_PORT=5432
 
+# Valeurs actuellement écrites en dur dans le code de production : à reprendre telles quelles
+CONTACT_EMAIL=info@zabantu.net
+
+# Compte principal : réponses, accusés de réception, admissions
+EMAIL_HOST=mail.zabantu.net
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_USE_SSL=False
 EMAIL_HOST_USER_MAIN=<adresse>
 EMAIL_HOST_PASSWORD_MAIN=<mot de passe>
+DEFAULT_FROM_EMAIL=Zabantu <info@zabantu.net>
+
+# Compte de l'info-lettre : annonces de publications et campagnes
+EMAIL_HOST_NEWS=mail.zabantu.net
+EMAIL_PORT_NEWS=587
+EMAIL_USE_TLS_NEWS=True
+EMAIL_USE_SSL_NEWS=False
 EMAIL_HOST_USER_NEWS=<adresse>
 EMAIL_HOST_PASSWORD_NEWS=<mot de passe>
+DEFAULT_FROM_EMAIL_NEWS=zabantu_newsletter@zabantu.net
 
-# Selon l'hébergement (chemins absolus)
-STATIC_ROOT=<chemin vers le dossier static public>
-MEDIA_ROOT=<chemin vers le dossier media>
+# Chemins actuels de la production (auparavant écrits en dur dans le code)
+STATIC_ROOT=/home/cp2594820p30/public_html/static
+MEDIA_ROOT=/home/cp2594820p30/public_html/media
 ```
 
 Points d'attention :
@@ -84,8 +108,8 @@ L'ancien `.gitignore` excluait les dossiers `migrations/`. Avant toute migration
 ```bash
 python manage.py showmigrations
 ```
-- Attendu : tout est `[X]` sauf `site_web` `0003_membershipapplication`, `0004_membershipapplication_member`,
-  `0005_membershipapplication_bio_and_more` (`[ ]`).
+- Attendu : tout est `[X]` sauf `articles.0011_scheduled_status`, `site_web.0003` à `0007` et `users.0003_backoffice_access` (`[ ]`). Les migrations `articles` `0008` à `0010`
+  sont déjà appliquées en production et présentes dans le dépôt.
 - **Si d'autres migrations apparaissent non appliquées, ou si des migrations appliquées en base n'existent plus dans le code : s'arrêter**
   et analyser avant d'aller plus loin. Ne pas utiliser `--fake` sans comprendre pourquoi.
 - **Ne jamais lancer `makemigrations` en production** : la bibliothèque `django_summernote` signale une modification de son propre schéma et
@@ -95,14 +119,15 @@ python manage.py showmigrations
 ```bash
 python manage.py migrate
 ```
-Contrôler la sortie : seules `site_web.0003`, `0004` et `0005` doivent être appliquées.
+Contrôler d'abord avec `python manage.py migrate --plan` : seules `articles.0011_scheduled_status`, `site_web.0003` à `0007` et
+`users.0003_backoffice_access` doivent figurer. Aucune ne supprime de colonne ni de ligne.
 
 ### 4.4 Fichiers statiques
 ```bash
 python manage.py collectstatic --noinput
 ```
-Note : `whitenoise` est installé mais n'est pas dans les middlewares ; les fichiers statiques sont donc servis par le serveur web.
-Vérifier que le serveur web pointe bien vers `STATIC_ROOT`.
+Note : WhiteNoise est actif hors `DEBUG` (comme dans la production actuelle) et sert les fichiers de `STATIC_ROOT` avec des noms à empreinte.
+`collectstatic` doit donc être relancé à **chaque** déploiement, sinon une page qui référence un fichier absent du manifeste échoue.
 
 ### 4.5 Miniatures de photos (optionnel mais recommandé)
 S'assurer que l'utilisateur du serveur d'application **peut écrire** dans `MEDIA_ROOT` (le dossier `cache/thumbs/` y sera créé).
@@ -135,8 +160,9 @@ Ajouter une tâche cron (toutes les 5 minutes suffisent), avec les chemins du se
 Tester à la main avant d'activer le cron : `python manage.py publish_scheduled` (affiche « 0 contenu(s) publié(s) » s'il n'y a rien à faire).
 La commande peut être relancée sans risque : un contenu n'est publié et annoncé qu'une fois.
 
-Variables d'environnement utiles aux e-mails : `SITE_URL` (liens des e-mails), `EMAIL_HOST_USER_MAIN` / `EMAIL_HOST_PASSWORD_MAIN`
-(réponses, accusés de réception, admissions) et `EMAIL_HOST_USER_NEWS` / `EMAIL_HOST_PASSWORD_NEWS` (info-lettre et annonces).
+Les e-mails utilisent uniquement le `.env` : `SITE_URL` (liens des e-mails), le compte principal (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_TLS`,
+`EMAIL_USE_SSL`, `EMAIL_HOST_USER_MAIN`, `EMAIL_HOST_PASSWORD_MAIN`, `DEFAULT_FROM_EMAIL`) et le compte de l'info-lettre (mêmes noms avec le suffixe
+`_NEWS`). Tester avec `python manage.py shell -c "from django.core.mail import send_mail; send_mail('Test','Bonjour','<expéditeur>',['<destinataire>'])"`.
 
 ## 5. Vérifications après déploiement
 

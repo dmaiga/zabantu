@@ -22,16 +22,26 @@ class Article(models.Model):
         ('published', 'Publié'),
     )
     
+    # État de la production (migration 0010) : « Zabantu » et « Analyse » ne font plus partie des choix du modèle.
     ARTICLE_TYPE_CHOICES = (
-        ('zabantu', 'Zabantu'),
-        ('academic', 'Académique'),
+        ('academic', 'Articles'),
         ('independent', 'Indépendant'),
-        ('analyse', 'Analyses'),
         ('article', 'Articles'),
         ('policy', 'Policy Briefs'),
         ('ouvrage', 'Ouvrages'),
         ('rapport', 'Rapports'),
         ('working', 'Working Paper'),
+    )
+
+    # Types proposés dans le menu de création et le filtre de la liste (comme en production)
+    TYPE_MENU = (
+        ('analyse', 'Analyse'),
+        ('academic', 'Article'),
+        ('ouvrage', 'Ouvrage'),
+        ('policy', 'Policy Brief'),
+        ('rapport', 'Rapport'),
+        ('working', 'Working Paper'),
+        ('independent', 'Indépendant'),
     )
 
 
@@ -87,6 +97,12 @@ class Article(models.Model):
     # Fichiers
     pdf_file = models.FileField(upload_to=article_upload_path, blank=True, null=True, verbose_name="Fichier PDF")
 
+    # Ouvrages
+    publisher_book = models.CharField(max_length=255, blank=True, null=True, verbose_name="Maison d’édition")
+    publication_place = models.CharField(max_length=255, blank=True, null=True, verbose_name="Lieu de publication")
+    page_count = models.PositiveIntegerField(blank=True, null=True, verbose_name="Nombre de pages")
+    publication_date = models.DateField(blank=True, null=True, verbose_name="Date de publication (ouvrage)")
+
     # Métadonnées SEO
     meta_title = models.CharField(max_length=60, blank=True, verbose_name="Titre SEO")
     meta_description = models.CharField(max_length=160, blank=True, verbose_name="Description SEO")
@@ -105,6 +121,24 @@ class Article(models.Model):
 
     def get_public_url(self):
         return reverse('public_article_detail', args=[self.slug])
+
+    def get_absolute_url(self):
+        return self.get_public_url()
+
+    @property
+    def type_label(self):
+        """Libellé du type tel qu'il apparaît dans le menu (le modèle ne connaît plus « Analyse »)."""
+        return dict(self.TYPE_MENU).get(self.article_type) or self.get_article_type_display()
+
+    def get_preview_text(self):
+        return self.content or self.abstract or self.resume or ""
+
+    def get_cover(self):
+        if self.cover_image:
+            return self.cover_image.url
+        if self.independent_cover:
+            return self.independent_cover.url
+        return None
 
     def save(self, *args, **kwargs):
         # Génération automatique du slug
@@ -139,39 +173,19 @@ class Article(models.Model):
             return "Brouillon"
     
     def get_display_authors(self):
-        """Retourne les auteurs formatés selon le type d'article"""
-        if self.article_type == 'independent' and self.external_author:
-            return [{'name': self.external_author, 'type': 'external', 'url': None}]
-        elif self.article_type == 'academic' and self.academic_authors:
-            authors = []
-            if self.authors.exists():
-                for author in self.authors.all():
-                    authors.append({
-                        'name': author.get_full_name(),
-                        'type': 'zabantu',
-                        'url': reverse('public_member_detail', args=[author.pk]),
-                        'user': author
-                    })
-            # Ajouter les auteurs académiques externes
-            if self.academic_authors:
-                authors.append({
-                    'name': self.academic_authors,
-                    'type': 'academic',
-                    'url': None
-                })
-            return authors
-        else:
-            # Articles Zabantu
-            authors = []
-            for author in self.authors.all():
-                authors.append({
-                    'name': author.get_full_name(),
-                    'type': 'zabantu',
-                    'url': reverse('public_member_detail', args=[author.pk]),
-                    'user': author
-                })
-            return authors
-    
+        """Tous les auteurs : membres Zabantu, auteur externe et auteurs académiques."""
+        authors = [{
+            'name': author.get_full_name(),
+            'type': 'zabantu',
+            'url': reverse('public_member_detail', args=[author.pk]),
+            'user': author,
+        } for author in self.authors.all()]
+        if self.external_author:
+            authors.append({'name': self.external_author, 'type': 'external', 'url': None})
+        if self.academic_authors:
+            authors.append({'name': self.academic_authors, 'type': 'academic', 'url': None})
+        return authors
+
     def has_external_link(self):
         """Vérifie si l'article a un lien externe"""
         return bool(self.external_link)
@@ -299,3 +313,6 @@ class Guelekan(models.Model):
     def get_intervenants_list(self):
         """Retourne la liste des intervenants sous forme de noms complets"""
         return [i.full_name() for i in self.intervenants.all()]
+
+    def get_preview_text(self):
+        return self.content or self.subtitle or ""
