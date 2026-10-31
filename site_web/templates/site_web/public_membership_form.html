@@ -37,6 +37,9 @@
         .stepper .label { display: none; }
         .stepper li.active .label { display: block; position: absolute; top: 44px; left: 50%; transform: translateX(-50%); white-space: nowrap; max-width: none; }
         .stepper { margin-bottom: 2.5rem; }
+        /* première et dernière étape : le libellé reste dans l'écran */
+        .stepper li.active:first-child .label { left: 0; transform: none; }
+        .stepper li.active:last-child .label { left: auto; right: 0; transform: none; }
     }
     .wizard-step {
         display: none; background: white; border: 0; border-radius: 8px; padding: 1.5rem; margin: 0;
