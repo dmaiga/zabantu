@@ -231,3 +231,14 @@ class EitherOrAuthorRuleTests(TestCase):
     def test_zabantu_style_articles_still_require_a_member(self):
         from articles.forms import ArticleForm
         self.assertTrue(ArticleForm().fields['authors'].required)
+
+
+class FormTitleTests(TestCase):
+    def test_the_type_is_shown_with_its_readable_label(self):
+        self.client.force_login(make_user('moderateur'))
+        r = self.client.get(reverse('article_create') + '?type=academic')
+        self.assertContains(r, '>Article</span>')
+        self.assertNotContains(r, '>academic</span>')
+        book = Article.objects.create(title='O', article_type='ouvrage', content='x')
+        self.assertContains(self.client.get(reverse('article_update', args=[book.slug])), '>Ouvrage</span>')
+        self.assertContains(self.client.get(reverse('article_update', args=[book.slug])), 'Enregistrez vos modifications')

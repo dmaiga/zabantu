@@ -61,7 +61,7 @@
 
                 {% if user.bio %}
                 <p class="small text-muted">
-                    {{ user.bio|safe|truncatewords:30 }}
+                    {{ user.bio|striptags|truncatewords:30 }}
                 </p>
                 {% endif %}
 

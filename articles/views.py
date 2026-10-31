@@ -85,6 +85,7 @@ def article_create(request):
     return render(request, 'articles/article_update.html', {
         'form': form,
         'article_type': article_type,
+        'type_label': dict(Article.TYPE_MENU).get(article_type, article_type),
         'back_url': reverse('article_list'),
     })
 
@@ -118,6 +119,7 @@ def article_update(request, slug):
         'form': form,
         'is_edit': True,
         'article_type': article.article_type,
+        'type_label': article.type_label,
         'article': article,
         'back_url': reverse('article_detail', args=[article.slug]),
     })

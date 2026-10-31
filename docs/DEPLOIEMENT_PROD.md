@@ -81,7 +81,8 @@ EMAIL_HOST_USER_NEWS=<adresse>
 EMAIL_HOST_PASSWORD_NEWS=<mot de passe>
 DEFAULT_FROM_EMAIL_NEWS=zabantu_newsletter@zabantu.net
 
-# Chemins actuels de la production (auparavant écrits en dur dans le code)
+# Chemins actuels de la production (auparavant écrits en dur dans le code). OBLIGATOIRES : le site refuse de démarrer sans eux.
+# En développement : STATIC_ROOT=staticfiles et MEDIA_ROOT=media
 STATIC_ROOT=/home/cp2594820p30/public_html/static
 MEDIA_ROOT=/home/cp2594820p30/public_html/media
 ```

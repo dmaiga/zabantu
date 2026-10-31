@@ -112,7 +112,7 @@
         items.forEach(function (item, i) {
             var hasError = steps[i].dataset.hasError === 'yes';
             item.classList.toggle('is-current', i === current);
-            item.classList.toggle('is-done', visited[i] && i !== current && !hasError);
+            item.classList.toggle('is-done', !!(visited[i] && i !== current && !hasError));  // !! : toggle(x, undefined) bascule au lieu de retirer
             item.classList.toggle('has-error', hasError);
             if (i === current) { item.setAttribute('aria-current', 'step'); } else { item.removeAttribute('aria-current'); }
         });

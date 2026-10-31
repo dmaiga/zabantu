@@ -80,7 +80,7 @@ absents du dépôt et 30 ne correspondent à aucune version. Ces 30, examinés u
 | Catégories publiques : « Zabantu » retiré, « académique » devient « Articles » ; menu public à plat | Oui (`CATEGORY_LABELS`, menu) |
 | Icône du site (`zabantu_logo.jpg`) sur le site public et le backoffice | Oui |
 | Administration des abonnés (`NewsletterSubscriber`) | Oui |
-| Commande `seed_newsletter` (abonne les comptes actifs à l'info-lettre) | Oui, avec un avertissement : ces personnes n'ont pas donné leur accord |
+| Commande `seed_newsletter` (abonne les comptes actifs du groupe Zabantu à l'info-lettre) | Oui. Choix assumé : les membres du groupe sont abonnés d'office ; chaque e-mail propose le désabonnement |
 | WhiteNoise (fichiers statiques) et stockage à empreintes | Oui, actif seulement hors `DEBUG` |
 | `mysql-connector-python` dans `requirements.txt` | Non : la base est PostgreSQL |
 

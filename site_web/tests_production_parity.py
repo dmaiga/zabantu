@@ -79,3 +79,53 @@ class ProductionToolingTests(TestCase):
         self.assertLess(settings.MIDDLEWARE.index('django.middleware.security.SecurityMiddleware'),
                         settings.MIDDLEWARE.index('whitenoise.middleware.WhiteNoiseMiddleware'))
         self.assertIn('staticfiles', settings.STORAGES)
+
+
+class MemberCardsLayoutTests(TestCase):
+    """Un résumé de biographie coupé au milieu du HTML ne doit pas casser la grille des membres."""
+
+    def make_members(self, n=7):
+        from django.contrib.auth import get_user_model
+        U = get_user_model()
+        # biographie riche, assez longue pour être coupée, avec des balises ouvertes au moment de la coupure
+        bio = '<div><p>' + ' '.join(f'mot{i}' for i in range(60)) + '</p><span><em>fin</em></span></div>'
+        for i in range(n):
+            U.objects.create_user(username=f'm{i}', email=f'm{i}@t.org', password='x', nom=f'Nom{i}', prenom='P',
+                                  role='membre', bio=bio)
+
+    def test_every_member_gets_its_own_column(self):
+        self.make_members(7)
+        html = self.client.get(reverse('public_member_list')).content.decode()
+        self.assertEqual(html.count('class="card member-card'), 7)
+        self.assertEqual(html.count('class="col-sm-6 col-md-4 col-xl-3 mb-4 d-flex align-items-stretch"'), 7)
+
+    def test_each_card_shows_the_member_name(self):
+        self.make_members(3)
+        html = self.client.get(reverse('public_member_list')).content.decode()
+        for i in range(3):
+            self.assertIn(f'<h5 class="card-title">P NOM{i}</h5>', html)
+
+    def test_the_card_shows_a_plain_text_excerpt(self):
+        self.make_members(1)
+        html = self.client.get(reverse('public_member_list')).content.decode()
+        card = html.split('class="card-text">')[1].split('</p>')[0]
+        self.assertNotIn('<', card)
+        self.assertIn('mot0', card)
+        self.assertNotIn('mot59', card)  # tronquée
+
+    def test_balanced_markup_inside_the_grid(self):
+        from html.parser import HTMLParser
+
+        class Depth(HTMLParser):
+            def __init__(self):
+                super().__init__(); self.stack = []; self.problems = []
+            def handle_starttag(self, tag, attrs):
+                if tag not in ('img', 'br', 'hr', 'input', 'meta', 'link'): self.stack.append(tag)
+            def handle_endtag(self, tag):
+                if self.stack and self.stack[-1] == tag: self.stack.pop()
+                else: self.problems.append(tag)
+        self.make_members(4)
+        html = self.client.get(reverse('public_member_list')).content.decode()
+        grid = html.split('<div class="container py-5">')[1].split('</main>')[0]
+        parser = Depth(); parser.feed('<div>' + grid)
+        self.assertEqual(parser.problems, [])

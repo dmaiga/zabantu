@@ -270,24 +270,12 @@
             font-size: 1.1rem;
         }
         
-        .team-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .member-photo-container {
-            height: 250px;
-        }
-        
         .partners-grid {
             grid-template-columns: repeat(2, 1fr);
         }
     }
     
     @media (max-width: 576px) {
-        .member-photo-container {
-            height: 220px;
-        }
-        
         .partners-grid {
             grid-template-columns: 1fr;
         }
@@ -298,57 +286,6 @@
     }
 
 
-.team-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.member-card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    padding: 2rem 1rem 1rem;
-    text-align: center;
-}
-
-.member-photo-container {
-    width: 120px;
-    height: 120px;
-    margin: -70px auto 10px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 4px solid #f8f9fa;
-}
-
-.member-photo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.member-info h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-.member-info p {
-    font-size: 0.9rem;
-    color: #6c757d;
-}
-
-@media (max-width: 768px) {
-    .team-grid {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    }
-    .member-photo-container {
-        width: 100px;
-        height: 100px;
-        margin-top: -50px;
-    }
-}
 /* Container du Carrousel */
 .partners-container {
     padding: 3rem 0;
@@ -496,24 +433,7 @@
     <div class="about-container">
         <h2 class="section-title">Notre Équipe</h2>
         
-        <div class="team-grid">
-            {% for member in active_members %}
-            <div class="member-card">
-                <div class="member-photo-container">
-                    <img src="{% if member.profile_picture %}{{ member.profile_picture.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" 
-                         alt="{{ member.get_full_name }}" 
-                         class="member-photo">
-                </div>
-                <div class="member-info text-center mt-3">
-                    <h3 class="member-name">{{ member.get_full_name }}</h3>
-                    <p class="member-position">{{ member.bio|safe|truncatewords:12 }}</p>
-                    <a href="{% url 'public_member_detail' member.pk %}" class="btn btn-outline-primary btn-sm mt-2">
-                        Voir le profil
-                    </a>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+        {% include 'site_web/includes/team_carousel.html' %}
 
         <!-- Lien vers la page complète de l'équipe -->
         <div class="text-center mt-5">

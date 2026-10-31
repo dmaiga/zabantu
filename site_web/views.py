@@ -239,26 +239,15 @@ def detail_photo(request, pk):
 #05_08_2025
 
 from django.contrib.auth import get_user_model
-import random
 from users.models import Partenaire
 User = get_user_model()
 
 def about_view(request):
-    # Récupérer tous les membres actifs
-    active_members = list(User.objects.filter(
-        is_active=True,
-        role__in=['moderateur', 'membre']
-    ))
-    
-    # Sélectionner 4 membres aléatoires si on en a assez
-    if len(active_members) > 4:
-        active_members = random.sample(active_members, 4)
-    else:
-        # Si moins de 4 membres, prendre tous les membres disponibles
-        active_members = active_members[:4]
+    # Tous les membres actifs, dans un ordre aléatoire : le backoffice ne fixe aucun ordre d'affichage
+    team_members = User.objects.filter(is_active=True, role__in=['moderateur', 'membre']).order_by('?')
     partenaires = Partenaire.objects.filter(is_active=True).order_by('order')
     context = {
-        'active_members': active_members,
+        'team_members': team_members,
         'partenaires': partenaires,
     }
     return render(request, 'site_web/public_about.html', context)
@@ -527,10 +516,11 @@ def public_event_ics(request, pk):
 
 def public_member_list(request):
     """Liste des membres publics"""
+    # Ordre aléatoire à chaque visite : le backoffice ne fixe aucun ordre d'affichage
     members = CustomUser.objects.filter(
         is_active=True,
         role__in=['moderateur', 'membre']
-    ).order_by('nom', 'prenom')
+    ).order_by('?')
     
     return render(request, 'site_web/public_member_list.html', {
         'members': members
@@ -557,7 +547,8 @@ class HomeView(TemplateView):
 
         # Membres actifs : aperçu de l'équipe et compteur
         members = CustomUser.objects.filter(is_active=True, role__in=['moderateur', 'membre'])
-        context['team_members'] = members.order_by('-date_joined')[:4]
+        # Tous les membres, dans un ordre aléatoire : le backoffice ne fixe aucun ordre d'affichage
+        context['team_members'] = members.order_by('?')
 
         # Chiffres clés (seules les valeurs non nulles sont affichées)
         context['stats'] = [

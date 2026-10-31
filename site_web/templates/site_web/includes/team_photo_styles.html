@@ -1,0 +1,7 @@
+{# Cadre de photo des membres : portrait 3:4, photo entière (jamais de tête coupée) sur un fond flou de la même photo #}
+<style>
+    .team-photo { position: relative; aspect-ratio: 3 / 4; overflow: hidden; border-radius: 10px; background: #eef0e8; border: 1px solid #e6e9e0; margin-bottom: .75rem; }
+    .team-photo-bg { position: absolute; inset: -24px; width: calc(100% + 48px); height: calc(100% + 48px); object-fit: cover; filter: blur(18px) saturate(1.1); opacity: .55; }
+    .team-photo-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+    .team-initials { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: var(--zabantu-primary, #6f826a); color: #fff; font-size: 3rem; font-weight: 600; }
+</style>

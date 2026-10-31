@@ -95,10 +95,11 @@ class EventOrderTests(TestCase):
 
 
 class MemberDirectoryOrderTests(TestCase):
-    def test_public_member_list_is_alphabetical_by_family_name(self):
+    def test_public_member_list_is_random_because_the_backoffice_sets_no_order(self):
         from django.contrib.auth import get_user_model
         U = get_user_model()
-        for i, nom in enumerate(('Zongo', 'Adams', 'Mensah')):
+        for i, nom in enumerate(('Zongo', 'Adams', 'Mensah', 'Bah', 'Cissé', 'Diallo', 'Keita', 'Traoré')):
             U.objects.create_user(username=f'u{i}', email=f'u{i}@t.org', password='x', nom=nom, prenom='A', role='membre')
-        r = self.client.get(reverse('public_member_list'))
-        self.assertEqual([m.nom for m in r.context['members']], ['ADAMS', 'MENSAH', 'ZONGO'])
+        orders = {tuple(m.pk for m in self.client.get(reverse('public_member_list')).context['members']) for _ in range(12)}
+        self.assertGreater(len(orders), 1)                       # l'ordre change d'une visite à l'autre
+        self.assertEqual(len({frozenset(o) for o in orders}), 1)  # mais ce sont toujours les mêmes membres

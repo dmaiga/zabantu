@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os 
 import environ
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -181,9 +182,20 @@ STORAGES = {
         else 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },
 }
-STATIC_ROOT = env('STATIC_ROOT', default=str(BASE_DIR / 'staticfiles'))
+def _files_root(name, dev_default):
+    """Dossier STATIC_ROOT ou MEDIA_ROOT : chemin absolu, ou relatif à la racine du projet.
+
+    En production il est obligatoire : sans lui, les images envoyées et les fichiers statiques iraient dans les
+    dossiers du projet au lieu de ceux que sert le serveur web, et les pages perdraient leurs images."""
+    value = env(name, default=dev_default if DEBUG else '')
+    if not value:
+        raise ImproperlyConfigured(f"Set the {name} environment variable (chemin absolu du dossier : voir .env.example)")
+    return str(BASE_DIR / value)  # BASE_DIR / chemin absolu = ce chemin absolu
+
+
+STATIC_ROOT = _files_root('STATIC_ROOT', 'staticfiles')
 MEDIA_URL = '/media/'
-MEDIA_ROOT = env('MEDIA_ROOT', default=str(BASE_DIR / 'media'))
+MEDIA_ROOT = _files_root('MEDIA_ROOT', 'media')
 
 
 # Default primary key field type

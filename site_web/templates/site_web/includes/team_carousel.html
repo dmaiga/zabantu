@@ -1,0 +1,90 @@
+{# Carrousel de tous les membres (contexte : team_members, déjà dans l'ordre voulu). Défile seul, avec pause, flèches et clavier. #}
+{% include 'site_web/includes/team_photo_styles.html' %}
+<style>
+    .team-track { display: flex; gap: 1rem; list-style: none; margin: 0; padding: .25rem; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; }
+    .team-track::-webkit-scrollbar { display: none; }
+    .team-card { flex: 0 0 calc((100% - 1rem) / 2); scroll-snap-align: start; }
+    @media (min-width: 768px) { .team-card { flex-basis: calc((100% - 2rem) / 3); } }
+    @media (min-width: 992px) { .team-card { flex-basis: calc((100% - 3rem) / 4); } }
+    @media (prefers-reduced-motion: reduce) { .team-track { scroll-behavior: auto; } }
+    .team-mini { display: block; text-align: center; text-decoration: none; color: inherit; }
+    .team-mini h3 { font-size: 1.05rem; margin: 0 0 .15rem; color: var(--zabantu-dark); }
+    .team-mini p { font-size: .85rem; color: #6c757d; margin: 0; }
+    .team-mini:hover h3, .team-mini:focus-visible h3 { text-decoration: underline; }
+    .team-bar { display: flex; justify-content: flex-end; margin-bottom: .75rem; }
+    .team-controls { display: flex; align-items: center; gap: .5rem; }
+    .team-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #d9ddd2; background: #fff; color: var(--zabantu-dark); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+    .team-btn:hover, .team-btn:focus-visible { border-color: var(--zabantu-primary); color: var(--zabantu-primary); }
+</style>
+<div class="team-bar"><div class="team-controls" data-team-controls hidden>
+    <button type="button" class="team-btn" data-team-prev aria-label="Membres précédents"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+    <button type="button" class="team-btn" data-team-toggle aria-label="Mettre en pause le défilement" aria-pressed="false"><i class="fas fa-pause" aria-hidden="true"></i></button>
+    <button type="button" class="team-btn" data-team-next aria-label="Membres suivants"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+</div></div>
+<div data-team-carousel role="region" aria-roledescription="carrousel" aria-label="Les membres du groupe Zabantu">
+    <ul class="team-track" tabindex="0">
+        {% for member in team_members %}
+        <li class="team-card">
+            <a class="team-mini" href="{% url 'public_member_detail' member.pk %}">
+                <div class="team-photo">
+                    {% if member.profile_picture %}
+                    <img class="team-photo-bg" src="{{ member.profile_picture.url }}" alt="" aria-hidden="true" loading="lazy">
+                    <img class="team-photo-img" src="{{ member.profile_picture.url }}" alt="{{ member.get_full_name }}" loading="lazy">
+                    {% else %}<span class="team-initials" aria-hidden="true">{{ member.prenom|slice:":1" }}{{ member.nom|slice:":1" }}</span>{% endif %}
+                </div>
+                <h3>{{ member.get_full_name }}</h3>
+                {% if member.job_title %}<p>{{ member.job_title }}</p>{% endif %}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+<script>
+(function () {
+    var root = document.querySelector('[data-team-carousel]');
+    if (!root) { return; }
+    var track = root.querySelector('.team-track');
+    var controls = document.querySelector('[data-team-controls]');
+    var prev = document.querySelector('[data-team-prev]'), next = document.querySelector('[data-team-next]'), toggle = document.querySelector('[data-team-toggle]');
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var behavior = reduceMotion ? 'auto' : 'smooth';
+    var paused = reduceMotion;          // pas de défilement automatique si l'utilisateur préfère moins d'animations
+    var hovered = false, timer = null;
+
+    function scrollable() { return track.scrollWidth > track.clientWidth + 4; }
+    function step() {
+        var card = track.querySelector('.team-card');
+        return card ? card.getBoundingClientRect().width + (parseFloat(getComputedStyle(track).columnGap) || 0) : 0;
+    }
+    function go(direction) {
+        var atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+        if (direction > 0 && atEnd) { track.scrollTo({ left: 0, behavior: behavior }); }
+        else if (direction < 0 && track.scrollLeft <= 4) { track.scrollTo({ left: track.scrollWidth, behavior: behavior }); }
+        else { track.scrollBy({ left: direction * step(), behavior: behavior }); }
+    }
+    function render() {
+        controls.hidden = !scrollable();
+        toggle.setAttribute('aria-pressed', paused ? 'true' : 'false');
+        toggle.setAttribute('aria-label', paused ? 'Reprendre le défilement' : 'Mettre en pause le défilement');
+        toggle.firstElementChild.className = paused ? 'fas fa-play' : 'fas fa-pause';
+    }
+    function tick() { if (!paused && !hovered && !document.hidden && scrollable()) { go(1); } }
+    // Une action manuelle relance le minuteur : le défilement automatique ne vient pas annuler le geste de l'utilisateur
+    function restart() { clearInterval(timer); timer = setInterval(tick, 3500); }
+    function manual(direction) { go(direction); restart(); }
+
+    prev.addEventListener('click', function () { manual(-1); });
+    next.addEventListener('click', function () { manual(1); });
+    toggle.addEventListener('click', function () { paused = !paused; render(); restart(); });
+    root.addEventListener('mouseenter', function () { hovered = true; });
+    root.addEventListener('mouseleave', function () { hovered = false; });
+    root.addEventListener('focusin', function () { hovered = true; });
+    root.addEventListener('focusout', function () { hovered = false; });
+    track.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { manual(1); e.preventDefault(); } else if (e.key === 'ArrowLeft') { manual(-1); e.preventDefault(); }
+    });
+    window.addEventListener('resize', render);
+    render();
+    restart();
+})();
+</script>

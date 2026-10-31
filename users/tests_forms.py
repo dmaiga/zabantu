@@ -286,5 +286,20 @@ class CommunicationSectionTests(TestCase):
         from site_web.models import ContactMessage
         ContactMessage.objects.create(name='A', last_name='B', email='a@b.org', subject='S', message='m')
         html = self.client.get(reverse('dashboard')).content.decode()
-        self.assertIn('Messages et info-lettre', html)
-        self.assertIn('badge bg-danger ms-1">1<', html.replace('\n', '').replace('  ', ''))
+        self.assertIn('Communication', html)
+        self.assertIn('badge bg-danger">1<', html.replace('\n', '').replace('  ', ''))
+
+
+class WizardScriptGuardTests(TestCase):
+    def test_done_state_is_toggled_with_a_real_boolean(self):
+        """classList.toggle(x, undefined) bascule au lieu de retirer : les étapes non visitées s'affichaient « terminées »."""
+        from pathlib import Path
+        source = Path(__file__).resolve().parent.joinpath('templates', 'form_page.html').read_text(encoding='utf-8')
+        self.assertIn("toggle('is-done', !!(visited[i]", source)
+
+    def test_message_badge_stays_on_the_same_line_in_the_menu(self):
+        self.client.force_login(make_user('moderateur'))
+        from site_web.models import ContactMessage
+        ContactMessage.objects.create(name='A', last_name='B', email='a@b.org', subject='S', message='m')
+        html = self.client.get(reverse('dashboard')).content.decode()
+        self.assertIn('justify-content:space-between', html.split('Communication</span>')[0][-300:])

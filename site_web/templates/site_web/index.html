@@ -88,13 +88,6 @@
     .stat strong { display: block; font-size: 2rem; line-height: 1.1; color: var(--zabantu-dark); }
     .stat span { font-size: .88rem; color: #5b6559; }
 
-    /* 7. Équipe */
-    .team-mini { text-align: center; text-decoration: none; color: inherit; display: block; }
-    .team-mini img { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid var(--zabantu-light); margin-bottom: .75rem; background: #eef0e8; }
-    .team-initials { width: 110px; height: 110px; border-radius: 50%; margin: 0 auto .75rem; display: flex; align-items: center; justify-content: center; background: var(--zabantu-primary); color: #fff; font-size: 2rem; font-weight: 600; border: 3px solid var(--zabantu-light); }
-    .team-mini h3 { font-size: 1.05rem; margin: 0 0 .15rem; color: var(--zabantu-dark); }
-    .team-mini p { font-size: .85rem; color: #6c757d; margin: 0; }
-
     /* 8. Partenaires */
     .partners-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1.5rem 2.5rem; }
     .partners-row img { max-height: 64px; max-width: 160px; object-fit: contain; filter: grayscale(1); opacity: .8; transition: all .2s; }
@@ -268,7 +261,7 @@
     </div>
 </section>
 
-<!-- 7. Équipe -->
+<!-- 7. Équipe : carrousel de tous les membres, dans un ordre aléatoire -->
 {% if team_members %}
 <section class="home-section alt">
     <div class="container">
@@ -276,18 +269,7 @@
             <h2 class="home-title mb-0">Notre équipe</h2>
             <a class="home-more" href="{% url 'public_member_list' %}">Voir tous les membres <i class="fas fa-arrow-right ms-1"></i></a>
         </div>
-        <div class="row g-4">
-            {% for member in team_members %}
-            <div class="col-6 col-lg-3">
-                <a class="team-mini" href="{% url 'public_member_detail' member.pk %}">
-                    {% if member.profile_picture %}<img src="{{ member.profile_picture.url }}" alt="{{ member.get_full_name }}" loading="lazy">
-                    {% else %}<span class="team-initials" aria-hidden="true">{{ member.prenom|slice:":1" }}{{ member.nom|slice:":1" }}</span>{% endif %}
-                    <h3>{{ member.get_full_name }}</h3>
-                    {% if member.job_title %}<p>{{ member.job_title }}</p>{% endif %}
-                </a>
-            </div>
-            {% endfor %}
-        </div>
+        {% include 'site_web/includes/team_carousel.html' %}
     </div>
 </section>
 {% endif %}

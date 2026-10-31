@@ -1,4 +1,4 @@
 {% extends 'form_page.html' %}
 {% block title %}{% if is_edit %}Modifier{% else %}Nouvelle{% endif %} publication{% endblock %}
-{% block form_title %}{% if is_edit %}Modifier la publication{% else %}Nouvelle publication{% endif %} <span class="badge bg-light text-dark border align-middle">{{ article_type }}</span>{% endblock %}
-{% block form_intro %}La publication est enregistrée en brouillon ; elle se publie ou se programme depuis sa fiche.{% endblock %}
+{% block form_title %}{% if is_edit %}Modifier la publication{% else %}Nouvelle publication{% endif %} <span class="badge bg-light text-dark border align-middle">{{ type_label }}</span>{% endblock %}
+{% block form_intro %}{% if is_edit %}Enregistrez vos modifications ; la publication se gère depuis sa fiche.{% else %}La publication est enregistrée en brouillon ; elle se publie ou se programme depuis sa fiche.{% endif %}{% endblock %}

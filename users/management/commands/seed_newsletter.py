@@ -7,8 +7,8 @@ from users.models import CustomUser
 
 class Command(BaseCommand):
     help = (
-        "Abonne à l'info-lettre les comptes actifs qui ne le sont pas encore (sans doublon). "
-        "Attention : ces personnes n'ont pas donné leur accord pour l'info-lettre ; à n'utiliser qu'en connaissance de cause."
+        "Abonne à l'info-lettre les comptes actifs du groupe Zabantu qui ne le sont pas encore (sans doublon). "
+        "Chaque e-mail envoyé contient un lien de désabonnement."
     )
 
     def handle(self, *args, **kwargs):
