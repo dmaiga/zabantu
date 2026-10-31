@@ -27,6 +27,11 @@ from django.shortcuts import get_object_or_404, render
 from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 
+# Les contenus publiés se trient par date de publication (la plus récente d'abord), comme la date affichée
+PUBLICATION_ORDER = (F('publish_at').desc(nulls_last=True), '-created_at')
+PUBLICATION_ORDER_ASC = (F('publish_at').asc(nulls_last=True), 'created_at')
+
+
 def public_member_detail(request, pk):
     """Détail d'un membre"""
     member = get_object_or_404(
@@ -40,7 +45,7 @@ def public_member_detail(request, pk):
     articles = Article.objects.filter(
         authors=member,
         status='published'
-    ).order_by('-publish_at')
+    ).order_by(*PUBLICATION_ORDER)
     
     return render(request, 'site_web/public_member_detail.html', {
         'member': member,
@@ -66,7 +71,7 @@ def membre_liste(request):
         publications_recentes = Article.objects.filter(
             authors=membre,
             status='published'
-        ).order_by('-publish_at')[:3]  # 3 publications les plus récentes
+        ).order_by(*PUBLICATION_ORDER)[:3]  # 3 publications les plus récentes
         
         membres_data.append({
             'membre': membre,
@@ -87,7 +92,7 @@ def membre_detail(request, user_id):
     publications = Article.objects.filter(
         authors=membre,
         status='published'
-    ).order_by('-publish_at')
+    ).order_by(*PUBLICATION_ORDER)
     
     context = {
         'membre': membre,
@@ -291,7 +296,7 @@ def public_article_list(request):
                 Q(subtitle__icontains=search_query) |
                 Q(content__icontains=search_query)
             )
-        guelekan_qs = guelekan_qs.order_by(F('publish_at').desc(nulls_last=True), '-created_at')
+        guelekan_qs = guelekan_qs.order_by(*PUBLICATION_ORDER)
         page_obj = Paginator(guelekan_qs, 12).get_page(request.GET.get('page'))
         total_articles = Article.objects.filter(status='published').count()
         type_counts_qs = Article.objects.filter(status='published').values('article_type').annotate(count=Count('id'))
@@ -325,13 +330,13 @@ def public_article_list(request):
 
     # ✅ SORT
     if sort_option == 'date_asc':
-        articles = articles.order_by('created_at')
+        articles = articles.order_by(*PUBLICATION_ORDER_ASC)
     elif sort_option == 'title_asc':
         articles = articles.order_by('title')
     elif sort_option == 'title_desc':
         articles = articles.order_by('-title')
     else:
-        articles = articles.order_by('-created_at')
+        articles = articles.order_by(*PUBLICATION_ORDER)
 
     # ✅ COUNTS PAR TYPE
     type_counts_qs = Article.objects.filter(status='published') \
@@ -526,7 +531,7 @@ def public_member_list(request):
     members = CustomUser.objects.filter(
         is_active=True,
         role__in=['moderateur', 'membre']
-    ).order_by('last_name')
+    ).order_by('nom', 'prenom')
     
     return render(request, 'site_web/public_member_list.html', {
         'members': members
@@ -540,8 +545,7 @@ class HomeView(TemplateView):
 
         published_articles = Article.objects.filter(status='published')
         # Dernières publications : par date de publication (création à défaut)
-        context['latest_articles'] = published_articles.order_by(
-            F('publish_at').desc(nulls_last=True), '-created_at')[:4]
+        context['latest_articles'] = published_articles.order_by(*PUBLICATION_ORDER)[:4]
 
         # Événements à venir
         now = timezone.now()
@@ -550,7 +554,7 @@ class HomeView(TemplateView):
         context['upcoming_events'] = upcoming.exclude(event_type='seminaire')[:3]
         context['gelekan_next'] = upcoming.filter(event_type='seminaire').first()
         context['latest_guelekans'] = Guelekan.objects.filter(status='published').prefetch_related(
-            'intervenants').order_by(F('publish_at').desc(nulls_last=True), '-created_at')[:3]
+            'intervenants').order_by(*PUBLICATION_ORDER)[:3]
 
         # Membres actifs : aperçu de l'équipe et compteur
         members = CustomUser.objects.filter(is_active=True, role__in=['moderateur', 'membre'])
