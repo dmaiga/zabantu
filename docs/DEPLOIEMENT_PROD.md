@@ -160,6 +160,11 @@ Ajouter une tâche cron (toutes les 5 minutes suffisent), avec les chemins du se
 Tester à la main avant d'activer le cron : `python manage.py publish_scheduled` (affiche « 0 contenu(s) publié(s) » s'il n'y a rien à faire).
 La commande peut être relancée sans risque : un contenu n'est publié et annoncé qu'une fois.
 
+**Annonces aux abonnés** : publier un contenu n'envoie plus rien dans la requête. Un signal met l'annonce en file (un envoi par abonné actif) ;
+`publish_scheduled` termine en appelant `send_pending_emails`, qui envoie par lots (`NEWSLETTER_BATCH_SIZE`, pause `NEWSLETTER_BATCH_PAUSE`) et
+**retente les échecs** à chaque passage, jusqu'à `NEWSLETTER_MAX_ATTEMPTS`. Ce même cron suffit donc pour tout ; le délai d'envoi est celui du cron
+(5 minutes au plus). Test manuel : `python manage.py send_pending_emails`. Sans cron, aucune annonce ne part.
+
 Les e-mails utilisent uniquement le `.env` : `SITE_URL` (liens des e-mails), le compte principal (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USE_TLS`,
 `EMAIL_USE_SSL`, `EMAIL_HOST_USER_MAIN`, `EMAIL_HOST_PASSWORD_MAIN`, `DEFAULT_FROM_EMAIL`) et le compte de l'info-lettre (mêmes noms avec le suffixe
 `_NEWS`). Tester avec `python manage.py shell -c "from django.core.mail import send_mail; send_mail('Test','Bonjour','<expéditeur>',['<destinataire>'])"`.

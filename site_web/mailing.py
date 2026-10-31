@@ -1,14 +1,17 @@
 """Envoi des e-mails du site : un seul point d'entrée pour la connexion, le rendu et le journal.
 
-- notify_publication(obj)  : annonce une publication ou un événement aux abonnés actifs
+- queue_publication(obj)  : met en file l'annonce d'une publication ou d'un événement (appelée par un signal)
+- send_pending()           : envoie par lots les annonces en file et retente les échecs (commande send_pending_emails)
 - send_campaign(campaign)  : envoie une campagne d'info-lettre à ses destinataires
 - send_reply(...)          : réponse à un message de contact
 """
 import html
 import logging
+import time
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import F
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
@@ -19,7 +22,7 @@ from django.utils.html import strip_tags
 from django.utils.http import urlsafe_base64_encode
 from django.utils.text import Truncator
 
-from .models import NewsletterSubscriber, PublicationNotice
+from .models import NewsletterSubscriber, PublicationDelivery, PublicationNotice
 
 logger = logging.getLogger(__name__)
 
@@ -59,17 +62,17 @@ def _build_message(subscriber, subject, template, context, text):
     return message
 
 
-def _deliver(messages):
-    """Envoie {clé: message} sur une seule connexion ; renvoie (clés envoyées, clés en échec)."""
+def _deliver_batch(batch):
+    """Envoie une liste de (clé, message) sur une connexion neuve ; renvoie (clés envoyées, clés en échec)."""
     sent, failed = [], []
     connection = newsletter_connection()
     try:
         connection.open()
     except Exception:
         logger.exception("Connexion au serveur d'info-lettre impossible")
-        return sent, list(messages)
+        return sent, [key for key, _ in batch]
     try:
-        for key, message in messages.items():
+        for key, message in batch:
             message.connection = connection
             try:
                 delivered = message.send()
@@ -79,6 +82,24 @@ def _deliver(messages):
             (sent if delivered else failed).append(key)
     finally:
         connection.close()
+    return sent, failed
+
+
+def _deliver(messages):
+    """Envoie {clé: message} par lots (NEWSLETTER_BATCH_SIZE), avec une pause entre deux lots (NEWSLETTER_BATCH_PAUSE).
+
+    Chaque lot ouvre sa propre connexion : une coupure du serveur n'affecte que son lot et le débit reste sous les
+    limites des hébergeurs. Renvoie (clés envoyées, clés en échec).
+    """
+    items = list(messages.items())
+    size = max(1, settings.NEWSLETTER_BATCH_SIZE)
+    sent, failed = [], []
+    for start in range(0, len(items), size):
+        if start:
+            time.sleep(settings.NEWSLETTER_BATCH_PAUSE)
+        batch_sent, batch_failed = _deliver_batch(items[start:start + size])
+        sent += batch_sent
+        failed += batch_failed
     return sent, failed
 
 
@@ -94,8 +115,11 @@ def _is_event(obj):
     return obj.__class__.__name__ == 'Event'
 
 
-def notify_publication(obj):
-    """Annonce `obj` aux abonnés actifs, une seule fois. Renvoie (envoyés, échecs) ou None si rien n'est envoyé."""
+def queue_publication(obj):
+    """Met en file l'annonce de `obj` aux abonnés actifs, une seule fois ; rien n'est envoyé ici (voir send_pending).
+
+    Renvoie le nombre d'envois créés, ou None si rien n'est mis en file.
+    """
     if not settings.SEND_NEWSLETTER_ON_PUBLISH:
         return None
     if _is_event(obj) and obj.date < timezone.now():
@@ -105,7 +129,12 @@ def notify_publication(obj):
         content_type=ContentType.objects.get_for_model(obj), object_id=obj.pk)
     if not created:
         return None
+    PublicationDelivery.objects.bulk_create(
+        PublicationDelivery(notice=notice, subscriber=s) for s in NewsletterSubscriber.objects.filter(is_active=True))
+    return notice.deliveries.count()
 
+
+def _publication_message(delivery, obj):
     label = 'Nouvel événement' if _is_event(obj) else 'Nouvelle publication'
     context = {
         'label': label,
@@ -116,15 +145,31 @@ def notify_publication(obj):
                    else 'Nous espérons que cette publication vous plaira.',
     }
     text = f"{label} : {obj.title}\n\n{context['excerpt']}\n\nLire la suite : {context['url']}\n\n{context['closing']}"
-    subscribers = {s.pk: s for s in NewsletterSubscriber.objects.filter(is_active=True)}
-    messages = {pk: _build_message(s, f"{label} : {obj.title}", 'emails/publication.html', context, text)
-                for pk, s in subscribers.items()}
+    return _build_message(delivery.subscriber, f"{label} : {obj.title}", 'emails/publication.html', context, text)
+
+
+def send_pending():
+    """Envoie par lots les annonces en attente et retente les échecs (jusqu'à NEWSLETTER_MAX_ATTEMPTS). Renvoie (envoyés, échecs)."""
+    pending = (PublicationDelivery.objects
+               .filter(sent_at=None, attempts__lt=settings.NEWSLETTER_MAX_ATTEMPTS, subscriber__is_active=True)
+               .select_related('subscriber', 'notice'))
+    contents, messages, notices = {}, {}, set()
+    for delivery in pending:
+        notice = delivery.notice
+        if notice.pk not in contents:
+            contents[notice.pk] = notice.content_object
+        obj = contents[notice.pk]
+        if obj is None or getattr(obj, 'status', 'published') != 'published':
+            continue  # supprimé ou dépublié depuis : on n'annonce plus
+        messages[delivery.pk] = _publication_message(delivery, obj)
+        notices.add(notice.pk)
 
     sent, failed = _deliver(messages)
-    if failed and not sent:
-        notice.delete()  # rien n'est parti : on pourra réessayer
-    else:
-        notice.sent_count = len(sent)
+    now = timezone.now()
+    PublicationDelivery.objects.filter(pk__in=sent).update(sent_at=now, attempts=F('attempts') + 1)
+    PublicationDelivery.objects.filter(pk__in=failed).update(attempts=F('attempts') + 1)
+    for notice in PublicationNotice.objects.filter(pk__in=notices):
+        notice.sent_count = notice.deliveries.exclude(sent_at=None).count()
         notice.save(update_fields=['sent_count'])
     return len(sent), len(failed)
 

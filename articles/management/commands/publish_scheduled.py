@@ -1,13 +1,13 @@
+from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from articles.models import Article, Guelekan
-from site_web.mailing import notify_publication
 
 
 class Command(BaseCommand):
     help = (
-        "Publie les contenus programmés dont la date est passée et les annonce aux abonnés. "
+        "Publie les contenus programmés dont la date est passée puis envoie les annonces en attente (et retente les échecs). "
         "À lancer régulièrement par cron (voir docs/DEPLOIEMENT_PROD.md)."
     )
 
@@ -18,7 +18,7 @@ class Command(BaseCommand):
             for item in due:
                 item.status = 'published'
                 item.save()
-                notify_publication(item)
                 self.stdout.write(f"Publié : {item.title}")
             total += len(due)
         self.stdout.write(f"{total} contenu(s) publié(s)")
+        call_command('send_pending_emails', stdout=self.stdout)

@@ -12,7 +12,6 @@ from .forms import EventForm,EventIntervenantForm
 from .filters import EventFilterForm
 from users.listing import paginate
  
-from site_web.mailing import notify_publication
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -84,11 +83,7 @@ def event_publish(request, id):
 
     event.status = 'published'
     event.save()
-    result = notify_publication(event)
-    if result and result[0]:
-        messages.success(request, f"L'événement « {event.title} » a été publié et annoncé à {result[0]} abonné(s).")
-    else:
-        messages.success(request, f"L'événement « {event.title} » a été publié.")
+    messages.success(request, f"L'événement « {event.title} » a été publié.")
     return redirect('event_detail', id=event.id)
 
 # Dépublier un événement (mettre en brouillon)

@@ -15,7 +15,6 @@ from users.listing import paginate
 from .media_library import list_media_files  
 from django.conf import settings
 from django.template.loader import render_to_string
-from site_web.mailing import notify_publication
 
 from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
@@ -197,7 +196,6 @@ def publish_article(request, slug):
         article.status = 'published'
         article.publish_at = timezone.now()  # Date de publication actuelle
         article.save()
-        notify_publication(article)
 
         messages.success(request, f"L'article « {article.title} » a été publié.")
     return redirect('article_detail', slug=slug)
@@ -255,8 +253,6 @@ def guelekan_create(request):
         if form.is_valid():
            
             guelekan = form.save()
-            if guelekan.status == 'published':
-                notify_publication(guelekan)
 
             messages.success(request, 'Séminaire créé avec succès!')
             return redirect('guelekan_detail', slug=guelekan.slug)
@@ -274,8 +270,6 @@ def guelekan_update(request, slug):
         if form.is_valid():
             
             guelekan = form.save()
-            if guelekan.status == 'published':
-                notify_publication(guelekan)
 
             messages.success(request, 'Séminaire mis à jour!')
             return redirect('guelekan_detail', slug=guelekan.slug)
@@ -334,6 +328,5 @@ def publish_guelekan(request, slug):
     if not guelekan.is_published():
         guelekan.status = 'published'
         guelekan.save()
-        notify_publication(guelekan)
         messages.success(request, f"Le Gɛlɛkan « {guelekan.title} » a été publié.")
     return redirect('guelekan_detail', slug=slug)

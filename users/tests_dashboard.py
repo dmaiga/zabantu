@@ -175,12 +175,12 @@ class PresentationTests(TestCase):
         user = make_user('moderateur')
         article = Article.objects.create(title='Sans abonnés', content='x', status='published')
         from site_web import mailing
-        mailing.notify_publication(article)  # aucun abonné : l'annonce est notée mais n'a touché personne
+        mailing.send_pending()  # aucun abonné : l'annonce est notée mais n'a touché personne
         texts = [e['text'] for e in dashboard_data.recent_activity(user)]
         self.assertFalse(any('Annonce envoyée' in t for t in texts))
         NewsletterSubscriber.objects.create(email='lecteur@t.org')
         other = Article.objects.create(title='Avec abonné', content='x', status='published')
-        mailing.notify_publication(other)
+        mailing.send_pending()
         texts = [e['text'] for e in dashboard_data.recent_activity(user)]
         self.assertTrue(any('Annonce envoyée à 1 abonné' in t for t in texts))
 

@@ -374,6 +374,7 @@ class PublicationNotice(models.Model):
     """Trace l'annonce d'un contenu aux abonnés : un contenu n'est annoncé qu'une fois."""
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
     sent_count = models.PositiveIntegerField(_('envoyés'), default=0)
     created_at = models.DateTimeField(_('annoncé le'), auto_now_add=True)
 
@@ -381,6 +382,19 @@ class PublicationNotice(models.Model):
         verbose_name = _('annonce de publication')
         verbose_name_plural = _('annonces de publication')
         unique_together = ('content_type', 'object_id')
+
+
+class PublicationDelivery(models.Model):
+    """Un envoi d'annonce à un abonné : créé à la publication, envoyé ensuite par lots (commande send_pending_emails)."""
+    notice = models.ForeignKey(PublicationNotice, on_delete=models.CASCADE, related_name='deliveries')
+    subscriber = models.ForeignKey(NewsletterSubscriber, on_delete=models.CASCADE, related_name='deliveries')
+    sent_at = models.DateTimeField(_('envoyé le'), null=True, blank=True)
+    attempts = models.PositiveSmallIntegerField(_('tentatives'), default=0)
+
+    class Meta:
+        verbose_name = _("envoi d'annonce")
+        verbose_name_plural = _("envois d'annonces")
+        unique_together = ('notice', 'subscriber')
 
 
 class BlockedSender(models.Model):

@@ -244,6 +244,11 @@ EMAIL_HOST_USER_NEWS = env("EMAIL_HOST_USER_NEWS", default="")
 EMAIL_HOST_PASSWORD_NEWS = env("EMAIL_HOST_PASSWORD_NEWS", default="")
 DEFAULT_FROM_EMAIL_NEWS = _mail("DEFAULT_FROM_EMAIL_NEWS", "Zabantu <newsletter@localhost>")
 SEND_NEWSLETTER_ON_PUBLISH = env.bool("SEND_NEWSLETTER_ON_PUBLISH", default=True)
+# Envoi par lots : nombre de messages par connexion SMTP et pause (secondes) entre deux lots
+NEWSLETTER_BATCH_SIZE = env.int("NEWSLETTER_BATCH_SIZE", default=50)
+NEWSLETTER_BATCH_PAUSE = env.int("NEWSLETTER_BATCH_PAUSE", default=5)
+# Une annonce en échec est retentée à chaque passage du cron, jusqu'à ce nombre de tentatives
+NEWSLETTER_MAX_ATTEMPTS = env.int("NEWSLETTER_MAX_ATTEMPTS", default=5)
 
 # Adresse publique du site, utilisée dans les liens des e-mails (obligatoire en production)
 SITE_URL = env("SITE_URL", default="http://localhost:8000" if DEBUG else environ.Env.NOTSET)

@@ -14,7 +14,7 @@ from events.models import Event
 from users.testing import make_user
 
 from . import mailing
-from .models import MembershipApplication, NewsletterCampaign, NewsletterRecipient, NewsletterSubscriber, PublicationNotice
+from .models import MembershipApplication, NewsletterCampaign, NewsletterRecipient, NewsletterSubscriber, PublicationDelivery, PublicationNotice
 
 
 def subscribe(email, active=True):
@@ -28,65 +28,117 @@ def make_article(**kw):
     return Article.objects.create(**defaults)
 
 
-class NotifyPublicationTests(TestCase):
+class AnnouncementTests(TestCase):
+    """La publication met l'annonce en file (signal) ; l'envoi par lots est fait par send_pending."""
+
     def setUp(self):
         self.active = subscribe('actif@test.org')
         subscribe('parti@test.org', active=False)
 
+    def test_publishing_sends_nothing_by_itself(self):
+        make_article()
+        self.assertEqual(mail.outbox, [])
+        self.assertEqual(PublicationDelivery.objects.count(), 1)
+
+    def test_draft_is_not_queued(self):
+        make_article(status='draft')
+        self.assertFalse(PublicationNotice.objects.exists())
+
     def test_only_active_subscribers_receive_it_individually(self):
-        mailing.notify_publication(make_article())
+        make_article()
+        self.assertEqual(mailing.send_pending(), (1, 0))
         self.assertEqual([m.to for m in mail.outbox], [['actif@test.org']])
 
     def test_publication_wording_is_neutral(self):
-        mailing.notify_publication(make_article())
+        make_article()
+        mailing.send_pending()
         msg = mail.outbox[0]
         self.assertEqual(msg.subject, 'Nouvelle publication : Étude sur le Sahel')
         self.assertNotIn('article', (msg.subject + msg.body + msg.alternatives[0][0]).lower())
 
     def test_guelekan_is_announced_as_a_publication(self):
-        mailing.notify_publication(Guelekan.objects.create(title='Séminaire', content='<p>x</p>', status='published'))
+        Guelekan.objects.create(title='Séminaire', content='<p>x</p>', status='published')
+        mailing.send_pending()
         self.assertEqual(mail.outbox[0].subject, 'Nouvelle publication : Séminaire')
 
     def test_upcoming_event_wording(self):
-        event = Event.objects.create(title='Atelier', content='Contenu', image='x.jpg', status='published',
-                                     date=timezone.now() + timedelta(days=2))
-        mailing.notify_publication(event)
+        Event.objects.create(title='Atelier', content='Contenu', image='x.jpg', status='published',
+                             date=timezone.now() + timedelta(days=2))
+        mailing.send_pending()
         self.assertEqual(mail.outbox[0].subject, 'Nouvel événement : Atelier')
 
     def test_past_event_is_not_announced(self):
-        event = Event.objects.create(title='Passé', content='x', image='x.jpg', status='published',
-                                     date=timezone.now() - timedelta(days=2))
-        self.assertIsNone(mailing.notify_publication(event))
+        Event.objects.create(title='Passé', content='x', image='x.jpg', status='published',
+                             date=timezone.now() - timedelta(days=2))
+        self.assertFalse(PublicationNotice.objects.exists())
+        self.assertEqual(mailing.send_pending(), (0, 0))
         self.assertEqual(mail.outbox, [])
 
     def test_content_is_announced_only_once(self):
         article = make_article()
-        mailing.notify_publication(article)
-        self.assertIsNone(mailing.notify_publication(article))
+        mailing.send_pending()
+        article.title = 'Modifié'
+        article.save()
+        mailing.send_pending()
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(PublicationNotice.objects.get().sent_count, 1)
 
     @override_settings(SEND_NEWSLETTER_ON_PUBLISH=False)
-    def test_switch_off_sends_nothing(self):
-        self.assertIsNone(mailing.notify_publication(make_article()))
-        self.assertEqual(mail.outbox, [])
+    def test_switch_off_queues_nothing(self):
+        make_article()
+        self.assertFalse(PublicationNotice.objects.exists())
 
     def test_links_use_the_token_and_the_public_page(self):
         article = make_article()
-        mailing.notify_publication(article)
+        mailing.send_pending()
         body = mail.outbox[0].body
         self.assertIn(reverse('public_article_detail', args=[article.slug]), body)
         self.assertIn(str(self.active.token), body)
         self.assertIn('List-Unsubscribe', mail.outbox[0].extra_headers)
 
-    def test_total_failure_can_be_retried(self):
-        article = make_article()
+    def test_failures_are_retried_on_the_next_run(self):
+        make_article()
         with mock.patch.object(mailing.EmailMultiAlternatives, 'send', side_effect=OSError), \
                 self.assertLogs('site_web.mailing', 'ERROR'):
-            sent, failed = mailing.notify_publication(article)
-        self.assertEqual((sent, failed), (0, 1))
-        self.assertFalse(PublicationNotice.objects.exists())
-        mailing.notify_publication(article)
+            self.assertEqual(mailing.send_pending(), (0, 1))
+        self.assertEqual(PublicationNotice.objects.get().sent_count, 0)
+        self.assertEqual(mailing.send_pending(), (1, 0))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mailing.send_pending(), (0, 0))
+
+    @override_settings(NEWSLETTER_MAX_ATTEMPTS=2)
+    def test_gives_up_after_max_attempts(self):
+        make_article()
+        with mock.patch.object(mailing.EmailMultiAlternatives, 'send', side_effect=OSError), \
+                self.assertLogs('site_web.mailing', 'ERROR'):
+            mailing.send_pending()
+            mailing.send_pending()
+        self.assertEqual(mailing.send_pending(), (0, 0))
+        self.assertEqual(mail.outbox, [])
+
+    def test_unpublished_content_is_no_longer_announced(self):
+        article = make_article()
+        article.status = 'draft'
+        article.save()
+        self.assertEqual(mailing.send_pending(), (0, 0))
+        self.assertEqual(mail.outbox, [])
+
+    @override_settings(NEWSLETTER_BATCH_SIZE=2, NEWSLETTER_BATCH_PAUSE=7)
+    def test_sends_in_batches_with_a_pause(self):
+        for i in range(4):
+            subscribe(f'n{i}@test.org')
+        make_article()
+        with mock.patch.object(mailing.time, 'sleep') as sleep, \
+                mock.patch.object(mailing, '_deliver_batch', wraps=mailing._deliver_batch) as batch:
+            self.assertEqual(mailing.send_pending(), (5, 0))
+        self.assertEqual([len(c.args[0]) for c in batch.call_args_list], [2, 2, 1])
+        self.assertEqual(sleep.call_args_list, [mock.call(7), mock.call(7)])
+
+    def test_command_sends_pending(self):
+        make_article()
+        out = StringIO()
+        call_command('send_pending_emails', stdout=out)
+        self.assertIn('1 e-mail(s) envoyé(s)', out.getvalue())
         self.assertEqual(len(mail.outbox), 1)
 
 
@@ -138,6 +190,8 @@ class PublishViewTests(TestCase):
         self.client.post(reverse('publish_article', args=[article.slug]))
         self.client.post(reverse('unpublish_article', args=[article.slug]))
         self.client.post(reverse('publish_article', args=[article.slug]))
+        self.assertEqual(mail.outbox, [])  # la requête n'envoie rien
+        mailing.send_pending()
         self.assertEqual(len(mail.outbox), 1)
 
 
