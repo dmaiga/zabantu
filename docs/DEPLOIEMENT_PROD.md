@@ -169,7 +169,18 @@ Les e-mails utilisent uniquement le `.env` : `SITE_URL` (liens des e-mails), le 
 `EMAIL_USE_SSL`, `EMAIL_HOST_USER_MAIN`, `EMAIL_HOST_PASSWORD_MAIN`, `DEFAULT_FROM_EMAIL`) et le compte de l'info-lettre (mêmes noms avec le suffixe
 `_NEWS`). Tester avec `python manage.py shell -c "from django.core.mail import send_mail; send_mail('Test','Bonjour','<expéditeur>',['<destinataire>'])"`.
 
-### 4.9 Protection des formulaires
+### 4.9 Sauvegardes régulières (cron)
+Deux scripts, dans `scripts/` : `backup_db.sh` (base PostgreSQL, format `pg_dump -Fc`) et `backup_media.sh` (archive du dossier `MEDIA_ROOT`, sans les miniatures).
+Ils lisent `DB_*` et `MEDIA_ROOT` dans le `.env` sans l'exécuter, écrivent dans `~/backups/zabantu` (hors de `public_html`, fichiers lisibles par le seul propriétaire),
+contrôlent chaque sauvegarde (non vide, lisible) et suppriment celles de plus de 14 jours (`KEEP_DAYS`).
+```cron
+0 2 * * *  /chemin/vers/zabantu/scripts/backup_db.sh    >> $HOME/backups/zabantu/backup.log 2>&1
+30 2 * * * /chemin/vers/zabantu/scripts/backup_media.sh >> $HOME/backups/zabantu/backup.log 2>&1
+```
+Créer d'abord `~/backups/zabantu`, tester à la main chaque script, puis copier régulièrement les fichiers **hors du serveur** (une sauvegarde sur le même serveur ne protège pas d'une panne du serveur).
+Restauration : voir l'en-tête de chaque script.
+
+### 4.10 Protection des formulaires
 
 Les formulaires de contact, d'adhésion et d'info-lettre ont un champ piège invisible et un délai minimal de 3 s (aucune limite
 d'envois, aucune adresse IP). La connexion est bloquée après 5 échecs sur un même identifiant : 5 minutes, puis 10, 15… à chaque
