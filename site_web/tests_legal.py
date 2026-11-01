@@ -32,3 +32,9 @@ class CookieBannerTests(TestCase):
 
     def test_cookie_policy_lists_the_consent_cookie(self):
         self.assertContains(self.client.get(reverse('cookies')), 'zabantu_consent')
+
+    def test_banner_script_is_not_cut_short_by_a_closing_tag(self):
+        # un « </script> » écrit dans le JavaScript (même en commentaire) ferait afficher le reste du code comme du texte
+        html = self.client.get(reverse('home')).content.decode()
+        start = html.index("var NAME = 'zabantu_consent'")
+        self.assertIn('})();', html[start:html.index('</script>', start)])

@@ -67,7 +67,7 @@
   function apply(choice) {
     window.zabantuConsent = choice;
     document.dispatchEvent(new CustomEvent('zabantu:consent', { detail: choice }));
-    // Scripts facultatifs : <script type="text/plain" data-consent="analytics" src="…"></script>
+    // Scripts facultatifs : balise script de type text/plain avec l'attribut data-consent="analytics"
     document.querySelectorAll('script[type="text/plain"][data-consent]').forEach(function (old) {
       if (!choice[old.dataset.consent] || old.dataset.done) return;
       var s = document.createElement('script');
