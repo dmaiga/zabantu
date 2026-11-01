@@ -19,7 +19,6 @@ Seuls les points encore ouverts figurent ici. Les versions (Django, Python, paqu
 |---|----------|--------|----------|--------|---------------|
 | A2 | `site_web/models.py` importe le module de réglages du projet au lieu de `django.conf.settings`, avec des imports en double | Corriger les imports | P3 | S | 1 h |
 | C3 | Aucune journalisation (`LOGGING`). Le gabarit `contact_reply.html` n'est pas dans le dossier des autres e-mails | Configurer les journaux, déplacer le gabarit | P3 | S | 2 à 3 h |
-| S4 | Aucune notion d'auteur : tout compte autorisé peut modifier le brouillon d'un autre (`@login_required` seulement) | Limiter la modification d'un brouillon à son auteur et aux modérateurs, si le groupe le souhaite | P3 | S | 3 à 4 h |
 | S5 | Pas de SRI sur les bibliothèques externes, pas d'en-tête CSP | Ajouter les empreintes SRI ; la CSP est plus longue car les pages contiennent du code et du style intégrés. Lancer `python manage.py check --deploy` sur le serveur. | P3 | S | SRI : 2 à 3 h · CSP : 1 jour |
 | A3 | Trois éditeurs de texte riche mélangés (Summernote, TinyMCE, CKEditor) | En garder un seul (demande une migration des champs) | P3 | M | 2 à 3 jours |
 | C1 | Fichiers trop gros : `site_web/views.py` (606 lignes), `site_web/models.py` (426), `articles/views.py` (332), plusieurs gabarits de 400 à 630 lignes | Découper progressivement | P3 | L | plus de 5 jours, par étapes |
