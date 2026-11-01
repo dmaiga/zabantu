@@ -34,11 +34,11 @@
         {% for photo in photos %}
         {% thumb photo.image 640 as t %}
         <figure class="photo-tile">
-            <a class="pswp-item" href="{{ photo.image.url }}" data-caption="{{ photo.title }}"{% if t.src_width %} data-pswp-width="{{ t.src_width }}" data-pswp-height="{{ t.src_height }}"{% endif %}>
-                <img src="{{ t.url }}"{% if t.width %} width="{{ t.width }}" height="{{ t.height }}"{% endif %} alt="{{ photo.title|default:'Photo de la galerie' }}" loading="lazy">
+            <a class="pswp-item" href="{{ photo.image.url }}" data-caption="{{ photo.display_title }}"{% if t.src_width %} data-pswp-width="{{ t.src_width }}" data-pswp-height="{{ t.src_height }}"{% endif %}>
+                <img src="{{ t.url }}"{% if t.width %} width="{{ t.width }}" height="{{ t.height }}"{% endif %} alt="{{ photo.display_title|default:'Photo de la galerie' }}" loading="lazy">
             </a>
             <a class="photo-info" href="{% url 'detail_photo' photo.pk %}" aria-label="Voir la fiche de la photo"><i class="fas fa-circle-info"></i></a>
-            {% if photo.title %}<figcaption>{{ photo.title }}</figcaption>{% endif %}
+            {% if photo.display_title %}<figcaption>{{ photo.display_title }}</figcaption>{% endif %}
         </figure>
         {% endfor %}
     </div>

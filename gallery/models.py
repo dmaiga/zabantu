@@ -1,3 +1,4 @@
+import re
 # gallery/models.py
 from django.db import models
 from django.contrib.auth import get_user_model
@@ -70,6 +71,23 @@ class Gallery(models.Model):
         from django.urls import reverse
         return reverse('gallery_detail', kwargs={'slug': self.slug})
 
+# Noms de fichiers bruts (appareil photo, WhatsApp, capture d'écran…) enregistrés tels quels comme titre
+_RAW_NAME = re.compile(
+    r'^(?:'
+    r'(?:IMG|DSC|DSCN|DSCF|PXL|VID|MVIMG|PHOTO|IMAGE|P|SAM|CIMG|WP)[-_ ]?\d[\w\-. ]*'        # IMG-20240803-WA0047, DSC01234
+    r'|WhatsApp (?:Image|Video)[\w\-. ()]*'                                               # WhatsApp Image 2024-08-03 at 10.12.33
+    r'|Screenshot[\w\-. ()]*|Capture d.écran[\w\-. ()]*'
+    r'|\d[\d_\-. ()]*'                                                                    # 20240803_121212, 1234567
+    r'|[0-9a-fA-F\-]{16,}'                                                                 # identifiant hexadécimal / UUID
+    r')(?:\.(?:jpe?g|png|webp|heic|gif))?$',
+    re.IGNORECASE,
+)
+
+
+def is_raw_filename(title):
+    return bool(_RAW_NAME.match((title or '').strip()))
+
+
 class Photo(models.Model):
     gallery = models.ForeignKey(
         Gallery, 
@@ -129,6 +147,11 @@ class Photo(models.Model):
             self.is_standalone = True
             
         super().save(*args, **kwargs)
+
+    @property
+    def display_title(self):
+        """Titre à montrer au public : vide quand c'est un nom de fichier brut (IMG-2024…-WA0047)."""
+        return '' if is_raw_filename(self.title) else self.title
 
     def get_absolute_url(self):
         from django.urls import reverse
