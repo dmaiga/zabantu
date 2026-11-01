@@ -1,0 +1,27 @@
+{% extends 'site_web/legal/_base_legal.html' %}
+{% block title %}Politique de cookies - Zabantu{% endblock %}
+{% block banner_title %}Cookies et traceurs{% endblock %}
+
+{% block legal_body %}
+<p>Un cookie est un petit fichier enregistré sur votre appareil lorsque vous visitez un site. Le site <strong>zabantu.net</strong> n’utilise <strong>aucun cookie de mesure d’audience, de publicité ou de réseau social</strong>. Il n’utilise que des cookies techniques, indispensables à son fonctionnement : ils ne nécessitent pas votre consentement, et c’est pourquoi aucun bandeau de choix ne s’affiche.</p>
+
+<h2>1. Cookies déposés par le site</h2>
+<table>
+  <thead><tr><th>Cookie</th><th>Rôle</th><th>Durée</th></tr></thead>
+  <tbody>
+    <tr><td><code>csrftoken</code></td><td>Protège les formulaires contre les envois frauduleux.</td><td>1 an au plus</td></tr>
+    <tr><td><code>sessionid</code></td><td>Maintient votre connexion au tableau de bord (membres) et mémorise l’étape de certains formulaires.</td><td>Durée de la session (2 semaines au plus)</td></tr>
+  </tbody>
+</table>
+<p>Les visiteurs qui ne se connectent pas ne reçoivent que le cookie de protection des formulaires, lorsqu’ils ouvrent une page qui en contient un.</p>
+
+<h2>2. Services externes chargés par les pages</h2>
+<p>Pour s’afficher, les pages chargent des polices, icônes et bibliothèques depuis des services externes : <strong>jsDelivr</strong>, <strong>Cloudflare (cdnjs)</strong>, <strong>Google Fonts</strong> et le <strong>CDN jQuery</strong>. Votre navigateur leur transmet votre adresse IP et des informations techniques pour recevoir ces fichiers. Nous ne leur confions aucune autre donnée et n’en tirons aucune statistique.</p>
+<p>Les liens vers LinkedIn, Facebook et la chaîne WhatsApp sont de simples liens : ces services ne reçoivent aucune information tant que vous ne cliquez pas dessus. Une fois sur leur site, leur propre politique s’applique.</p>
+
+<h2>3. Gérer ou refuser les cookies</h2>
+<p>Vous pouvez à tout moment supprimer ou bloquer les cookies depuis les réglages de votre navigateur (Chrome, Firefox, Safari, Edge : rubrique « Confidentialité »). Bloquer les cookies techniques peut empêcher la connexion et l’envoi des formulaires.</p>
+
+<h2>4. En savoir plus</h2>
+<p>Voir la <a href="{% url 'privacy' %}">politique de confidentialité</a> pour vos droits et pour nous contacter : <a href="mailto:Info@zabantu.net">Info@zabantu.net</a>.</p>
+{% endblock %}

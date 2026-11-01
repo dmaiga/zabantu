@@ -1,0 +1,29 @@
+{% extends 'base_public.html' %}
+
+{% block banner_subtitle %}Dernière mise à jour : {% block legal_updated %}1er novembre 2026{% endblock %}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .legal-wrap { max-width: 860px; margin: 0 auto; }
+  .legal-wrap h2 { font-size: 1.35rem; font-weight: 700; color: var(--zabantu-dark); margin: 2.2rem 0 .8rem; padding-bottom: .4rem; border-bottom: 2px solid var(--zabantu-secondary); }
+  .legal-wrap p, .legal-wrap li { color: #3d463a; line-height: 1.7; }
+  .legal-wrap table { width: 100%; font-size: .93rem; margin: 1rem 0; }
+  .legal-wrap th { background: #eef0e8; color: var(--zabantu-dark); text-align: left; }
+  .legal-wrap th, .legal-wrap td { padding: .6rem .75rem; border: 1px solid #dfe3d6; vertical-align: top; }
+  .legal-wrap mark { background: #fff3c4; padding: 0 .25rem; border-radius: 3px; }
+  .legal-nav { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.5rem; }
+  .legal-nav a { padding: .35rem .9rem; border: 1px solid #d5dacb; border-radius: 999px; font-size: .9rem; text-decoration: none; color: var(--zabantu-dark); }
+  .legal-nav a.active { background: var(--zabantu-dark); color: #fff; border-color: var(--zabantu-dark); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="legal-wrap">
+  <nav class="legal-nav" aria-label="Informations légales">
+    <a href="{% url 'legal_notice' %}" {% if legal_page == 'notice' %}class="active"{% endif %}>Mentions légales</a>
+    <a href="{% url 'privacy' %}" {% if legal_page == 'privacy' %}class="active"{% endif %}>Confidentialité</a>
+    <a href="{% url 'cookies' %}" {% if legal_page == 'cookies' %}class="active"{% endif %}>Cookies</a>
+  </nav>
+  {% block legal_body %}{% endblock %}
+</div>
+{% endblock %}

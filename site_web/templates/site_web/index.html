@@ -320,6 +320,7 @@
                         <button type="submit" class="btn btn-primary btn-lg w-100"><i class="fas fa-envelope me-2"></i>S'abonner</button>
                     </div>
                 </form>
+                <p class="small mt-2 mb-0 opacity-75">Votre e-mail sert uniquement à vous envoyer l'info-lettre ; désabonnement possible à tout moment. <a href="{% url 'privacy' %}">En savoir plus</a></p>
                 {% if messages %}
                 <div class="mt-3 w-100">
                     {% for message in messages %}

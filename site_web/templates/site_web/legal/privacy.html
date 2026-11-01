@@ -1,0 +1,89 @@
+{% extends 'site_web/legal/_base_legal.html' %}
+{% block title %}Politique de confidentialité - Zabantu{% endblock %}
+{% block banner_title %}Politique de confidentialité{% endblock %}
+
+{% block legal_body %}
+<p>Cette page explique quelles données personnelles le site <strong>zabantu.net</strong> collecte, pourquoi, combien de temps elles sont conservées et comment exercer vos droits. Elle est rédigée conformément à la législation malienne sur la protection des données à caractère personnel, sous le contrôle de l’Autorité de protection des données à caractère personnel (APDP).</p>
+
+<h2>1. Responsable du traitement</h2>
+<p>Groupe de recherche Zabantu, Campus universitaire de Badalabougou, Bamako, Mali. E-mail : <a href="mailto:Info@zabantu.net">Info@zabantu.net</a> · Téléphone : <a href="tel:77941470">77941470</a>. Voir aussi les <a href="{% url 'legal_notice' %}">mentions légales</a>.</p>
+
+<h2>2. Données collectées et finalités</h2>
+<table>
+  <thead><tr><th>Situation</th><th>Données</th><th>Finalité</th><th>Conservation</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Formulaire de <strong>contact</strong></td>
+      <td>Nom, prénom, e-mail, téléphone (facultatif), sujet, message</td>
+      <td>Répondre à votre demande</td>
+      <td><mark>3 ans</mark> après le dernier échange</td>
+    </tr>
+    <tr>
+      <td>Demande d’<strong>adhésion</strong></td>
+      <td>Nom et prénom(s), e-mail, téléphone (facultatif), ville et pays, statut académique, institution, centres d’intérêt de recherche, motivations, source de connaissance du groupe, photo et biographie (facultatives)</td>
+      <td>Examiner la candidature, créer et gérer le compte de membre</td>
+      <td>Demande refusée : <mark>1 an</mark>. Membre : pendant l’adhésion, puis <mark>3 ans</mark> après la fin de l’adhésion</td>
+    </tr>
+    <tr>
+      <td><strong>Info-lettre</strong></td>
+      <td>Adresse e-mail, date d’inscription</td>
+      <td>Vous envoyer l’info-lettre et les annonces de publication</td>
+      <td>Jusqu’à votre désabonnement, puis <mark>1 an</mark> (preuve du désabonnement)</td>
+    </tr>
+    <tr>
+      <td><strong>Compte membre</strong> (connexion)</td>
+      <td>Nom, prénom, e-mail, téléphone, photo, biographie, poste, département, identifiants de connexion (mot de passe chiffré)</td>
+      <td>Accès au tableau de bord, présentation publique des membres</td>
+      <td>Durée de l’adhésion</td>
+    </tr>
+    <tr>
+      <td><strong>Navigation</strong></td>
+      <td>Adresse IP, type de navigateur, pages demandées (journaux techniques du serveur)</td>
+      <td>Sécurité, prévention des abus, bon fonctionnement du site</td>
+      <td><mark>12 mois</mark> au plus</td>
+    </tr>
+  </tbody>
+</table>
+<p>Le site ne réalise <strong>aucune mesure d’audience ni profilage publicitaire</strong>, et ne vend aucune donnée.</p>
+<p>Les champs marqués « facultatif » peuvent rester vides. Les autres sont nécessaires pour traiter votre demande.</p>
+
+<h2>3. Base de la collecte</h2>
+<ul>
+  <li><strong>Votre consentement</strong> : inscription à l’info-lettre, photo et biographie du profil public.</li>
+  <li><strong>Votre demande</strong> : réponse à un message de contact, examen d’une candidature, gestion de votre compte.</li>
+  <li><strong>Notre intérêt légitime</strong> : sécurité du site et lutte contre les envois automatisés (robots).</li>
+</ul>
+
+<h2>4. Informations visibles publiquement</h2>
+<p>Si votre candidature est acceptée, votre profil de membre (nom, photo, biographie, poste) est affiché sur la page « Membres ». Vous pouvez demander à tout moment sa modification ou son retrait. Les publications affichent le nom de leurs auteurs.</p>
+
+<h2>5. Destinataires</h2>
+<ul>
+  <li><strong>Les personnes habilitées du groupe Zabantu</strong> (administrateurs et modérateurs du site), pour traiter les messages, candidatures et envois.</li>
+  <li><strong>Nos prestataires techniques</strong> : l’hébergeur du site et du serveur de messagerie (<mark>[nom de l’hébergeur à compléter]</mark>), qui traitent les données pour notre compte.</li>
+  <li><strong>Les services de contenu externes</strong> qui servent les polices et bibliothèques d’affichage (jsDelivr, Cloudflare cdnjs, Google Fonts, jQuery CDN) : ils reçoivent votre adresse IP et des informations techniques lors du chargement des pages. Voir la <a href="{% url 'cookies' %}">politique de cookies</a>.</li>
+</ul>
+<p>Vos données ne sont communiquées à aucun autre tiers, sauf obligation légale.</p>
+
+<h2>6. Transfert hors du Mali</h2>
+<p>Les services de contenu externes cités ci-dessus sont exploités depuis l’étranger. Les données de vos formulaires sont stockées sur les serveurs de l’hébergeur du site <mark>[préciser le pays d’hébergement]</mark>.</p>
+
+<h2>7. Sécurité</h2>
+<p>Les connexions au site sont chiffrées (HTTPS), les mots de passe sont stockés sous forme chiffrée, l’accès au tableau de bord est réservé aux personnes autorisées et les formulaires sont protégés contre les envois automatisés. Aucun système n’est infaillible : en cas de violation de données vous concernant, nous vous en informerions ainsi que l’APDP, conformément à la loi.</p>
+
+<h2>8. Vos droits</h2>
+<p>Vous disposez des droits suivants sur vos données :</p>
+<ul>
+  <li><strong>accès</strong> : savoir quelles données nous détenons sur vous et en obtenir une copie ;</li>
+  <li><strong>rectification</strong> : faire corriger des données inexactes ;</li>
+  <li><strong>suppression</strong> : demander l’effacement de vos données ;</li>
+  <li><strong>opposition</strong> : vous opposer, pour un motif légitime, à un traitement ;</li>
+  <li><strong>retrait du consentement</strong> à tout moment.</li>
+</ul>
+<p><strong>Comment les exercer :</strong> écrivez à <a href="mailto:Info@zabantu.net">Info@zabantu.net</a> en indiquant l’objet de votre demande et l’adresse e-mail concernée. Nous pouvons vous demander un justificatif d’identité en cas de doute. Nous répondons dans un délai d’<mark>un mois</mark>.</p>
+<p>Pour vous <strong>désabonner de l’info-lettre</strong>, utilisez le lien présent au bas de chaque message : le désabonnement est immédiat.</p>
+<p>Si vous estimez que vos droits ne sont pas respectés, vous pouvez saisir l’<strong>Autorité de protection des données à caractère personnel (APDP)</strong> du Mali.</p>
+
+<h2>9. Mises à jour</h2>
+<p>Cette politique peut évoluer. La date de dernière mise à jour figure en haut de la page.</p>
+{% endblock %}

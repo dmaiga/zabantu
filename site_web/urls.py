@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import TemplateView
 from .views import (
     HomeView, 
     public_article_list, 
@@ -42,6 +43,9 @@ urlpatterns = [
     #06_08
     
     path('contact/', contact, name='contact'),
+    path('mentions-legales/', TemplateView.as_view(template_name='site_web/legal/legal_notice.html', extra_context={'legal_page': 'notice'}), name='legal_notice'),
+    path('confidentialite/', TemplateView.as_view(template_name='site_web/legal/privacy.html', extra_context={'legal_page': 'privacy'}), name='privacy'),
+    path('cookies/', TemplateView.as_view(template_name='site_web/legal/cookies.html', extra_context={'legal_page': 'cookies'}), name='cookies'),
     path('adhesion/', membership_apply, name='membership_apply'),
     path('adhesion/merci/', membership_thanks, name='membership_thanks'),
     

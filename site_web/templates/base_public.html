@@ -91,6 +91,7 @@
     .footer-social a:hover { background: var(--zabantu-secondary); color: #2c1c0c; transform: translateY(-2px); }
     .footer-cta { display: inline-block; margin-top: .5rem; padding: .5rem 1.2rem; border: 1px solid var(--zabantu-secondary); border-radius: 30px; color: #fff !important; font-size: .9rem; }
     .footer-cta:hover { background: var(--zabantu-secondary); color: #2c1c0c !important; }
+    .footer-legal a { color: inherit; }
     .footer-bottom { border-top: 1px solid rgba(255,255,255,.12); margin-top: 2.25rem; padding-top: 1.25rem; font-size: .85rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem; }
   </style>
   {% block extra_css %}{% endblock %}
@@ -230,7 +231,11 @@
 
     <div class="footer-bottom">
       <span>&copy; {% now "Y" %} Groupe de recherche Zabantu. Tous droits réservés.</span>
-      <a href="{% url 'contact' %}">Contact</a>
+      <span class="footer-legal">
+        <a href="{% url 'legal_notice' %}">Mentions légales</a> ·
+        <a href="{% url 'privacy' %}">Confidentialité</a> ·
+        <a href="{% url 'cookies' %}">Cookies</a>
+      </span>
     </div>
   </div>
 </footer>

@@ -1,0 +1,38 @@
+{% extends 'site_web/legal/_base_legal.html' %}
+{% block title %}Mentions légales - Zabantu{% endblock %}
+{% block banner_title %}Mentions légales{% endblock %}
+
+{% block legal_body %}
+<h2>1. Éditeur du site et responsable du traitement</h2>
+<p>Le site <strong>zabantu.net</strong> est édité par le <strong>groupe de recherche Zabantu</strong> (Economy | Conflict | State).</p>
+<ul>
+  <li><strong>Forme juridique :</strong> <mark>[à compléter : association, numéro d’enregistrement…]</mark></li>
+  <li><strong>Adresse :</strong> Campus universitaire de Badalabougou, Bamako, Mali</li>
+  <li><strong>Téléphone :</strong> <a href="tel:77941470">77941470</a></li>
+  <li><strong>E-mail :</strong> <a href="mailto:Info@zabantu.net">Info@zabantu.net</a></li>
+</ul>
+<p>Le groupe Zabantu est le <strong>responsable du traitement</strong> des données personnelles collectées sur ce site (voir la <a href="{% url 'privacy' %}">politique de confidentialité</a>).</p>
+
+<h2>2. Directeur de la publication</h2>
+<p><mark>[à compléter : nom et fonction du responsable de la publication]</mark>, joignable à l’adresse <a href="mailto:Info@zabantu.net">Info@zabantu.net</a>.</p>
+
+<h2>3. Hébergeur</h2>
+<ul>
+  <li><strong>Nom :</strong> <mark>[à compléter]</mark></li>
+  <li><strong>Adresse :</strong> <mark>[à compléter]</mark></li>
+  <li><strong>Contact :</strong> <mark>[à compléter : téléphone ou e-mail]</mark></li>
+</ul>
+
+<h2>4. Propriété intellectuelle</h2>
+<p>Les textes, publications, photographies, logos et autres contenus du site sont la propriété du groupe Zabantu ou de leurs auteurs, sauf mention contraire. Toute reproduction ou réutilisation, totale ou partielle, nécessite l’accord préalable de l’éditeur, à l’exception des courtes citations accompagnées de la mention de la source et de l’auteur.</p>
+<p>Les publications portent le nom de leurs auteurs, qui restent responsables de leurs opinions. Elles n’engagent pas nécessairement le groupe Zabantu.</p>
+
+<h2>5. Responsabilité</h2>
+<p>Le groupe Zabantu s’efforce de publier des informations exactes et à jour, sans pouvoir garantir l’absence d’erreur. Le site contient des liens vers des sites tiers (LinkedIn, Facebook, WhatsApp…) dont le contenu n’engage pas sa responsabilité.</p>
+
+<h2>6. Données personnelles et cookies</h2>
+<p>Les informations sur les données collectées, leur finalité, leur durée de conservation et vos droits figurent dans la <a href="{% url 'privacy' %}">politique de confidentialité</a>. Celles sur les traceurs figurent dans la <a href="{% url 'cookies' %}">politique de cookies</a>.</p>
+
+<h2>7. Droit applicable</h2>
+<p>Le présent site est soumis au droit malien. En cas de litige, et à défaut de résolution amiable, les tribunaux compétents de Bamako seront saisis.</p>
+{% endblock %}
