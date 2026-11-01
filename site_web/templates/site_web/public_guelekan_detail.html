@@ -3,15 +3,6 @@
 
 {% block title %}{{ guelekan.title }} | Séminaires Gɛlɛkan{% endblock %}
 
-{% block meta %}
-<meta name="description" content="{{ guelekan.meta_description|default:guelekan.subtitle|default:guelekan.title|truncatewords:20 }}">
-<meta property="og:title" content="{{ guelekan.title }}">
-<meta property="og:description" content="{{ guelekan.meta_description|default:guelekan.subtitle|default:guelekan.title|truncatewords:20 }}">
-{% if guelekan.cover_image %}
-<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ guelekan.cover_image.url }}">
-{% endif %}
-{% endblock %}
-
 {% block banner_title %}{{ guelekan.title }}{% endblock %}
 {% block banner_subtitle %}{{ guelekan.subtitle|default:"Séminaire de recherche" }}{% endblock %}
 

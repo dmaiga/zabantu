@@ -20,10 +20,13 @@ from django.conf.urls.static import static
 from django.conf import settings
 from users.views import login_view 
 from site_web.views import HomeView
+from site_web import seo_views
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 
 urlpatterns = [
+    path('sitemap.xml', seo_views.sitemap, name='sitemap'),
+    path('robots.txt', seo_views.robots, name='robots'),
     path('admin/', admin.site.urls),
     path('', HomeView.as_view(), name='home'),
 

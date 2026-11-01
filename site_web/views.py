@@ -6,6 +6,7 @@ from django.utils.html import strip_tags
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from articles.models import Article,Guelekan
+from . import seo
 from events.models import Event
 from gallery.models import Photo, Gallery, PhotoTag
 from django.views.generic import TemplateView
@@ -159,6 +160,7 @@ def detail_galerie(request, slug):
 
     return render(request, 'site_web/public_detail_galerie.html', {
         'galerie': galerie,
+        'seo': seo.gallery_seo(request, galerie),
         'photos': photos_page,
         'photo_total': photos_page.paginator.count,
         'page_title': f"Galerie : {galerie.title}"
@@ -335,6 +337,7 @@ def public_article_detail(request, slug):
     context = {
         'article': article,
         'authors': authors,
+        'seo': seo.article_seo(request, article),
     }
     
     return render(request, 'site_web/public_article_detail.html', context)
@@ -442,6 +445,7 @@ def public_event_detail(request, pk):
 
     return render(request, 'site_web/public_event_detail.html', {
         'event': event,
+        'seo': seo.event_seo(request, event),
         'now': now,
         'time_range': _event_when(event),
         'is_past_event': is_past_event,
@@ -555,6 +559,7 @@ def public_guelekan_detail(request, slug):
     context = {
         'guelekan': guelekan,
         'galleries': galleries,
+        'seo': seo.guelekan_seo(request, guelekan),
     }
     
     return render(request, 'site_web/public_guelekan_detail.html', context)

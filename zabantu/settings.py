@@ -1,4 +1,3 @@
-
 """
 Django settings for zabantu project.
 
@@ -11,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import datetime
 from pathlib import Path
 import os 
 import environ
@@ -251,6 +251,8 @@ NEWSLETTER_BATCH_PAUSE = env.int("NEWSLETTER_BATCH_PAUSE", default=5)
 NEWSLETTER_MAX_ATTEMPTS = env.int("NEWSLETTER_MAX_ATTEMPTS", default=5)
 
 # Adresse publique du site, utilisée dans les liens des e-mails (obligatoire en production)
+# Contenus publiés à partir de cette date : sitemap et balise canonique (les plus anciens ne changent pas)
+SEO_START_DATE = datetime.date.fromisoformat(env("SEO_START_DATE", default="2026-11-01"))
 SITE_URL = env("SITE_URL", default="http://localhost:8000" if DEBUG else environ.Env.NOTSET)
 
 # Password reset timeout (24 hours)
