@@ -40,6 +40,7 @@ Principe : **rien ne doit modifier ou supprimer de données existantes**. Toute 
 | HTML des éditeurs nettoyé à l'affichage (`bleach`) | Aucune : aucune donnée enregistrée n'est modifiée. Les iframes intégrées ne s'affichent plus. |
 | Middleware d'auto-publication supprimé | Le cron `publish_scheduled` (3.1) est **obligatoire** : sans lui, un contenu « Programmé » reste en attente. Il est déjà en place. |
 | Pages légales, bandeau de cookies, aperçu des liens partagés (Open Graph), `/sitemap.xml`, `/robots.txt` | Vérifier `SITE_URL` dans le `.env` (section 4) ; déclarer le site dans Google Search Console (une fois). |
+| Empreintes SRI sur les bibliothèques externes (Bootstrap, Font Awesome, PhotoSwipe CSS, jQuery) | Aucune. Si la mise en page ou les icônes disparaissent, ouvrir la console du navigateur : un message « integrity » indique la balise en cause. |
 | Scripts de sauvegarde `scripts/backup_*.sh` | Créer le dossier et ajouter les deux tâches cron (3.2). |
 
 Il n'y a **aucune nouvelle variable obligatoire**. `SEO_START_DATE` est facultative (1er novembre 2026 par défaut) : elle fixe la date à partir de laquelle un contenu publié figure dans le sitemap et reçoit une balise canonique.
@@ -103,6 +104,7 @@ Sur le site réel :
 - [ ] `https://zabantu.net/robots.txt` et `https://zabantu.net/sitemap.xml` s'affichent. Le sitemap ne liste que les contenus publiés à partir de `SEO_START_DATE`.
 - [ ] Aperçu d'un lien d'article, d'événement et de Gɛlɛkan sur WhatsApp, Facebook et LinkedIn (un réseau peut garder un ancien aperçu en cache).
 - [ ] Google Search Console : site déclaré, sitemap envoyé (une seule fois).
+- [ ] Console du navigateur (accueil et tableau de bord) : aucune erreur « integrity » ni ressource bloquée ; mise en page et icônes intactes.
 - [ ] HTTPS sans contenu mixte ; e-mail de test reçu.
 
 ## 6. Retour arrière

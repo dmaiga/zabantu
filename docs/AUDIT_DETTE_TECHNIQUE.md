@@ -19,13 +19,13 @@ Seuls les points encore ouverts figurent ici. Les versions (Django, Python, paqu
 |---|----------|--------|----------|--------|---------------|
 | A2 | `site_web/models.py` importe le module de réglages du projet au lieu de `django.conf.settings`, avec des imports en double | Corriger les imports | P3 | S | 1 h |
 | C3 | Aucune journalisation (`LOGGING`). Le gabarit `contact_reply.html` n'est pas dans le dossier des autres e-mails | Configurer les journaux, déplacer le gabarit | P3 | S | 2 à 3 h |
-| S5 | Pas de SRI sur les bibliothèques externes, pas d'en-tête CSP | Ajouter les empreintes SRI ; la CSP est plus longue car les pages contiennent du code et du style intégrés. Lancer `python manage.py check --deploy` sur le serveur. | P3 | S | SRI : 2 à 3 h · CSP : 1 jour |
 | A3 | Trois éditeurs de texte riche mélangés (Summernote, TinyMCE, CKEditor) | En garder un seul (demande une migration des champs) | P3 | M | 2 à 3 jours |
 | C1 | Fichiers trop gros : `site_web/views.py` (606 lignes), `site_web/models.py` (426), `articles/views.py` (332), plusieurs gabarits de 400 à 630 lignes | Découper progressivement | P3 | L | plus de 5 jours, par étapes |
 | C2 | CSS copié dans les gabarits : plus de 30 fichiers avec un bloc `<style>` et plusieurs centaines de couleurs écrites en dur | Créer une feuille de style commune quand le design system sera appliqué | P3 | L | plus de 5 jours, par étapes |
 
 ## Fermés depuis le dernier audit
 
+- **S5 (SRI)** : chaque feuille de style ou script externe (Bootstrap, Font Awesome, PhotoSwipe CSS, jQuery) porte une empreinte `integrity` : le navigateur refuse un fichier modifié. Un test vérifie qu'aucune balise n'en manque. Hors périmètre : la feuille de polices Google Fonts (contenu variable) et les modules JavaScript de PhotoSwipe (importés par `import`, sans empreinte possible). L'en-tête CSP n'est pas retenu. Reste à lancer `python manage.py check --deploy` sur le serveur.
 - **A1 (middleware d'auto-publication)** : supprimé. Les contenus programmés sont publiés uniquement par la commande `publish_scheduled` (cron obligatoire, voir [DEPLOIEMENT_PROD.md](DEPLOIEMENT_PROD.md), section 3.1).
 - **S2 (HTML non nettoyé)** : les gabarits n'utilisent plus `|safe` pour le contenu saisi ; le filtre `clean_html` (liste blanche de balises et de styles, via `bleach`) nettoie à l'affichage, sans modifier les contenus enregistrés. Les titres et extraits passent par `plain_text`.
 - **S3 (fichiers téléversés)** : les images (JPG, PNG, WebP, GIF, 10 Mo au plus, lisibles par Pillow) et les PDF (25 Mo au plus, en-tête PDF vérifié) sont contrôlés, y compris dans l'envoi multiple de photos. Seuls les nouveaux fichiers sont vérifiés.
