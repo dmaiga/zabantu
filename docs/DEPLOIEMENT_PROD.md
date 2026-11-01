@@ -2,7 +2,7 @@
 
 Date : 1er novembre 2026
 
-Le site est **déjà en production** (hébergement cPanel LWS, code tiré depuis GitHub dans `/home/cp2594820p30/repositories/zabantu`). Ce guide décrit la mise à jour de routine, ce que contient la prochaine, et les tâches planifiées.
+Le site est **en production** (hébergement cPanel LWS, code tiré depuis GitHub dans `/home/cp2594820p30/repositories/zabantu`). Ce guide décrit la mise à jour de routine, l'état de la dernière mise à jour et les tâches planifiées.
 
 Principe : **rien ne doit modifier ou supprimer de données existantes**. Toute opération sur la base est précédée d'une sauvegarde.
 
@@ -10,58 +10,70 @@ Principe : **rien ne doit modifier ou supprimer de données existantes**. Toute 
 
 ## 1. Mise à jour de routine
 
-1. **Sauvegarder** (les scripts du 3.2 le font chaque nuit ; avant une mise à jour, les lancer à la main) :
-   ```bash
-   bash /home/cp2594820p30/repositories/zabantu/scripts/backup_db.sh
-   bash /home/cp2594820p30/repositories/zabantu/scripts/backup_media.sh
-   ```
-2. **Tirer le code** : `git pull` (le `.env`, `media/` et les bases ne sont pas dans le dépôt).
-3. **Dépendances**, si `requirements.txt` a changé : `pip install -r requirements.txt` dans le virtualenv du serveur.
-4. **Lire le plan des migrations avant de les appliquer** :
-   ```bash
-   python manage.py migrate --plan
-   python manage.py migrate
-   ```
-   Si une migration supprime une colonne ou une table, ou si l'historique ne correspond pas à la base : s'arrêter et analyser. Pas de `--fake` sans comprendre.
-   **Ne jamais lancer `makemigrations` en production** (`django_summernote` essaierait d'écrire dans le dossier des paquets installés).
-5. **Fichiers statiques** : `python manage.py collectstatic --noinput` à **chaque** mise à jour (WhiteNoise sert des noms à empreinte : une page qui référence un fichier absent du manifeste échoue).
-6. **Miniatures** (si de nouvelles photos sont arrivées) : `python manage.py generate_thumbnails`. Retour arrière : supprimer `MEDIA_ROOT/cache/thumbs/`.
-7. **Redémarrer l'application** (obligatoire pour les nouveaux fichiers Python et bibliothèques de balises).
-8. **Vérifier** (section 5).
+Après avoir poussé les commits sur GitHub, sur le serveur :
+```bash
+cd /home/cp2594820p30/repositories/zabantu
+PYTHON=/home/cp2594820p30/virtualenv/repositories/zabantu/3.13/bin/python ./deploy.sh
+```
+`deploy.sh` enchaîne, en s'arrêtant à la première erreur :
+1. **Sauvegardes** de la base et des médias (`SKIP_BACKUP=1` pour les passer, déconseillé).
+2. **Code** : `git fetch origin main`, puis `git reset --hard origin/main`. Le code du serveur devient identique à GitHub. Les modifications faites à la main sur des fichiers suivis par git sont **écrasées** (le script les affiche) ; le `.env`, `media/` et `logs/` ne sont pas touchés. Ne jamais modifier le code directement sur le serveur.
+3. **Dépendances** : `pip install -r requirements.txt`.
+4. **Migrations** : le plan est affiché (`migrate --plan`), puis `migrate`.
+5. **Fichiers statiques** : `collectstatic` à **chaque** mise à jour (WhiteNoise sert des noms à empreinte : une page qui référence un fichier absent du manifeste échoue).
+6. **Miniatures** : `generate_thumbnails`.
+7. **Contrôle** : `check --deploy` (aucun avertissement bloquant).
+8. Option : `./deploy.sh <username> …` donne l'accès au backoffice à ces comptes.
 
-`deploy.sh` enchaîne les étapes 4 (sans le plan), 5 et 6 ; il ne remplace ni la sauvegarde ni le redémarrage.
+Ensuite :
+- **Redémarrer l'application** (cPanel > Setup Python App > Restart) : obligatoire pour les nouveaux fichiers Python et bibliothèques de balises.
+- **Vérifier** (section 5).
 
-## 2. Prochaine mise à jour : ce qu'elle change
+À savoir :
+- Lire le plan des migrations affiché : si l'une supprime une colonne ou une table, ou si l'historique ne correspond pas à la base, s'arrêter et analyser (pas de `--fake` sans comprendre). Une sauvegarde de la veille ou de l'instant existe.
+- **Ne jamais lancer `makemigrations` en production** (`django_summernote` essaierait d'écrire dans le dossier des paquets installés).
+- Retour arrière des miniatures : supprimer `MEDIA_ROOT/cache/thumbs/`.
+- `deploy.sh` doit d'abord être sur GitHub : un changement du script ne s'applique qu'au déploiement suivant.
 
-| Changement | Action à prévoir |
-|------------|------------------|
-| Six migrations « AlterField » (`articles.0012`, `events.0004`, `gallery.0003`, `intervenants.0003`, `site_web.0011`, `users.0004`) | `migrate`. Elles ne changent que les règles de validation des fichiers téléversés, aucune table. |
-| Contrôle des fichiers téléversés (images JPG, PNG, WebP, GIF, 10 Mo ; PDF, 25 Mo) | Aucune. Les anciens fichiers ne sont pas revérifiés. |
-| HTML des éditeurs nettoyé à l'affichage (`bleach`) | Aucune : aucune donnée enregistrée n'est modifiée. Les iframes intégrées ne s'affichent plus. |
-| Middleware d'auto-publication supprimé | Le cron `publish_scheduled` (3.1) est **obligatoire** : sans lui, un contenu « Programmé » reste en attente. Il est déjà en place. |
-| Pages légales, bandeau de cookies, aperçu des liens partagés (Open Graph), `/sitemap.xml`, `/robots.txt` | Vérifier `SITE_URL` dans le `.env` (section 4) ; déclarer le site dans Google Search Console (une fois). |
-| Empreintes SRI sur les bibliothèques externes (Bootstrap, Font Awesome, PhotoSwipe CSS, jQuery) | Aucune. Si la mise en page ou les icônes disparaissent, ouvrir la console du navigateur : un message « integrity » indique la balise en cause. |
-| Scripts de sauvegarde `scripts/backup_*.sh` | Créer le dossier et ajouter les deux tâches cron (3.2). |
+## 2. Dernière mise à jour (1er novembre 2026) : effective
 
-Il n'y a **aucune nouvelle variable obligatoire**. `SEO_START_DATE` est facultative (1er novembre 2026 par défaut) : elle fixe la date à partir de laquelle un contenu publié figure dans le sitemap et reçoit une balise canonique.
+Déployée en production ; les sauvegardes ont été testées à la main avec succès (base : 180 Ko ; médias : 42 Mo) et les trois tâches cron sont en place.
+
+| Changement | État |
+|------------|------|
+| Six migrations « AlterField » (`articles.0012`, `events.0004`, `gallery.0003`, `intervenants.0003`, `site_web.0011`, `users.0004`) : règles de validation des fichiers, aucune table | Appliquées |
+| Contrôle des fichiers téléversés (images JPG, PNG, WebP, GIF, 10 Mo ; PDF, 25 Mo) | En service. Les anciens fichiers ne sont pas revérifiés. |
+| HTML des éditeurs nettoyé à l'affichage (`bleach`) | En service. Aucune donnée enregistrée modifiée ; les iframes intégrées ne s'affichent plus. |
+| Middleware d'auto-publication supprimé | Le cron `publish_scheduled` (3.1) est **obligatoire** et en place. |
+| Pages légales, bandeau de cookies, aperçu des liens partagés (Open Graph), `/sitemap.xml`, `/robots.txt` | En service. À faire : déclarer le site dans Google Search Console (une fois). |
+| Empreintes SRI sur Bootstrap, Font Awesome, PhotoSwipe CSS, jQuery | En service. Si la mise en page ou les icônes disparaissent, la console du navigateur indique la balise en cause (« integrity »). |
+| Scripts de sauvegarde `scripts/backup_*.sh` et leurs cron | En place et testés (3.2). |
+
+Aucune nouvelle variable obligatoire. `SEO_START_DATE` est facultative (1er novembre 2026 par défaut) : elle fixe la date à partir de laquelle un contenu publié figure dans le sitemap et reçoit une balise canonique.
 
 ## 3. Tâches planifiées (cPanel > Tâches Cron)
 
-### 3.1 Publications programmées (déjà en place)
-Un contenu « Programmé » est publié, puis annoncé aux abonnés, par cette commande. Elle peut être relancée sans risque : un contenu n'est publié et annoncé qu'une fois. Elle appelle aussi `send_pending_emails` (envoi par lots, nouvelles tentatives des échecs).
+Les trois tâches sont en place :
+
+| Fréquence | Tâche |
+|-----------|-------|
+| Toutes les 5 minutes | `publish_scheduled` (3.1) |
+| Tous les jours à 2 h | `backup_db.sh` (3.2) |
+| Tous les jours à 2 h 30 | `backup_media.sh` (3.2) |
+
+### 3.1 Publications programmées
+Un contenu « Programmé » est publié, puis annoncé aux abonnés, par cette commande. Elle peut être relancée sans risque : un contenu n'est publié et annoncé qu'une fois. Elle appelle aussi `send_pending_emails` (envoi par lots, nouvelles tentatives des échecs). Sans elle, un contenu programmé reste en attente.
 ```cron
 */5 * * * * cd /home/cp2594820p30/repositories/zabantu && /home/cp2594820p30/virtualenv/repositories/zabantu/3.13/bin/python manage.py publish_scheduled >> /home/cp2594820p30/repositories/zabantu/logs/publish_scheduled.log 2>&1
 ```
-La fréquence est celle réglée dans cPanel (toutes les 5 minutes suffisent). Le dossier `logs/` doit exister dans le dépôt du serveur.
 
-### 3.2 Sauvegardes (à ajouter)
-`backup_db.sh` (base PostgreSQL, `pg_dump -Fc`) et `backup_media.sh` (archive de `MEDIA_ROOT`, sans les miniatures). Ils lisent `DB_*` et `MEDIA_ROOT` dans le `.env` sans l'exécuter, écrivent dans `/home/cp2594820p30/backups/zabantu` (hors de `public_html`, lisibles par le seul propriétaire), contrôlent chaque sauvegarde et suppriment celles de plus de 14 jours (`KEEP_DAYS`).
+### 3.2 Sauvegardes
+`backup_db.sh` (base PostgreSQL, `pg_dump -Fc`) et `backup_media.sh` (archive de `MEDIA_ROOT`, sans les miniatures). Ils lisent `DB_*` et `MEDIA_ROOT` dans le `.env` sans l'exécuter, écrivent dans `/home/cp2594820p30/backups/zabantu` (hors de `public_html`, lisibles par le seul propriétaire), contrôlent chaque sauvegarde et suppriment celles de plus de 14 jours (`KEEP_DAYS`). `deploy.sh` les lance aussi avant chaque mise à jour.
 ```cron
 0 2 * * *  bash /home/cp2594820p30/repositories/zabantu/scripts/backup_db.sh    >> /home/cp2594820p30/backups/zabantu/backup.log 2>&1
 30 2 * * * bash /home/cp2594820p30/repositories/zabantu/scripts/backup_media.sh >> /home/cp2594820p30/backups/zabantu/backup.log 2>&1
 ```
-Avant de planifier : `mkdir -p /home/cp2594820p30/backups/zabantu`, tester chaque script à la main, vérifier que `pg_dump` est disponible pour cet utilisateur. Copier ensuite régulièrement les fichiers **hors du serveur** : une sauvegarde sur le même serveur ne protège pas d'une panne du serveur.
-Restauration : voir l'en-tête de chaque script.
+Copier régulièrement les fichiers **hors du serveur** : une sauvegarde sur le même serveur ne protège pas d'une panne du serveur. Restauration : voir l'en-tête de chaque script.
 
 ## 4. Fichier `.env` de production (référence)
 
@@ -111,7 +123,7 @@ Sur le site réel :
 
 | Situation | Action |
 |-----------|--------|
-| Page en erreur après mise à jour | Revenir au commit précédent (`git checkout <commit>`), redémarrer. Les migrations ajoutées n'empêchent pas l'ancien code de fonctionner. |
+| Page en erreur après mise à jour | Revenir au commit précédent sur le serveur (`git reset --hard <commit>`, `collectstatic`), redémarrer. Ne pas relancer `deploy.sh` avant d'avoir corrigé GitHub : il réaligne le code sur `origin/main`. Les migrations ajoutées n'empêchent pas l'ancien code de fonctionner. |
 | Problème de base de données | Restaurer la sauvegarde : `pg_restore --no-owner -U <utilisateur> -d <base> <fichier>.dump`, sur une base vide, application arrêtée. En dernier recours : cela efface les données saisies depuis la sauvegarde. |
 | Miniatures problématiques | Supprimer `MEDIA_ROOT/cache/thumbs/`. |
 | Redirection HTTPS en boucle | `SECURE_SSL_REDIRECT=False` dans `.env`, redémarrer. |
