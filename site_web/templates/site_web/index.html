@@ -1,4 +1,5 @@
 {% extends 'base_public.html' %}
+{% load clean_tags %}
 {% load antispam_tags %}
 {% load static %}
 
@@ -206,8 +207,8 @@
                     </a>
                     <div class="home-card-body">
                         {% if article.category %}<span class="home-card-badge">{{ article.get_category_display }}</span>{% endif %}
-                        <h3 class="home-card-title"><a href="{% url 'public_article_detail' article.slug %}">{{ article.title|striptags|safe }}</a></h3>
-                        <p class="home-card-text">{% if article.resume %}{{ article.resume|striptags|safe|truncatewords:22 }}{% else %}{{ article.content|default_if_none:""|striptags|safe|truncatewords:22 }}{% endif %}</p>
+                        <h3 class="home-card-title"><a href="{% url 'public_article_detail' article.slug %}">{{ article.title|plain_text }}</a></h3>
+                        <p class="home-card-text">{% if article.resume %}{{ article.resume|plain_text|truncatewords:22 }}{% else %}{{ article.content|default_if_none:""|plain_text|truncatewords:22 }}{% endif %}</p>
                     </div>
                     <div class="home-card-foot">
                         <time datetime="{{ article.publish_at|default:article.created_at|date:'Y-m-d' }}">{{ article.publish_at|default:article.created_at|date:"j F Y" }}</time>

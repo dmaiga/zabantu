@@ -1,5 +1,6 @@
 # articles/models.py
 from django.db import models
+from zabantu.validators import validate_image, validate_pdf
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify, Truncator
 from tinymce.models import HTMLField
@@ -71,7 +72,7 @@ class Article(models.Model):
     content = HTMLField(blank=True, null=True, verbose_name="Contenu")
     
 
-    cover_image = models.ImageField(upload_to='articles/covers/', blank=True, null=True, verbose_name="Image de couverture")
+    cover_image = models.ImageField(upload_to='articles/covers/', blank=True, null=True, verbose_name="Image de couverture", validators=[validate_image])
     # Working paper fields
     institution = models.CharField(max_length=255, blank=True, null=True)
     working_number = models.CharField(max_length=50, blank=True, null=True)
@@ -91,11 +92,11 @@ class Article(models.Model):
     external_link = models.URLField(blank=True, null=True, verbose_name="Lien vers l'article")
     external_link_academique = models.URLField(blank=True, null=True, verbose_name="Lien vers l'article Académique")
     independent_cover = models.ImageField(upload_to='articles/independent/', blank=True, null=True, 
-                                        verbose_name="Image de couverture (facultatif)")
+                                        verbose_name="Image de couverture (facultatif)", validators=[validate_image])
 
     resume = models.TextField(blank=True, null=True, verbose_name="Résumé") 
     # Fichiers
-    pdf_file = models.FileField(upload_to=article_upload_path, blank=True, null=True, verbose_name="Fichier PDF")
+    pdf_file = models.FileField(upload_to=article_upload_path, blank=True, null=True, verbose_name="Fichier PDF", validators=[validate_pdf])
 
     # Ouvrages
     publisher_book = models.CharField(max_length=255, blank=True, null=True, verbose_name="Maison d’édition")
@@ -223,8 +224,8 @@ class Guelekan(models.Model):
     content = HTMLField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
 
-    cover_image = models.ImageField(upload_to='guelekan/covers/', blank=True, null=True)
-    pdf_file = models.FileField(upload_to='guelekan/pdfs/%Y/%m/%d/', blank=True, null=True)
+    cover_image = models.ImageField(upload_to='guelekan/covers/', blank=True, null=True, validators=[validate_image])
+    pdf_file = models.FileField(upload_to='guelekan/pdfs/%Y/%m/%d/', blank=True, null=True, validators=[validate_pdf])
 
     # Relation vers les galeries
     galleries = models.ManyToManyField(

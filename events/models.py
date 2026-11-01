@@ -1,4 +1,5 @@
 from django.db import models
+from zabantu.validators import validate_image, validate_pdf
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -25,7 +26,7 @@ class Event(models.Model):
     title = models.CharField(max_length=200, verbose_name="Titre")
     slug = models.SlugField(max_length=200, unique=True, blank=True, verbose_name="Slug")
     content = models.TextField(verbose_name="Contenu")
-    image = models.ImageField(upload_to='events/', verbose_name="Image")
+    image = models.ImageField(upload_to='events/', verbose_name="Image", validators=[validate_image])
     
     # Nouveau champ de statut
     status = models.CharField(

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load clean_tags %}
 
 {% block title %}{{ guelekan.title|striptags }}{% endblock %}
 
@@ -21,7 +22,7 @@
         <div class="col-lg-8 order-2 order-lg-1">
             <div class="card mb-4">
                 <div class="card-body">
-                    <div class="article-content">{{ guelekan.content|safe }}</div>
+                    <div class="article-content">{{ guelekan.content|clean_html }}</div>
                     {% if guelekan.pdf_file %}
                         <a href="{{ guelekan.pdf_file.url }}" class="btn btn-outline-primary mt-3" target="_blank" rel="noopener"><i class="fas fa-file-pdf me-1"></i> Télécharger le PDF</a>
                     {% endif %}

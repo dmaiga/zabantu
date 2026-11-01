@@ -1,6 +1,7 @@
 import re
 # gallery/models.py
 from django.db import models
+from zabantu.validators import validate_image, validate_pdf
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 import uuid
@@ -23,7 +24,8 @@ class Gallery(models.Model):
         blank=True, 
         null=True,
         verbose_name="Image de couverture",
-        help_text="Image représentative de la galerie"
+        help_text="Image représentative de la galerie",
+        validators=[validate_image],
     )
     created_by = models.ForeignKey(
         User,
@@ -104,7 +106,8 @@ class Photo(models.Model):
     )
     image = models.ImageField(
         upload_to='galleries/photos/%Y/%m/%d/',
-        verbose_name="Fichier image"
+        verbose_name="Fichier image",
+        validators=[validate_image],
     )
     uploaded_by = models.ForeignKey(
         User,

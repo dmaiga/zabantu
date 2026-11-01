@@ -1,4 +1,5 @@
 {% extends 'base_public.html' %}
+{% load clean_tags %}
 {% block title %}Événements - Zabantu{% endblock %}
 {% block banner_title %}Nos Événements{% endblock %}
 {% block banner_subtitle %}Séminaires, formations et rencontres du groupe Zabantu{% endblock %}
@@ -137,7 +138,7 @@
                                 {% if event.location %}<span><i class="fas fa-location-dot"></i>{{ event.location }}</span>
                                 {% elif not event.is_webinar %}<span><i class="fas fa-location-dot"></i>Lieu à confirmer</span>{% endif %}
                             </p>
-                            <p class="ev-excerpt">{{ event.content|striptags|safe|truncatewords:22 }}</p>
+                            <p class="ev-excerpt">{{ event.content|plain_text|truncatewords:22 }}</p>
                         </div>
                     </div>
                     <div class="ev-foot">

@@ -7,13 +7,6 @@ Seuls les points encore ouverts figurent ici. Les versions (Django, Python, paqu
 **Priorité** : P1 = d'abord, P2 = à planifier, P3 = confort.
 **Effort** : S = moins d'une demi-journée, M = 1 à 3 jours, L = plus de 3 jours. La **durée estimée** est un ordre de grandeur pour une personne, tests compris.
 
-## À faire en premier
-
-| # | Problème | Action | Priorité | Effort | Durée estimée |
-|---|----------|--------|----------|--------|---------------|
-| S3 | Les fichiers téléversés ne sont presque pas contrôlés : seule la photo d'adhésion a une limite (5 Mo) | Ajouter des règles communes : types autorisés, poids maximal, ouverture de l'image avec Pillow | P2 | S | 3 à 4 h |
-| S2 | 25 `\|safe` dans les gabarits, dont des titres. `bleach` est installé mais jamais utilisé | Nettoyer le HTML à l'enregistrement (titres en texte brut, contenus avec une liste de balises permises) | P2 | M | 1 à 2 jours |
-
 ## À planifier
 
 | # | Problème | Action | Priorité | Effort | Durée estimée |
@@ -35,6 +28,8 @@ Seuls les points encore ouverts figurent ici. Les versions (Django, Python, paqu
 
 ## Fermés depuis le dernier audit
 
+- **S2 (HTML non nettoyé)** : les gabarits n'utilisent plus `|safe` pour le contenu saisi ; le filtre `clean_html` (liste blanche de balises et de styles, via `bleach`) nettoie à l'affichage, sans modifier les contenus enregistrés. Les titres et extraits passent par `plain_text`.
+- **S3 (fichiers téléversés)** : les images (JPG, PNG, WebP, GIF, 10 Mo au plus, lisibles par Pillow) et les PDF (25 Mo au plus, en-tête PDF vérifié) sont contrôlés, y compris dans l'envoi multiple de photos. Seuls les nouveaux fichiers sont vérifiés.
 - **S1 (secrets)** : le `.env` de production est différent de celui qui a circulé.
 - **A4 (ancienne base locale)** : `db_v3.sqlite3` n'existe plus.
 - **O1 (sauvegardes)** : les scripts `scripts/backup_db.sh` et `scripts/backup_media.sh` existent (voir [DEPLOIEMENT_PROD.md](DEPLOIEMENT_PROD.md), section 4.9). Reste à activer le cron sur le serveur et à copier les sauvegardes hors du serveur.

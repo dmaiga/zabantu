@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from zabantu.validators import validate_image, validate_pdf
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
@@ -39,7 +40,8 @@ class CustomUser(AbstractUser):
     _('photo de profil'),
     upload_to='profiles/',  
     blank=True,
-    default=None 
+    default=None,
+    validators=[validate_image],
         )
     
     # Profession
@@ -154,7 +156,7 @@ from django.db import models
 
 class Partenaire(models.Model):
     name = models.CharField(max_length=255)
-    logo = models.ImageField(upload_to='partenaires/')
+    logo = models.ImageField(upload_to='partenaires/', validators=[validate_image])
    
 
     is_active = models.BooleanField(default=True)

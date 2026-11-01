@@ -1,5 +1,6 @@
 {% extends 'emails/base_email.html' %}
+{% load clean_tags %}
 {% block title %}{{ title }}{% endblock %}
 {% block heading %}{{ title }}{% endblock %}
 {# Le contenu vient de l'éditeur de texte riche (administrateurs et modérateurs seulement) : on l'affiche tel quel. Un ancien contenu en texte brut garde ses retours à la ligne. #}
-{% block body %}{% if '<' in body %}{{ body|safe }}{% else %}{{ body|linebreaks }}{% endif %}{% endblock %}
+{% block body %}{% if '<' in body %}{{ body|clean_html }}{% else %}{{ body|linebreaks }}{% endif %}{% endblock %}

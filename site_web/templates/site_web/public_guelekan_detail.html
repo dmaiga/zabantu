@@ -1,4 +1,5 @@
 {% extends "base_public.html" %}
+{% load clean_tags %}
 {% load static %}
 
 {% block title %}{{ guelekan.title }} | Séminaires Gɛlɛkan{% endblock %}
@@ -67,7 +68,7 @@
         <!-- Content Section -->
         <section class="guelekan-content-section">
             <div class="guelekan-content">
-                {{ guelekan.content|safe }}
+                {{ guelekan.content|clean_html }}
             </div>
             
             <!-- PDF Download -->

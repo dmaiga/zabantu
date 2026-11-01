@@ -121,6 +121,7 @@ python manage.py migrate
 ```
 Contrôler d'abord avec `python manage.py migrate --plan` : seules `articles.0011_scheduled_status`, `site_web.0003` à `0007` et
 `users.0003_backoffice_access` doivent figurer. Aucune ne supprime de colonne ni de ligne.
+S'y ajoutent six migrations « AlterField » (`articles.0012`, `events.0004`, `gallery.0003`, `intervenants.0003`, `site_web.0011`, `users.0004`) : elles ne changent que les règles de validation des fichiers téléversés, pas les tables.
 
 ### 4.4 Fichiers statiques
 ```bash

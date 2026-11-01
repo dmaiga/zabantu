@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load clean_tags %}
 {% block content %}
 <div class="container mt-4">
   <h2>Profil de {{ user_detail.prenom }} {{ user_detail.nom|title }}</h2>
@@ -21,7 +22,7 @@
         <li class="list-group-item"><strong>Connexion :</strong> {% if user_detail.can_access_backoffice %}<span class="badge bg-success">Autorisée</span>{% else %}<span class="badge bg-secondary">Sans accès</span>{% endif %}</li>
         <li class="list-group-item"><strong>Fonction :</strong> {{ user_detail.job_title |default:" — " }}</li>
         <li class="list-group-item"><strong>Département :</strong> {{ user_detail.department |default:" — " }}</li>
-        <li class="list-group-item"><strong>Bio :</strong><br>{{ user_detail.bio|safe|default:" — "  }}</li>
+        <li class="list-group-item"><strong>Bio :</strong><br>{{ user_detail.bio|clean_html|default:" — "  }}</li>
         <li class="list-group-item"><strong>Depuis :</strong> {{ user_detail.date_started|default:" — "  }}</li>
       </ul>
     </div>

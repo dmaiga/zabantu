@@ -127,7 +127,10 @@ class ProductionParityTests(TestCase):
         for expected in ('0008_alter_article_article_type', '0009_article_page_count_article_publication_date_and_more',
                          '0010_alter_article_article_type', '0011_scheduled_status'):
             self.assertIn(expected, names)
-        self.assertEqual(loader.graph.leaf_nodes('articles'), [('articles', '0011_scheduled_status')])
+        # 0012 ne change que les règles de validation des fichiers (aucune modification de table)
+        self.assertEqual(loader.graph.leaf_nodes('articles'), [('articles', '0012_alter_article_cover_image_and_more')])
+        self.assertEqual(loader.graph.node_map[('articles', '0012_alter_article_cover_image_and_more')].parents.pop(),
+                         ('articles', '0011_scheduled_status'))
         self.assertEqual(loader.graph.node_map[('articles', '0011_scheduled_status')].parents.pop(),
                          ('articles', '0010_alter_article_article_type'))
 

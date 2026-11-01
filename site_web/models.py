@@ -1,5 +1,6 @@
 import os
 from django.core.files.base import ContentFile
+from zabantu.validators import validate_image, validate_pdf
 from django.utils.html import escape
 from django.utils.html import linebreaks
 from django.db import models
@@ -241,7 +242,7 @@ class MembershipApplication(models.Model):
     career_benefit = models.TextField("Apport de l'adhésion pour votre carrière")
 
     # Profil public (facultatif) : recopié sur le compte membre à la validation
-    profile_picture = models.ImageField("Photo de profil", upload_to='membership/photos/', blank=True)
+    profile_picture = models.ImageField("Photo de profil", upload_to='membership/photos/', blank=True, validators=[validate_image])
     bio = models.TextField("Courte biographie", blank=True)
     social_linkedin = models.URLField("LinkedIn", blank=True)
     social_facebook = models.URLField("Facebook", blank=True)

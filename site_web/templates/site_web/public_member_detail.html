@@ -1,4 +1,5 @@
 {% extends 'base_public.html' %}
+{% load clean_tags %}
 
 {% block title %}{{ member.get_full_name }} - Zabantu{% endblock %}
 
@@ -184,7 +185,7 @@
                 {% if member.bio %}
                 <div class="member-bio bio-container">
                     <div class="link-break">
-                        {{ member.bio|safe|linebreaks }}
+                        {{ member.bio|clean_html|linebreaks }}
                     </div>
                 </div>
                 {% else %}

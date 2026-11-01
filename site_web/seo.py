@@ -4,13 +4,12 @@ Les balises sont générées à l'affichage : aucune URL ni donnée en base ne c
 concernent que les contenus publiés à partir de SEO_START_DATE ; les plus anciens restent tels quels.
 """
 import datetime
-import html
 import re
 
 from django.conf import settings
 from django.utils import timezone
-from django.utils.html import strip_tags
 
+from .sanitize import plain_text
 from .thumbnails import get_thumbnail
 
 SHARE_IMAGE_WIDTH = 1200
@@ -30,7 +29,7 @@ def absolute_url(url):
 
 def clean_text(value, limit=DESCRIPTION_MAX):
     """Texte brut d'un contenu HTML, espaces regroupés, raccourci à `limit` caractères."""
-    text = re.sub(r'\s+', ' ', html.unescape(strip_tags(str(value or '')))).strip()
+    text = re.sub(r'\s+', ' ', plain_text(value)).strip()
     return text if len(text) <= limit else text[:limit - 1].rstrip() + '…'
 
 

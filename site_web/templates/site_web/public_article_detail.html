@@ -1,4 +1,5 @@
 {% extends 'base_public.html' %}
+{% load clean_tags %}
 
 {% block title %}{{ article.title }} | Zabantu{% endblock %}
 {% block banner_title %}Groupe de recherche Zabantu {% endblock %}
@@ -73,14 +74,14 @@
                 {# Gestion unifiée des résumés selon ton modèle #}
                 {% if article.article_type == 'academic' and article.abstract %}
                     <h3>Résumé</h3>
-                    {{ article.abstract|safe }}
+                    {{ article.abstract|clean_html }}
                 {% elif article.resume %}
                     <h3>Résumé</h3>
-                    {{ article.resume|safe }}
+                    {{ article.resume|clean_html }}
                 {% endif %}
                 
                 {% if article.content %}
-                    <div class="mt-4">{{ article.content|safe }}</div>
+                    <div class="mt-4">{{ article.content|clean_html }}</div>
                 {% endif %}
             </div>
         </div>

@@ -89,6 +89,21 @@ def gallery_delete(request, slug):
 
 # Vues CRUD Photo
 import os
+from django.core.exceptions import ValidationError
+from zabantu.validators import validate_image
+
+
+def _image_errors(files):
+    """Messages d'erreur des fichiers refusés (le téléversement multiple ne passe pas par un champ de formulaire)."""
+    errors = []
+    for f in files:
+        try:
+            validate_image(f)
+        except ValidationError as e:
+            errors.append(f"{f.name} : {e.messages[0]}")
+    return errors
+
+
 @login_required
 def photo_create(request):
     gallery_id = request.GET.get('gallery')
@@ -98,7 +113,11 @@ def photo_create(request):
         form = PhotoForm(request.POST, request.FILES)
         files = request.FILES.getlist('images')  # ← Changer 'image' par 'images'
 
-        if form.is_valid() and files:  # ← Vérifier qu'il y a des fichiers
+        file_errors = _image_errors(files)
+        for error in file_errors:
+            messages.error(request, error)
+
+        if form.is_valid() and files and not file_errors:
             gallery = form.cleaned_data.get('gallery')
             title = form.cleaned_data.get('title')
             is_standalone = form.cleaned_data.get('is_standalone')

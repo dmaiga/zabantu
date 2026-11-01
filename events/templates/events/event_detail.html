@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load clean_tags %}
 {% load static %}
 {% load custom_filters %}
 
@@ -182,7 +183,7 @@
                 <div class="card-body p-4">
                     <h4 class="h5 font-weight-bold mb-3">À propos de cet événement</h4>
                     <div class="event-description-text article-content">
-                        {{ event.content|safe }}
+                        {{ event.content|clean_html }}
                     </div>
                 </div>
             </div>

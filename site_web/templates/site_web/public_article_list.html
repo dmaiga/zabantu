@@ -1,4 +1,5 @@
 {% extends 'base_public.html' %}
+{% load clean_tags %}
 
 {% block title %}
     {% if current_filter %}
@@ -333,11 +334,11 @@
                             <span class="badge-type badge-type-zabantu">Séminaire Gɛlɛkan</span>
                             <time class="pub-date" datetime="{{ g.publish_at|default:g.created_at|date:'Y-m-d' }}">{{ g.publish_at|default:g.created_at|date:"j F Y" }}</time>
                         </div>
-                        <h3 class="pub-title"><a href="{% url 'public_guelekan_detail' g.slug %}">{{ g.title|striptags|safe }}</a></h3>
+                        <h3 class="pub-title"><a href="{% url 'public_guelekan_detail' g.slug %}">{{ g.title|plain_text }}</a></h3>
                         {% with intervenants=g.intervenants.all %}{% if intervenants %}
                         <p class="pub-authors"><i class="fas fa-users"></i>{% for i in intervenants %}{{ i.full_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
                         {% endif %}{% endwith %}
-                        <p class="pub-excerpt">{% if g.subtitle %}{{ g.subtitle|truncatewords:40 }}{% else %}{{ g.content|default_if_none:""|striptags|safe|truncatewords:40 }}{% endif %}</p>
+                        <p class="pub-excerpt">{% if g.subtitle %}{{ g.subtitle|truncatewords:40 }}{% else %}{{ g.content|default_if_none:""|plain_text|truncatewords:40 }}{% endif %}</p>
                         <div class="pub-actions">
                             <a href="{% url 'public_guelekan_detail' g.slug %}" class="btn btn-primary btn-sm">Voir le compte-rendu</a>
                             {% if g.pdf_file %}<a href="{{ g.pdf_file.url }}" class="btn btn-outline-primary btn-sm" target="_blank" rel="noopener noreferrer"><i class="fas fa-file-pdf"></i> PDF</a>{% endif %}
@@ -374,7 +375,7 @@
                         </div>
 
                         <h3 class="pub-title">
-                            <a href="{% url 'public_article_detail' article.slug %}">{{ article.title|striptags|safe }}</a>
+                            <a href="{% url 'public_article_detail' article.slug %}">{{ article.title|plain_text }}</a>
                         </h3>
 
                         {% if article.article_type == 'independent' and article.external_author %}
@@ -392,9 +393,9 @@
                         {% endif %}
 
                         <p class="pub-excerpt">
-                            {% if article.article_type == 'academic' and article.abstract %}{{ article.abstract|striptags|safe|truncatewords:40 }}
-                            {% elif article.resume %}{{ article.resume|striptags|safe|truncatewords:40 }}
-                            {% else %}{{ article.content|default_if_none:""|striptags|safe|truncatewords:40 }}{% endif %}
+                            {% if article.article_type == 'academic' and article.abstract %}{{ article.abstract|plain_text|truncatewords:40 }}
+                            {% elif article.resume %}{{ article.resume|plain_text|truncatewords:40 }}
+                            {% else %}{{ article.content|default_if_none:""|plain_text|truncatewords:40 }}{% endif %}
                         </p>
 
                         <div class="pub-actions">

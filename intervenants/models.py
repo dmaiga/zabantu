@@ -1,4 +1,5 @@
 from django.db import models
+from zabantu.validators import validate_image
 from django.conf import settings
 
 class Intervenant(models.Model):
@@ -38,7 +39,8 @@ class Intervenant(models.Model):
         upload_to='intervenants/', 
         blank=True, 
         null=True,
-        verbose_name="Photo de profil"
+        verbose_name="Photo de profil",
+        validators=[validate_image],
     )
     
     # Liens sociaux
