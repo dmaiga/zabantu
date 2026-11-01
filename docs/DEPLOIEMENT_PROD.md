@@ -198,6 +198,9 @@ Contrôle manuel, sur le site réel :
 - [ ] Connexion d'un administrateur, création d'un membre depuis le tableau de bord.
 - [ ] Envoi d'un e-mail de test (réinitialisation de mot de passe) : les nouveaux identifiants SMTP fonctionnent.
 - [ ] Pas de HTTPS cassé (cadenas, pas de contenu mixte) ; redirection HTTP vers HTTPS si activée.
+- [ ] Partage : `https://zabantu.net/robots.txt` et `https://zabantu.net/sitemap.xml` s'affichent. Le sitemap ne liste que les contenus publiés à partir de `SEO_START_DATE` (1er novembre 2026 par défaut, modifiable dans le `.env`).
+- [ ] Aperçu des liens : partager un lien d'article, d'événement et de Gɛlɛkan sur WhatsApp, Facebook et LinkedIn. Un réseau peut garder un ancien aperçu en cache.
+- [ ] Google Search Console : déclarer le site et envoyer le sitemap (action manuelle, une seule fois).
 
 ## 6. Retour arrière
 
