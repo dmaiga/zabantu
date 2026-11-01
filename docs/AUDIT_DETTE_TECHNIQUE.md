@@ -11,7 +11,6 @@ Seuls les points encore ouverts figurent ici. Les versions (Django, Python, paqu
 
 | # | Problème | Action | Priorité | Effort | Durée estimée |
 |---|----------|--------|----------|--------|---------------|
-| A1 | Un middleware écrit en base à chaque visite pour publier les articles programmés | Le supprimer une fois le cron `publish_scheduled` en place sur le serveur (voir [DEPLOIEMENT_PROD.md](DEPLOIEMENT_PROD.md), section 4.8). D'ici là, c'est lui qui publie. | P2 | S | 1 à 2 h |
 | T1 | Pas d'intégration continue ni de linter | Ajouter une CI qui lance les tests sur SQLite et sur PostgreSQL, et un linter (`ruff`) | P2 | M | 1 jour |
 
 ## Confort
@@ -28,11 +27,12 @@ Seuls les points encore ouverts figurent ici. Les versions (Django, Python, paqu
 
 ## Fermés depuis le dernier audit
 
+- **A1 (middleware d'auto-publication)** : supprimé. Les contenus programmés sont publiés uniquement par la commande `publish_scheduled` (cron obligatoire, voir [DEPLOIEMENT_PROD.md](DEPLOIEMENT_PROD.md), section 3.1).
 - **S2 (HTML non nettoyé)** : les gabarits n'utilisent plus `|safe` pour le contenu saisi ; le filtre `clean_html` (liste blanche de balises et de styles, via `bleach`) nettoie à l'affichage, sans modifier les contenus enregistrés. Les titres et extraits passent par `plain_text`.
 - **S3 (fichiers téléversés)** : les images (JPG, PNG, WebP, GIF, 10 Mo au plus, lisibles par Pillow) et les PDF (25 Mo au plus, en-tête PDF vérifié) sont contrôlés, y compris dans l'envoi multiple de photos. Seuls les nouveaux fichiers sont vérifiés.
 - **S1 (secrets)** : le `.env` de production est différent de celui qui a circulé.
 - **A4 (ancienne base locale)** : `db_v3.sqlite3` n'existe plus.
-- **O1 (sauvegardes)** : les scripts `scripts/backup_db.sh` et `scripts/backup_media.sh` existent (voir [DEPLOIEMENT_PROD.md](DEPLOIEMENT_PROD.md), section 4.9). Reste à activer le cron sur le serveur et à copier les sauvegardes hors du serveur.
+- **O1 (sauvegardes)** : les scripts `scripts/backup_db.sh` et `scripts/backup_media.sh` existent (voir [DEPLOIEMENT_PROD.md](DEPLOIEMENT_PROD.md), section 3.2). Reste à activer le cron sur le serveur (3.2) et à copier les sauvegardes hors du serveur.
 - **Tests de `gallery` et `intervenants`** : ces apps ont maintenant leurs propres tests (310 tests au total dans le projet).
 
 ## Choix assumés (pas de la dette)
@@ -44,4 +44,4 @@ Décidés avec le client :
 
 ## Limites de l'audit
 
-Basé sur la lecture du code et l'exécution locale, sans accès au serveur de production. Le cron `publish_scheduled` (A1) et les sauvegardes planifiées ne peuvent pas être vérifiés d'ici. Les outils `bandit` et `pip-audit` n'ont pas été lancés : ils compléteraient S2, S3 et S5.
+Basé sur la lecture du code et l'exécution locale, sans accès au serveur de production. Le cron `publish_scheduled` et les sauvegardes planifiées ne peuvent pas être vérifiés d'ici. Les outils `bandit` et `pip-audit` n'ont pas été lancés : ils compléteraient S2, S3 et S5.

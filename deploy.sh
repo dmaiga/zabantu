@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Déploiement : migrate, statiques, miniatures, accès au backoffice.
 # Usage : ./deploy.sh [username ...]   (les usernames reçoivent l'accès au backoffice)
-# Prérequis : sauvegarde de la base faite (docs/DEPLOIEMENT_PROD.md, section 2).
+# Prérequis : sauvegarde de la base faite (docs/DEPLOIEMENT_PROD.md, section 1 ou 3.2).
 set -euo pipefail
 
 cd "$(dirname "$0")"
