@@ -30,7 +30,7 @@
     {% endif %}
 
     {% if photos %}
-    <div class="photo-masonry pswp-gallery">
+    <div class="photo-grid pswp-gallery">
         {% for photo in photos %}
         {% thumb photo.image 640 as t %}
         <figure class="photo-tile">

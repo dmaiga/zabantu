@@ -302,7 +302,7 @@ class GalleryPagesTests(TestCase):
     def test_detail_uses_viewer_and_whole_photos(self):
         r = self.client.get(reverse('detail_galerie', args=[self.full.slug]))
         self.assertContains(r, 'pswp-gallery')
-        self.assertContains(r, 'photo-masonry')
+        self.assertContains(r, 'photo-grid')
         self.assertContains(r, 'photoswipe')
         self.assertNotContains(r, 'data-lightbox')
 
