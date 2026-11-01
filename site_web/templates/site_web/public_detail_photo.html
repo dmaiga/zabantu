@@ -1,7 +1,7 @@
 {% extends 'base_public.html' %}
 {% load photo_tags %}
 
-{% block title %}{{ photo.display_title|default:"Photo" }} - Zabantu{% endblock %}
+{% block title %}Photo - Zabantu{% endblock %}
 {% block banner_title %}Galerie photos{% endblock %}
 {% block banner_subtitle %}{% if photo.gallery %}{{ photo.gallery.title }}{% else %}Photo{% endif %}{% endblock %}
 
@@ -25,17 +25,16 @@
             <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
             <li class="breadcrumb-item"><a href="{% url 'liste_galeries' %}">Galerie</a></li>
             {% if photo.gallery %}<li class="breadcrumb-item"><a href="{% url 'detail_galerie' photo.gallery.slug %}">{{ photo.gallery.title|truncatechars:40 }}</a></li>{% endif %}
-            <li class="breadcrumb-item active" aria-current="page">{{ photo.display_title|default:"Photo"|truncatechars:40 }}</li>
+            <li class="breadcrumb-item active" aria-current="page">Photo</li>
         </ol>
     </nav>
 
     <div class="row g-4">
         <div class="col-lg-8">
-            <h2 class="h3 mb-3">{{ photo.display_title|default:"Photo sans titre" }}</h2>
             <div class="photo-stage">
                 {% thumb photo.image 1600 as t %}
                 <a href="{{ photo.image.url }}" target="_blank" rel="noopener noreferrer" title="Ouvrir l'image en taille réelle">
-                    <img src="{{ t.url }}"{% if t.width %} width="{{ t.width }}" height="{{ t.height }}"{% endif %} alt="{{ photo.display_title|default:'Photo sans titre' }}">
+                    <img src="{{ t.url }}"{% if t.width %} width="{{ t.width }}" height="{{ t.height }}"{% endif %} alt="Photo">
                 </a>
             </div>
             {% if photo.caption %}<p class="lead mt-3">{{ photo.caption }}</p>{% endif %}
