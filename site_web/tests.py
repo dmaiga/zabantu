@@ -313,7 +313,7 @@ class GalleryPagesTests(TestCase):
         r = self.client.get(reverse('toutes_photos'), {'gallery': 'inexistante'})
         self.assertContains(r, 'Aucune photo pour cette sélection')
 
-    def test_photo_detail_navigation_and_author_name(self):
+    def test_photo_detail_navigation_and_group_attribution(self):
         # p2 est la plus récente : elle a une « suivante » (p1) mais pas de « précédente »
         r2 = self.client.get(reverse('detail_photo', args=[self.p2.pk]))
         self.assertContains(r2, 'Photo suivante')
@@ -321,7 +321,9 @@ class GalleryPagesTests(TestCase):
         r1 = self.client.get(reverse('detail_photo', args=[self.p1.pk]))
         self.assertContains(r1, 'Photo précédente')
         self.assertNotContains(r1, 'Photo suivante')
-        self.assertContains(r2, 'Dadi')               # nom complet affiché
+        self.assertContains(r2, 'Publié par')         # tout est publié au nom du groupe
+        self.assertContains(r2, 'Groupe de recherche Zabantu')
+        self.assertNotContains(r2, 'Dadi')            # jamais le nom de la personne
         self.assertNotContains(r2, '>g<')             # pas l'identifiant de connexion
 
     def test_event_detail_has_proper_banner(self):
