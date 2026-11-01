@@ -1,0 +1,107 @@
+{# Bannière de consentement. Choix gardé dans le cookie « zabantu_consent » (6 mois). #}
+<div id="cookie-banner" class="cookie-banner" role="dialog" aria-modal="false" aria-labelledby="cookie-title" hidden>
+  <div class="cookie-inner">
+    <h2 id="cookie-title">Cookies et confidentialité</h2>
+    <p class="cookie-text">Ce site utilise des cookies techniques, indispensables à son fonctionnement. Vous choisissez si des cookies facultatifs (mesure d’audience) peuvent être utilisés. <a href="{% url 'cookies' %}">En savoir plus</a></p>
+
+    <div id="cookie-prefs" class="cookie-prefs" hidden>
+      <label class="cookie-pref">
+        <input type="checkbox" checked disabled>
+        <span><strong>Nécessaires</strong> : connexion, protection des formulaires. Toujours actifs.</span>
+      </label>
+      <label class="cookie-pref">
+        <input type="checkbox" id="cookie-analytics">
+        <span><strong>Mesure d’audience</strong> : statistiques anonymes de fréquentation, pour améliorer le site.</span>
+      </label>
+    </div>
+
+    <div class="cookie-actions">
+      <button type="button" class="cookie-btn cookie-btn-primary" data-cookie="accept">Oui, tout accepter</button>
+      <button type="button" class="cookie-btn cookie-btn-primary" data-cookie="refuse">Non, refuser</button>
+      <button type="button" class="cookie-btn cookie-btn-link" data-cookie="customize" aria-expanded="false" aria-controls="cookie-prefs">Personnaliser</button>
+      <button type="button" class="cookie-btn cookie-btn-primary" data-cookie="save" hidden>Enregistrer mes choix</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cookie-banner { position: fixed; left: 1rem; right: 1rem; bottom: 1rem; z-index: 2000; display: flex; justify-content: center; pointer-events: none; }
+  .cookie-banner[hidden] { display: none; }
+  .cookie-inner { pointer-events: auto; width: 100%; max-width: 760px; background: #fff; color: #2c3a28; border: 1px solid #d5dacb; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.25); padding: 1.1rem 1.25rem; }
+  .cookie-inner h2 { font-size: 1.05rem; font-weight: 700; margin: 0 0 .4rem; }
+  .cookie-text { font-size: .9rem; line-height: 1.55; margin: 0 0 .8rem; }
+  .cookie-text a { color: var(--zabantu-primary-dark, #3d5239); }
+  .cookie-prefs { display: grid; gap: .6rem; margin-bottom: .9rem; padding: .8rem; background: #f4f6ef; border-radius: 8px; }
+  .cookie-prefs[hidden] { display: none; }
+  .cookie-pref { display: flex; gap: .65rem; align-items: flex-start; font-size: .88rem; margin: 0; cursor: pointer; }
+  .cookie-pref input { margin-top: .2rem; width: 1.1rem; height: 1.1rem; flex: 0 0 auto; }
+  .cookie-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+  .cookie-btn { min-height: 42px; padding: .45rem 1.1rem; border-radius: 8px; border: 1px solid transparent; font-size: .92rem; font-weight: 600; cursor: pointer; }
+  .cookie-btn[hidden] { display: none; }
+  .cookie-btn-primary { background: var(--zabantu-dark, #2f4a2c); color: #fff; }
+  .cookie-btn-primary:hover { filter: brightness(1.15); }
+  .cookie-btn-link { background: transparent; color: var(--zabantu-dark, #2f4a2c); border-color: #c5ccb8; }
+  .cookie-btn-link:hover { background: #eef0e8; }
+  @media (max-width: 575.98px) { .cookie-btn { flex: 1 1 100%; } }
+</style>
+
+<script>
+(function () {
+  var NAME = 'zabantu_consent', MAX_AGE = 60 * 60 * 24 * 182;
+  var banner = document.getElementById('cookie-banner');
+  if (!banner) return;
+  var prefs = document.getElementById('cookie-prefs');
+  var analytics = document.getElementById('cookie-analytics');
+  var btnCustomize = banner.querySelector('[data-cookie="customize"]');
+  var btnSave = banner.querySelector('[data-cookie="save"]');
+
+  function read() {
+    var m = document.cookie.match(new RegExp('(?:^|; )' + NAME + '=([^;]*)'));
+    if (!m) return null;
+    try { return JSON.parse(decodeURIComponent(m[1])); } catch (e) { return null; }
+  }
+  function write(choice) {
+    var secure = location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = NAME + '=' + encodeURIComponent(JSON.stringify(choice)) + '; Max-Age=' + MAX_AGE + '; Path=/; SameSite=Lax' + secure;
+  }
+  function apply(choice) {
+    window.zabantuConsent = choice;
+    document.dispatchEvent(new CustomEvent('zabantu:consent', { detail: choice }));
+    // Scripts facultatifs : <script type="text/plain" data-consent="analytics" src="…"></script>
+    document.querySelectorAll('script[type="text/plain"][data-consent]').forEach(function (old) {
+      if (!choice[old.dataset.consent] || old.dataset.done) return;
+      var s = document.createElement('script');
+      if (old.src) s.src = old.src; else s.textContent = old.textContent;
+      old.dataset.done = '1';
+      old.parentNode.insertBefore(s, old);
+    });
+  }
+  function choose(analyticsOn) {
+    var choice = { necessary: true, analytics: !!analyticsOn };
+    write(choice); apply(choice); banner.hidden = true;
+  }
+  function open(showPrefs) {
+    var c = read() || {};
+    analytics.checked = !!c.analytics;
+    prefs.hidden = !showPrefs; btnSave.hidden = !showPrefs;
+    btnCustomize.setAttribute('aria-expanded', showPrefs ? 'true' : 'false');
+    banner.hidden = false;
+  }
+
+  banner.addEventListener('click', function (e) {
+    var act = e.target.closest('[data-cookie]');
+    if (!act) return;
+    var kind = act.dataset.cookie;
+    if (kind === 'accept') choose(true);
+    else if (kind === 'refuse') choose(false);
+    else if (kind === 'customize') open(prefs.hidden);
+    else if (kind === 'save') choose(analytics.checked);
+  });
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('[data-open-cookie-settings]')) { e.preventDefault(); open(true); }
+  });
+
+  var saved = read();
+  if (saved) apply(saved); else open(false);
+})();
+</script>
