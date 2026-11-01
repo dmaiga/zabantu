@@ -12,7 +12,7 @@
     <meta property="og:title" content="{{ seo.title|default:'Zabantu - Groupe de recherche : Economy | Conflict | State' }}">
     <meta property="og:description" content="{{ seo.description|default:'Groupe de chercheurs en sciences sociales travaillant sur le développement économique et social.' }}">
     <meta property="og:url" content="{{ SITE_ORIGIN }}{{ request.path }}">
-    <meta property="og:image" content="{{ seo.image|default:SEO_DEFAULT_IMAGE }}">
+    <meta property="og:image" content="{% firstof seo.image SEO_DEFAULT_IMAGE %}">
     <meta property="og:image:alt" content="{% if seo.image %}{{ seo.title }}{% else %}Logo du groupe de recherche Zabantu{% endif %}">
     <meta name="twitter:card" content="summary_large_image">
     {% if seo.published %}<meta property="article:published_time" content="{{ seo.published }}">{% endif %}

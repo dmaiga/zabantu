@@ -1,0 +1,19 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Page introuvable - Zabantu{% endblock %}
+{% block banner_title %}Page introuvable{% endblock %}
+{% block banner_subtitle %}Erreur 404{% endblock %}
+
+{% block content %}
+<div class="text-center py-4">
+  <p class="display-1 fw-bold" style="color: var(--zabantu-primary);">404</p>
+  <h2 class="h4 mb-3">Cette page n'existe pas ou n'est plus disponible</h2>
+  <p class="text-muted mb-4">Le lien est peut-être erroné, ou la page a été déplacée ou retirée.</p>
+  <div class="d-flex justify-content-center flex-wrap gap-2">
+    <a href="{% url 'home' %}" class="btn btn-primary"><i class="fas fa-house me-1"></i> Accueil</a>
+    <a href="{% url 'public_article_list' %}" class="btn btn-outline-primary">Publications</a>
+    <a href="{% url 'public_event_list' %}" class="btn btn-outline-primary">Événements</a>
+    <a href="{% url 'contact' %}" class="btn btn-outline-primary">Nous écrire</a>
+  </div>
+</div>
+{% endblock %}

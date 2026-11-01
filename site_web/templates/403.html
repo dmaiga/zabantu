@@ -1,0 +1,17 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Accès refusé - Zabantu{% endblock %}
+{% block banner_title %}Accès refusé{% endblock %}
+{% block banner_subtitle %}Erreur 403{% endblock %}
+
+{% block content %}
+<div class="text-center py-4">
+  <p class="display-1 fw-bold" style="color: var(--zabantu-primary);">403</p>
+  <h2 class="h4 mb-3">Vous n'avez pas l'autorisation d'ouvrir cette page</h2>
+  <p class="text-muted mb-4">Cette page est réservée à certains comptes. Si vous pensez que c'est une erreur, contactez-nous.</p>
+  <div class="d-flex justify-content-center flex-wrap gap-2">
+    <a href="{% url 'home' %}" class="btn btn-primary">Accueil</a>
+    <a href="{% url 'contact' %}" class="btn btn-outline-primary">Nous écrire</a>
+  </div>
+</div>
+{% endblock %}

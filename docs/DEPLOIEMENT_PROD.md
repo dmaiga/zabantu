@@ -117,6 +117,7 @@ Sur le site réel :
 - [ ] Aperçu d'un lien d'article, d'événement et de Gɛlɛkan sur WhatsApp, Facebook et LinkedIn (un réseau peut garder un ancien aperçu en cache).
 - [ ] Google Search Console : site déclaré, sitemap envoyé (une seule fois).
 - [ ] Console du navigateur (accueil et tableau de bord) : aucune erreur « integrity » ni ressource bloquée ; mise en page et icônes intactes.
+- [ ] Pages d'erreur : `https://zabantu.net/zabantu/page-inexistante/` affiche la page 404 aux couleurs du site. (Les pages 500, 400 et 403 s'affichent seulement avec `DEBUG=False`.)
 - [ ] HTTPS sans contenu mixte ; e-mail de test reçu.
 
 ## 6. Retour arrière

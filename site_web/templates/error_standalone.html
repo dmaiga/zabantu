@@ -1,0 +1,34 @@
+{# Base des pages d'erreur sans dépendance (400, 500) : ni base de données, ni balise url ou static, qui pourraient échouer à leur tour. #}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>{% block title %}Erreur{% endblock %} - Zabantu</title>
+  <style>
+    body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; font-family: Georgia, serif; background: #f8f9fa; color: #333; }
+    header { background: #2c3e2c; border-bottom: 3px solid #bf9264; padding: 1rem 1.5rem; }
+    header img { height: 56px; }
+    main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; text-align: center; }
+    .box { max-width: 560px; }
+    .code { font-size: 4.5rem; font-weight: 700; color: #6f826a; line-height: 1; margin: 0; }
+    h1 { font-size: 1.6rem; color: #2c3e2c; margin: .6rem 0 1rem; }
+    p { line-height: 1.6; margin: 0 0 1.2rem; }
+    a.btn { display: inline-block; padding: .6rem 1.4rem; border-radius: 8px; background: #2c3e2c; color: #fff; text-decoration: none; font-weight: 600; }
+    a.mail { color: #6f826a; }
+  </style>
+</head>
+<body>
+  <header><a href="/zabantu/"><img src="/static/site_web/images/zabantu-logo-dark.png" alt="Zabantu"></a></header>
+  <main>
+    <div class="box">
+      <p class="code">{% block code %}{% endblock %}</p>
+      <h1>{% block heading %}{% endblock %}</h1>
+      {% block message %}{% endblock %}
+      <p><a class="btn" href="/zabantu/">Retour à l'accueil</a></p>
+      <p>Besoin d'aide ? <a class="mail" href="mailto:Info@zabantu.net">Info@zabantu.net</a></p>
+    </div>
+  </main>
+</body>
+</html>
