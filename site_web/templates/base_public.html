@@ -80,7 +80,7 @@
     .zabantu-footer a { color: #d6dfd0; text-decoration: none; transition: color .2s; }
     .zabantu-footer a:hover { color: var(--zabantu-secondary); }
     .footer-brand { display: flex; align-items: center; gap: .75rem; margin-bottom: .9rem; }
-    .footer-brand img { height: 48px; width: 48px; object-fit: cover; border-radius: 8px; background: #fff; }
+    .footer-brand img { height: 64px; width: auto; }
     .footer-brand strong { color: #fff; font-size: 1.35rem; }
     .footer-tagline { font-size: .92rem; line-height: 1.6; max-width: 34ch; }
     .footer-navigation li { margin-bottom: .5rem; font-size: .95rem; }
@@ -103,7 +103,7 @@
         <div class="container-fluid">
           <!-- Logo à gauche -->
           <a class="navbar-brand" href="{% url 'home' %}">
-            <img src="/static/site_web/images/zabantu_logo.jpg" alt="Zabantu Logo" class="logo">
+            <img src="{% static 'site_web/images/zabantu-logo-dark.png' %}" alt="Zabantu Logo" class="logo" height="56">
           
           </a>
 
@@ -186,13 +186,13 @@
 
       <div class="col-lg-4 col-md-6">
         <div class="footer-brand">
-          <img src="/static/site_web/images/zabantu_logo.jpg" alt="">
-          <strong>Zabantu</strong>
+          <img src="{% static 'site_web/images/zabantu-logo-dark.png' %}" alt="Zabantu" height="64">
         </div>
         <p class="footer-tagline">Groupe de recherche : Economy, Conflict, State. Vers une recherche ancrée dans les dynamiques économiques et sociales.</p>
         <div class="footer-social">
           <a href="https://www.linkedin.com/company/zabantu-ecs/about/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
           <a href="https://www.facebook.com/zabantu.ecs" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://whatsapp.com/channel/0029VbE1ds8GufIpCbIXZL1T" target="_blank" rel="noopener" aria-label="Chaîne WhatsApp Zabantu" title="Suivre la chaîne Zabantu sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
         </div>
       </div>
 
@@ -212,7 +212,6 @@
       <div class="col-lg-3 col-md-3 col-6">
         <h5>Participer</h5>
         <ul class="list-unstyled footer-navigation">
-          <li><a href="{% url 'membership_apply' %}">Devenir membre</a></li>
           <li><a href="{% url 'contact' %}">Nous écrire</a></li>
         </ul>
         <a class="footer-cta" href="{% url 'membership_apply' %}">Rejoindre Zabantu</a>
