@@ -20,6 +20,8 @@ from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.core.cache import cache
+from django.utils.translation import gettext as _, gettext_lazy
+from zabantu.i18n import page_translation_context
 
 
 
@@ -50,7 +52,8 @@ def public_member_detail(request, pk):
     
     return render(request, 'site_web/public_member_detail.html', {
         'member': member,
-        'articles': articles
+        'articles': articles,
+        **page_translation_context(member),
     })
 
 #09_08
@@ -69,6 +72,18 @@ from django.contrib import messages
 from .forms import ContactForm, MembershipApplicationForm, NewsletterSubscribeForm
 from . import antispam
 
+LEGAL_TEMPLATES = {'notice': 'legal_notice', 'privacy': 'privacy', 'cookies': 'cookies'}
+
+
+def legal_page(request, page):
+    """Pages légales. Leur texte, long et juridique, existe en un gabarit par langue (legal/en/… pour l'anglais)
+    plutôt qu'en centaines de phrases à traduire une à une ; la version française fait foi."""
+    name = LEGAL_TEMPLATES[page]
+    language = request.LANGUAGE_CODE
+    templates = [f'site_web/legal/{language}/{name}.html', f'site_web/legal/{name}.html']
+    return render(request, templates, {'legal_page': page})
+
+
 def donate(request):
     """Page de don : pas encore de paiement en ligne, on indique les numéros gérés dans le backoffice."""
     from .models import DonationNumber
@@ -81,13 +96,14 @@ def contact(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
+            form.instance.language = request.LANGUAGE_CODE  # la réponse sera mise en page dans cette langue
             form.save()  # Enregistre dans la BD
-            messages.success(request, "Merci ! Votre message a été enregistré ✅")
+            messages.success(request, _("Merci ! Votre message a été enregistré ✅"))
             return redirect('contact')  # recharge la page
         elif antispam.is_bot_rejection(form):
             antispam.show_antispam_errors(request, form)
         else:
-            messages.error(request, "Veuillez corriger les erreurs dans le formulaire.")
+            messages.error(request, _("Veuillez corriger les erreurs dans le formulaire."))
     else:
         # ?sujet=don : lien « Confirmer mon don » de la page de don
         initial = {'subject': 'Confirmation de don'} if request.GET.get('sujet') == 'don' else {}
@@ -99,7 +115,7 @@ def contact(request):
     context = {
         'form': form,  # ton formulaire
         'map_embed_url': map_embed_url,
-        'page_title': "Contact - Zabantu",
+        'page_title': _("Contact - Zabantu"),
         'social_links': {
             'linkedin': "https://www.linkedin.com/company/zabantu-ecs/about/",
             'facebook': "https://www.facebook.com/zabantu.ecs",
@@ -117,6 +133,7 @@ def membership_apply(request):
     if request.method == 'POST':
         form = MembershipApplicationForm(request.POST, request.FILES)
         if form.is_valid():
+            form.instance.language = request.LANGUAGE_CODE  # e-mails au candidat dans la langue du formulaire
             application = form.save()
             mailing.send_application_received(application)
             request.session['membership_thanks'] = application.full_name
@@ -125,7 +142,7 @@ def membership_apply(request):
             antispam.show_antispam_errors(request, form)
             start_step = form.first_error_step()
         else:
-            messages.error(request, "Veuillez corriger les erreurs signalées.")
+            messages.error(request, _("Veuillez corriger les erreurs signalées."))
             start_step = form.first_error_step()
     else:
         form = MembershipApplicationForm()
@@ -133,7 +150,7 @@ def membership_apply(request):
     return render(request, 'site_web/public_membership_form.html', {
         'form': form,
         'start_step': start_step,
-        'page_title': "Adhésion - Zabantu",
+        'page_title': _("Adhésion - Zabantu"),
     })
 
 def membership_thanks(request):
@@ -141,7 +158,7 @@ def membership_thanks(request):
     name = request.session.pop('membership_thanks', '')
     return render(request, 'site_web/public_membership_thanks.html', {
         'name': name,
-        'page_title': "Merci - Zabantu",
+        'page_title': _("Merci - Zabantu"),
     })
 
 def liste_galeries(request):
@@ -158,7 +175,7 @@ def liste_galeries(request):
     return render(request, 'site_web/public_liste_galeries.html', {
         'galeries': galeries,
         'photos_total': Photo.objects.count(),
-        'page_title': "Galerie photos"
+        'page_title': _("Galerie photos")
     })
 
 def detail_galerie(request, slug):
@@ -172,7 +189,8 @@ def detail_galerie(request, slug):
         'seo': seo.gallery_seo(request, galerie),
         'photos': photos_page,
         'photo_total': photos_page.paginator.count,
-        'page_title': f"Galerie : {galerie.title}"
+        'page_title': _("Galerie : %(title)s") % {'title': galerie.t.title},
+        **page_translation_context(galerie),
     })
 
 def toutes_photos(request):
@@ -194,7 +212,7 @@ def toutes_photos(request):
         'tag_filters': PhotoTag.objects.annotate(n=Count('photo')).filter(n__gt=0).order_by('name'),
         'current_gallery': gallery_slug,
         'current_tag': tag_slug,
-        'page_title': "Toutes les photos"
+        'page_title': _("Toutes les photos")
     })
 
 def detail_photo(request, pk):
@@ -205,7 +223,7 @@ def detail_photo(request, pk):
         'photo': photo,
         'newer_photo': siblings.filter(uploaded_at__gt=photo.uploaded_at).order_by('uploaded_at').first(),
         'older_photo': siblings.filter(uploaded_at__lt=photo.uploaded_at).order_by('-uploaded_at').first(),
-        'page_title': f"Photo : {photo.title}"
+        'page_title': _("Photo : %(title)s") % {'title': photo.title}
     })
 #06_08_2025
 #------------------------------------------------------------------------------
@@ -235,14 +253,22 @@ def about_view(request):
 #______________________________________________________________________________
 # Catégories de la production : « Zabantu » a été retiré et « académique » s'appelle « Articles »
 CATEGORY_LABELS = {
-    'analyse': 'Analyses',
-    'academic': 'Articles',
-    'ouvrage': 'Ouvrages',
+    'analyse': gettext_lazy('Analyses'),
+    'academic': gettext_lazy('Articles'),
+    'ouvrage': gettext_lazy('Ouvrages'),
     'policy': 'Policy Briefs',
-    'rapport': 'Rapports',
+    'rapport': gettext_lazy('Rapports'),
     'working': 'Working Papers',
-    'independent': 'Publications indépendantes',
+    'independent': gettext_lazy('Publications indépendantes'),
 }
+
+
+def _search(query, fields):
+    """Recherche dans les champs français et anglais : un contenu se trouve dans les deux langues du site."""
+    condition = Q()
+    for name in fields:
+        condition |= Q(**{f'{name}__icontains': query}) | Q(**{f'{name}_en__icontains': query})
+    return condition
 
 
 def public_article_list(request):
@@ -256,11 +282,7 @@ def public_article_list(request):
     # Gɛlɛkan est un filtre de la page Publications : même liste, même carte
     if current_filter == 'guelekan':
         if search_query:
-            guelekan_qs = guelekan_qs.filter(
-                Q(title__icontains=search_query) |
-                Q(subtitle__icontains=search_query) |
-                Q(content__icontains=search_query)
-            )
+            guelekan_qs = guelekan_qs.filter(_search(search_query, Guelekan.TRANSLATED_FIELDS))
         guelekan_qs = guelekan_qs.order_by(*PUBLICATION_ORDER)
         page_obj = Paginator(guelekan_qs, 12).get_page(request.GET.get('page'))
         total_articles = Article.objects.filter(status='published').count()
@@ -271,6 +293,7 @@ def public_article_list(request):
             'guelekans': page_obj,
             'page_obj': page_obj,
             'current_filter': current_filter,
+            'current_label': _('Séminaires Gɛlɛkan'),
             'search_query': search_query or '',
             'guelekan_count': guelekan_count,
             'category_data': [(k, CATEGORY_LABELS[k], type_counts.get(k, 0)) for k in CATEGORY_LABELS],
@@ -285,13 +308,7 @@ def public_article_list(request):
 
     # ✅ SEARCH (corrigé multi-type)
     if search_query:
-        articles = articles.filter(
-            Q(title__icontains=search_query) |
-            Q(content__icontains=search_query) |
-            Q(subtitle__icontains=search_query) |
-            Q(resume__icontains=search_query) |
-            Q(abstract__icontains=search_query)
-        )
+        articles = articles.filter(_search(search_query, Article.TRANSLATED_FIELDS))
 
     # ✅ SORT
     if sort_option == 'date_asc':
@@ -325,6 +342,7 @@ def public_article_list(request):
         'page_obj': page_obj,
         'guelekan_count': guelekan_count,
         'current_filter': current_filter,
+        'current_label': CATEGORY_LABELS.get(current_filter, ''),
         'search_query': search_query or '',
         'category_data': category_data,
         'total_count': sum(type_counts.values()),
@@ -339,7 +357,7 @@ def public_article_detail(request, slug):
     )
     
     if article.publish_at and article.publish_at > timezone.now():
-        raise Http404("Cet article n'est pas encore publié")
+        raise Http404("Article pas encore publié")
     
     authors = article.authors.all()
     
@@ -348,6 +366,7 @@ def public_article_detail(request, slug):
         'article': article,
         'authors': authors,
         'seo': seo.article_seo(request, article),
+        **page_translation_context(article),
     }
     
     return render(request, 'site_web/public_article_detail.html', context)
@@ -447,9 +466,9 @@ def public_event_detail(request, pk):
     end_utc = (event.end_date or event.date + timedelta(hours=2)).astimezone(dt_timezone.utc)
     google_calendar_url = "https://calendar.google.com/calendar/render?" + urlencode({
         'action': 'TEMPLATE',
-        'text': event.title,
+        'text': event.t.title,
         'dates': f"{start_utc:%Y%m%dT%H%M%SZ}/{end_utc:%Y%m%dT%H%M%SZ}",
-        'details': strip_tags(event.content or '')[:400] + "\n" + request.build_absolute_uri(),
+        'details': strip_tags(event.t.content or '')[:400] + "\n" + request.build_absolute_uri(),
         'location': event.location or '',
     })
 
@@ -463,6 +482,7 @@ def public_event_detail(request, pk):
         'intervenants_par_role': intervenants_par_role,
         'event_intervenants': event_intervenants,
         'similar_events': similar_events,
+        **page_translation_context(event),
     })
 
 
@@ -476,7 +496,7 @@ def public_event_ics(request, pk):
     event = get_object_or_404(Event, pk=pk, status='published')
     start = event.date.astimezone(dt_timezone.utc)
     end = (event.end_date or event.date + timedelta(hours=2)).astimezone(dt_timezone.utc)
-    description = strip_tags(event.content or '')[:500]
+    description = strip_tags(event.t.content or '')[:500]
     lines = [
         'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Zabantu//Evenements//FR', 'CALSCALE:GREGORIAN',
         'BEGIN:VEVENT',
@@ -484,14 +504,14 @@ def public_event_ics(request, pk):
         f'DTSTAMP:{timezone.now().astimezone(dt_timezone.utc):%Y%m%dT%H%M%SZ}',
         f'DTSTART:{start:%Y%m%dT%H%M%SZ}',
         f'DTEND:{end:%Y%m%dT%H%M%SZ}',
-        f'SUMMARY:{_ics_escape(event.title)}',
+        f'SUMMARY:{_ics_escape(event.t.title)}',
         f'DESCRIPTION:{_ics_escape(description)}',
         f'LOCATION:{_ics_escape(event.location or "")}',
         f'URL:{request.build_absolute_uri(reverse("public_event_detail", args=[event.pk]))}',
         'END:VEVENT', 'END:VCALENDAR',
     ]
     response = HttpResponse('\r\n'.join(lines) + '\r\n', content_type='text/calendar; charset=utf-8')
-    response['Content-Disposition'] = f'attachment; filename="evenement-{event.pk}.ics"'
+    response['Content-Disposition'] = f'attachment; filename="{_("evenement")}-{event.pk}.ics"'
     return response
 
 def public_member_list(request):
@@ -532,10 +552,10 @@ class HomeView(TemplateView):
 
         # Chiffres clés (seules les valeurs non nulles sont affichées)
         context['stats'] = [
-            ('Publications', published_articles.count(), 'fa-file-lines'),
-            ('Membres', members.count(), 'fa-users'),
-            ('Séminaires Gɛlɛkan', Guelekan.objects.filter(status='published').count(), 'fa-microphone-lines'),
-            ('Événements', Event.objects.filter(status='published').count(), 'fa-calendar-days'),
+            (_('Publications'), published_articles.count(), 'fa-file-lines'),
+            (_('Membres'), members.count(), 'fa-users'),
+            (_('Séminaires Gɛlɛkan'), Guelekan.objects.filter(status='published').count(), 'fa-microphone-lines'),
+            (_('Événements'), Event.objects.filter(status='published').count(), 'fa-calendar-days'),
         ]
 
         context['partenaires'] = Partenaire.objects.filter(is_active=True).order_by('order')
@@ -570,6 +590,7 @@ def public_guelekan_detail(request, slug):
         'guelekan': guelekan,
         'galleries': galleries,
         'seo': seo.guelekan_seo(request, guelekan),
+        **page_translation_context(guelekan),
     }
     
     return render(request, 'site_web/public_guelekan_detail.html', context)
@@ -601,16 +622,17 @@ def newsletter_subscribe(request):
         if form.is_valid():
             subscriber, created = NewsletterSubscriber.objects.get_or_create(
                 email=form.cleaned_data['email'],
-                defaults={'is_active': True}
+                defaults={'is_active': True, 'language': request.LANGUAGE_CODE}
             )
-            if not created and not subscriber.is_active:
-                # Réactiver l'abonné s'il existait déjà
+            if not created and (not subscriber.is_active or subscriber.language != request.LANGUAGE_CODE):
+                # Réactiver l'abonné s'il existait déjà ; les annonces suivent la langue de sa dernière inscription
                 subscriber.is_active = True
+                subscriber.language = request.LANGUAGE_CODE
                 subscriber.save()
-            messages.success(request, 'Vous êtes maintenant abonné à notre info-lettre !')
+            messages.success(request, _('Vous êtes maintenant abonné à notre info-lettre !'))
         elif antispam.is_bot_rejection(form):
             antispam.show_antispam_errors(request, form)
         else:
-            messages.error(request, "Adresse e-mail invalide. Vérifiez-la, puis réessayez.")
+            messages.error(request, _("Adresse e-mail invalide. Vérifiez-la, puis réessayez."))
 
     return redirect('home')

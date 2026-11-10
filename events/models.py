@@ -1,19 +1,23 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from zabantu.validators import validate_image, validate_pdf
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from zabantu.i18n import TranslatableMixin
 
 User = get_user_model()
 
-class Event(models.Model):
+class Event(TranslatableMixin, models.Model):
+    TRANSLATED_FIELDS = ('title', 'content')
+    MAIN_FIELDS = ('title', 'content')
     EVENT_TYPE_CHOICES = [
-        ('conference', 'Conférence'),
-        ('formation', 'Formation'),
-        ('seminaire', 'Séminaire Gɛlɛkan'),
-        ('webinaire', 'Webinaire'),
-        ('atelier', 'Atelier'),
-        ('autre', 'Autre'),
+        ('conference', _('Conférence')),
+        ('formation', _('Formation')),
+        ('seminaire', _('Séminaire Gɛlɛkan')),
+        ('webinaire', _('Webinaire')),
+        ('atelier', _('Atelier')),
+        ('autre', _('Autre')),
     ]
     
     STATUS_CHOICES = [
@@ -84,7 +88,11 @@ class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     published_at = models.DateTimeField(null=True, blank=True, verbose_name="Date de publication")
-    
+
+    # Version anglaise, facultative : vide, la page anglaise affiche le français (zabantu/i18n.py)
+    title_en = models.CharField(max_length=200, blank=True, verbose_name="Titre (anglais)")
+    content_en = models.TextField(blank=True, verbose_name="Contenu (anglais)")
+
     class Meta:
         verbose_name = "Événement"
         verbose_name_plural = "Événements"
@@ -134,12 +142,12 @@ class Event(models.Model):
 
 class EventIntervenant(models.Model):
     ROLE_CHOICES = [
-        ('moderator', 'Modérateur'),
-        ('speaker', 'Intervenant'),
-        ('trainer', 'Formateur'),
-        ('panelist', 'Panéliste'),
-        ('expert', 'Expert'),
-        ('host', 'Animateur'),
+        ('moderator', _('Modérateur')),
+        ('speaker', _('Intervenant')),
+        ('trainer', _('Formateur')),
+        ('panelist', _('Panéliste')),
+        ('expert', _('Expert')),
+        ('host', _('Animateur')),
     ]
     
     event = models.ForeignKey(Event, on_delete=models.CASCADE)

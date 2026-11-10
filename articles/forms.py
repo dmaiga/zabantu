@@ -28,7 +28,9 @@ class BaseArticleForm(SectionedFormMixin, forms.ModelForm):
 
     class Meta:
         model = Article
-        fields = ['title', 'cover_image', 'pdf_file']
+        # Version anglaise : seuls restent les champs dont le français est dans le formulaire (SectionedFormMixin)
+        fields = ['title', 'cover_image', 'pdf_file',
+                  'title_en', 'subtitle_en', 'content_en', 'resume_en', 'abstract_en']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -164,7 +166,8 @@ class GuelekanForm(SectionedFormMixin, forms.ModelForm):
         fields = [
             'title', 'subtitle', 'content', 'status', 
             'cover_image', 'pdf_file', 'galleries', 'intervenants', 
-            'publish_at'
+            'publish_at',
+            'title_en', 'subtitle_en', 'content_en',
         ]
         widgets = {
             'publish_at': forms.DateTimeInput(attrs={

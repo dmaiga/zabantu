@@ -30,7 +30,8 @@ class EventForm(SectionedFormMixin, forms.ModelForm):
             'date', 'end_date', 'location', 'lieu_gps',
             'is_webinar', 'is_featured',  # Retirer is_published
             'target_audience', 'expected_attendees', 
-            'primary_topic', 'secondary_topics'
+            'primary_topic', 'secondary_topics',
+            'title_en', 'content_en',
         ]
         widgets = {
             'date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),

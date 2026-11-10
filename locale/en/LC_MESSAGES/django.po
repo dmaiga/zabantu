@@ -1,0 +1,2597 @@
+# Traductions anglaises du site public Zabantu (le français est la langue source).
+# Mise à jour : python manage.py makemessages -l en --ignore=.venv --ignore=staticfiles --ignore=media --ignore=data --ignore=var --add-location=file
+# puis traduire les nouvelles entrées et compiler : python manage.py compilemessages -l en --ignore=.venv
+# Le fichier .mo compilé est versionné : msgfmt n'est pas installé sur le serveur.
+msgid ""
+msgstr ""
+"Project-Id-Version: Zabantu\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-10 23:14+0000\n"
+"PO-Revision-Date: 2026-11-10 23:00+0000\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: articles/models.py site_web/templates/base_public.html site_web/views.py
+msgid "Articles"
+msgstr "Articles"
+
+#: articles/models.py site_web/templates/site_web/public_article_list.html
+msgid "Indépendant"
+msgstr "Independent"
+
+#: articles/models.py
+msgid "Policy Briefs"
+msgstr "Policy Briefs"
+
+#: articles/models.py site_web/templates/base_public.html site_web/views.py
+msgid "Ouvrages"
+msgstr "Books"
+
+#: articles/models.py site_web/templates/base_public.html site_web/views.py
+msgid "Rapports"
+msgstr "Reports"
+
+#: articles/models.py
+msgid "Working Paper"
+msgstr "Working Paper"
+
+#: articles/models.py
+msgid "Analyse"
+msgstr "Analysis"
+
+#: articles/models.py
+msgid "Article"
+msgstr "Article"
+
+#: articles/models.py
+msgid "Ouvrage"
+msgstr "Book"
+
+#: articles/models.py
+msgid "Policy Brief"
+msgstr "Policy Brief"
+
+#: articles/models.py
+msgid "Rapport"
+msgstr "Report"
+
+#: events/models.py
+msgid "Conférence"
+msgstr "Conference"
+
+#: events/models.py
+msgid "Formation"
+msgstr "Training"
+
+#: events/models.py site_web/templates/base_public.html
+#: site_web/templates/site_web/public_about.html
+#: site_web/templates/site_web/public_article_list.html
+msgid "Séminaire Gɛlɛkan"
+msgstr "Gɛlɛkan Seminar"
+
+#: events/models.py
+msgid "Webinaire"
+msgstr "Webinar"
+
+#: events/models.py
+msgid "Atelier"
+msgstr "Workshop"
+
+#: events/models.py site_web/forms.py site_web/models.py
+msgid "Autre"
+msgstr "Other"
+
+#: events/models.py intervenants/models.py users/models.py
+msgid "Modérateur"
+msgstr "Moderator"
+
+#: events/models.py intervenants/models.py
+msgid "Intervenant"
+msgstr "Speaker"
+
+#: events/models.py intervenants/models.py
+msgid "Formateur"
+msgstr "Trainer"
+
+#: events/models.py intervenants/models.py
+msgid "Panéliste"
+msgstr "Panellist"
+
+#: events/models.py intervenants/models.py
+msgid "Expert"
+msgstr "Expert"
+
+#: events/models.py
+msgid "Animateur"
+msgstr "Host"
+
+#: site_web/antispam.py
+msgid ""
+"Envoi refusé : un champ réservé à la protection anti-robots a été rempli. "
+"Rechargez la page et réessayez."
+msgstr ""
+"Submission refused: a field reserved for bot protection was filled in. Reload"
+" the page and try again."
+
+#: site_web/antispam.py
+msgid ""
+"Formulaire envoyé trop vite. Patientez quelques secondes, puis réessayez."
+msgstr "Form sent too quickly. Wait a few seconds, then try again."
+
+#: site_web/antispam.py
+msgid ""
+"Cette adresse e-mail ne peut plus envoyer de formulaire sur ce site. Si vous "
+"pensez qu'il s'agit d'une erreur, contactez le groupe par un autre moyen."
+msgstr ""
+"This e-mail address can no longer send forms on this website. If you think "
+"this is a mistake, contact the group by another means."
+
+#: site_web/antispam.py
+msgid ""
+"Le formulaire a expiré ou n'est pas valide. Rechargez la page, puis "
+"réessayez."
+msgstr "The form has expired or is not valid. Reload the page, then try again."
+
+#: site_web/forms.py
+msgid "Votre email"
+msgstr "Your e-mail"
+
+#: site_web/forms.py
+msgid "Votre nom"
+msgstr "Your last name"
+
+#: site_web/forms.py
+msgid "Votre prénom"
+msgstr "Your first name"
+
+#: site_web/forms.py
+msgid "Sélectionnez un sujet"
+msgstr "Select a subject"
+
+#: site_web/forms.py
+msgid "Collaboration"
+msgstr "Collaboration"
+
+#: site_web/forms.py
+msgid "Demande d'information"
+msgstr "Request for information"
+
+#: site_web/forms.py
+msgid "Confirmation de don"
+msgstr "Donation confirmation"
+
+#: site_web/forms.py
+msgid "Votre message"
+msgstr "Your message"
+
+#: site_web/forms.py
+msgid "Nom"
+msgstr "Last name"
+
+#: site_web/forms.py
+msgid "Prénom"
+msgstr "First name"
+
+#: site_web/forms.py site_web/templates/site_web/public_contact.html
+#: users/forms.py
+msgid "Téléphone"
+msgstr "Phone"
+
+#: site_web/forms.py
+msgid "Email"
+msgstr "E-mail"
+
+#: site_web/forms.py
+msgid "Sujet"
+msgstr "Subject"
+
+#: site_web/forms.py
+msgid "Message"
+msgstr "Message"
+
+#: site_web/forms.py site_web/models.py
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Comment avez-vous entendu parler de Zabantu ?"
+msgstr "How did you hear about Zabantu?"
+
+#: site_web/forms.py site_web/templates/site_web/public_membership_form.html
+msgid "Sélectionnez au moins une réponse."
+msgstr "Select at least one answer."
+
+#: site_web/forms.py
+msgid "Si « Autre », précisez"
+msgstr "If “Other”, please specify"
+
+#: site_web/forms.py
+msgid ""
+"Comment souhaitez-vous contribuer aux activités de Zabantu ? (max 100 mots)"
+msgstr ""
+"How would you like to contribute to Zabantu’s activities? (max 100 words)"
+
+#: site_web/forms.py
+msgid ""
+"Comment adhérer à Zabantu peut-il vous aider à avancer dans votre carrière de"
+" chercheur(se) ? (max 100 mots)"
+msgstr ""
+"How can joining Zabantu help you advance your career as a researcher? (max "
+"100 words)"
+
+#: site_web/forms.py site_web/models.py
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Courte biographie"
+msgstr "Short biography"
+
+#: site_web/forms.py
+msgid ""
+"J'autorise l'utilisation des informations fournies pour le traitement de ma "
+"demande d'adhésion et la prise de contact avec moi."
+msgstr ""
+"I authorise the use of the information provided to process my membership "
+"application and to contact me."
+
+#: site_web/forms.py
+msgid "Sélectionnez votre statut"
+msgstr "Select your status"
+
+#: site_web/forms.py
+msgid "Votre consentement est nécessaire pour traiter la demande."
+msgstr "Your consent is required to process the application."
+
+#: site_web/forms.py
+#, python-format
+msgid "Maximum %(n)s mots."
+msgstr "Maximum %(n)s words."
+
+#: site_web/forms.py
+#, python-format
+msgid "La photo ne doit pas dépasser %(n)s Mo."
+msgstr "The photo must not exceed %(n)s MB."
+
+#: site_web/forms.py site_web/templates/site_web/public_membership_form.html
+msgid "Précisez votre réponse."
+msgstr "Please specify your answer."
+
+#: site_web/mailing.py
+#, python-format
+msgid "Se désabonner : %(url)s"
+msgstr "Unsubscribe: %(url)s"
+
+#: site_web/mailing.py
+msgid "Nouvel événement"
+msgstr "New event"
+
+#: site_web/mailing.py
+msgid "Nouvelle publication"
+msgstr "New publication"
+
+#: site_web/mailing.py
+msgid "Nous espérons vous y retrouver."
+msgstr "We hope to see you there."
+
+#: site_web/mailing.py
+msgid "Nous espérons que cette publication vous plaira."
+msgstr "We hope you enjoy this publication."
+
+#: site_web/mailing.py
+#, python-format
+msgid "%(label)s : %(title)s"
+msgstr "%(label)s: %(title)s"
+
+#: site_web/mailing.py
+#, python-format
+msgid "Lire la suite : %(url)s"
+msgstr "Read more: %(url)s"
+
+#: site_web/mailing.py
+msgid "Votre demande d'adhésion à Zabantu"
+msgstr "Your application to join Zabantu"
+
+#: site_web/mailing.py
+msgid "Bienvenue chez Zabantu : votre adhésion est validée"
+msgstr "Welcome to Zabantu: your membership has been approved"
+
+#: site_web/models.py users/models.py
+msgid "email"
+msgstr ""
+
+#: site_web/models.py
+msgid "date d'inscription"
+msgstr ""
+
+#: site_web/models.py users/models.py
+msgid "actif"
+msgstr ""
+
+#: site_web/models.py
+msgid "token de désinscription"
+msgstr ""
+
+#: site_web/models.py
+msgid "abonné à l'info-lettre"
+msgstr ""
+
+#: site_web/models.py
+msgid "abonnés à l'info-lettre"
+msgstr ""
+
+#: site_web/models.py
+msgid "titre"
+msgstr ""
+
+#: site_web/models.py
+msgid "sujet"
+msgstr ""
+
+#: site_web/models.py
+msgid "contenu"
+msgstr ""
+
+#: site_web/models.py
+msgid "statut"
+msgstr ""
+
+#: site_web/models.py
+msgid "envoyé le"
+msgstr ""
+
+#: site_web/models.py
+msgid "créé par"
+msgstr ""
+
+#: site_web/models.py users/models.py
+msgid "créé le"
+msgstr ""
+
+#: site_web/models.py
+msgid "mis à jour le"
+msgstr ""
+
+#: site_web/models.py
+msgid "campagne d'info-lettre"
+msgstr ""
+
+#: site_web/models.py
+msgid "campagnes d'info-lettre"
+msgstr ""
+
+#: site_web/models.py
+msgid "campagne"
+msgstr ""
+
+#: site_web/models.py
+msgid "abonné"
+msgstr ""
+
+#: site_web/models.py
+msgid "ouvert le"
+msgstr ""
+
+#: site_web/models.py
+msgid "ouvert"
+msgstr ""
+
+#: site_web/models.py
+msgid "token de suivi"
+msgstr ""
+
+#: site_web/models.py
+msgid "journal d'info-lettre"
+msgstr ""
+
+#: site_web/models.py
+msgid "journaux d'info-lettre"
+msgstr ""
+
+#: site_web/models.py
+msgid "tentatives"
+msgstr ""
+
+#: site_web/models.py
+msgid "dernière erreur"
+msgstr ""
+
+#: site_web/models.py
+msgid "destinataire d'info-lettre"
+msgstr ""
+
+#: site_web/models.py
+msgid "destinataires d'info-lettre"
+msgstr ""
+
+#: site_web/models.py
+msgid "Étudiant(e) en licence"
+msgstr "Undergraduate student"
+
+#: site_web/models.py
+msgid "Étudiant(e) en master"
+msgstr "Master’s student"
+
+#: site_web/models.py
+msgid "Doctorant(e)"
+msgstr "PhD candidate"
+
+#: site_web/models.py
+msgid "Enseignant(e)-chercheur(e)"
+msgstr "Lecturer-researcher"
+
+#: site_web/models.py
+msgid "Chercheur(e)"
+msgstr "Researcher"
+
+#: site_web/models.py
+msgid "Professionnel(le)"
+msgstr "Professional"
+
+#: site_web/models.py
+msgid "Un(e) collègue ou un(e) ami(e)"
+msgstr "A colleague or a friend"
+
+#: site_web/models.py
+msgid "Les réseaux sociaux"
+msgstr "Social media"
+
+#: site_web/models.py
+msgid "Le site web de Zabantu"
+msgstr "The Zabantu website"
+
+#: site_web/models.py
+msgid "Un événement ou un séminaire (Gɛlɛkan)"
+msgstr "An event or a seminar (Gɛlɛkan)"
+
+#: site_web/models.py
+msgid "Une publication de Zabantu"
+msgstr "A Zabantu publication"
+
+#: site_web/models.py
+msgid "La newsletter"
+msgstr "The newsletter"
+
+#: site_web/models.py
+msgid "Nom et prénom(s)"
+msgstr "Full name"
+
+#: site_web/models.py
+msgid "Adresse e-mail"
+msgstr "E-mail address"
+
+#: site_web/models.py
+msgid "Téléphone (WhatsApp, si disponible)"
+msgstr "Phone (WhatsApp, if available)"
+
+#: site_web/models.py
+msgid "Ville et pays de résidence"
+msgstr "City and country of residence"
+
+#: site_web/models.py
+msgid "Statut"
+msgstr "Status"
+
+#: site_web/models.py
+msgid "Institution d'affiliation"
+msgstr "Institution of affiliation"
+
+#: site_web/models.py
+msgid "Principaux centres de recherche"
+msgstr "Main research interests"
+
+#: site_web/models.py site_web/templates/site_web/public_membership_form.html
+msgid "Autre (précisez)"
+msgstr "Other (please specify)"
+
+#: site_web/models.py
+msgid "Contribution aux activités de Zabantu"
+msgstr "Contribution to Zabantu’s activities"
+
+#: site_web/models.py
+msgid "Apport de l'adhésion pour votre carrière"
+msgstr "Benefit of membership for your career"
+
+#: site_web/models.py site_web/templates/site_web/public_membership_form.html
+msgid "Photo de profil"
+msgstr "Profile photo"
+
+#: site_web/models.py users/models.py
+msgid "LinkedIn"
+msgstr "LinkedIn"
+
+#: site_web/models.py users/models.py
+msgid "Facebook"
+msgstr "Facebook"
+
+#: site_web/models.py
+msgid "Twitter / X"
+msgstr "Twitter / X"
+
+#: site_web/models.py users/models.py
+msgid "Instagram"
+msgstr "Instagram"
+
+#: site_web/models.py users/models.py
+msgid "Google Scholar"
+msgstr "Google Scholar"
+
+#: site_web/models.py site_web/templates/site_web/public_member_list.html
+#: users/models.py
+msgid "Site web personnel"
+msgstr "Personal website"
+
+#: site_web/models.py
+msgid "Consentement au traitement de la demande"
+msgstr "Consent to the processing of the application"
+
+#: site_web/models.py
+msgid "Langue"
+msgstr "Language"
+
+#: site_web/models.py
+msgid "envoyés"
+msgstr ""
+
+#: site_web/models.py
+msgid "annoncé le"
+msgstr ""
+
+#: site_web/models.py
+msgid "annonce de publication"
+msgstr ""
+
+#: site_web/models.py
+msgid "annonces de publication"
+msgstr ""
+
+#: site_web/models.py
+msgid "envoi d'annonce"
+msgstr ""
+
+#: site_web/models.py
+msgid "envois d'annonces"
+msgstr ""
+
+#: site_web/seo.py
+msgid "Publications - Zabantu"
+msgstr "Publications - Zabantu"
+
+#: site_web/seo.py
+msgid ""
+"Analyses, articles, ouvrages, policy briefs et rapports du groupe de "
+"recherche Zabantu."
+msgstr ""
+"Analyses, articles, books, policy briefs and reports by the Zabantu research "
+"group."
+
+#: site_web/seo.py
+msgid "Événements - Zabantu"
+msgstr "Events - Zabantu"
+
+#: site_web/seo.py
+msgid ""
+"Séminaires Gɛlɛkan, conférences, ateliers et webinaires du groupe de "
+"recherche Zabantu."
+msgstr ""
+"Gɛlɛkan seminars, conferences, workshops and webinars of the Zabantu research"
+" group."
+
+#: site_web/seo.py
+msgid "Membres - Zabantu"
+msgstr "Members - Zabantu"
+
+#: site_web/seo.py
+msgid "Les chercheurs et chercheuses du groupe de recherche Zabantu."
+msgstr "The researchers of the Zabantu research group."
+
+#: site_web/seo.py
+msgid "Qui sommes-nous - Zabantu"
+msgstr "About us - Zabantu"
+
+#: site_web/seo.py
+msgid ""
+"Zabantu est un groupe de recherche pluridisciplinaire sur le nexus Economy | "
+"Conflict | State."
+msgstr ""
+"Zabantu is a multidisciplinary research group on the Economy | Conflict | "
+"State nexus."
+
+#: site_web/seo.py
+msgid "Galerie photos - Zabantu"
+msgstr "Photo gallery - Zabantu"
+
+#: site_web/seo.py
+msgid "Les photos des séminaires et activités du groupe de recherche Zabantu."
+msgstr "Photos of the seminars and activities of the Zabantu research group."
+
+#: site_web/seo.py
+msgid "Toutes les photos du groupe de recherche Zabantu."
+msgstr "All the photos of the Zabantu research group."
+
+#: site_web/seo.py site_web/views.py
+msgid "Contact - Zabantu"
+msgstr "Contact - Zabantu"
+
+#: site_web/seo.py
+msgid ""
+"Écrivez au groupe de recherche Zabantu : collaboration, information, "
+"questions."
+msgstr ""
+"Write to the Zabantu research group: collaboration, information, questions."
+
+#: site_web/seo.py
+msgid "Faire un don - Zabantu"
+msgstr "Donate - Zabantu"
+
+#: site_web/seo.py
+msgid ""
+"Soutenez le groupe de recherche Zabantu : vos dons financent la recherche, "
+"les séminaires Gɛlɛkan et les publications."
+msgstr ""
+"Support the Zabantu research group: your donations fund research, Gɛlɛkan "
+"seminars and publications."
+
+#: site_web/seo.py site_web/templates/base_public.html
+#: site_web/templates/site_web/index.html
+#: site_web/templates/site_web/public_about.html
+#: site_web/templates/site_web/public_donate.html
+msgid "Rejoindre Zabantu"
+msgstr "Join Zabantu"
+
+#: site_web/seo.py
+msgid "Faites une demande d'adhésion au groupe de recherche Zabantu."
+msgstr "Apply to join the Zabantu research group."
+
+#: site_web/templates/400.html
+msgid "Requête invalide"
+msgstr "Bad request"
+
+#: site_web/templates/400.html
+msgid ""
+"Votre demande n'a pas pu être comprise par le serveur. Revenez à l'accueil et"
+" recommencez."
+msgstr ""
+"The server could not understand your request. Go back to the home page and "
+"try again."
+
+#: site_web/templates/403.html
+msgid "Accès refusé"
+msgstr "Access denied"
+
+#: site_web/templates/403.html site_web/templates/403_csrf.html
+msgid "Erreur 403"
+msgstr "Error 403"
+
+#: site_web/templates/403.html
+msgid "Vous n'avez pas l'autorisation d'ouvrir cette page"
+msgstr "You are not allowed to open this page"
+
+#: site_web/templates/403.html
+msgid ""
+"Cette page est réservée à certains comptes. Si vous pensez que c'est une "
+"erreur, contactez-nous."
+msgstr ""
+"This page is restricted to certain accounts. If you think this is a mistake, "
+"contact us."
+
+#: site_web/templates/403.html site_web/templates/404.html
+#: site_web/templates/base_public.html
+#: site_web/templates/site_web/public_detail_galerie.html
+#: site_web/templates/site_web/public_detail_photo.html
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Accueil"
+msgstr "Home"
+
+#: site_web/templates/403.html site_web/templates/404.html
+#: site_web/templates/base_public.html
+msgid "Nous écrire"
+msgstr "Write to us"
+
+#: site_web/templates/403_csrf.html
+msgid "Formulaire expiré"
+msgstr "Form expired"
+
+#: site_web/templates/403_csrf.html
+msgid "La page est restée ouverte trop longtemps"
+msgstr "The page was left open too long"
+
+#: site_web/templates/403_csrf.html
+msgid ""
+"Par sécurité, le formulaire n'a pas été envoyé. Revenez en arrière, rechargez"
+" la page, puis recommencez. Les cookies doivent être autorisés dans votre "
+"navigateur."
+msgstr ""
+"For security reasons, the form was not sent. Go back, reload the page, then "
+"try again. Cookies must be allowed in your browser."
+
+#: site_web/templates/403_csrf.html site_web/templates/error_standalone.html
+#: site_web/templates/site_web/newsletter_unsubscribe_success.html
+#: site_web/templates/site_web/public_membership_thanks.html
+msgid "Retour à l'accueil"
+msgstr "Back to the home page"
+
+#: site_web/templates/404.html
+msgid "Page introuvable"
+msgstr "Page not found"
+
+#: site_web/templates/404.html
+msgid "Erreur 404"
+msgstr "Error 404"
+
+#: site_web/templates/404.html
+msgid "Cette page n'existe pas ou n'est plus disponible"
+msgstr "This page does not exist or is no longer available"
+
+#: site_web/templates/404.html
+msgid "Le lien est peut-être erroné, ou la page a été déplacée ou retirée."
+msgstr "The link may be wrong, or the page may have been moved or removed."
+
+#: site_web/templates/404.html site_web/templates/base_public.html
+#: site_web/templates/site_web/public_article_list.html
+#: site_web/templates/site_web/public_member_detail.html site_web/views.py
+msgid "Publications"
+msgstr "Publications"
+
+#: site_web/templates/404.html site_web/templates/base_public.html
+#: site_web/templates/site_web/public_event_detail.html
+#: site_web/templates/site_web/public_event_list.html site_web/views.py
+msgid "Événements"
+msgstr "Events"
+
+#: site_web/templates/500.html
+msgid "Erreur du serveur"
+msgstr "Server error"
+
+#: site_web/templates/500.html
+msgid "Une erreur est survenue de notre côté"
+msgstr "Something went wrong on our side"
+
+#: site_web/templates/500.html
+msgid ""
+"Nous n'avons pas pu afficher cette page. Le problème n'est pas de votre fait."
+" Réessayez dans quelques instants ; s'il persiste, écrivez-nous en précisant "
+"la page concernée."
+msgstr ""
+"We could not display this page. The problem is not on your side. Try again in"
+" a few moments; if it persists, write to us and tell us which page is "
+"affected."
+
+#: site_web/templates/base_public.html
+msgid "Zabantu - Analyses et Séminaires"
+msgstr "Zabantu - Analyses and Seminars"
+
+#: site_web/templates/base_public.html
+msgid ""
+"Blog Zabantu - un groupe de chercheurs en sciences sociales travaillant sur "
+"le développement économique et social."
+msgstr ""
+"Zabantu blog - a group of social science researchers working on economic and "
+"social development."
+
+#: site_web/templates/base_public.html site_web/templates/site_web/index.html
+msgid "Zabantu - Groupe de recherche : Economy | Conflict | State"
+msgstr "Zabantu - Research group: Economy | Conflict | State"
+
+#: site_web/templates/base_public.html
+msgid ""
+"Groupe de chercheurs en sciences sociales travaillant sur le développement "
+"économique et social."
+msgstr ""
+"A group of social science researchers working on economic and social "
+"development."
+
+#: site_web/templates/base_public.html
+msgid "Logo du groupe de recherche Zabantu"
+msgstr "Logo of the Zabantu research group"
+
+#: site_web/templates/base_public.html
+msgid "Logo Zabantu"
+msgstr "Zabantu logo"
+
+#: site_web/templates/base_public.html
+#: site_web/templates/site_web/includes/donate_band.html
+#: site_web/templates/site_web/public_donate.html site_web/tests_i18n.py
+msgid "Faire un don"
+msgstr "Donate"
+
+#: site_web/templates/base_public.html
+msgid "Ouvrir le menu"
+msgstr "Open the menu"
+
+#: site_web/templates/base_public.html
+#: site_web/templates/site_web/public_about.html
+msgid "À propos"
+msgstr "About"
+
+#: site_web/templates/base_public.html
+#: site_web/templates/site_web/public_about.html
+msgid "Qui sommes-nous"
+msgstr "About us"
+
+#: site_web/templates/base_public.html
+#: site_web/templates/site_web/public_member_list.html site_web/views.py
+msgid "Membres"
+msgstr "Members"
+
+#: site_web/templates/base_public.html
+#: site_web/templates/site_web/public_article_list.html
+msgid "Toutes les publications"
+msgstr "All publications"
+
+#: site_web/templates/base_public.html site_web/views.py
+msgid "Analyses"
+msgstr "Analyses"
+
+#: site_web/templates/base_public.html
+msgid "Indépendantes"
+msgstr "Independent"
+
+#: site_web/templates/base_public.html
+#: site_web/templates/site_web/public_detail_galerie.html
+#: site_web/templates/site_web/public_detail_photo.html
+msgid "Galerie"
+msgstr "Gallery"
+
+#: site_web/templates/base_public.html
+#: site_web/templates/site_web/public_contact.html
+msgid "Contact"
+msgstr "Contact"
+
+#: site_web/templates/base_public.html
+msgid "Connexion"
+msgstr "Log in"
+
+#: site_web/templates/base_public.html
+msgid "Bienvenue au groupe de recherche Zabantu"
+msgstr "Welcome to the Zabantu research group"
+
+#: site_web/templates/base_public.html
+msgid ""
+"Groupe de recherche : Economy, Conflict, State. Vers une recherche ancrée "
+"dans les dynamiques économiques et sociales."
+msgstr ""
+"Research group: Economy, Conflict, State. Towards research grounded in "
+"economic and social dynamics."
+
+#: site_web/templates/base_public.html
+msgid "Chaîne WhatsApp Zabantu"
+msgstr "Zabantu WhatsApp channel"
+
+#: site_web/templates/base_public.html
+msgid "Suivre la chaîne Zabantu sur WhatsApp"
+msgstr "Follow the Zabantu channel on WhatsApp"
+
+#: site_web/templates/base_public.html
+msgid "Explorer"
+msgstr "Explore"
+
+#: site_web/templates/base_public.html site_web/templates/site_web/index.html
+#: site_web/templates/site_web/public_event_list.html
+#: site_web/templates/site_web/public_guelekan_detail.html site_web/views.py
+msgid "Séminaires Gɛlɛkan"
+msgstr "Gɛlɛkan Seminars"
+
+#: site_web/templates/base_public.html
+msgid "Participer"
+msgstr "Get involved"
+
+#: site_web/templates/base_public.html
+#: site_web/templates/site_web/public_contact.html
+msgid ""
+"Faculté des Sciences Économiques et de Gestion (FSEG), Campus universitaire "
+"de Badalabougou, Bamako"
+msgstr ""
+"Faculty of Economics and Management (FSEG), Badalabougou University Campus, "
+"Bamako"
+
+#: site_web/templates/base_public.html
+msgid "Groupe de recherche Zabantu. Tous droits réservés."
+msgstr "Zabantu research group. All rights reserved."
+
+#: site_web/templates/base_public.html
+#: site_web/templates/site_web/legal/_base_legal.html
+msgid "Mentions légales"
+msgstr "Legal notice"
+
+#: site_web/templates/base_public.html
+#: site_web/templates/site_web/legal/_base_legal.html
+msgid "Confidentialité"
+msgstr "Privacy"
+
+#: site_web/templates/base_public.html
+#: site_web/templates/site_web/includes/cookie_banner.html
+#: site_web/templates/site_web/legal/_base_legal.html
+msgid "Cookies"
+msgstr "Cookies"
+
+#: site_web/templates/base_public.html
+msgid "Gérer mes cookies"
+msgstr "Manage my cookies"
+
+#: site_web/templates/emails/application_approved.html
+msgid "Adhésion validée"
+msgstr "Membership approved"
+
+#: site_web/templates/emails/application_approved.html
+msgid "Bienvenue chez Zabantu"
+msgstr "Welcome to Zabantu"
+
+#: site_web/templates/emails/application_approved.html
+#: site_web/templates/emails/application_received.html
+#, python-format
+msgid "Bonjour %(name)s,"
+msgstr "Hello %(name)s,"
+
+#: site_web/templates/emails/application_approved.html
+#, python-format
+msgid ""
+"Bonne nouvelle : votre adhésion au groupe de recherche Zabantu est validée. "
+"Votre profil figure désormais parmi <a href=\"%(members_url)s\" "
+"style=\"color:#6f826a;\">les membres sur le site</a>."
+msgstr ""
+"Good news: your membership of the Zabantu research group has been approved. "
+"Your profile now appears among <a href=\"%(members_url)s\" "
+"style=\"color:#6f826a;\">the members on the website</a>."
+
+#: site_web/templates/emails/application_approved.html
+msgid ""
+"Nous vous tiendrons informé de nos séminaires Gɛlɛkan, de nos événements et "
+"de nos publications."
+msgstr ""
+"We will keep you informed of our Gɛlɛkan seminars, our events and our "
+"publications."
+
+#: site_web/templates/emails/application_approved.html
+msgid "Bienvenue parmi nous,"
+msgstr "Welcome aboard,"
+
+#: site_web/templates/emails/application_approved.html
+#: site_web/templates/emails/application_received.html
+msgid "L'équipe Zabantu"
+msgstr "The Zabantu team"
+
+#: site_web/templates/emails/application_received.html
+msgid "Demande d'adhésion reçue"
+msgstr "Membership application received"
+
+#: site_web/templates/emails/application_received.html
+msgid "Demande bien reçue"
+msgstr "Application received"
+
+#: site_web/templates/emails/application_received.html
+msgid ""
+"Nous avons bien reçu votre demande d'adhésion au groupe de recherche Zabantu."
+" Merci de l'intérêt que vous portez à nos travaux."
+msgstr ""
+"We have received your application to join the Zabantu research group. Thank "
+"you for your interest in our work."
+
+#: site_web/templates/emails/application_received.html
+msgid ""
+"Notre équipe va examiner votre dossier et reviendra vers vous par e-mail. Il "
+"est inutile de renvoyer le formulaire."
+msgstr ""
+"Our team will review your application and get back to you by e-mail. There is"
+" no need to send the form again."
+
+#: site_web/templates/emails/application_received.html
+msgid "À très bientôt,"
+msgstr "Speak soon,"
+
+#: site_web/templates/emails/base_email.html
+#: users/templates/emails/contact_reply.html
+msgid "Tous droits réservés."
+msgstr "All rights reserved."
+
+#: site_web/templates/emails/base_email.html
+msgid ""
+"Vous recevez cet e-mail parce que vous êtes abonné à l'info-lettre de "
+"Zabantu."
+msgstr ""
+"You are receiving this e-mail because you subscribed to the Zabantu "
+"newsletter."
+
+#: site_web/templates/emails/base_email.html
+msgid "Se désabonner"
+msgstr "Unsubscribe"
+
+#: site_web/templates/emails/publication.html
+#: site_web/templates/site_web/public_article_list.html
+msgid "Lire la suite"
+msgstr "Read more"
+
+#: site_web/templates/error_standalone.html
+msgid "Erreur"
+msgstr "Error"
+
+#: site_web/templates/error_standalone.html
+msgid "Besoin d'aide ?"
+msgstr "Need help?"
+
+#: site_web/templates/site_web/includes/cookie_banner.html
+msgid ""
+"Ce site n’utilise que des cookies techniques, indispensables à son "
+"fonctionnement (connexion, protection des formulaires). Aucun cookie de "
+"mesure d’audience ni de publicité n’est déposé."
+msgstr ""
+"This website only uses technical cookies that are essential for it to work "
+"(login, form protection). No audience measurement or advertising cookies are "
+"set."
+
+#: site_web/templates/site_web/includes/cookie_banner.html
+#: site_web/templates/site_web/index.html
+msgid "En savoir plus"
+msgstr "Find out more"
+
+#: site_web/templates/site_web/includes/cookie_banner.html
+msgid "J’ai compris"
+msgstr "Got it"
+
+#: site_web/templates/site_web/includes/donate_band.html
+msgid ""
+"Zabantu accepte les dons pour financer ses recherches et ses séminaires."
+msgstr "Zabantu welcomes donations to fund its research and seminars."
+
+#: site_web/templates/site_web/includes/team_carousel.html
+msgid "Membres précédents"
+msgstr "Previous members"
+
+#: site_web/templates/site_web/includes/team_carousel.html
+msgid "Mettre en pause le défilement"
+msgstr "Pause scrolling"
+
+#: site_web/templates/site_web/includes/team_carousel.html
+msgid "Reprendre le défilement"
+msgstr "Resume scrolling"
+
+#: site_web/templates/site_web/includes/team_carousel.html
+msgid "Membres suivants"
+msgstr "Next members"
+
+#: site_web/templates/site_web/includes/team_carousel.html
+msgid "carrousel"
+msgstr "carousel"
+
+#: site_web/templates/site_web/includes/team_carousel.html
+msgid "Les membres du groupe Zabantu"
+msgstr "The members of the Zabantu group"
+
+#: site_web/templates/site_web/index.html
+#: site_web/templates/site_web/public_about.html
+msgid "Vers une recherche ancrée dans les dynamiques économiques et sociales"
+msgstr "Towards research grounded in economic and social dynamics"
+
+#: site_web/templates/site_web/index.html
+msgid ""
+"Zabantu, inspiré d'une plante mandingue, est un groupe de recherche "
+"pluridisciplinaire travaillant sur le nexus Économie-Conflit-État. Nos "
+"travaux portent sur les dynamiques économiques, les conflits armés et les "
+"politiques publiques, dans le paradigme d'une recherche ancrée sur les "
+"réalités locales."
+msgstr ""
+"Named after a Manding plant, Zabantu is a multidisciplinary research group "
+"working on the Economy-Conflict-State nexus. Our work covers economic "
+"dynamics, armed conflicts and public policy, within a paradigm of research "
+"grounded in local realities."
+
+#: site_web/templates/site_web/index.html
+msgid "Voir les publications"
+msgstr "See the publications"
+
+#: site_web/templates/site_web/index.html
+msgid "Réunion de chercheurs du groupe Zabantu"
+msgstr "Meeting of researchers from the Zabantu group"
+
+#: site_web/templates/site_web/index.html
+#: site_web/templates/site_web/public_event_list.html
+msgid "Programme phare"
+msgstr "Flagship programme"
+
+#: site_web/templates/site_web/index.html
+msgid ""
+"Nos grands rendez-vous de réflexion : chercheurs, professeurs et invités de "
+"renom réunis autour d'un même sujet."
+msgstr ""
+"Our major forums for reflection: researchers, professors and distinguished "
+"guests brought together around a single topic."
+
+#: site_web/templates/site_web/index.html
+msgid "Toutes les éditions"
+msgstr "All editions"
+
+#: site_web/templates/site_web/index.html
+msgid "Prochain séminaire"
+msgstr "Next seminar"
+
+#: site_web/templates/site_web/index.html
+#: site_web/templates/site_web/public_event_list.html
+msgid "En ligne"
+msgstr "Online"
+
+#: site_web/templates/site_web/index.html
+#, python-format
+msgid "et %(n)s autre"
+msgid_plural "et %(n)s autres"
+msgstr[0] "and %(n)s other"
+msgstr[1] "and %(n)s others"
+
+#: site_web/templates/site_web/index.html
+msgid "Dernières publications"
+msgstr "Latest publications"
+
+#: site_web/templates/site_web/index.html
+msgid "Les travaux récents des membres et partenaires du groupe."
+msgstr "Recent work by the group’s members and partners."
+
+#: site_web/templates/site_web/index.html
+#: site_web/templates/site_web/public_article_list.html
+msgid "Voir toutes les publications"
+msgstr "See all publications"
+
+#: site_web/templates/site_web/index.html
+msgid "Lire"
+msgstr "Read"
+
+#: site_web/templates/site_web/index.html
+msgid "Aucune publication pour le moment."
+msgstr "No publications yet."
+
+#: site_web/templates/site_web/index.html
+#: site_web/templates/site_web/public_about.html
+#: site_web/templates/site_web/public_event_list.html
+msgid "Événements à venir"
+msgstr "Upcoming events"
+
+#: site_web/templates/site_web/index.html
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Tous les événements"
+msgstr "All events"
+
+#: site_web/templates/site_web/index.html
+msgid "Aucun événement prévu pour le moment."
+msgstr "No events scheduled for now."
+
+#: site_web/templates/site_web/index.html
+msgid "Voir les événements passés"
+msgstr "See past events"
+
+#: site_web/templates/site_web/index.html
+msgid "Rejoignez le Groupe de recherche Zabantu"
+msgstr "Join the Zabantu research group"
+
+#: site_web/templates/site_web/index.html
+msgid ""
+"Intégrez un réseau de chercheurs pluridisciplinaire, ouvert à tous les "
+"chercheurs du monde."
+msgstr ""
+"Join a multidisciplinary network of researchers, open to researchers from all"
+" over the world."
+
+#: site_web/templates/site_web/index.html
+msgid "Participez aux séminaires Gɛlɛkan et aux activités du groupe."
+msgstr "Take part in the Gɛlɛkan seminars and the group’s activities."
+
+#: site_web/templates/site_web/index.html
+msgid "Partagez vos travaux et faites connaître votre profil de chercheur(se)."
+msgstr "Share your work and raise your profile as a researcher."
+
+#: site_web/templates/site_web/index.html
+msgid "Faire une demande d'adhésion"
+msgstr "Apply for membership"
+
+#: site_web/templates/site_web/index.html
+msgid "Notre équipe"
+msgstr "Our team"
+
+#: site_web/templates/site_web/index.html
+#: site_web/templates/site_web/public_about.html
+msgid "Voir tous les membres"
+msgstr "See all members"
+
+#: site_web/templates/site_web/index.html
+msgid "Nos partenaires"
+msgstr "Our partners"
+
+#: site_web/templates/site_web/index.html
+msgid "Restez informés"
+msgstr "Stay informed"
+
+#: site_web/templates/site_web/index.html
+msgid ""
+"Abonnez-vous à notre info-lettre pour recevoir nos dernières analyses et "
+"invitations aux événements."
+msgstr ""
+"Subscribe to our newsletter to receive our latest analyses and invitations to"
+" events."
+
+#: site_web/templates/site_web/index.html
+msgid "Votre adresse e-mail"
+msgstr "Your e-mail address"
+
+#: site_web/templates/site_web/index.html
+msgid "Votre e-mail"
+msgstr "Your e-mail"
+
+#: site_web/templates/site_web/index.html
+msgid "S'abonner"
+msgstr "Subscribe"
+
+#: site_web/templates/site_web/index.html
+msgid ""
+"Votre e-mail sert uniquement à vous envoyer l'info-lettre ; désabonnement "
+"possible à tout moment."
+msgstr ""
+"Your e-mail is only used to send you the newsletter; you can unsubscribe at "
+"any time."
+
+#: site_web/templates/site_web/legal/_base_legal.html
+msgid "Dernière mise à jour :"
+msgstr "Last updated:"
+
+#: site_web/templates/site_web/legal/_base_legal.html
+msgid "Informations légales"
+msgstr "Legal information"
+
+#: site_web/templates/site_web/newsletter_unsubscribe_confirm.html
+#: site_web/templates/site_web/newsletter_unsubscribe_success.html
+msgid "Désabonnement"
+msgstr "Unsubscribe"
+
+#: site_web/templates/site_web/newsletter_unsubscribe_confirm.html
+msgid "Confirmer le désabonnement"
+msgstr "Confirm unsubscription"
+
+#: site_web/templates/site_web/newsletter_unsubscribe_confirm.html
+msgid "Êtes-vous sûr de vouloir vous désabonner de l'info-lettre Zabantu ?"
+msgstr "Are you sure you want to unsubscribe from the Zabantu newsletter?"
+
+#: site_web/templates/site_web/newsletter_unsubscribe_confirm.html
+msgid "E-mail :"
+msgstr "E-mail:"
+
+#: site_web/templates/site_web/newsletter_unsubscribe_confirm.html
+msgid "Annuler"
+msgstr "Cancel"
+
+#: site_web/templates/site_web/newsletter_unsubscribe_success.html
+msgid "Désabonnement confirmé"
+msgstr "Unsubscription confirmed"
+
+#: site_web/templates/site_web/newsletter_unsubscribe_success.html
+msgid "Vous avez été désabonné de notre info-lettre avec succès."
+msgstr "You have been unsubscribed from our newsletter."
+
+#: site_web/templates/site_web/newsletter_unsubscribe_success.html
+msgid "Nous sommes désolés de vous voir partir."
+msgstr "We are sorry to see you go."
+
+#: site_web/templates/site_web/public_about.html
+#: site_web/templates/site_web/public_article_detail.html
+#: site_web/templates/site_web/public_detail_photo.html
+#: users/templates/emails/contact_reply.html
+msgid "Groupe de recherche Zabantu"
+msgstr "Zabantu research group"
+
+#: site_web/templates/site_web/public_about.html
+msgid ""
+"Nom inspiré d'une plante locale mandingue, Zabantu est un groupe de "
+"chercheurs en sciences sociales travaillant sur le développement économique "
+"et social. C'est de ce fait un groupe pluri et interdisciplinaire, qui est "
+"ouvert à tous les chercheurs et chercheuses du monde dans l'objectif d'avoir "
+"une recherche plus inclusive et plus ancrée."
+msgstr ""
+"Named after a local Manding plant, Zabantu is a group of social science "
+"researchers working on economic and social development. It is therefore a "
+"multidisciplinary and interdisciplinary group, open to researchers from all "
+"over the world, with the aim of making research more inclusive and more "
+"grounded."
+
+#: site_web/templates/site_web/public_about.html
+msgid "Vision"
+msgstr "Vision"
+
+#: site_web/templates/site_web/public_about.html
+msgid "Domaines de recherche"
+msgstr "Research areas"
+
+#: site_web/templates/site_web/public_about.html
+msgid "Économie politique"
+msgstr "Political economy"
+
+#: site_web/templates/site_web/public_about.html
+msgid "Conflits et sécurité"
+msgstr "Conflict and security"
+
+#: site_web/templates/site_web/public_about.html
+msgid "Développement"
+msgstr "Development"
+
+#: site_web/templates/site_web/public_about.html
+msgid "Politiques publiques"
+msgstr "Public policy"
+
+#: site_web/templates/site_web/public_about.html
+msgid "Études africaines"
+msgstr "African studies"
+
+#: site_web/templates/site_web/public_about.html
+msgid "Activités"
+msgstr "Activities"
+
+#: site_web/templates/site_web/public_about.html
+msgid ""
+"Gɛlɛkan est une tribune scientifique de collaboration et de partage "
+"d'expérience et de connaissance. Inspiré de la tribune de sagesse bamanan "
+"réservée aux aînés (considérés comme des sagesses et des érudits), Gɛlɛkan "
+"est un espace de communication scientifique permettant aux chercheurs de "
+"partager les résultats de leurs recherches accomplies ou en cours."
+msgstr ""
+"Gɛlɛkan is a scientific forum for collaboration and for sharing experience "
+"and knowledge. Inspired by the Bamanan forum of wisdom reserved for elders "
+"(regarded as sages and scholars), Gɛlɛkan is a space for scientific "
+"communication where researchers share the results of their completed or "
+"ongoing research."
+
+#: site_web/templates/site_web/public_about.html
+msgid ""
+"Les séminaires Gɛlɛkan portent aussi sur les thématiques de formation comme "
+"la méthodologie de recherche et les astuces de publications académiques. Il "
+"s'agit de partage d'expérience des auteurs bien établis dans leurs domaines "
+"visant à initier et ou renforcer les jeunes chercheurs à la conduite de la "
+"recherche scientifique et de la communication scientifique."
+msgstr ""
+"Gɛlɛkan seminars also cover training topics such as research methodology and "
+"tips for academic publishing. Well-established authors share their experience"
+" in order to introduce young researchers to, or strengthen their skills in, "
+"conducting scientific research and scientific communication."
+
+#: site_web/templates/site_web/public_about.html
+msgid ""
+"Au-delà de la démarche méthodologique, les séminaires Gɛlɛkan mettent un "
+"accent particulier sur les débats épistémologiques, qui déterminent, dans une"
+" large mesure, la contribution à la connaissance scientifique."
+msgstr ""
+"Beyond methodology, Gɛlɛkan seminars place particular emphasis on "
+"epistemological debates, which largely determine the contribution to "
+"scientific knowledge."
+
+#: site_web/templates/site_web/public_about.html
+msgid ""
+"La nécessité d'un tel cadre académique réside dans le caractère collectif de "
+"la production de la connaissance. Ainsi, débattre des résultats de recherche "
+"permettent de mettre en évidence leurs pertinence et limites éventuelles et "
+"par conséquent de les consolider, dans la mesure où ces limites seront "
+"adressées à la communauté scientifique. Dans ce contexte, la communication "
+"des résultats de recherche devient plus qu'une nécessité, elle contribue à la"
+" validation externe des connaissances et leur diffusion."
+msgstr ""
+"Such an academic framework is needed because knowledge is produced "
+"collectively. Debating research results brings out their relevance and "
+"possible limitations, and therefore strengthens them, as these limitations "
+"are put before the scientific community. In this context, communicating "
+"research results becomes more than a necessity: it contributes to the "
+"external validation of knowledge and to its dissemination."
+
+#: site_web/templates/site_web/public_about.html
+msgid "Suivre les séminaires"
+msgstr "Follow the seminars"
+
+#: site_web/templates/site_web/public_about.html
+msgid "Retrouvez les séances passées et à venir du séminaire Gɛlɛkan."
+msgstr "Find past and upcoming sessions of the Gɛlɛkan seminar."
+
+#: site_web/templates/site_web/public_about.html
+msgid "Voir les séminaires"
+msgstr "See the seminars"
+
+#: site_web/templates/site_web/public_about.html
+msgid "Notre Équipe"
+msgstr "Our Team"
+
+#: site_web/templates/site_web/public_about.html
+msgid "Nos Partenaires"
+msgstr "Our Partners"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Résumé"
+msgstr "Abstract"
+
+#: site_web/templates/site_web/public_article_detail.html
+#: site_web/templates/site_web/public_detail_photo.html
+msgid "Informations"
+msgstr "Details"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Type"
+msgstr "Type"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Institution"
+msgstr "Institution"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Série / Numéro"
+msgstr "Series / Number"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Revue"
+msgstr "Journal"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Éditeur"
+msgstr "Publisher"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Maison d’édition"
+msgstr "Publishing house"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Lieu de publication"
+msgstr "Place of publication"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Nombre de pages"
+msgstr "Number of pages"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Date de publication"
+msgstr "Publication date"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Lien externe"
+msgstr "External link"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Consulter l'article"
+msgstr "View the article"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Document"
+msgstr "Document"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Télécharger le PDF"
+msgstr "Download the PDF"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Auteur(s)"
+msgstr "Author(s)"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Membre Zabantu"
+msgstr "Zabantu member"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Collaborateur Académique"
+msgstr "Academic collaborator"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Auteur externe"
+msgstr "External author"
+
+#: site_web/templates/site_web/public_article_detail.html
+msgid "Retour aux publications"
+msgstr "Back to publications"
+
+#: site_web/templates/site_web/public_article_list.html
+msgid "Toutes nos publications"
+msgstr "All our publications"
+
+#: site_web/templates/site_web/public_article_list.html
+msgid "Découvrez les travaux du Groupe de recherche Zabantu"
+msgstr "Discover the work of the Zabantu research group"
+
+#: site_web/templates/site_web/public_article_list.html
+msgid "Catégories"
+msgstr "Categories"
+
+#: site_web/templates/site_web/public_article_list.html
+msgid "Rechercher une publication"
+msgstr "Search for a publication"
+
+#: site_web/templates/site_web/public_article_list.html
+msgid "Rechercher une publication (titre, résumé, mot-clé)…"
+msgstr "Search for a publication (title, abstract, keyword)…"
+
+#: site_web/templates/site_web/public_article_list.html
+msgid "Rechercher"
+msgstr "Search"
+
+#: site_web/templates/site_web/public_article_list.html
+msgid "Voir le compte-rendu"
+msgstr "Read the report"
+
+#: site_web/templates/site_web/public_article_list.html
+msgid "Aucun séminaire trouvé"
+msgstr "No seminar found"
+
+#: site_web/templates/site_web/public_article_list.html
+msgid "Aucun séminaire Gɛlɛkan ne correspond à votre recherche."
+msgstr "No Gɛlɛkan seminar matches your search."
+
+#: site_web/templates/site_web/public_article_list.html
+msgid "Article source"
+msgstr "Source article"
+
+#: site_web/templates/site_web/public_article_list.html
+msgid "Aucun article trouvé"
+msgstr "No article found"
+
+#: site_web/templates/site_web/public_article_list.html
+#, python-format
+msgid "Aucun résultat pour « %(search_query)s ». Essayez avec d'autres termes."
+msgstr "No results for “%(search_query)s”. Try other terms."
+
+#: site_web/templates/site_web/public_article_list.html
+msgid "Aucune publication disponible dans cette catégorie pour le moment."
+msgstr "No publications in this category yet."
+
+#: site_web/templates/site_web/public_article_list.html
+msgid "Pagination des publications"
+msgstr "Publications pagination"
+
+#: site_web/templates/site_web/public_article_list.html
+#: site_web/templates/site_web/public_detail_galerie.html
+#: site_web/templates/site_web/public_event_list.html
+#: site_web/templates/site_web/public_liste_galeries.html
+#: site_web/templates/site_web/public_membership_form.html
+#: site_web/templates/site_web/public_toutes_photos.html
+msgid "Précédent"
+msgstr "Previous"
+
+#: site_web/templates/site_web/public_article_list.html
+#: site_web/templates/site_web/public_detail_galerie.html
+#: site_web/templates/site_web/public_event_list.html
+#: site_web/templates/site_web/public_liste_galeries.html
+#: site_web/templates/site_web/public_toutes_photos.html
+#, python-format
+msgid "Page %(number)s sur %(total)s"
+msgstr "Page %(number)s of %(total)s"
+
+#: site_web/templates/site_web/public_article_list.html
+#: site_web/templates/site_web/public_detail_galerie.html
+#: site_web/templates/site_web/public_event_list.html
+#: site_web/templates/site_web/public_liste_galeries.html
+#: site_web/templates/site_web/public_membership_form.html
+#: site_web/templates/site_web/public_toutes_photos.html
+msgid "Suivant"
+msgstr "Next"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Contactez-nous"
+msgstr "Contact us"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Envoyez-nous un message"
+msgstr "Send us a message"
+
+#: site_web/templates/site_web/public_contact.html
+msgid ""
+"Une question, une proposition de collaboration ? Écrivez-nous, nous vous "
+"répondrons."
+msgstr ""
+"A question, a proposal for collaboration? Write to us and we will get back to"
+" you."
+
+#: site_web/templates/site_web/public_contact.html
+msgid "(facultatif)"
+msgstr "(optional)"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Ces informations servent uniquement à répondre à votre message."
+msgstr "This information is only used to reply to your message."
+
+#: site_web/templates/site_web/public_contact.html
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Politique de confidentialité"
+msgstr "Privacy policy"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Envoyer le message"
+msgstr "Send the message"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Coordonnées"
+msgstr "Contact details"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Nos coordonnées"
+msgstr "Our contact details"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Adresse"
+msgstr "Address"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "E-mail"
+msgstr "E-mail"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Horaires"
+msgstr "Opening hours"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Lundi - Vendredi : 8h - 17h"
+msgstr "Monday - Friday: 8 am - 5 pm"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "LinkedIn de Zabantu"
+msgstr "Zabantu on LinkedIn"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Facebook de Zabantu"
+msgstr "Zabantu on Facebook"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Nous trouver"
+msgstr "Find us"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Carte : localisation de Zabantu"
+msgstr "Map: Zabantu’s location"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Questions fréquentes"
+msgstr "Frequently asked questions"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Comment puis-je collaborer avec votre équipe ?"
+msgstr "How can I collaborate with your team?"
+
+#: site_web/templates/site_web/public_contact.html
+msgid ""
+"Nous sommes ouverts aux collaborations interdisciplinaires. Veuillez nous "
+"contacter via le formulaire en précisant votre domaine d'expertise et la "
+"nature de la collaboration envisagée."
+msgstr ""
+"We are open to interdisciplinary collaboration. Please contact us using the "
+"form, stating your field of expertise and the kind of collaboration you have "
+"in mind."
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Où puis-je trouver vos publications ?"
+msgstr "Where can I find your publications?"
+
+#: site_web/templates/site_web/public_contact.html
+msgid ""
+"Nos publications sont disponibles dans la section dédiée de notre site web. "
+"Certains travaux peuvent être disponibles sur demande."
+msgstr ""
+"Our publications are available in the dedicated section of our website. Some "
+"work may be available on request."
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Quels sont vos horaires d'ouverture ?"
+msgstr "What are your opening hours?"
+
+#: site_web/templates/site_web/public_contact.html
+msgid ""
+"Notre bureau est ouvert du lundi au vendredi de 8h à 17h. Les rendez-vous en "
+"dehors de ces horaires peuvent être arrangés sur demande."
+msgstr ""
+"Our office is open Monday to Friday from 8 am to 5 pm. Appointments outside "
+"these hours can be arranged on request."
+
+#: site_web/templates/site_web/public_detail_galerie.html
+msgid "Galerie Zabantu"
+msgstr "Zabantu Gallery"
+
+#: site_web/templates/site_web/public_detail_galerie.html
+#: site_web/templates/site_web/public_detail_photo.html
+#: site_web/templates/site_web/public_liste_galeries.html
+#: site_web/templates/site_web/public_toutes_photos.html site_web/views.py
+msgid "Galerie photos"
+msgstr "Photo gallery"
+
+#: site_web/templates/site_web/public_detail_galerie.html
+#: site_web/templates/site_web/public_detail_photo.html
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Fil d'Ariane"
+msgstr "Breadcrumb"
+
+#: site_web/templates/site_web/public_detail_galerie.html
+#: site_web/templates/site_web/public_guelekan_detail.html
+#: site_web/templates/site_web/public_liste_galeries.html
+#: site_web/templates/site_web/public_toutes_photos.html site_web/tests_i18n.py
+#, python-format
+msgid "%(n)s photo"
+msgid_plural "%(n)s photos"
+msgstr[0] "%(n)s photo"
+msgstr[1] "%(n)s photos"
+
+#: site_web/templates/site_web/public_detail_galerie.html
+#: site_web/templates/site_web/public_detail_photo.html
+#: site_web/templates/site_web/public_toutes_photos.html site_web/views.py
+msgid "Toutes les photos"
+msgstr "All photos"
+
+#: site_web/templates/site_web/public_detail_galerie.html
+msgid "Photo de la galerie"
+msgstr "Gallery photo"
+
+#: site_web/templates/site_web/public_detail_galerie.html
+#: site_web/templates/site_web/public_toutes_photos.html
+msgid "Voir la fiche de la photo"
+msgstr "See the photo details"
+
+#: site_web/templates/site_web/public_detail_galerie.html
+#: site_web/templates/site_web/public_toutes_photos.html
+msgid "Pagination des photos"
+msgstr "Photos pagination"
+
+#: site_web/templates/site_web/public_detail_galerie.html
+msgid "Aucune photo dans cette galerie."
+msgstr "No photos in this gallery."
+
+#: site_web/templates/site_web/public_detail_photo.html
+#: site_web/templates/site_web/public_toutes_photos.html
+msgid "Photo"
+msgstr "Photo"
+
+#: site_web/templates/site_web/public_detail_photo.html
+msgid "Ouvrir l'image en taille réelle"
+msgstr "Open the full-size image"
+
+#: site_web/templates/site_web/public_detail_photo.html
+msgid "Photo précédente"
+msgstr "Previous photo"
+
+#: site_web/templates/site_web/public_detail_photo.html
+msgid "Photo suivante"
+msgstr "Next photo"
+
+#: site_web/templates/site_web/public_detail_photo.html
+msgid "Ajoutée le"
+msgstr "Added on"
+
+#: site_web/templates/site_web/public_detail_photo.html
+msgid "Publié par"
+msgstr "Published by"
+
+#: site_web/templates/site_web/public_detail_photo.html
+msgid "Mots-clés"
+msgstr "Keywords"
+
+#: site_web/templates/site_web/public_detail_photo.html
+msgid "Retour à la galerie"
+msgstr "Back to the gallery"
+
+#: site_web/templates/site_web/public_detail_photo.html
+#: site_web/templates/site_web/public_toutes_photos.html
+msgid "Retour aux galeries"
+msgstr "Back to the galleries"
+
+#: site_web/templates/site_web/public_donate.html
+msgid "Soutenir Zabantu"
+msgstr "Support Zabantu"
+
+#: site_web/templates/site_web/public_donate.html
+msgid "Votre don fait avancer la recherche"
+msgstr "Your donation moves research forward"
+
+#: site_web/templates/site_web/public_donate.html
+msgid ""
+"Zabantu est un groupe de recherche indépendant qui travaille sur le nexus "
+"<strong>Economy | Conflict | State</strong>. Pour mener ses travaux et les "
+"partager librement, le groupe accepte les dons des personnes et des "
+"organisations qui souhaitent le soutenir. Chaque contribution, quel que soit "
+"son montant, compte."
+msgstr ""
+"Zabantu is an independent research group working on the <strong>Economy | "
+"Conflict | State</strong> nexus. To carry out its work and share it freely, "
+"the group accepts donations from individuals and organisations who wish to "
+"support it. Every contribution counts, whatever its amount."
+
+#: site_web/templates/site_web/public_donate.html
+msgid "À quoi servent les dons"
+msgstr "What donations are used for"
+
+#: site_web/templates/site_web/public_donate.html
+msgid "Financer les enquêtes de terrain et les travaux de recherche"
+msgstr "Funding fieldwork and research"
+
+#: site_web/templates/site_web/public_donate.html
+msgid "Organiser les séminaires Gɛlɛkan, conférences et ateliers"
+msgstr "Organising Gɛlɛkan seminars, conferences and workshops"
+
+#: site_web/templates/site_web/public_donate.html
+msgid "Publier et diffuser nos analyses en accès libre"
+msgstr "Publishing and disseminating our analyses in open access"
+
+#: site_web/templates/site_web/public_donate.html
+msgid "Accompagner les jeunes chercheuses et chercheurs"
+msgstr "Supporting young researchers"
+
+#: site_web/templates/site_web/public_donate.html
+msgid "Comment faire un don"
+msgstr "How to donate"
+
+#: site_web/templates/site_web/public_donate.html
+msgid "Envoyez votre don par Mobile Money"
+msgstr "Send your donation by Mobile Money"
+
+#: site_web/templates/site_web/public_donate.html
+msgid "Faites un transfert vers l'un de ces numéros :"
+msgstr "Make a transfer to one of these numbers:"
+
+#: site_web/templates/site_web/public_donate.html
+#, python-format
+msgid "Copier le numéro %(number)s"
+msgstr "Copy the number %(number)s"
+
+#: site_web/templates/site_web/public_donate.html
+msgid "Copier"
+msgstr "Copy"
+
+#: site_web/templates/site_web/public_donate.html
+msgid "Copié"
+msgstr "Copied"
+
+#: site_web/templates/site_web/public_donate.html
+#, python-format
+msgid ""
+"Les numéros sont en cours de mise à jour : <a "
+"href=\"%(contact_url)s?sujet=don#formulaire\">écrivez-nous</a> pour faire un "
+"don."
+msgstr ""
+"The numbers are being updated: <a "
+"href=\"%(contact_url)s?sujet=don#formulaire\">write to us</a> to make a "
+"donation."
+
+#: site_web/templates/site_web/public_donate.html
+msgid "Confirmez votre don"
+msgstr "Confirm your donation"
+
+#: site_web/templates/site_web/public_donate.html
+msgid ""
+"Envoyez-nous un message en indiquant votre nom, le montant, la date et le "
+"numéro utilisé : nous pourrons ainsi vérifier la réception et vous remercier."
+msgstr ""
+"Send us a message with your name, the amount, the date and the number used: "
+"this lets us check that it has arrived and thank you."
+
+#: site_web/templates/site_web/public_donate.html
+msgid "Confirmer mon don"
+msgstr "Confirm my donation"
+
+#: site_web/templates/site_web/public_donate.html
+msgid ""
+"Vous pouvez aussi nous écrire à <a "
+"href=\"mailto:info@zabantu.net\">info@zabantu.net</a>."
+msgstr ""
+"You can also write to us at <a "
+"href=\"mailto:info@zabantu.net\">info@zabantu.net</a>."
+
+#: site_web/templates/site_web/public_donate.html
+msgid "Nous vous répondons"
+msgstr "We reply to you"
+
+#: site_web/templates/site_web/public_donate.html
+msgid ""
+"Nous vous confirmons la réception de votre don. Merci pour votre soutien !"
+msgstr ""
+"We confirm that your donation has been received. Thank you for your support!"
+
+#: site_web/templates/site_web/public_donate.html
+msgid ""
+"Le don en ligne par carte bancaire et par Mobile Money sera bientôt "
+"disponible directement sur ce site. En attendant, merci d'utiliser les "
+"numéros ci-dessus."
+msgstr ""
+"Online donations by bank card and Mobile Money will soon be available "
+"directly on this website. In the meantime, please use the numbers above."
+
+#: site_web/templates/site_web/public_donate.html
+msgid "Soutenir autrement"
+msgstr "Other ways to support us"
+
+#: site_web/templates/site_web/public_donate.html
+msgid "Proposer une collaboration"
+msgstr "Propose a collaboration"
+
+#: site_web/templates/site_web/public_donate.html
+msgid "Suivre la chaîne WhatsApp"
+msgstr "Follow the WhatsApp channel"
+
+#: site_web/templates/site_web/public_event_detail.html
+#: site_web/templates/site_web/public_event_list.html
+msgid "Nos Événements"
+msgstr "Our Events"
+
+#: site_web/templates/site_web/public_event_detail.html
+#: site_web/templates/site_web/public_event_list.html
+msgid "Séminaires, formations et rencontres du groupe Zabantu"
+msgstr "Seminars, training sessions and meetings of the Zabantu group"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Événement passé"
+msgstr "Past event"
+
+#: site_web/templates/site_web/public_event_detail.html
+#: site_web/templates/site_web/public_event_list.html
+msgid "À venir"
+msgstr "Upcoming"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Date et heure"
+msgstr "Date and time"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Google Agenda"
+msgstr "Google Calendar"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Autre agenda (.ics)"
+msgstr "Other calendar (.ics)"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Informations d'accès"
+msgstr "How to attend"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Événement en ligne"
+msgstr "Online event"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Rejoindre la réunion"
+msgstr "Join the meeting"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Cet événement est terminé."
+msgstr "This event is over."
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Présentiel"
+msgstr "In person"
+
+#: site_web/templates/site_web/public_event_detail.html
+#: site_web/templates/site_web/public_event_list.html
+msgid "Lieu à confirmer"
+msgstr "Venue to be confirmed"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Itinéraire"
+msgstr "Directions"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Détails de l'emplacement à venir."
+msgstr "Venue details to follow."
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Public concerné"
+msgstr "Audience"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Participants attendus"
+msgstr "Expected participants"
+
+#: site_web/templates/site_web/public_event_detail.html
+#, python-format
+msgid "%(n)s personne"
+msgid_plural "%(n)s personnes"
+msgstr[0] "%(n)s person"
+msgstr[1] "%(n)s people"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Thème principal"
+msgstr "Main theme"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Nos Intervenants"
+msgstr "Our Speakers"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Expertise :"
+msgstr "Expertise:"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Site web"
+msgstr "Website"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Rejoignez-nous pour cet événement"
+msgstr "Join us for this event"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Ne manquez pas cette opportunité unique d'échanger et d'apprendre"
+msgstr "Don’t miss this unique opportunity to exchange and learn"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Rejoindre le webinaire"
+msgstr "Join the webinar"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Événements similaires"
+msgstr "Similar events"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Terminé"
+msgstr "Over"
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Découvrir"
+msgstr "Discover"
+
+#: site_web/templates/site_web/public_event_list.html
+msgid "Filtrer par type d'événement"
+msgstr "Filter by event type"
+
+#: site_web/templates/site_web/public_event_list.html
+msgid "Tous"
+msgstr "All"
+
+#: site_web/templates/site_web/public_event_list.html
+msgid ""
+"De grands séminaires réunissant professeurs, chercheurs et invités autour "
+"d'un thème. À ne pas confondre avec nos autres événements ci-dessous."
+msgstr ""
+"Major seminars bringing together professors, researchers and guests around a "
+"theme. Not to be confused with our other events below."
+
+#: site_web/templates/site_web/public_event_list.html
+msgid "Éditions passées"
+msgstr "Past editions"
+
+#: site_web/templates/site_web/public_event_list.html
+msgid "Retrouver les comptes rendus des séminaires"
+msgstr "Read the seminar reports"
+
+#: site_web/templates/site_web/public_event_list.html
+msgid "Autres événements à venir"
+msgstr "Other upcoming events"
+
+#: site_web/templates/site_web/public_event_list.html
+msgid "Plus d'informations"
+msgstr "More information"
+
+#: site_web/templates/site_web/public_event_list.html
+msgid "Aucun événement à venir dans cette catégorie"
+msgstr "No upcoming events in this category"
+
+#: site_web/templates/site_web/public_event_list.html
+msgid "Aucun événement à venir"
+msgstr "No upcoming events"
+
+#: site_web/templates/site_web/public_event_list.html
+msgid "Revenez bientôt, ou consultez les événements passés ci-dessous."
+msgstr "Come back soon, or see the past events below."
+
+#: site_web/templates/site_web/public_event_list.html
+msgid "Autres événements passés"
+msgstr "Other past events"
+
+#: site_web/templates/site_web/public_event_list.html
+msgid "Événements passés"
+msgstr "Past events"
+
+#: site_web/templates/site_web/public_event_list.html
+msgid "Pagination des événements passés"
+msgstr "Past events pagination"
+
+#: site_web/templates/site_web/public_event_list.html
+msgid "Aucun événement passé à afficher pour le moment."
+msgstr "No past events to show yet."
+
+#: site_web/templates/site_web/public_guelekan_detail.html
+msgid "Séminaire de recherche"
+msgstr "Research seminar"
+
+#: site_web/templates/site_web/public_guelekan_detail.html
+#, python-format
+msgid "Publié le %(date)s"
+msgstr "Published on %(date)s"
+
+#: site_web/templates/site_web/public_guelekan_detail.html
+msgid "Document associé"
+msgstr "Related document"
+
+#: site_web/templates/site_web/public_guelekan_detail.html
+msgid "PDF disponible en téléchargement"
+msgstr "PDF available for download"
+
+#: site_web/templates/site_web/public_guelekan_detail.html
+msgid "Télécharger"
+msgstr "Download"
+
+#: site_web/templates/site_web/public_guelekan_detail.html
+msgid "Galeries photos associées"
+msgstr "Related photo galleries"
+
+#: site_web/templates/site_web/public_guelekan_detail.html
+msgid "Voir la galerie"
+msgstr "See the gallery"
+
+#: site_web/templates/site_web/public_guelekan_detail.html
+msgid "Retour aux séminaires"
+msgstr "Back to the seminars"
+
+#: site_web/templates/site_web/public_liste_galeries.html
+msgid "Les moments forts du groupe Zabantu"
+msgstr "Highlights of the Zabantu group"
+
+#: site_web/templates/site_web/public_liste_galeries.html
+#, python-format
+msgid "%(n)s galerie"
+msgid_plural "%(n)s galeries"
+msgstr[0] "%(n)s gallery"
+msgstr[1] "%(n)s galleries"
+
+#: site_web/templates/site_web/public_liste_galeries.html
+msgid "Voir toutes les photos"
+msgstr "See all photos"
+
+#: site_web/templates/site_web/public_liste_galeries.html
+msgid "À la une"
+msgstr "Featured"
+
+#: site_web/templates/site_web/public_liste_galeries.html
+msgid "Aucune galerie disponible pour le moment."
+msgstr "No galleries available yet."
+
+#: site_web/templates/site_web/public_liste_galeries.html
+msgid "Pagination des galeries"
+msgstr "Galleries pagination"
+
+#: site_web/templates/site_web/public_member_detail.html
+msgid "Membre depuis :"
+msgstr "Member since:"
+
+#: site_web/templates/site_web/public_member_detail.html
+msgid "Présentation"
+msgstr "About"
+
+#: site_web/templates/site_web/public_member_detail.html
+msgid "Ce membre n'a pas encore rédigé de biographie."
+msgstr "This member has not written a biography yet."
+
+#: site_web/templates/site_web/public_member_detail.html
+msgid "Retour à la liste des membres"
+msgstr "Back to the list of members"
+
+#: site_web/templates/site_web/public_member_list.html
+msgid "Nos Membres"
+msgstr "Our Members"
+
+#: site_web/templates/site_web/public_member_list.html
+msgid "Découvrez les membres du Groupe de recherche Zabantu"
+msgstr "Meet the members of the Zabantu research group"
+
+#: site_web/templates/site_web/public_member_list.html
+msgid "Vous partagez nos centres d'intérêt ?"
+msgstr "Do you share our interests?"
+
+#: site_web/templates/site_web/public_member_list.html
+msgid ""
+"Chercheur(e), enseignant(e), doctorant(e) ou professionnel(le) : rejoignez le"
+" Groupe de recherche Zabantu."
+msgstr ""
+"Researcher, lecturer, PhD candidate or professional: join the Zabantu "
+"research group."
+
+#: site_web/templates/site_web/public_member_list.html
+msgid "Rejoindre les membres"
+msgstr "Become a member"
+
+#: site_web/templates/site_web/public_member_list.html
+msgid "Voir le profil"
+msgstr "See the profile"
+
+#: site_web/templates/site_web/public_member_list.html
+msgid "Aucun membre à afficher pour le moment."
+msgstr "No members to show yet."
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Adhésion"
+msgstr "Membership"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Formulaire d'adhésion à Zabantu"
+msgstr "Zabantu membership form"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid ""
+"Vous souhaitez rejoindre le Groupe de recherche Zabantu ? Ce formulaire "
+"permet aux personnes intéressées de manifester leur intérêt pour le groupe."
+msgstr ""
+"Would you like to join the Zabantu research group? This form lets interested "
+"people express their interest in the group."
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid ""
+"Zabantu promeut une recherche pluridisciplinaire et ancrée dans les réalités "
+"locales, autour des dynamiques économiques et sociales, des conflits et de "
+"l'État."
+msgstr ""
+"Zabantu promotes multidisciplinary research grounded in local realities, on "
+"economic and social dynamics, conflict and the State."
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Étapes du formulaire"
+msgstr "Form steps"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Informations personnelles"
+msgstr "Personal information"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Profil et recherche"
+msgstr "Profile and research"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Motivation"
+msgstr "Motivation"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Profil public"
+msgstr "Public profile"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Consentement"
+msgstr "Consent"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid ""
+"Naviguez librement entre les étapes : les champs obligatoires (*) sont "
+"vérifiés à l'envoi."
+msgstr ""
+"Move freely between the steps: required fields (*) are checked when you send "
+"the form."
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Les champs marqués * sont obligatoires."
+msgstr "Fields marked * are required."
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Profil académique ou professionnel"
+msgstr "Academic or professional profile"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Votre statut, votre institution et vos centres d'intérêt scientifiques."
+msgstr "Your status, your institution and your research interests."
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Quel est votre statut académique ?"
+msgstr "What is your academic status?"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Quelle est votre institution d'affiliation ?"
+msgstr "What is your institution of affiliation?"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Quels sont vos principaux centres de recherche ?"
+msgstr "What are your main research interests?"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Adhésion au groupe"
+msgstr "Joining the group"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Motivation et contribution."
+msgstr "Motivation and contribution."
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "(plusieurs réponses possibles)"
+msgstr "(several answers possible)"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Votre profil de membre"
+msgstr "Your member profile"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid ""
+"Facultatif. Si votre adhésion est validée, ces informations seront reprises "
+"sur votre page membre du site, ce qui vous évitera de les renseigner plus "
+"tard. Vous pouvez passer cette étape."
+msgstr ""
+"Optional. If your membership is approved, this information will be used on "
+"your member page on the website, so you will not have to fill it in later. "
+"You can skip this step."
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "(5 Mo max)"
+msgstr "(5 MB max)"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Aperçu de la photo"
+msgstr "Photo preview"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Dernière étape avant l'envoi."
+msgstr "Last step before sending."
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid ""
+"Les informations de l'étape 4, si vous les renseignez, pourront être "
+"affichées sur votre page membre une fois votre adhésion validée."
+msgstr ""
+"The information from step 4, if you provide it, may be displayed on your "
+"member page once your membership is approved."
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Les informations transmises servent à examiner votre candidature."
+msgstr "The information you send is used to review your application."
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Envoyer ma demande"
+msgstr "Send my application"
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Ce champ est obligatoire."
+msgstr "This field is required."
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Valeur invalide."
+msgstr "Invalid value."
+
+#: site_web/templates/site_web/public_membership_form.html
+#, python-format
+msgid "Maximum %%(n)s mots."
+msgstr "Maximum %%(n)s words."
+
+#: site_web/templates/site_web/public_membership_form.html
+msgid "mots"
+msgstr "words"
+
+#: site_web/templates/site_web/public_membership_form.html
+#, python-format
+msgid "La photo ne doit pas dépasser %%(n)s Mo."
+msgstr "The photo must not exceed %%(n)s MB."
+
+#: site_web/templates/site_web/public_membership_thanks.html
+msgid "Merci"
+msgstr "Thank you"
+
+#: site_web/templates/site_web/public_membership_thanks.html
+msgid "Merci pour votre demande"
+msgstr "Thank you for your application"
+
+#: site_web/templates/site_web/public_membership_thanks.html
+#, python-format
+msgid "Merci %(name)s !"
+msgstr "Thank you, %(name)s!"
+
+#: site_web/templates/site_web/public_membership_thanks.html
+msgid "Merci !"
+msgstr "Thank you!"
+
+#: site_web/templates/site_web/public_membership_thanks.html
+msgid ""
+"Votre demande d'adhésion au Groupe de recherche Zabantu a bien été "
+"enregistrée."
+msgstr "Your application to join the Zabantu research group has been recorded."
+
+#: site_web/templates/site_web/public_membership_thanks.html
+msgid "L'équipe de Zabantu examine votre demande."
+msgstr "The Zabantu team reviews your application."
+
+#: site_web/templates/site_web/public_membership_thanks.html
+msgid ""
+"Si elle est validée, vous apparaîtrez dans la liste des membres du site, avec"
+" les informations de profil que vous avez renseignées."
+msgstr ""
+"If it is approved, you will appear in the list of members on the website, "
+"with the profile information you provided."
+
+#: site_web/templates/site_web/public_membership_thanks.html
+msgid "Nous pourrons vous contacter à l'adresse e-mail ou au numéro indiqué."
+msgstr "We may contact you at the e-mail address or phone number you gave."
+
+#: site_web/templates/site_web/public_membership_thanks.html
+msgid "Découvrir nos publications"
+msgstr "Discover our publications"
+
+#: site_web/templates/site_web/public_toutes_photos.html
+msgid "Toutes les photos du groupe Zabantu"
+msgstr "All the photos of the Zabantu group"
+
+#: site_web/templates/site_web/public_toutes_photos.html
+msgid "Filtrer par galerie"
+msgstr "Filter by gallery"
+
+#: site_web/templates/site_web/public_toutes_photos.html
+msgid "Toutes les galeries"
+msgstr "All galleries"
+
+#: site_web/templates/site_web/public_toutes_photos.html
+msgid "Filtrer par mot-clé"
+msgstr "Filter by keyword"
+
+#: site_web/templates/site_web/public_toutes_photos.html
+msgid "Tous les mots-clés"
+msgstr "All keywords"
+
+#: site_web/templates/site_web/public_toutes_photos.html
+msgid "Aucune photo pour cette sélection."
+msgstr "No photos for this selection."
+
+#: site_web/templatetags/antispam_tags.py
+msgid "Ne pas remplir ce champ"
+msgstr "Leave this field empty"
+
+#: site_web/views.py
+msgid "Merci ! Votre message a été enregistré ✅"
+msgstr "Thank you! Your message has been recorded ✅"
+
+#: site_web/views.py
+msgid "Veuillez corriger les erreurs dans le formulaire."
+msgstr "Please correct the errors in the form."
+
+#: site_web/views.py
+msgid "Veuillez corriger les erreurs signalées."
+msgstr "Please correct the errors shown."
+
+#: site_web/views.py
+msgid "Adhésion - Zabantu"
+msgstr "Membership - Zabantu"
+
+#: site_web/views.py
+msgid "Merci - Zabantu"
+msgstr "Thank you - Zabantu"
+
+#: site_web/views.py
+#, python-format
+msgid "Galerie : %(title)s"
+msgstr "Gallery: %(title)s"
+
+#: site_web/views.py
+#, python-format
+msgid "Photo : %(title)s"
+msgstr "Photo: %(title)s"
+
+#: site_web/views.py
+msgid "Publications indépendantes"
+msgstr "Independent publications"
+
+#: site_web/views.py
+msgid "evenement"
+msgstr "event"
+
+#: site_web/views.py
+msgid "Vous êtes maintenant abonné à notre info-lettre !"
+msgstr "You are now subscribed to our newsletter!"
+
+#: site_web/views.py
+msgid "Adresse e-mail invalide. Vérifiez-la, puis réessayez."
+msgstr "Invalid e-mail address. Check it, then try again."
+
+#: users/forms.py
+msgid "Autoriser la connexion à l'espace de gestion"
+msgstr ""
+
+#: users/forms.py
+msgid "Compte actif"
+msgstr ""
+
+#: users/forms.py
+msgid "Date de début"
+msgstr ""
+
+#: users/models.py
+msgid "Administrateur"
+msgstr ""
+
+#: users/models.py
+msgid "Membre"
+msgstr ""
+
+#: users/models.py
+msgid "nom"
+msgstr ""
+
+#: users/models.py
+msgid "prénom"
+msgstr ""
+
+#: users/models.py
+msgid "rôle"
+msgstr ""
+
+#: users/models.py
+msgid "date de début"
+msgstr ""
+
+#: users/models.py
+msgid "accès au backoffice"
+msgstr ""
+
+#: users/models.py
+msgid ""
+"Autorise ce membre à se connecter. Les administrateurs et modérateurs se "
+"connectent toujours."
+msgstr ""
+
+#: users/models.py
+msgid "photo de profil"
+msgstr ""
+
+#: users/models.py
+msgid "biographie"
+msgstr ""
+
+#: users/models.py
+msgid "poste"
+msgstr ""
+
+#: users/models.py
+msgid "département"
+msgstr ""
+
+#: users/models.py
+msgid "Twitter"
+msgstr ""
+
+#: users/models.py
+msgid "Lien vers votre profil Google Scholar"
+msgstr ""
+
+#: users/models.py
+msgid "Lien vers votre site web personnel ou portfolio"
+msgstr ""
+
+#: users/models.py
+msgid "modifié le"
+msgstr ""
+
+#: users/models.py
+msgid "utilisateur"
+msgstr ""
+
+#: users/models.py
+msgid "utilisateurs"
+msgstr ""
+
+#: users/templates/emails/contact_reply.html
+msgid "Recherche ancrée dans les dynamiques économiques et sociales"
+msgstr "Research grounded in economic and social dynamics"
+
+#: users/templates/emails/contact_reply.html
+#, python-format
+msgid "Bonjour <strong style=\"color: #bf9264;\">%(name)s</strong>,"
+msgstr "Hello <strong style=\"color: #bf9264;\">%(name)s</strong>,"
+
+#: users/templates/emails/contact_reply.html
+msgid "Nous vous remercions pour votre message. Voici notre réponse :"
+msgstr "Thank you for your message. Here is our reply:"
+
+#: users/templates/emails/contact_reply.html
+msgid "Notre vision :"
+msgstr "Our vision:"
+
+#: users/templates/emails/contact_reply.html
+msgid ""
+"Vers une recherche ancrée dans les dynamiques économiques et sociales, "
+"promouvant l'inclusion et le développement."
+msgstr ""
+"Towards research grounded in economic and social dynamics, promoting "
+"inclusion and development."
+
+#: users/templates/emails/contact_reply.html
+msgid "Votre message original :"
+msgstr "Your original message:"
+
+#: users/templates/emails/contact_reply.html
+msgid "Sujet :"
+msgstr "Subject:"
+
+#: users/templates/emails/contact_reply.html
+msgid "Date :"
+msgstr "Date:"
+
+#: users/templates/emails/contact_reply.html
+msgid "Cordialement,"
+msgstr "Kind regards,"
+
+#: users/templates/emails/contact_reply.html
+msgid "Équipe Groupe de recherche Zabantu"
+msgstr "Zabantu research group team"
+
+#: users/templates/emails/contact_reply.html
+#, python-format
+msgid ""
+"Cet email a été envoyé depuis la plateforme Zabantu en réponse à votre "
+"message du %(date)s."
+msgstr ""
+"This e-mail was sent from the Zabantu platform in reply to your message of "
+"%(date)s."
+
+#: users/templates/emails/contact_reply.html
+msgid "Site Web"
+msgstr "Website"

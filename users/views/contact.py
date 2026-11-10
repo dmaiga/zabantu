@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
-from django.utils import timezone
+from django.utils import timezone, translation
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 from site_web import mailing
@@ -151,7 +151,8 @@ def contact_message_reply(request, pk):
                 'site_name': 'Zabantu',  # Ajoutez le nom de votre site
             }
 
-            html_content = render_to_string('emails/contact_reply.html', context)
+            with translation.override(message.language):  # mise en page dans la langue du message reçu
+                html_content = render_to_string('emails/contact_reply.html', context)
             if mailing.send_reply(message.email, subject, html_content):
                 response.email_sent = True
                 response.sent_at = timezone.now()

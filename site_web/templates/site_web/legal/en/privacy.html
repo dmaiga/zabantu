@@ -1,0 +1,96 @@
+{% extends 'site_web/legal/_base_legal.html' %}
+{# Version anglaise de la politique de confidentialité (la version française, legal/privacy.html, fait foi) #}
+{% block title %}Privacy policy - Zabantu{% endblock %}
+{% block banner_title %}Privacy policy{% endblock %}
+{% block legal_updated %}10 November 2026{% endblock %}
+
+{% block legal_body %}
+<p>This page explains which personal data the website <strong>zabantu.net</strong> collects, why, how long it is kept and how to exercise your rights. It is written in accordance with Malian legislation on the protection of personal data, under the supervision of the Personal Data Protection Authority (APDP).</p>
+
+<h2>1. Data controller</h2>
+<p>Zabantu research group, Faculty of Economics and Management (FSEG), Badalabougou University Campus, Bamako, Mali. E-mail: <a href="mailto:Info@zabantu.net">Info@zabantu.net</a> · Phone: <a href="tel:+22377941470">+223 77 94 14 70</a> / <a href="tel:+22376634515">+223 76 63 45 15</a>. See also the <a href="{% url 'legal_notice' %}">legal notice</a>.</p>
+
+<h2>2. Data collected and purposes</h2>
+<table>
+  <thead><tr><th>Situation</th><th>Data</th><th>Purpose</th><th>Retention</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Contact</strong> form</td>
+      <td>Last name, first name, e-mail, phone (optional), subject, message</td>
+      <td>Answering your request</td>
+      <td>3 years after the last exchange</td>
+    </tr>
+    <tr>
+      <td><strong>Membership</strong> application</td>
+      <td>Full name, e-mail, phone (optional), city and country, academic status, institution, research interests, motivations, how you heard about the group, photo and biography (optional), language of the form</td>
+      <td>Reviewing the application, creating and managing the member account</td>
+      <td>Rejected application: 1 year. Member: for the duration of the membership, then 3 years after it ends</td>
+    </tr>
+    <tr>
+      <td><strong>Newsletter</strong></td>
+      <td>E-mail address, subscription date, language (French or English)</td>
+      <td>Sending you the newsletter and publication announcements</td>
+      <td>Until you unsubscribe, then 1 year (proof of unsubscription)</td>
+    </tr>
+    <tr>
+      <td><strong>Member account</strong> (login)</td>
+      <td>Last name, first name, e-mail, phone, photo, biography, position, department, login credentials (encrypted password)</td>
+      <td>Access to the dashboard, public presentation of the members</td>
+      <td>Duration of the membership</td>
+    </tr>
+    <tr>
+      <td><strong>Browsing</strong></td>
+      <td>IP address, browser type, pages requested (technical server logs)</td>
+      <td>Security, abuse prevention, proper functioning of the website</td>
+      <td>12 months at most</td>
+    </tr>
+  </tbody>
+</table>
+<p>The website carries out <strong>no audience measurement or advertising profiling</strong>, and sells no data.</p>
+<p>Fields marked “optional” may be left empty. The others are needed to process your request.</p>
+
+<h2>3. Legal basis</h2>
+<ul>
+  <li><strong>Your consent</strong>: newsletter subscription, photo and biography of the public profile.</li>
+  <li><strong>Your request</strong>: answering a contact message, reviewing an application, managing your account.</li>
+  <li><strong>Our legitimate interest</strong>: website security and protection against automated submissions (bots).</li>
+</ul>
+
+<h2>4. Publicly visible information</h2>
+<p>If your application is accepted, your member profile (name, photo, biography, position) is displayed on the “Members” page. You can ask for it to be changed or removed at any time. Publications display the names of their authors.</p>
+
+<h2>5. Recipients</h2>
+<ul>
+  <li><strong>The moderation team (Zabantu group)</strong>: these moderators manage the website (memberships, messages, publications, newsletter) and are the only people authorised to process your data on our behalf.</li>
+  <li><strong>Our technical providers</strong>:
+    <ul>
+      <li><strong>LWS (France)</strong>: our host for the website and e-mail.</li>
+      <li><strong>Our web developer</strong>: acts only on our instructions, for technical maintenance and for your requests for changes or deletion.</li>
+    </ul>
+  </li>
+  <li><strong>External display services</strong>: when pages load, third-party tools (Google Fonts, Cloudflare, jsDelivr, jQuery) automatically receive your technical data and IP address (to find out more, see our <a href="{% url 'cookies' %}">cookie policy</a>).</li>
+</ul>
+<p>Your data is not disclosed to any other third party, unless required by law.</p>
+
+<h2>6. Transfers outside Mali</h2>
+<p>The external content services mentioned above are operated from abroad. The data from your forms and your account is stored in <strong>France</strong>, on the servers of our host LWS.</p>
+
+<h2>7. Security</h2>
+<p>Connections to the website are encrypted (HTTPS), passwords are stored in encrypted form, access to the dashboard is restricted to authorised people and forms are protected against automated submissions. No system is infallible: in the event of a data breach affecting you, we would inform you and the APDP, as required by law.</p>
+
+<h2>8. Your rights</h2>
+<p>You have the following rights over your data:</p>
+<ul>
+  <li><strong>access</strong>: find out which data we hold about you and obtain a copy;</li>
+  <li><strong>rectification</strong>: have inaccurate data corrected;</li>
+  <li><strong>erasure</strong>: ask for your data to be deleted;</li>
+  <li><strong>objection</strong>: object, on legitimate grounds, to processing;</li>
+  <li><strong>withdrawal of consent</strong> at any time.</li>
+</ul>
+<p><strong>How to exercise them:</strong> write to <a href="mailto:Info@zabantu.net">Info@zabantu.net</a>, stating the purpose of your request and the e-mail address concerned. The moderators handle your request and, if a technical operation is needed, have it carried out by the website developer. We may ask you for proof of identity if in doubt. We reply within one month.</p>
+<p>To <strong>unsubscribe from the newsletter</strong>, use the link at the bottom of each message: unsubscription is immediate.</p>
+<p>If you believe that your rights are not being respected, you can refer the matter to Mali's <strong>Personal Data Protection Authority (APDP)</strong>.</p>
+
+<h2>9. Updates</h2>
+<p>This policy may change. The date of the last update is shown at the top of the page.</p>
+{% endblock %}

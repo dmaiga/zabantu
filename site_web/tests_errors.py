@@ -1,6 +1,8 @@
 from django.core.exceptions import PermissionDenied
 from django.test import Client, TestCase, override_settings
-from django.urls import include, path
+from django.urls import path
+
+from zabantu import urls as site_urls
 from django.views.defaults import bad_request
 
 
@@ -16,12 +18,13 @@ def bad(request):
     return bad_request(request, Exception('x'))
 
 
+# Les vraies routes ensuite : les pages d'erreur y renvoient (accueil, contact…). Pas d'include() : le site public
+# utilise i18n_patterns, interdit dans une liste incluse.
 urlpatterns = [
     path('boom/', boom),
     path('interdit/', forbidden),
     path('mauvaise/', bad),
-    path('', include('zabantu.urls')),     # les vraies routes : les pages d'erreur y renvoient (accueil, contact…)
-]
+] + site_urls.urlpatterns
 
 
 class ErrorPagesOnPublicSiteTests(TestCase):

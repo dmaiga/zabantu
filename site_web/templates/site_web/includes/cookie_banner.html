@@ -1,10 +1,10 @@
-{# Bannière de consentement. Choix gardé dans le cookie « zabantu_consent » (6 mois). #}
+{% load i18n %}{# Bannière de consentement. Choix gardé dans le cookie « zabantu_consent » (6 mois). #}
 <div id="cookie-banner" class="cookie-banner" role="dialog" aria-modal="false" aria-labelledby="cookie-title" hidden>
   <div class="cookie-inner">
-    <h2 id="cookie-title">Cookies</h2>
-    <p class="cookie-text">Ce site n’utilise que des cookies techniques, indispensables à son fonctionnement (connexion, protection des formulaires). Aucun cookie de mesure d’audience ni de publicité n’est déposé. <a href="{% url 'cookies' %}">En savoir plus</a></p>
+    <h2 id="cookie-title">{% translate "Cookies" %}</h2>
+    <p class="cookie-text">{% translate "Ce site n’utilise que des cookies techniques, indispensables à son fonctionnement (connexion, protection des formulaires). Aucun cookie de mesure d’audience ni de publicité n’est déposé." %} <a href="{% url 'cookies' %}">{% translate "En savoir plus" %}</a></p>
     <div class="cookie-actions">
-      <button type="button" class="cookie-btn cookie-btn-primary" data-cookie="ack">J’ai compris</button>
+      <button type="button" class="cookie-btn cookie-btn-primary" data-cookie="ack">{% translate "J’ai compris" %}</button>
     </div>
   </div>
 </div>

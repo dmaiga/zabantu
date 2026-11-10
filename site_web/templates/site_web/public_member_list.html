@@ -1,20 +1,20 @@
 {% extends 'base_public.html' %}
 {% load photo_tags %}
-{% load static %}  
+{% load static i18n %}
 
-{% block title %}Membres - Zabantu{% endblock %}
+{% block title %}{% translate "Membres" %} - Zabantu{% endblock %}
 
-{% block banner_title %}Nos Membres{% endblock %}
-{% block banner_subtitle %}Découvrez les membres du  Groupe de recheche Zabantu{% endblock %}
+{% block banner_title %}{% translate "Nos Membres" %}{% endblock %}
+{% block banner_subtitle %}{% translate "Découvrez les membres du Groupe de recherche Zabantu" %}{% endblock %}
 
 {% block content %}
 {% include 'site_web/includes/team_photo_styles.html' %}
 <div class="member-cta">
     <div>
-        <h2 class="h4 mb-1">Vous partagez nos centres d'intérêt ?</h2>
-        <p class="mb-0">Chercheur(e), enseignant(e), doctorant(e) ou professionnel(le) : rejoignez le Groupe de recherche Zabantu.</p>
+        <h2 class="h4 mb-1">{% translate "Vous partagez nos centres d'intérêt ?" %}</h2>
+        <p class="mb-0">{% translate "Chercheur(e), enseignant(e), doctorant(e) ou professionnel(le) : rejoignez le Groupe de recherche Zabantu." %}</p>
     </div>
-    <a href="{% url 'membership_apply' %}" class="btn btn-primary btn-lg">Rejoindre les membres</a>
+    <a href="{% url 'membership_apply' %}" class="btn btn-primary btn-lg">{% translate "Rejoindre les membres" %}</a>
 </div>
 <style>
     .member-cta {
@@ -97,14 +97,14 @@
                     {% endif %}
                     
                     {% if member.bio %}
-                    <p class="card-text">{{ member.bio|striptags|truncatewords:20 }}</p>
+                    <p class="card-text">{{ member.t.bio|striptags|truncatewords:20 }}</p>
                     {% endif %}
                 </div>
                 
                 <div class="card-footer bg-white pt-3">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <a href="{% url 'public_member_detail' member.pk %}" class="btn btn-outline-primary btn-sm btn-view-profile">
-                            Voir le profil
+                            {% translate "Voir le profil" %}
                         </a>
                         
                       <div class="social-links">
@@ -129,7 +129,7 @@
     </a>
     {% endif %}
     {% if member.personal_website %}
-    <a href="{{ member.personal_website }}" target="_blank" class="social-icon" title="Site web personnel">
+    <a href="{{ member.personal_website }}" target="_blank" class="social-icon" title="{% translate 'Site web personnel' %}">
         <i class="fas fa-globe"></i>
     </a>
     {% endif %}
@@ -140,7 +140,7 @@
         </div>
         {% empty %}
         <div class="col-12 text-center py-5">
-            <p class="lead">Aucun membre à afficher pour le moment.</p>
+            <p class="lead">{% translate "Aucun membre à afficher pour le moment." %}</p>
         </div>
         {% endfor %}
     </div>

@@ -6,7 +6,7 @@ class GalleryForm(SectionedFormMixin, forms.ModelForm):
     sections = (('Galerie', ('title', 'description', 'cover_image')), ('Mise en avant', ('is_featured',)))
     class Meta:
         model = Gallery
-        fields = ['title', 'description', 'cover_image', 'is_featured']
+        fields = ['title', 'description', 'cover_image', 'is_featured', 'title_en', 'description_en']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
         }

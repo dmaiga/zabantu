@@ -1,30 +1,30 @@
 {% extends 'base_public.html' %}
-{% load photo_tags %}
+{% load photo_tags i18n %}
 
-{% block title %}Toutes les photos - Zabantu{% endblock %}
-{% block banner_title %}Galerie photos{% endblock %}
-{% block banner_subtitle %}Toutes les photos du groupe Zabantu{% endblock %}
+{% block title %}{% translate "Toutes les photos" %} - Zabantu{% endblock %}
+{% block banner_title %}{% translate "Galerie photos" %}{% endblock %}
+{% block banner_subtitle %}{% translate "Toutes les photos du groupe Zabantu" %}{% endblock %}
 
 {% block extra_css %}{% include 'site_web/includes/photo_viewer_css.html' %}{% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-        <p class="mb-0 text-muted">{{ photos.paginator.count }} photo{{ photos.paginator.count|pluralize }}</p>
-        <a href="{% url 'liste_galeries' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-arrow-left me-1"></i>Retour aux galeries</a>
+        <p class="mb-0 text-muted">{% blocktranslate count n=photos.paginator.count %}{{ n }} photo{% plural %}{{ n }} photos{% endblocktranslate %}</p>
+        <a href="{% url 'liste_galeries' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-arrow-left me-1"></i>{% translate "Retour aux galeries" %}</a>
     </div>
 
     {% if gallery_filters %}
-    <nav class="page-filters" aria-label="Filtrer par galerie">
-        <a href="{% url 'toutes_photos' %}{% if current_tag %}?tag={{ current_tag }}{% endif %}" class="{% if not current_gallery %}active{% endif %}">Toutes les galeries</a>
+    <nav class="page-filters" aria-label="{% translate 'Filtrer par galerie' %}">
+        <a href="{% url 'toutes_photos' %}{% if current_tag %}?tag={{ current_tag }}{% endif %}" class="{% if not current_gallery %}active{% endif %}">{% translate "Toutes les galeries" %}</a>
         {% for g in gallery_filters %}
-        <a href="?gallery={{ g.slug }}{% if current_tag %}&tag={{ current_tag }}{% endif %}" class="{% if current_gallery == g.slug %}active{% endif %}">{{ g.title }}</a>
+        <a href="?gallery={{ g.slug }}{% if current_tag %}&tag={{ current_tag }}{% endif %}" class="{% if current_gallery == g.slug %}active{% endif %}">{{ g.t.title }}</a>
         {% endfor %}
     </nav>
     {% endif %}
     {% if tag_filters %}
-    <nav class="page-filters" aria-label="Filtrer par mot-clé">
-        <a href="{% url 'toutes_photos' %}{% if current_gallery %}?gallery={{ current_gallery }}{% endif %}" class="{% if not current_tag %}active{% endif %}">Tous les mots-clés</a>
+    <nav class="page-filters" aria-label="{% translate 'Filtrer par mot-clé' %}">
+        <a href="{% url 'toutes_photos' %}{% if current_gallery %}?gallery={{ current_gallery }}{% endif %}" class="{% if not current_tag %}active{% endif %}">{% translate "Tous les mots-clés" %}</a>
         {% for t in tag_filters %}
         <a href="?tag={{ t.slug }}{% if current_gallery %}&gallery={{ current_gallery }}{% endif %}" class="{% if current_tag == t.slug %}active{% endif %}"># {{ t.name }}</a>
         {% endfor %}
@@ -36,26 +36,26 @@
         {% for photo in photos %}
         {% thumb photo.image 640 as t %}
         <figure class="photo-tile">
-            <a class="pswp-item" href="{{ photo.image.url }}" data-caption="{% if photo.display_title %}{{ photo.display_title }}{% endif %}{% if photo.gallery %}{% if photo.display_title %} · {% endif %}{{ photo.gallery.title }}{% endif %}"{% if t.src_width %} data-pswp-width="{{ t.src_width }}" data-pswp-height="{{ t.src_height }}"{% endif %}>
-                <img src="{{ t.url }}"{% if t.width %} width="{{ t.width }}" height="{{ t.height }}"{% endif %} alt="{{ photo.display_title|default:'Photo' }}" loading="lazy">
+            <a class="pswp-item" href="{{ photo.image.url }}" data-caption="{% if photo.display_title %}{{ photo.display_title }}{% endif %}{% if photo.gallery %}{% if photo.display_title %} · {% endif %}{{ photo.gallery.t.title }}{% endif %}"{% if t.src_width %} data-pswp-width="{{ t.src_width }}" data-pswp-height="{{ t.src_height }}"{% endif %}>
+                <img src="{{ t.url }}"{% if t.width %} width="{{ t.width }}" height="{{ t.height }}"{% endif %} alt="{% if photo.display_title %}{{ photo.display_title }}{% else %}{% translate 'Photo' %}{% endif %}" loading="lazy">
             </a>
-            <a class="photo-info" href="{% url 'detail_photo' photo.pk %}" aria-label="Voir la fiche de la photo"><i class="fas fa-circle-info"></i></a>
+            <a class="photo-info" href="{% url 'detail_photo' photo.pk %}" aria-label="{% translate 'Voir la fiche de la photo' %}"><i class="fas fa-circle-info"></i></a>
             {% if photo.display_title %}<figcaption>{{ photo.display_title }}</figcaption>{% endif %}
         </figure>
         {% endfor %}
     </div>
 
     {% if photos.has_other_pages %}
-    <nav class="mt-4" aria-label="Pagination des photos">
+    <nav class="mt-4" aria-label="{% translate 'Pagination des photos' %}">
         <ul class="pagination justify-content-center flex-wrap">
-            {% if photos.has_previous %}<li class="page-item"><a class="page-link" href="?{% if current_gallery %}gallery={{ current_gallery }}&{% endif %}{% if current_tag %}tag={{ current_tag }}&{% endif %}page={{ photos.previous_page_number }}">Précédent</a></li>{% endif %}
-            <li class="page-item disabled"><span class="page-link">Page {{ photos.number }} sur {{ photos.paginator.num_pages }}</span></li>
-            {% if photos.has_next %}<li class="page-item"><a class="page-link" href="?{% if current_gallery %}gallery={{ current_gallery }}&{% endif %}{% if current_tag %}tag={{ current_tag }}&{% endif %}page={{ photos.next_page_number }}">Suivant</a></li>{% endif %}
+            {% if photos.has_previous %}<li class="page-item"><a class="page-link" href="?{% if current_gallery %}gallery={{ current_gallery }}&{% endif %}{% if current_tag %}tag={{ current_tag }}&{% endif %}page={{ photos.previous_page_number }}">{% translate "Précédent" %}</a></li>{% endif %}
+            <li class="page-item disabled"><span class="page-link">{% blocktranslate with number=photos.number total=photos.paginator.num_pages %}Page {{ number }} sur {{ total }}{% endblocktranslate %}</span></li>
+            {% if photos.has_next %}<li class="page-item"><a class="page-link" href="?{% if current_gallery %}gallery={{ current_gallery }}&{% endif %}{% if current_tag %}tag={{ current_tag }}&{% endif %}page={{ photos.next_page_number }}">{% translate "Suivant" %}</a></li>{% endif %}
         </ul>
     </nav>
     {% endif %}
     {% else %}
-    <div class="text-center py-5 text-muted"><i class="fas fa-images fa-3x mb-3"></i><p class="mb-0">Aucune photo pour cette sélection.</p></div>
+    <div class="text-center py-5 text-muted"><i class="fas fa-images fa-3x mb-3"></i><p class="mb-0">{% translate "Aucune photo pour cette sélection." %}</p></div>
     {% endif %}
 </div>
 {% endblock %}

@@ -1,9 +1,10 @@
 {% extends 'base_public.html' %}
 {% load photo_tags %}
 {% load clean_tags %}
-{% block title %}Événements - Zabantu{% endblock %}
-{% block banner_title %}Nos Événements{% endblock %}
-{% block banner_subtitle %}Séminaires, formations et rencontres du groupe Zabantu{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Événements" %} - Zabantu{% endblock %}
+{% block banner_title %}{% translate "Nos Événements" %}{% endblock %}
+{% block banner_subtitle %}{% translate "Séminaires, formations et rencontres du groupe Zabantu" %}{% endblock %}
 
 {% block content %}
 <style>
@@ -64,9 +65,9 @@
 
 <div class="container">
     {% if type_filters or gelekan_total %}
-    <nav class="ev-filters" aria-label="Filtrer par type d'événement">
-        <a href="{% url 'public_event_list' %}" class="{% if not current_type %}active{% endif %}">Tous</a>
-        {% if gelekan_total %}<a href="?type=seminaire" class="gk {% if current_type == 'seminaire' %}active{% endif %}"><i class="fas fa-microphone-lines"></i>Séminaires Gɛlɛkan <span class="n">{{ gelekan_total }}</span></a>{% endif %}
+    <nav class="ev-filters" aria-label="{% translate "Filtrer par type d'événement" %}">
+        <a href="{% url 'public_event_list' %}" class="{% if not current_type %}active{% endif %}">{% translate "Tous" %}</a>
+        {% if gelekan_total %}<a href="?type=seminaire" class="gk {% if current_type == 'seminaire' %}active{% endif %}"><i class="fas fa-microphone-lines"></i>{% translate "Séminaires Gɛlɛkan" %} <span class="n">{{ gelekan_total }}</span></a>{% endif %}
         {% for key, label, count in type_filters %}
         <a href="?type={{ key }}" class="{% if current_type == key %}active{% endif %}">{{ label }} <span class="n">{{ count }}</span></a>
         {% endfor %}
@@ -75,20 +76,20 @@
 
     {% if gelekan_upcoming or gelekan_past %}
     <section class="gk-block" id="guelekan">
-        <div class="gk-eyebrow"><i class="fas fa-microphone-lines"></i>Programme phare</div>
-        <h2>Séminaires Gɛlɛkan</h2>
-        <p class="gk-lead">De grands séminaires réunissant professeurs, chercheurs et invités autour d'un thème. À ne pas confondre avec nos autres événements ci-dessous.</p>
+        <div class="gk-eyebrow"><i class="fas fa-microphone-lines"></i>{% translate "Programme phare" %}</div>
+        <h2>{% translate "Séminaires Gɛlɛkan" %}</h2>
+        <p class="gk-lead">{% translate "De grands séminaires réunissant professeurs, chercheurs et invités autour d'un thème. À ne pas confondre avec nos autres événements ci-dessous." %}</p>
 
         {% if gelekan_upcoming %}
-        <h3 class="gk-sub">À venir</h3>
+        <h3 class="gk-sub">{% translate "À venir" %}</h3>
         <div class="row g-3">
             {% for event in gelekan_upcoming %}
             <div class="col-lg-6">
                 <a class="gk-item" href="{% url 'public_event_detail' event.pk %}">
                     <div class="ev-date"><strong>{{ event.date|date:"j" }}</strong><span>{{ event.date|date:"M Y" }}</span></div>
                     <div>
-                        <h3>{{ event.title }}</h3>
-                        <p>{{ event.date|time:"H:i" }}{% if event.is_webinar %} · En ligne{% elif event.location %} · {{ event.location }}{% endif %}</p>
+                        <h3>{{ event.t.title }}</h3>
+                        <p>{{ event.date|time:"H:i" }}{% if event.is_webinar %} · {% translate "En ligne" %}{% elif event.location %} · {{ event.location }}{% endif %}</p>
                     </div>
                 </a>
             </div>
@@ -97,29 +98,29 @@
         {% endif %}
 
         {% if gelekan_past %}
-        <h3 class="gk-sub">Éditions passées</h3>
+        <h3 class="gk-sub">{% translate "Éditions passées" %}</h3>
         <div class="row g-3">
             {% for event in gelekan_past %}
             <div class="col-lg-4 col-md-6">
                 <a class="gk-item past" href="{% url 'public_event_detail' event.pk %}">
                     <div class="ev-date"><strong>{{ event.date|date:"j" }}</strong><span>{{ event.date|date:"M Y" }}</span></div>
                     <div>
-                        <h3>{{ event.title }}</h3>
-                        <p>{% if event.is_webinar %}En ligne{% elif event.location %}{{ event.location }}{% endif %}</p>
+                        <h3>{{ event.t.title }}</h3>
+                        <p>{% if event.is_webinar %}{% translate "En ligne" %}{% elif event.location %}{{ event.location }}{% endif %}</p>
                     </div>
                 </a>
             </div>
             {% endfor %}
         </div>
         {% endif %}
-        <p class="gk-foot mb-0"><a href="{% url 'public_article_list' %}?type=guelekan">Retrouver les comptes rendus des séminaires <i class="fas fa-arrow-right ms-1"></i></a></p>
+        <p class="gk-foot mb-0"><a href="{% url 'public_article_list' %}?type=guelekan">{% translate "Retrouver les comptes rendus des séminaires" %} <i class="fas fa-arrow-right ms-1"></i></a></p>
     </section>
     {% endif %}
 
     {% if current_type != 'seminaire' %}
     <!-- Événements à venir -->
     <section class="mb-5">
-        <h2 class="ev-title">{% if gelekan_upcoming or gelekan_past %}Autres événements à venir{% else %}Événements à venir{% endif %} <small>{{ upcoming_events|length }}</small></h2>
+        <h2 class="ev-title">{% if gelekan_upcoming or gelekan_past %}{% translate "Autres événements à venir" %}{% else %}{% translate "Événements à venir" %}{% endif %} <small>{{ upcoming_events|length }}</small></h2>
         {% if upcoming_events %}
         <div class="row g-4">
             {% for event in upcoming_events %}
@@ -132,18 +133,18 @@
                         <div class="ev-date"><strong>{{ event.date|date:"j" }}</strong><span>{{ event.date|date:"M" }}</span></div>
                         <div class="ev-info">
                             <span class="ev-type">{{ event.get_event_type_display }}</span>
-                            <h3><a href="{% url 'public_event_detail' event.pk %}">{{ event.title }}</a></h3>
+                            <h3><a href="{% url 'public_event_detail' event.pk %}">{{ event.t.title }}</a></h3>
                             <p class="ev-meta">
                                 <span><i class="far fa-clock"></i>{{ event.date|time:"H:i" }}</span>
-                                {% if event.is_webinar %}<span><i class="fas fa-video"></i>En ligne</span>{% endif %}
+                                {% if event.is_webinar %}<span><i class="fas fa-video"></i>{% translate "En ligne" %}</span>{% endif %}
                                 {% if event.location %}<span><i class="fas fa-location-dot"></i>{{ event.location }}</span>
-                                {% elif not event.is_webinar %}<span><i class="fas fa-location-dot"></i>Lieu à confirmer</span>{% endif %}
+                                {% elif not event.is_webinar %}<span><i class="fas fa-location-dot"></i>{% translate "Lieu à confirmer" %}</span>{% endif %}
                             </p>
-                            <p class="ev-excerpt">{{ event.content|plain_text|truncatewords:22 }}</p>
+                            <p class="ev-excerpt">{{ event.t.content|plain_text|truncatewords:22 }}</p>
                         </div>
                     </div>
                     <div class="ev-foot">
-                        <a href="{% url 'public_event_detail' event.pk %}" class="btn btn-primary w-100">Plus d'informations <i class="fas fa-arrow-right"></i></a>
+                        <a href="{% url 'public_event_detail' event.pk %}" class="btn btn-primary w-100">{% translate "Plus d'informations" %} <i class="fas fa-arrow-right"></i></a>
                     </div>
                 </article>
             </div>
@@ -152,15 +153,15 @@
         {% else %}
         <div class="ev-empty">
             <i class="fas fa-calendar-plus"></i>
-            <h3 class="h5">Aucun événement à venir{% if current_type %} dans cette catégorie{% endif %}</h3>
-            <p class="mb-0">Revenez bientôt, ou consultez les événements passés ci-dessous.</p>
+            <h3 class="h5">{% if current_type %}{% translate "Aucun événement à venir dans cette catégorie" %}{% else %}{% translate "Aucun événement à venir" %}{% endif %}</h3>
+            <p class="mb-0">{% translate "Revenez bientôt, ou consultez les événements passés ci-dessous." %}</p>
         </div>
         {% endif %}
     </section>
 
     <!-- Événements passés -->
     <section class="mb-5">
-        <h2 class="ev-title">{% if gelekan_upcoming or gelekan_past %}Autres événements passés{% else %}Événements passés{% endif %} <small>{{ past_events.paginator.count }}</small></h2>
+        <h2 class="ev-title">{% if gelekan_upcoming or gelekan_past %}{% translate "Autres événements passés" %}{% else %}{% translate "Événements passés" %}{% endif %} <small>{{ past_events.paginator.count }}</small></h2>
         {% if past_events %}
         <div class="row g-3">
             {% for event in past_events %}
@@ -168,8 +169,8 @@
                 <a class="ev-past" href="{% url 'public_event_detail' event.pk %}">
                     <div class="ev-date"><strong>{{ event.date|date:"j" }}</strong><span>{{ event.date|date:"M Y" }}</span></div>
                     <div>
-                        <h3>{{ event.title }}</h3>
-                        <p>{{ event.get_event_type_display }}{% if event.is_webinar %} · En ligne{% elif event.location %} · {{ event.location }}{% endif %}</p>
+                        <h3>{{ event.t.title }}</h3>
+                        <p>{{ event.get_event_type_display }}{% if event.is_webinar %} · {% translate "En ligne" %}{% elif event.location %} · {{ event.location }}{% endif %}</p>
                     </div>
                 </a>
             </div>
@@ -177,16 +178,16 @@
         </div>
 
         {% if past_events.has_other_pages %}
-        <nav class="mt-4" aria-label="Pagination des événements passés">
+        <nav class="mt-4" aria-label="{% translate 'Pagination des événements passés' %}">
             <ul class="pagination justify-content-center flex-wrap">
-                {% if past_events.has_previous %}<li class="page-item"><a class="page-link" href="?{% if current_type %}type={{ current_type }}&{% endif %}page={{ past_events.previous_page_number }}">Précédent</a></li>{% endif %}
-                <li class="page-item disabled"><span class="page-link">Page {{ past_events.number }} sur {{ past_events.paginator.num_pages }}</span></li>
-                {% if past_events.has_next %}<li class="page-item"><a class="page-link" href="?{% if current_type %}type={{ current_type }}&{% endif %}page={{ past_events.next_page_number }}">Suivant</a></li>{% endif %}
+                {% if past_events.has_previous %}<li class="page-item"><a class="page-link" href="?{% if current_type %}type={{ current_type }}&{% endif %}page={{ past_events.previous_page_number }}">{% translate "Précédent" %}</a></li>{% endif %}
+                <li class="page-item disabled"><span class="page-link">{% blocktranslate with number=past_events.number total=past_events.paginator.num_pages %}Page {{ number }} sur {{ total }}{% endblocktranslate %}</span></li>
+                {% if past_events.has_next %}<li class="page-item"><a class="page-link" href="?{% if current_type %}type={{ current_type }}&{% endif %}page={{ past_events.next_page_number }}">{% translate "Suivant" %}</a></li>{% endif %}
             </ul>
         </nav>
         {% endif %}
         {% else %}
-        <div class="ev-empty"><i class="fas fa-clock-rotate-left"></i><p class="mb-0">Aucun événement passé à afficher pour le moment.</p></div>
+        <div class="ev-empty"><i class="fas fa-clock-rotate-left"></i><p class="mb-0">{% translate "Aucun événement passé à afficher pour le moment." %}</p></div>
         {% endif %}
     </section>
     {% endif %}

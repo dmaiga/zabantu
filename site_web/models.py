@@ -26,6 +26,8 @@ class NewsletterSubscriber(models.Model):
     subscribed_at = models.DateTimeField(_('date d\'inscription'), auto_now_add=True)
     is_active = models.BooleanField(_('actif'), default=True)
     token = models.UUIDField(_('token de désinscription'), default=uuid.uuid4, editable=False, unique=True)
+    # Langue de la page d'inscription : les annonces sont envoyées dans cette langue
+    language = models.CharField('langue', max_length=5, choices=settings.LANGUAGES, default='fr')
 
     def __str__(self):
         return self.email
@@ -145,6 +147,8 @@ class ContactMessage(models.Model):
     # Ajoutez ces champs si vous voulez suivre l'IP et le user agent
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.TextField(blank=True)
+    # Langue du site au moment de l'envoi : la réponse par e-mail est mise en page dans cette langue
+    language = models.CharField("Langue", max_length=5, choices=settings.LANGUAGES, default='fr', editable=False)
     
     class Meta:
         ordering = ['-created_at']
@@ -208,54 +212,56 @@ class MembershipApplication(models.Model):
         REVOKED = 'revoked', 'Révoquée'
 
     class AcademicStatus(models.TextChoices):
-        BACHELOR = 'licence', 'Étudiant(e) en licence'
-        MASTER = 'master', 'Étudiant(e) en master'
-        PHD = 'doctorant', 'Doctorant(e)'
-        TEACHER_RESEARCHER = 'enseignant_chercheur', 'Enseignant(e)-chercheur(e)'
-        RESEARCHER = 'chercheur', 'Chercheur(e)'
-        PROFESSIONAL = 'professionnel', 'Professionnel(le)'
-        OTHER = 'autre', 'Autre'
+        BACHELOR = 'licence', _('Étudiant(e) en licence')
+        MASTER = 'master', _('Étudiant(e) en master')
+        PHD = 'doctorant', _('Doctorant(e)')
+        TEACHER_RESEARCHER = 'enseignant_chercheur', _('Enseignant(e)-chercheur(e)')
+        RESEARCHER = 'chercheur', _('Chercheur(e)')
+        PROFESSIONAL = 'professionnel', _('Professionnel(le)')
+        OTHER = 'autre', _('Autre')
 
     class HowHeard(models.TextChoices):
-        COLLEAGUE = 'collegue', 'Un(e) collègue ou un(e) ami(e)'
-        SOCIAL = 'reseaux_sociaux', 'Les réseaux sociaux'
-        WEBSITE = 'site_web', 'Le site web de Zabantu'
-        EVENT = 'evenement', 'Un événement ou un séminaire (Gɛlɛkan)'
-        PUBLICATION = 'publication', 'Une publication de Zabantu'
-        NEWSLETTER = 'newsletter', 'La newsletter'
-        OTHER = 'autre', 'Autre'
+        COLLEAGUE = 'collegue', _('Un(e) collègue ou un(e) ami(e)')
+        SOCIAL = 'reseaux_sociaux', _('Les réseaux sociaux')
+        WEBSITE = 'site_web', _('Le site web de Zabantu')
+        EVENT = 'evenement', _('Un événement ou un séminaire (Gɛlɛkan)')
+        PUBLICATION = 'publication', _('Une publication de Zabantu')
+        NEWSLETTER = 'newsletter', _('La newsletter')
+        OTHER = 'autre', _('Autre')
 
     # 1. Informations personnelles
-    full_name = models.CharField("Nom et prénom(s)", max_length=255)
-    email = models.EmailField("Adresse e-mail")
-    phone = models.CharField("Téléphone (WhatsApp, si disponible)", max_length=30, blank=True)
-    city_country = models.CharField("Ville et pays de résidence", max_length=255)
+    full_name = models.CharField(_("Nom et prénom(s)"), max_length=255)
+    email = models.EmailField(_("Adresse e-mail"))
+    phone = models.CharField(_("Téléphone (WhatsApp, si disponible)"), max_length=30, blank=True)
+    city_country = models.CharField(_("Ville et pays de résidence"), max_length=255)
 
     # 2. Profil académique ou professionnel
-    academic_status = models.CharField("Statut", max_length=30, choices=AcademicStatus.choices)
-    institution = models.CharField("Institution d'affiliation", max_length=255)
+    academic_status = models.CharField(_("Statut"), max_length=30, choices=AcademicStatus.choices)
+    institution = models.CharField(_("Institution d'affiliation"), max_length=255)
 
     # 3. Centres d'intérêt scientifiques
-    research_interests = models.TextField("Principaux centres de recherche")
+    research_interests = models.TextField(_("Principaux centres de recherche"))
 
     # 4. Adhésion au groupe
-    how_heard_choices = models.JSONField("Comment avez-vous entendu parler de Zabantu ?", default=list)
-    how_heard = models.TextField("Autre (précisez)", blank=True)
-    contribution = models.TextField("Contribution aux activités de Zabantu")
-    career_benefit = models.TextField("Apport de l'adhésion pour votre carrière")
+    how_heard_choices = models.JSONField(_("Comment avez-vous entendu parler de Zabantu ?"), default=list)
+    how_heard = models.TextField(_("Autre (précisez)"), blank=True)
+    contribution = models.TextField(_("Contribution aux activités de Zabantu"))
+    career_benefit = models.TextField(_("Apport de l'adhésion pour votre carrière"))
 
     # Profil public (facultatif) : recopié sur le compte membre à la validation
-    profile_picture = models.ImageField("Photo de profil", upload_to='membership/photos/', blank=True, validators=[validate_image])
-    bio = models.TextField("Courte biographie", blank=True)
-    social_linkedin = models.URLField("LinkedIn", blank=True)
-    social_facebook = models.URLField("Facebook", blank=True)
-    social_twitter = models.URLField("Twitter / X", blank=True)
-    social_instagram = models.URLField("Instagram", blank=True)
-    scholar_link = models.URLField("Google Scholar", blank=True)
-    personal_website = models.URLField("Site web personnel", blank=True)
+    profile_picture = models.ImageField(_("Photo de profil"), upload_to='membership/photos/', blank=True, validators=[validate_image])
+    bio = models.TextField(_("Courte biographie"), blank=True)
+    social_linkedin = models.URLField(_("LinkedIn"), blank=True)
+    social_facebook = models.URLField(_("Facebook"), blank=True)
+    social_twitter = models.URLField(_("Twitter / X"), blank=True)
+    social_instagram = models.URLField(_("Instagram"), blank=True)
+    scholar_link = models.URLField(_("Google Scholar"), blank=True)
+    personal_website = models.URLField(_("Site web personnel"), blank=True)
 
     # 5. Consentement
-    consent = models.BooleanField("Consentement au traitement de la demande", default=False)
+    consent = models.BooleanField(_("Consentement au traitement de la demande"), default=False)
+    # Langue du formulaire rempli : les e-mails envoyés au candidat sont dans cette langue
+    language = models.CharField(_("Langue"), max_length=5, choices=settings.LANGUAGES, default='fr', editable=False)
 
     # Suivi back-office
     status = models.CharField("Statut de la demande", max_length=10, choices=Status.choices,

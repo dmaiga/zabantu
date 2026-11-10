@@ -2,26 +2,13 @@
 {% load photo_tags %}
 {% load clean_tags %}
 {% load cache %}
+{% load i18n %}
 
-{% block title %}
-    {% if current_filter %}
-        {{ current_filter|title }} - Zabantu
-    {% else %}
-        Publications - Zabantu
-    {% endif %}
-{% endblock %}
+{% block title %}{% if current_label %}{{ current_label }}{% else %}{% translate "Publications" %}{% endif %} - Zabantu{% endblock %}
 
-{% block banner_title %}
-    {% if current_filter %}
-        {{ current_filter|title }}
-    {% else %}
-        Toutes nos publications
-    {% endif %}
-{% endblock %}
+{% block banner_title %}{% if current_label %}{{ current_label }}{% else %}{% translate "Toutes nos publications" %}{% endif %}{% endblock %}
 
-{% block banner_subtitle %}
-    Découvrez les travaux du Groupe de recherche Zabantu
-{% endblock %}
+{% block banner_subtitle %}{% translate "Découvrez les travaux du Groupe de recherche Zabantu" %}{% endblock %}
 
 {% block content %}
 <style>
@@ -283,25 +270,25 @@
     }
 </style>
 {# Résultats en cache, selon l'adresse (filtres, recherche, tri, page) ; voir site_web/content_cache.py #}
-{% cache PAGE_CACHE_TIMEOUT publication_list content_version request.get_full_path %}
+{% cache PAGE_CACHE_TIMEOUT publication_list content_version LANGUAGE_CODE request.get_full_path %}
 
 <div class="container">
     <div class="publication-container">
         <!-- Sidebar des filtres -->
         <div class="filter-sidebar">
-            <h3 class="filter-title">Catégories</h3>
+            <h3 class="filter-title">{% translate "Catégories" %}</h3>
             <ul class="filter-list">
                 <li class="filter-item">
                     <a href="{% url 'public_article_list' %}" 
                        class="filter-link {% if not current_filter %}active{% endif %}">
-                        Toutes les publications
+                        {% translate "Toutes les publications" %}
                         <span class="badge-count">{{ total_count }}</span>
                     </a>
                 </li>
                 <li class="filter-item">
                     <a href="{% url 'public_article_list' %}?type=guelekan" 
                        class="filter-link {% if current_filter == 'guelekan' %}active{% endif %}">
-                        Séminaire Gɛlɛkan
+                        {% translate "Séminaire Gɛlɛkan" %}
                         <span class="badge-count">{{ guelekan_count }}</span>
                     </a>
                 </li>
@@ -322,10 +309,10 @@
         <div class="articles-list">
             <form method="get" action="{% url 'public_article_list' %}" class="publication-search" role="search">
                 {% if current_filter %}<input type="hidden" name="type" value="{{ current_filter }}">{% endif %}
-                <label for="publication-search-input" class="visually-hidden">Rechercher une publication</label>
+                <label for="publication-search-input" class="visually-hidden">{% translate "Rechercher une publication" %}</label>
                 <input id="publication-search-input" type="search" name="q" value="{{ search_query|default:'' }}"
-                       class="form-control" placeholder="Rechercher une publication (titre, résumé, mot-clé)…">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i><span class="visually-hidden">Rechercher</span></button>
+                       class="form-control" placeholder="{% translate 'Rechercher une publication (titre, résumé, mot-clé)…' %}">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i><span class="visually-hidden">{% translate "Rechercher" %}</span></button>
             </form>
             {% if current_filter == 'guelekan' %}
                 {% for g in guelekans %}
@@ -335,24 +322,24 @@
                     </a>
                     <div class="pub-body">
                         <div class="pub-meta-top">
-                            <span class="badge-type badge-type-zabantu">Séminaire Gɛlɛkan</span>
+                            <span class="badge-type badge-type-zabantu">{% translate "Séminaire Gɛlɛkan" %}</span>
                             <time class="pub-date" datetime="{{ g.publish_at|default:g.created_at|date:'Y-m-d' }}">{{ g.publish_at|default:g.created_at|date:"j F Y" }}</time>
                         </div>
-                        <h3 class="pub-title"><a href="{% url 'public_guelekan_detail' g.slug %}">{{ g.title|plain_text }}</a></h3>
+                        <h3 class="pub-title"><a href="{% url 'public_guelekan_detail' g.slug %}">{{ g.t.title|plain_text }}</a></h3>
                         {% with intervenants=g.intervenants.all %}{% if intervenants %}
                         <p class="pub-authors"><i class="fas fa-users"></i>{% for i in intervenants %}{{ i.full_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
                         {% endif %}{% endwith %}
-                        <p class="pub-excerpt">{% if g.subtitle %}{{ g.subtitle|truncatewords:40 }}{% else %}{{ g.content|default_if_none:""|plain_text|truncatewords:40 }}{% endif %}</p>
+                        <p class="pub-excerpt">{% if g.subtitle %}{{ g.t.subtitle|truncatewords:40 }}{% else %}{{ g.t.content|default_if_none:""|plain_text|truncatewords:40 }}{% endif %}</p>
                         <div class="pub-actions">
-                            <a href="{% url 'public_guelekan_detail' g.slug %}" class="btn btn-primary btn-sm">Voir le compte-rendu</a>
+                            <a href="{% url 'public_guelekan_detail' g.slug %}" class="btn btn-primary btn-sm">{% translate "Voir le compte-rendu" %}</a>
                             {% if g.pdf_file %}<a href="{{ g.pdf_file.url }}" class="btn btn-outline-primary btn-sm" target="_blank" rel="noopener noreferrer"><i class="fas fa-file-pdf"></i> PDF</a>{% endif %}
                         </div>
                     </div>
                 </article>
                 {% empty %}
                 <div class="empty-state">
-                    <h3 class="empty-state-title">Aucun séminaire trouvé</h3>
-                    <p class="empty-state-text">Aucun séminaire Gɛlɛkan ne correspond à votre recherche.</p>
+                    <h3 class="empty-state-title">{% translate "Aucun séminaire trouvé" %}</h3>
+                    <p class="empty-state-text">{% translate "Aucun séminaire Gɛlɛkan ne correspond à votre recherche." %}</p>
                 </div>
                 {% endfor %}
             {% elif articles %}
@@ -372,14 +359,14 @@
                         <div class="pub-meta-top">
                             {% if article.article_type == 'academic' %}<span class="badge-type badge-type-academic">{{ article.type_label }}</span>
                             {% elif article.article_type == 'zabantu' %}<span class="badge-type badge-type-zabantu">Zabantu</span>
-                            {% elif article.article_type == 'independent' %}<span class="badge-type badge-type-independent">Indépendant</span>
+                            {% elif article.article_type == 'independent' %}<span class="badge-type badge-type-independent">{% translate "Indépendant" %}</span>
                             {% else %}<span class="badge-type">{{ article.type_label }}</span>{% endif %}
                             {% if article.category %}<span class="pub-category">{{ article.get_category_display }}</span>{% endif %}
                             <time class="pub-date" datetime="{{ article.publish_at|default:article.created_at|date:'Y-m-d' }}">{{ article.publish_at|default:article.created_at|date:"j F Y" }}</time>
                         </div>
 
                         <h3 class="pub-title">
-                            <a href="{% url 'public_article_detail' article.slug %}">{{ article.title|plain_text }}</a>
+                            <a href="{% url 'public_article_detail' article.slug %}">{{ article.t.title|plain_text }}</a>
                         </h3>
 
                         {% if article.article_type == 'independent' and article.external_author %}
@@ -397,16 +384,16 @@
                         {% endif %}
 
                         <p class="pub-excerpt">
-                            {% if article.article_type == 'academic' and article.abstract %}{{ article.abstract|plain_text|truncatewords:40 }}
-                            {% elif article.resume %}{{ article.resume|plain_text|truncatewords:40 }}
-                            {% else %}{{ article.content|default_if_none:""|plain_text|truncatewords:40 }}{% endif %}
+                            {% if article.article_type == 'academic' and article.abstract %}{{ article.t.abstract|plain_text|truncatewords:40 }}
+                            {% elif article.resume %}{{ article.t.resume|plain_text|truncatewords:40 }}
+                            {% else %}{{ article.t.content|default_if_none:""|plain_text|truncatewords:40 }}{% endif %}
                         </p>
 
                         <div class="pub-actions">
-                            <a href="{% url 'public_article_detail' article.slug %}" class="btn btn-primary btn-sm">Lire la suite</a>
+                            <a href="{% url 'public_article_detail' article.slug %}" class="btn btn-primary btn-sm">{% translate "Lire la suite" %}</a>
                             {% if article.article_type == 'academic' and article.external_link_academique %}
                             <a href="{{ article.external_link_academique }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">
-                                <i class="fas fa-arrow-up-right-from-square"></i> Article source
+                                <i class="fas fa-arrow-up-right-from-square"></i> {% translate "Article source" %}
                             </a>
                             {% endif %}
                         </div>
@@ -416,25 +403,25 @@
             {% else %}
                 <div class="empty-state">
                     <div class="empty-state-icon">📭</div>
-                    <h3 class="empty-state-title">Aucun article trouvé</h3>
+                    <h3 class="empty-state-title">{% translate "Aucun article trouvé" %}</h3>
                     <p class="empty-state-text">
                         {% if search_query %}
-                            Aucun résultat pour "{{ search_query }}". Essayez avec d'autres termes.
+                            {% blocktranslate trimmed %}Aucun résultat pour « {{ search_query }} ». Essayez avec d'autres termes.{% endblocktranslate %}
                         {% else %}
-                            Aucune publication disponible dans cette catégorie pour le moment.
+                            {% translate "Aucune publication disponible dans cette catégorie pour le moment." %}
                         {% endif %}
                     </p>
                     <a href="{% url 'public_article_list' %}" class="btn btn-primary">
-                        Voir toutes les publications
+                        {% translate "Voir toutes les publications" %}
                     </a>
                 </div>
             {% endif %}
             {% if page_obj.has_other_pages %}
-            <nav aria-label="Pagination des publications" class="mt-4">
+            <nav aria-label="{% translate 'Pagination des publications' %}" class="mt-4">
                 <ul class="pagination justify-content-center flex-wrap">
-                    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?{% if current_filter %}type={{ current_filter }}&{% endif %}{% if search_query %}q={{ search_query|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">Précédent</a></li>{% endif %}
-                    <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span></li>
-                    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?{% if current_filter %}type={{ current_filter }}&{% endif %}{% if search_query %}q={{ search_query|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Suivant</a></li>{% endif %}
+                    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?{% if current_filter %}type={{ current_filter }}&{% endif %}{% if search_query %}q={{ search_query|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">{% translate "Précédent" %}</a></li>{% endif %}
+                    <li class="page-item disabled"><span class="page-link">{% blocktranslate with number=page_obj.number total=page_obj.paginator.num_pages %}Page {{ number }} sur {{ total }}{% endblocktranslate %}</span></li>
+                    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?{% if current_filter %}type={{ current_filter }}&{% endif %}{% if search_query %}q={{ search_query|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">{% translate "Suivant" %}</a></li>{% endif %}
                 </ul>
             </nav>
             {% endif %}

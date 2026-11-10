@@ -38,6 +38,7 @@
                 <p><strong>Tel:</strong> {{ message.phone }}</p>
                 <p><strong>Email:</strong> <a href="mailto:{{ message.email }}">{{ message.email }}</a></p>
                 <p><strong>Date:</strong> {{ message.created_at|date:"d/m/Y H:i" }}</p>
+                {% if message.language == 'en' %}<p><span class="badge bg-info text-dark"><i class="fas fa-language me-1"></i>Envoyé depuis le site en anglais</span> <small class="text-muted">Répondez de préférence en anglais : l'e-mail de réponse sera mis en page en anglais.</small></p>{% endif %}
             </div>
             <div class="col-md-6">
                 <h6>Sujet</h6>

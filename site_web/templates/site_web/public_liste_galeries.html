@@ -1,10 +1,10 @@
 {% extends 'base_public.html' %}
 {% load photo_tags %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Galerie photos - Zabantu{% endblock %}
-{% block banner_title %}Galerie photos{% endblock %}
-{% block banner_subtitle %}Les moments forts du groupe Zabantu{% endblock %}
+{% block title %}{% translate "Galerie photos" %} - Zabantu{% endblock %}
+{% block banner_title %}{% translate "Galerie photos" %}{% endblock %}
+{% block banner_subtitle %}{% translate "Les moments forts du groupe Zabantu" %}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -24,8 +24,8 @@
 {% block content %}
 <div class="container">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-        <p class="mb-0 text-muted">{{ galeries.paginator.count }} galerie{{ galeries.paginator.count|pluralize }} · {{ photos_total }} photo{{ photos_total|pluralize }}</p>
-        <a href="{% url 'toutes_photos' %}" class="btn btn-outline-primary"><i class="fas fa-images me-2"></i>Voir toutes les photos</a>
+        <p class="mb-0 text-muted">{% blocktranslate count n=galeries.paginator.count %}{{ n }} galerie{% plural %}{{ n }} galeries{% endblocktranslate %} · {% blocktranslate count n=photos_total %}{{ n }} photo{% plural %}{{ n }} photos{% endblocktranslate %}</p>
+        <a href="{% url 'toutes_photos' %}" class="btn btn-outline-primary"><i class="fas fa-images me-2"></i>{% translate "Voir toutes les photos" %}</a>
     </div>
 
     <div class="row g-4">
@@ -39,10 +39,10 @@
                     <span class="gal-count"><i class="fas fa-camera me-1"></i>{{ g.n_photos }}</span>
                 </div>
                 <div class="gal-body">
-                    {% if g.is_featured %}<span class="gal-featured">À la une</span>{% endif %}
-                    <h2>{{ g.title }}</h2>
+                    {% if g.is_featured %}<span class="gal-featured">{% translate "À la une" %}</span>{% endif %}
+                    <h2>{{ g.t.title }}</h2>
                     <div class="gal-date">{{ g.created_at|date:"j F Y" }}</div>
-                    {% if g.description %}<p class="gal-desc">{{ g.description }}</p>{% endif %}
+                    {% if g.description %}<p class="gal-desc">{{ g.t.description }}</p>{% endif %}
                 </div>
             </a>
         </div>
@@ -50,18 +50,18 @@
         <div class="col-12">
             <div class="text-center py-5 text-muted">
                 <i class="fas fa-images fa-3x mb-3"></i>
-                <p class="mb-0">Aucune galerie disponible pour le moment.</p>
+                <p class="mb-0">{% translate "Aucune galerie disponible pour le moment." %}</p>
             </div>
         </div>
         {% endfor %}
     </div>
 
     {% if galeries.has_other_pages %}
-    <nav class="mt-4" aria-label="Pagination des galeries">
+    <nav class="mt-4" aria-label="{% translate 'Pagination des galeries' %}">
         <ul class="pagination justify-content-center flex-wrap">
-            {% if galeries.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ galeries.previous_page_number }}">Précédent</a></li>{% endif %}
-            <li class="page-item disabled"><span class="page-link">Page {{ galeries.number }} sur {{ galeries.paginator.num_pages }}</span></li>
-            {% if galeries.has_next %}<li class="page-item"><a class="page-link" href="?page={{ galeries.next_page_number }}">Suivant</a></li>{% endif %}
+            {% if galeries.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ galeries.previous_page_number }}">{% translate "Précédent" %}</a></li>{% endif %}
+            <li class="page-item disabled"><span class="page-link">{% blocktranslate with number=galeries.number total=galeries.paginator.num_pages %}Page {{ number }} sur {{ total }}{% endblocktranslate %}</span></li>
+            {% if galeries.has_next %}<li class="page-item"><a class="page-link" href="?page={{ galeries.next_page_number }}">{% translate "Suivant" %}</a></li>{% endif %}
         </ul>
     </nav>
     {% endif %}

@@ -88,6 +88,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # sert les fichiers statiques (comme en production)
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'zabantu.i18n.PathLanguageMiddleware',  # langue selon l'adresse : /en/… en anglais, le reste en français
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -105,6 +106,7 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
+                'django.template.context_processors.i18n',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'zabantu.context_processors.global_settings',
@@ -161,6 +163,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
 LANGUAGE_CODE = 'fr'
+# Site public bilingue : français aux adresses actuelles, anglais sous /en/ (voir zabantu/i18n.py).
+# Les traductions compilées (.mo) sont versionnées : msgfmt n'est pas installé sur le serveur.
+LANGUAGES = [('fr', 'Français'), ('en', 'English')]
+LOCALE_PATHS = [BASE_DIR / 'locale']
 
 TIME_ZONE = 'UTC'
 

@@ -1,5 +1,4 @@
 from django.urls import path
-from django.views.generic import TemplateView
 from .views import (
     HomeView, 
     public_article_list, 
@@ -18,6 +17,7 @@ from .views import (
     toutes_photos,
     contact,
     donate,
+    legal_page,
     membership_apply,
     membership_thanks,
     newsletter_subscribe,
@@ -45,9 +45,9 @@ urlpatterns = [
     
     path('contact/', contact, name='contact'),
     path('soutenir/', donate, name='donate'),
-    path('mentions-legales/', TemplateView.as_view(template_name='site_web/legal/legal_notice.html', extra_context={'legal_page': 'notice'}), name='legal_notice'),
-    path('confidentialite/', TemplateView.as_view(template_name='site_web/legal/privacy.html', extra_context={'legal_page': 'privacy'}), name='privacy'),
-    path('cookies/', TemplateView.as_view(template_name='site_web/legal/cookies.html', extra_context={'legal_page': 'cookies'}), name='cookies'),
+    path('mentions-legales/', legal_page, {'page': 'notice'}, name='legal_notice'),
+    path('confidentialite/', legal_page, {'page': 'privacy'}, name='privacy'),
+    path('cookies/', legal_page, {'page': 'cookies'}, name='cookies'),
     path('adhesion/', membership_apply, name='membership_apply'),
     path('adhesion/merci/', membership_thanks, name='membership_thanks'),
     

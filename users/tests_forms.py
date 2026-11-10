@@ -140,8 +140,9 @@ class WizardMarkupTests(TestCase):
     def test_multi_section_form_gets_a_stepper_with_one_entry_per_section(self):
         r = self.client.get(reverse('event_create'))
         self.assertContains(r, 'data-wizard="on"')
-        self.assertContains(r, 'data-goto=', count=3)
-        self.assertContains(r, 'class="card mb-4 wizard-step"', count=3)
+        self.assertContains(r, 'data-goto=', count=4)                 # 3 sections + la version anglaise
+        self.assertContains(r, 'class="card mb-4 wizard-step"', count=4)
+        self.assertContains(r, 'Version anglaise (facultatif)')
 
     def test_without_javascript_every_section_is_in_the_page(self):
         r = self.client.get(reverse('guelekan_create'))
@@ -227,7 +228,7 @@ class RemainingScreensTests(TestCase):
 
     def test_intervenant_form_uses_the_wizard_and_creates(self):
         r = self.client.get(reverse('intervenant_create'))
-        self.assertContains(r, 'data-goto=', count=4)
+        self.assertContains(r, 'data-goto=', count=5)                 # 4 sections + la version anglaise
         r = self.client.post(reverse('intervenant_create'), {
             'first_name': 'Aminata', 'last_name': 'Cissé', 'email': 'a@t.org', 'organization': 'U',
             'bio': 'bio', 'intervenant_type': 'expert', 'is_available': 'on'})
@@ -262,7 +263,7 @@ class RemainingScreensTests(TestCase):
 
     def test_profile_edit_uses_the_common_form(self):
         r = self.client.get(reverse('profile_edit'))
-        self.assertContains(r, 'data-goto=', count=4)
+        self.assertContains(r, 'data-goto=', count=5)                 # 4 sections + la version anglaise
         self.assertContains(r, 'Champ obligatoire')
 
 

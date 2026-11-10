@@ -1,7 +1,8 @@
 """Fichiers à la racine du site : /sitemap.xml et /robots.txt."""
+from django.conf import settings
 from django.http import HttpResponse
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import timezone, translation
 from django.utils.xmlutils import SimplerXMLGenerator
 from django.views.decorators.http import require_GET
 
@@ -16,14 +17,25 @@ PRIVATE_PATHS = ('/admin/', '/auth/', '/users/', '/articles/', '/events/', '/gal
 
 
 def _entries():
-    """(adresse, dernière modification) des contenus publiés à partir de SEO_START_DATE."""
+    """(contenu, nom d'URL, arguments) des contenus publiés à partir de SEO_START_DATE."""
     start, now = seo.start_datetime(), timezone.now()
     for article in Article.objects.filter(status='published', publish_at__gte=start, publish_at__lte=now):
-        yield reverse('public_article_detail', args=[article.slug]), article.updated_at
+        yield article, 'public_article_detail', [article.slug]
     for g in Guelekan.objects.filter(status='published', publish_at__gte=start, publish_at__lte=now):
-        yield reverse('public_guelekan_detail', args=[g.slug]), g.updated_at
+        yield g, 'public_guelekan_detail', [g.slug]
     for event in Event.objects.filter(status='published', created_at__gte=start):
-        yield reverse('public_event_detail', args=[event.pk]), event.updated_at
+        yield event, 'public_event_detail', [event.pk]
+
+
+def _addresses(obj, name, args):
+    """{langue: adresse complète} de la page dans chaque langue où elle est traduite (le français toujours) :
+    une page anglaise dont le contenu principal reste en français n'est pas annoncée (voir page_translation_context)."""
+    addresses = {}
+    for code, _name in settings.LANGUAGES:
+        if code == settings.LANGUAGE_CODE or obj.is_translated(code):
+            with translation.override(code):
+                addresses[code] = seo.origin() + reverse(name, args=args)
+    return addresses
 
 
 @require_GET
@@ -31,12 +43,21 @@ def sitemap(request):
     response = HttpResponse(content_type='application/xml; charset=utf-8')
     xml = SimplerXMLGenerator(response, 'utf-8')
     xml.startDocument()
-    xml.startElement('urlset', {'xmlns': 'http://www.sitemaps.org/schemas/sitemap/0.9'})
-    for path, modified in _entries():
-        xml.startElement('url', {})
-        xml.addQuickElement('loc', seo.origin() + path)
-        xml.addQuickElement('lastmod', modified.date().isoformat())
-        xml.endElement('url')
+    xml.startElement('urlset', {'xmlns': 'http://www.sitemaps.org/schemas/sitemap/0.9',
+                                'xmlns:xhtml': 'http://www.w3.org/1999/xhtml'})
+    # Une entrée par langue, chacune annonçant toutes les versions (hreflang), comme les balises des pages
+    for obj, name, args in _entries():
+        addresses = _addresses(obj, name, args)
+        for address in addresses.values():
+            xml.startElement('url', {})
+            xml.addQuickElement('loc', address)
+            xml.addQuickElement('lastmod', obj.updated_at.date().isoformat())
+            if len(addresses) > 1:
+                for code, alternate in addresses.items():
+                    xml.addQuickElement('xhtml:link', attrs={'rel': 'alternate', 'hreflang': code, 'href': alternate})
+                xml.addQuickElement('xhtml:link', attrs={'rel': 'alternate', 'hreflang': 'x-default',
+                                                         'href': addresses[settings.LANGUAGE_CODE]})
+            xml.endElement('url')
     xml.endElement('urlset')
     xml.endDocument()
     return response

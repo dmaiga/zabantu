@@ -1,10 +1,11 @@
 {% extends 'base_public.html' %}
 {% load clean_tags %}
+{% load i18n %}
 
 {% block title %}{{ member.get_full_name }} - Zabantu{% endblock %}
 
 {% block banner_title %}{{ member.get_full_name }}{% endblock %}
-{% block banner_subtitle %}{{ member.job_title }}{% endblock %}
+{% block banner_subtitle %}{{ member.t.job_title|default_if_none:"" }}{% endblock %}
 
 {% block content %}
 <style>
@@ -132,7 +133,7 @@
                     <h4 class="mb-3">{{ member.get_full_name }}</h4>
                     
                     {% if member.job_title %}
-                    <p class="text-muted mb-4">{{ member.job_title }}</p>
+                    <p class="text-muted mb-4">{{ member.t.job_title }}</p>
                     {% endif %}
                     
                     <!-- Liens sociaux -->
@@ -168,7 +169,7 @@
                     <div class="member-meta">
                         {% if member.date_started %}
                         <p class="mb-2">
-                            <span class="meta-label">Membre depuis:</span>
+                            <span class="meta-label">{% translate "Membre depuis :" %}</span>
                             {{ member.date_started|date:"F Y" }}
                         </p>
                         {% endif %}
@@ -180,29 +181,29 @@
         <!-- Bio et détails -->
         <div class="col-lg-8">
             <div class="member-profile p-4 h-100">
-                <h4 class="mb-4">Présentation</h4>
+                <h4 class="mb-4">{% translate "Présentation" %}</h4>
                 
                 {% if member.bio %}
                 <div class="member-bio bio-container">
-                    <div class="link-break">
-                        {{ member.bio|clean_html|linebreaks }}
+                    <div class="link-break" lang="{{ member.t.lang_bio }}">
+                        {{ member.t.bio|clean_html|linebreaks }}
                     </div>
                 </div>
                 {% else %}
                 <div class="alert alert-info">
-                    Ce membre n'a pas encore rédigé de biographie.
+                    {% translate "Ce membre n'a pas encore rédigé de biographie." %}
                 </div>
                 {% endif %}
                 
                 <!-- Section Articles -->
                 {% if articles %}
                 <div class="article-list">
-                    <h4 class="mb-4">Publications</h4>
+                    <h4 class="mb-4">{% translate "Publications" %}</h4>
                     
                     <div class="list-group">
                         {% for article in articles %}
                         <div class="article-item">
-                            <a href="{% url 'public_article_detail' article.slug %}">{{ article.title }}</a>
+                            <a href="{% url 'public_article_detail' article.slug %}">{{ article.t.title }}</a>
                             <div class="article-meta mt-1">
                                 {{ article.get_public_category_display }} • 
                                 {{ article.publish_at|date:"F Y" }}
@@ -215,7 +216,7 @@
                 
                 <div class="mt-4">
                     <a href="{% url 'public_member_list' %}" class="btn btn-outline-primary">
-                        <i class="fas fa-arrow-left me-2"></i> Retour à la liste des membres
+                        <i class="fas fa-arrow-left me-2"></i> {% translate "Retour à la liste des membres" %}
                     </a>
                 </div>
             </div>

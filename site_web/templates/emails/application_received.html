@@ -1,9 +1,9 @@
-{% extends 'emails/base_email.html' %}
-{% block title %}Demande d'adhésion reçue{% endblock %}
-{% block heading %}Demande bien reçue{% endblock %}
+{% extends 'emails/base_email.html' %}{% load i18n %}
+{% block title %}{% translate "Demande d'adhésion reçue" %}{% endblock %}
+{% block heading %}{% translate "Demande bien reçue" %}{% endblock %}
 {% block body %}
-<p style="margin:0 0 16px;">Bonjour {{ name }},</p>
-<p style="margin:0 0 16px;">Nous avons bien reçu votre demande d'adhésion au groupe de recherche Zabantu. Merci de l'intérêt que vous portez à nos travaux.</p>
-<p style="margin:0 0 16px;">Notre équipe va examiner votre dossier et reviendra vers vous par e-mail. Il est inutile de renvoyer le formulaire.</p>
-<p style="margin:0;">À très bientôt,<br>L'équipe Zabantu</p>
+<p style="margin:0 0 16px;">{% blocktranslate %}Bonjour {{ name }},{% endblocktranslate %}</p>
+<p style="margin:0 0 16px;">{% translate "Nous avons bien reçu votre demande d'adhésion au groupe de recherche Zabantu. Merci de l'intérêt que vous portez à nos travaux." %}</p>
+<p style="margin:0 0 16px;">{% translate "Notre équipe va examiner votre dossier et reviendra vers vous par e-mail. Il est inutile de renvoyer le formulaire." %}</p>
+<p style="margin:0;">{% translate "À très bientôt," %}<br>{% translate "L'équipe Zabantu" %}</p>
 {% endblock %}

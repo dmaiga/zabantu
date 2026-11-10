@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html lang="fr">
+{% load i18n %}{% get_current_language as LANG %}<!DOCTYPE html>
+<html lang="{{ LANG }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,11 +23,11 @@
                 <td bgcolor="#2c3e2c" style="padding:22px 20px; text-align:center; font-size:14px; color:#f0f1c5;">
                     <a href="https://www.facebook.com/zabantu.ecs" style="color:#bbd8a3; text-decoration:none;">Facebook</a> |
                     <a href="https://www.linkedin.com/company/zabantu-ecs/about/" style="color:#bbd8a3; text-decoration:none;">LinkedIn</a>
-                    <p style="margin:12px 0;">&copy; {% now "Y" %} Zabantu. Tous droits réservés.</p>
+                    <p style="margin:12px 0;">&copy; {% now "Y" %} Zabantu. {% translate "Tous droits réservés." %}</p>
                     {% if unsubscribe_url %}
                     <p style="margin:0; color:#bbd8a3;">
-                        Vous recevez cet e-mail parce que vous êtes abonné à l'info-lettre de Zabantu.<br>
-                        <a href="{{ unsubscribe_url }}" style="color:#bbd8a3; text-decoration:underline;">Se désabonner</a>
+                        {% translate "Vous recevez cet e-mail parce que vous êtes abonné à l'info-lettre de Zabantu." %}<br>
+                        <a href="{{ unsubscribe_url }}" style="color:#bbd8a3; text-decoration:underline;">{% translate "Se désabonner" %}</a>
                     </p>
                     {% endif %}
                 </td>

@@ -1,9 +1,9 @@
 {% extends 'base_public.html' %}
 {% load antispam_tags %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Contact - Zabantu{% endblock %}
-{% block banner_title %}Contactez-nous{% endblock %}
+{% block title %}{% translate "Contact" %} - Zabantu{% endblock %}
+{% block banner_title %}{% translate "Contactez-nous" %}{% endblock %}
 {% block banner_subtitle %}Economy | Conflict | State{% endblock %}
 
 {% block extra_css %}
@@ -59,8 +59,8 @@
         <!-- Formulaire -->
         <div class="col-lg-7">
             <section class="contact-card" id="formulaire">
-                <h2>Envoyez-nous un message</h2>
-                <p class="contact-intro">Une question, une proposition de collaboration ? Écrivez-nous, nous vous répondrons.</p>
+                <h2>{% translate "Envoyez-nous un message" %}</h2>
+                <p class="contact-intro">{% translate "Une question, une proposition de collaboration ? Écrivez-nous, nous vous répondrons." %}</p>
 
                 {% for message in messages %}
                 <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>
@@ -87,7 +87,7 @@
                             {% for e in form.email.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
                         </div>
                         <div class="col-md-6">
-                            <label for="{{ form.phone.id_for_label }}" class="form-label">{{ form.phone.label }} <small class="text-muted fw-normal">(facultatif)</small></label>
+                            <label for="{{ form.phone.id_for_label }}" class="form-label">{{ form.phone.label }} <small class="text-muted fw-normal">{% translate "(facultatif)" %}</small></label>
                             {{ form.phone }}
                             {% for e in form.phone.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
                         </div>
@@ -102,8 +102,8 @@
                             {% for e in form.message.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
                         </div>
                         <div class="col-12">
-                            <p class="text-muted small">Ces informations servent uniquement à répondre à votre message. <a href="{% url 'privacy' %}">Politique de confidentialité</a></p>
-                            <button type="submit" class="btn-submit"><i class="fas fa-paper-plane me-2"></i>Envoyer le message</button>
+                            <p class="text-muted small">{% translate "Ces informations servent uniquement à répondre à votre message." %} <a href="{% url 'privacy' %}">{% translate "Politique de confidentialité" %}</a></p>
+                            <button type="submit" class="btn-submit"><i class="fas fa-paper-plane me-2"></i>{% translate "Envoyer le message" %}</button>
                         </div>
                     </div>
                 </form>
@@ -112,20 +112,20 @@
 
         <!-- Coordonnées en liste -->
         <div class="col-lg-5">
-            <aside class="contact-aside" aria-label="Coordonnées">
-                <h2>Nos coordonnées</h2>
+            <aside class="contact-aside" aria-label="{% translate 'Coordonnées' %}">
+                <h2>{% translate "Nos coordonnées" %}</h2>
                 <ul class="contact-list">
                     <li>
                         <span class="ico"><i class="fas fa-location-dot"></i></span>
                         <div>
-                            <div class="label">Adresse</div>
-                            <p class="value">Faculté des Sciences Économiques et de Gestion (FSEG), Campus universitaire de Badalabougou, Bamako</p>
+                            <div class="label">{% translate "Adresse" %}</div>
+                            <p class="value">{% translate "Faculté des Sciences Économiques et de Gestion (FSEG), Campus universitaire de Badalabougou, Bamako" %}</p>
                         </div>
                     </li>
                     <li>
                         <span class="ico"><i class="fas fa-phone"></i></span>
                         <div>
-                            <div class="label">Téléphone</div>
+                            <div class="label">{% translate "Téléphone" %}</div>
                             <p class="value"><a href="tel:+22377941470">+223 77 94 14 70</a></p>
                             <p class="value"><a href="tel:+22376634515">+223 76 63 45 15</a></p>
                         </div>
@@ -133,21 +133,21 @@
                     <li>
                         <span class="ico"><i class="fas fa-envelope"></i></span>
                         <div>
-                            <div class="label">E-mail</div>
+                            <div class="label">{% translate "E-mail" %}</div>
                             <p class="value"><a href="mailto:info@zabantu.net">info@zabantu.net</a></p>
                         </div>
                     </li>
                     <li>
                         <span class="ico"><i class="far fa-clock"></i></span>
                         <div>
-                            <div class="label">Horaires</div>
-                            <p class="value">Lundi - Vendredi : 8h - 17h</p>
+                            <div class="label">{% translate "Horaires" %}</div>
+                            <p class="value">{% translate "Lundi - Vendredi : 8h - 17h" %}</p>
                         </div>
                     </li>
                 </ul>
                 <div class="contact-social">
-                    <a href="https://www.linkedin.com/company/zabantu-ecs/posts/?feedView=all" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn de Zabantu"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="https://www.facebook.com/zabantu.ecs" target="_blank" rel="noopener noreferrer" aria-label="Facebook de Zabantu"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.linkedin.com/company/zabantu-ecs/posts/?feedView=all" target="_blank" rel="noopener noreferrer" aria-label="{% translate 'LinkedIn de Zabantu' %}"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://www.facebook.com/zabantu.ecs" target="_blank" rel="noopener noreferrer" aria-label="{% translate 'Facebook de Zabantu' %}"><i class="fab fa-facebook-f"></i></a>
                 </div>
             </aside>
         </div>
@@ -155,38 +155,38 @@
 
     <!-- Carte -->
     <section class="contact-block">
-        <h2>Nous trouver</h2>
+        <h2>{% translate "Nous trouver" %}</h2>
         <div class="map-container">
-            <iframe src="{{ map_embed_url }}" title="Carte : localisation de Zabantu" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <iframe src="{{ map_embed_url }}" title="{% translate 'Carte : localisation de Zabantu' %}" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
     </section>
 
     <!-- FAQ -->
     <section class="contact-block faq">
-        <h2>Questions fréquentes</h2>
+        <h2>{% translate "Questions fréquentes" %}</h2>
         <div class="accordion" id="faqAccordion">
             <div class="accordion-item">
                 <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1" aria-expanded="false" aria-controls="faq1">Comment puis-je collaborer avec votre équipe ?</button>
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1" aria-expanded="false" aria-controls="faq1">{% translate "Comment puis-je collaborer avec votre équipe ?" %}</button>
                 </h3>
                 <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">Nous sommes ouverts aux collaborations interdisciplinaires. Veuillez nous contacter via le formulaire en précisant votre domaine d'expertise et la nature de la collaboration envisagée.</div>
+                    <div class="accordion-body">{% translate "Nous sommes ouverts aux collaborations interdisciplinaires. Veuillez nous contacter via le formulaire en précisant votre domaine d'expertise et la nature de la collaboration envisagée." %}</div>
                 </div>
             </div>
             <div class="accordion-item">
                 <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" aria-expanded="false" aria-controls="faq2">Où puis-je trouver vos publications ?</button>
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" aria-expanded="false" aria-controls="faq2">{% translate "Où puis-je trouver vos publications ?" %}</button>
                 </h3>
                 <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">Nos publications sont disponibles dans la section dédiée de notre site web. Certains travaux peuvent être disponibles sur demande.</div>
+                    <div class="accordion-body">{% translate "Nos publications sont disponibles dans la section dédiée de notre site web. Certains travaux peuvent être disponibles sur demande." %}</div>
                 </div>
             </div>
             <div class="accordion-item">
                 <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">Quels sont vos horaires d'ouverture ?</button>
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">{% translate "Quels sont vos horaires d'ouverture ?" %}</button>
                 </h3>
                 <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body">Notre bureau est ouvert du lundi au vendredi de 8h à 17h. Les rendez-vous en dehors de ces horaires peuvent être arrangés sur demande.</div>
+                    <div class="accordion-body">{% translate "Notre bureau est ouvert du lundi au vendredi de 8h à 17h. Les rendez-vous en dehors de ces horaires peuvent être arrangés sur demande." %}</div>
                 </div>
             </div>
         </div>

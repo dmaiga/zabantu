@@ -8,6 +8,9 @@ import re
 
 from django.conf import settings
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+
+from zabantu.i18n import current_language, is_blank, translated
 
 from .sanitize import plain_text
 from .thumbnails import get_thumbnail
@@ -66,15 +69,15 @@ def build(request, obj, *, title, description, image=None, type_='website', publ
 
 # Titres de partage des pages sans contenu propre (listes, présentation). Les vues de détail les remplacent.
 PAGE_SEO = {
-    'public_article_list': ('Publications - Zabantu', "Analyses, articles, ouvrages, policy briefs et rapports du groupe de recherche Zabantu."),
-    'public_event_list': ('Événements - Zabantu', "Séminaires Gɛlɛkan, conférences, ateliers et webinaires du groupe de recherche Zabantu."),
-    'public_member_list': ('Membres - Zabantu', "Les chercheurs et chercheuses du groupe de recherche Zabantu."),
-    'about': ('Qui sommes-nous - Zabantu', "Zabantu est un groupe de recherche pluridisciplinaire sur le nexus Economy | Conflict | State."),
-    'liste_galeries': ('Galerie photos - Zabantu', "Les photos des séminaires et activités du groupe de recherche Zabantu."),
-    'toutes_photos': ('Galerie photos - Zabantu', "Toutes les photos du groupe de recherche Zabantu."),
-    'contact': ('Contact - Zabantu', "Écrivez au groupe de recherche Zabantu : collaboration, information, questions."),
-    'donate': ('Faire un don - Zabantu', "Soutenez le groupe de recherche Zabantu : vos dons financent la recherche, les séminaires Gɛlɛkan et les publications."),
-    'membership_apply': ('Rejoindre Zabantu', "Faites une demande d'adhésion au groupe de recherche Zabantu."),
+    'public_article_list': (_('Publications - Zabantu'), _("Analyses, articles, ouvrages, policy briefs et rapports du groupe de recherche Zabantu.")),
+    'public_event_list': (_('Événements - Zabantu'), _("Séminaires Gɛlɛkan, conférences, ateliers et webinaires du groupe de recherche Zabantu.")),
+    'public_member_list': (_('Membres - Zabantu'), _("Les chercheurs et chercheuses du groupe de recherche Zabantu.")),
+    'about': (_('Qui sommes-nous - Zabantu'), _("Zabantu est un groupe de recherche pluridisciplinaire sur le nexus Economy | Conflict | State.")),
+    'liste_galeries': (_('Galerie photos - Zabantu'), _("Les photos des séminaires et activités du groupe de recherche Zabantu.")),
+    'toutes_photos': (_('Galerie photos - Zabantu'), _("Toutes les photos du groupe de recherche Zabantu.")),
+    'contact': (_('Contact - Zabantu'), _("Écrivez au groupe de recherche Zabantu : collaboration, information, questions.")),
+    'donate': (_('Faire un don - Zabantu'), _("Soutenez le groupe de recherche Zabantu : vos dons financent la recherche, les séminaires Gɛlɛkan et les publications.")),
+    'membership_apply': (_('Rejoindre Zabantu'), _("Faites une demande d'adhésion au groupe de recherche Zabantu.")),
 }
 
 
@@ -82,19 +85,35 @@ def page_seo(request):
     """Titre et description de partage d'une page sans contenu propre ; vide pour l'accueil et les autres pages."""
     match = getattr(request, 'resolver_match', None)
     found = PAGE_SEO.get(match.url_name) if match else None
-    return {'title': found[0], 'description': found[1]} if found else {}
+    return {'title': str(found[0]), 'description': str(found[1])} if found else {}
+
+
+def _description(obj, *fields):
+    """Premier texte rempli pour la description de partage. En anglais, la version anglaise passe avant la
+    description SEO (rédigée en français) ; le français reste le dernier recours."""
+    if current_language() != settings.LANGUAGE_CODE:
+        for name in fields:
+            value = getattr(obj, f'{name}_{current_language()}', None)
+            if not is_blank(value):
+                return value
+    for name in ('meta_description',) + fields:
+        value = getattr(obj, name, None)
+        if not is_blank(value):
+            return value
+    return ''
 
 
 def gallery_seo(request, gallery):
-    return build(request, gallery, title=gallery.title, description=gallery.description or PAGE_SEO['liste_galeries'][1],
+    return build(request, gallery, title=translated(gallery, 'title'),
+                 description=_description(gallery, 'description') or PAGE_SEO['liste_galeries'][1],
                  image=gallery.cover_image)
 
 
 def article_seo(request, article):
     return build(
         request, article,
-        title=article.title,
-        description=article.meta_description or article.subtitle or article.content,
+        title=translated(article, 'title'),
+        description=_description(article, 'subtitle', 'content'),
         image=article.cover_image or article.independent_cover,
         type_='article', published=article.publish_at,
     )
@@ -103,12 +122,13 @@ def article_seo(request, article):
 def guelekan_seo(request, guelekan):
     return build(
         request, guelekan,
-        title=guelekan.title,
-        description=guelekan.meta_description or guelekan.subtitle or guelekan.content,
+        title=translated(guelekan, 'title'),
+        description=_description(guelekan, 'subtitle', 'content'),
         image=guelekan.cover_image,
         type_='article', published=guelekan.publish_at,
     )
 
 
 def event_seo(request, event):
-    return build(request, event, title=event.title, description=event.content, image=event.image)
+    return build(request, event, title=translated(event, 'title'), description=_description(event, 'content'),
+                 image=event.image)

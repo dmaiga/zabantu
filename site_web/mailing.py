@@ -21,6 +21,10 @@ from django.utils.encoding import force_bytes
 from django.utils.html import strip_tags
 from django.utils.http import urlsafe_base64_encode
 from django.utils.text import Truncator
+from django.utils import translation
+from django.utils.translation import gettext as _
+
+from zabantu.i18n import translated
 
 from .models import NewsletterSubscriber, PublicationDelivery, PublicationNotice
 
@@ -34,7 +38,8 @@ def absolute_url(path):
 
 
 def unsubscribe_url(subscriber):
-    return absolute_url(reverse('newsletter_unsubscribe', args=[subscriber.token]))
+    with translation.override(subscriber.language):
+        return absolute_url(reverse('newsletter_unsubscribe', args=[subscriber.token]))
 
 
 def newsletter_connection():
@@ -50,15 +55,19 @@ def newsletter_connection():
 
 
 def _build_message(subscriber, subject, template, context, text):
+    """Message de l'info-lettre, rendu dans la langue de l'abonné (pied de page, lien de désabonnement)."""
     context = {**context, 'unsubscribe_url': unsubscribe_url(subscriber)}
+    with translation.override(subscriber.language):
+        unsubscribe = _("Se désabonner : %(url)s") % {'url': context['unsubscribe_url']}
+        html_body = render_to_string(template, context)
     message = EmailMultiAlternatives(
         subject=subject,
-        body=f"{text}\n\nSe désabonner : {context['unsubscribe_url']}",
+        body=f"{text}\n\n{unsubscribe}",
         from_email=settings.DEFAULT_FROM_EMAIL_NEWS,
         to=[subscriber.email],
         headers={'List-Unsubscribe': f"<{context['unsubscribe_url']}>"},
     )
-    message.attach_alternative(render_to_string(template, context), 'text/html')
+    message.attach_alternative(html_body, 'text/html')
     return message
 
 
@@ -77,8 +86,8 @@ def _deliver_batch(batch, errors=None):
         connection.open()
     except Exception as exc:
         logger.exception("Connexion au serveur d'info-lettre impossible")
-        errors.update({key: _short_error(exc) for key, _ in batch})
-        return sent, [key for key, _ in batch]
+        errors.update({key: _short_error(exc) for key, _message in batch})
+        return sent, [key for key, _message in batch]
     try:
         for key, message in batch:
             message.connection = connection
@@ -114,9 +123,10 @@ def _deliver(messages, errors=None):
     return sent, failed
 
 
-def _excerpt(obj):
+def _excerpt(obj, language=None):
     for field in EXCERPT_FIELDS:
-        text = html.unescape(strip_tags(getattr(obj, field, None) or '')).strip()
+        value = translated(obj, field, language) if hasattr(obj, field) else None
+        text = html.unescape(strip_tags(value or '')).strip()
         if text:
             return Truncator(text).words(50)
     return ''
@@ -146,17 +156,23 @@ def queue_publication(obj):
 
 
 def _publication_message(delivery, obj):
-    label = 'Nouvel événement' if _is_event(obj) else 'Nouvelle publication'
-    context = {
-        'label': label,
-        'title': obj.title,
-        'excerpt': _excerpt(obj),
-        'url': absolute_url(obj.get_public_url()),
-        'closing': 'Nous espérons vous y retrouver.' if _is_event(obj)
-                   else 'Nous espérons que cette publication vous plaira.',
-    }
-    text = f"{label} : {obj.title}\n\n{context['excerpt']}\n\nLire la suite : {context['url']}\n\n{context['closing']}"
-    return _build_message(delivery.subscriber, f"{label} : {obj.title}", 'emails/publication.html', context, text)
+    """Annonce dans la langue de l'abonné : titre et extrait anglais s'ils existent, lien vers la page de sa langue."""
+    language = delivery.subscriber.language
+    with translation.override(language):
+        label = _('Nouvel événement') if _is_event(obj) else _('Nouvelle publication')
+        title = translated(obj, 'title', language)
+        context = {
+            'label': label,
+            'title': title,
+            'excerpt': _excerpt(obj, language),
+            'url': absolute_url(obj.get_public_url()),
+            'closing': _('Nous espérons vous y retrouver.') if _is_event(obj)
+                       else _('Nous espérons que cette publication vous plaira.'),
+        }
+        heading = _('%(label)s : %(title)s') % {'label': label, 'title': title}
+        read_more = _('Lire la suite : %(url)s') % {'url': context['url']}
+    text = f"{heading}\n\n{context['excerpt']}\n\n{read_more}\n\n{context['closing']}"
+    return _build_message(delivery.subscriber, heading, 'emails/publication.html', context, text)
 
 
 def send_pending():
@@ -240,18 +256,23 @@ send_reply = send_html  # réponse à un message de contact
 
 
 def send_application_received(application):
-    """Accusé de réception d'une demande d'adhésion."""
-    html_body = render_to_string('emails/application_received.html', {'name': application.full_name})
-    return send_html(application.email, "Votre demande d'adhésion à Zabantu", html_body)
+    """Accusé de réception d'une demande d'adhésion, dans la langue du formulaire."""
+    with translation.override(application.language):
+        html_body = render_to_string('emails/application_received.html', {'name': application.full_name})
+        subject = _("Votre demande d'adhésion à Zabantu")
+    return send_html(application.email, subject, html_body)
 
 
 def send_application_approved(application):
-    """Annonce l'admission. L'adhésion ne donne pas accès au backoffice : le message ne parle pas de connexion."""
-    html_body = render_to_string('emails/application_approved.html', {
-        'name': application.full_name,
-        'members_url': absolute_url(reverse('public_member_list')),
-    })
-    return send_html(application.email, 'Bienvenue chez Zabantu : votre adhésion est validée', html_body)
+    """Annonce l'admission, dans la langue du formulaire. L'adhésion ne donne pas accès au backoffice : le message
+    ne parle pas de connexion."""
+    with translation.override(application.language):
+        html_body = render_to_string('emails/application_approved.html', {
+            'name': application.full_name,
+            'members_url': absolute_url(reverse('public_member_list')),
+        })
+        subject = _('Bienvenue chez Zabantu : votre adhésion est validée')
+    return send_html(application.email, subject, html_body)
 
 
 def send_access_granted(user):

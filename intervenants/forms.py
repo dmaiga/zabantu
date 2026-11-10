@@ -17,7 +17,8 @@ class IntervenantForm(SectionedFormMixin, forms.ModelForm):
             'organization', 'position', 'intervenant_type',
             'bio', 'expertise', 'photo',
             'linkedin', 'facebook', 'website',
-            'is_available', 'note_internal'
+            'is_available', 'note_internal',
+            'position_en', 'bio_en',
         ]
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénom'}),

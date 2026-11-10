@@ -1,14 +1,17 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from zabantu.validators import validate_image
 from django.conf import settings
+from zabantu.i18n import TranslatableMixin
 
-class Intervenant(models.Model):
+class Intervenant(TranslatableMixin, models.Model):
+    TRANSLATED_FIELDS = ('position', 'bio')
     TYPE_INTERVENANT_CHOICES = [
-        ('moderator', 'Modérateur'),
-        ('speaker', 'Intervenant'),
-        ('trainer', 'Formateur'),
-        ('panelist', 'Panéliste'),
-        ('expert', 'Expert'),
+        ('moderator', _('Modérateur')),
+        ('speaker', _('Intervenant')),
+        ('trainer', _('Formateur')),
+        ('panelist', _('Panéliste')),
+        ('expert', _('Expert')),
     ]
     
     user = models.OneToOneField(
@@ -28,6 +31,9 @@ class Intervenant(models.Model):
     
     bio = models.TextField(verbose_name="Biographie")
     expertise = models.CharField(max_length=300, blank=True, null=True, verbose_name="Domaines d'expertise")
+    # Version anglaise, facultative : vide, la page anglaise affiche le français (zabantu/i18n.py)
+    position_en = models.CharField(max_length=200, blank=True, verbose_name="Poste (anglais)")
+    bio_en = models.TextField(blank=True, verbose_name="Biographie (anglais)")
     
     intervenant_type = models.CharField(
         max_length=20,

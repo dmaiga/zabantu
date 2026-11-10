@@ -1,0 +1,4 @@
+{# Lien vers la même page dans l'autre langue (filtres conservés) ; absent si la page n'existe que dans une langue #}
+{% if other_language %}
+<a href="{{ other_language_url }}" class="lang-link {{ extra_class }}" hreflang="{{ other_language }}" lang="{{ other_language }}" title="{% if other_language == 'en' %}English version{% else %}Version française{% endif %}" aria-label="{% if other_language == 'en' %}English version{% else %}Version française{% endif %}">{{ other_language|upper }}</a>
+{% endif %}

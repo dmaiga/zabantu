@@ -4,8 +4,11 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
 from django.urls import reverse
+from zabantu.i18n import TranslatableMixin
 
-class CustomUser(AbstractUser):
+class CustomUser(TranslatableMixin, AbstractUser):
+    TRANSLATED_FIELDS = ('bio', 'job_title')
+    MAIN_FIELDS = ('bio',)
     ROLE_CHOICES = [
         ('admin', _('Administrateur')),
         ('moderateur', _('Modérateur')),
@@ -48,6 +51,9 @@ class CustomUser(AbstractUser):
     bio = models.TextField(_('biographie'), blank=True, null=True)
     job_title = models.CharField(_('poste'), max_length=100, blank=True, null=True)
     department = models.CharField(_('département'), max_length=100, blank=True, null=True)
+    # Version anglaise du profil public, facultative : vide, la page anglaise affiche le français (zabantu/i18n.py)
+    bio_en = models.TextField('biographie (anglais)', blank=True)
+    job_title_en = models.CharField('poste (anglais)', max_length=100, blank=True)
     
     # Réseaux sociaux
     social_facebook = models.URLField(_('Facebook'), blank=True, null=True)

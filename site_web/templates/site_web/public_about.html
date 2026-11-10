@@ -1,9 +1,9 @@
 
 {% extends 'base_public.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}À propos | Zabantu{% endblock %}
-{% block banner_title %}Qui sommes-nous{% endblock %}
+{% block title %}{% translate "À propos" %} | Zabantu{% endblock %}
+{% block banner_title %}{% translate "Qui sommes-nous" %}{% endblock %}
 {% block banner_subtitle %}{% endblock %}
 
 {% block content %}
@@ -381,25 +381,25 @@
     <!-- Identity Section -->
     <section class="section" id="presentation">
         <div class="identity-card">
-            <h1 class="group-name">Groupe de recherche Zabantu</h1>
+            <h1 class="group-name">{% translate "Groupe de recherche Zabantu" %}</h1>
             <p class="group-subtitle">Economy | Conflict | State</p>
             
             <div class="identity-grid">
-                <p>Nom inspiré d'une plante locale mandingue, Zabantu est un groupe de chercheurs en sciences sociales travaillant sur le développement économique et social. C'est de ce fait un groupe pluri et interdisciplinaire, qui est ouvert à tous les chercheurs et chercheuses du monde dans l'objectif d'avoir une recherche plus inclusive et plus ancrée.</p>
+                <p>{% blocktranslate trimmed %}Nom inspiré d'une plante locale mandingue, Zabantu est un groupe de chercheurs en sciences sociales travaillant sur le développement économique et social. C'est de ce fait un groupe pluri et interdisciplinaire, qui est ouvert à tous les chercheurs et chercheuses du monde dans l'objectif d'avoir une recherche plus inclusive et plus ancrée.{% endblocktranslate %}</p>
 
                 <div class="vision-box">
-                    <h3 class="vision-title">Vision</h3>
-                    <p class="group-subtitle">Vers une recherche ancrée dans les dynamiques économiques et sociales</p>
+                    <h3 class="vision-title">{% translate "Vision" %}</h3>
+                    <p class="group-subtitle">{% translate "Vers une recherche ancrée dans les dynamiques économiques et sociales" %}</p>
                 </div>
             </div>
 
-            <h3 class="section-title" id="domaines">Domaines de recherche</h3>
+            <h3 class="section-title" id="domaines">{% translate "Domaines de recherche" %}</h3>
             <div class="research-domains">
-                <span class="domain-badge">Économie politique</span>
-                <span class="domain-badge">Conflits et sécurité</span>
-                <span class="domain-badge">Développement</span>
-                <span class="domain-badge">Politiques publiques</span>
-                <span class="domain-badge">Études africaines</span>
+                <span class="domain-badge">{% translate "Économie politique" %}</span>
+                <span class="domain-badge">{% translate "Conflits et sécurité" %}</span>
+                <span class="domain-badge">{% translate "Développement" %}</span>
+                <span class="domain-badge">{% translate "Politiques publiques" %}</span>
+                <span class="domain-badge">{% translate "Études africaines" %}</span>
             </div>
         </div>
     </section>
@@ -407,21 +407,21 @@
     <!-- Activités Section -->
     <section class="section" id="activites">
         <div class="activity-section">
-            <h2 class="section-title">Activités</h2>
+            <h2 class="section-title">{% translate "Activités" %}</h2>
             
-            <h3 class="activity-title">Séminaire Gɛlɛkan</h3>
+            <h3 class="activity-title">{% translate "Séminaire Gɛlɛkan" %}</h3>
             <div class="activity-grid">
                 <div>
-                    <p class="lead-text">Gɛlɛkan est une tribune scientifique de collaboration et de partage d'expérience et de connaissance. Inspiré de la tribune de sagesse bamanan réservée aux aînés (considérés comme des sagesses et des érudits), Gɛlɛkan est un espace de communication scientifique permettant aux chercheurs de partager les résultats de leurs recherches accomplies ou en cours.</p>
-                    <p>Les séminaires Gɛlɛkan portent aussi sur les thématiques de formation comme la méthodologie de recherche et les astuces de publications académiques. Il s'agit de partage d'expérience des auteurs bien établis dans leurs domaines visant à initier et ou renforcer les jeunes chercheurs à la conduite de la recherche scientifique et de la communication scientifique.</p>
-                    <p>Au-delà de la démarche méthodologique, les séminaires Gɛlɛkan mettent un accent particulier sur les débats épistémologiques, qui déterminent, dans une large mesure, la contribution à la connaissance scientifique.</p>
-                    <p>La nécessité d'un tel cadre académique réside dans le caractère collectif de la production de la connaissance. Ainsi, débattre des résultats de recherche permettent de mettre en évidence leurs pertinence et limites éventuelles et par conséquent de les consolider, dans la mesure où ces limites seront adressées à la communauté scientifique. Dans ce contexte, la communication des résultats de recherche devient plus qu'une nécessité, elle contribue à la validation externe des connaissances et leur diffusion.</p>
+                    <p class="lead-text">{% blocktranslate trimmed %}Gɛlɛkan est une tribune scientifique de collaboration et de partage d'expérience et de connaissance. Inspiré de la tribune de sagesse bamanan réservée aux aînés (considérés comme des sagesses et des érudits), Gɛlɛkan est un espace de communication scientifique permettant aux chercheurs de partager les résultats de leurs recherches accomplies ou en cours.{% endblocktranslate %}</p>
+                    <p>{% blocktranslate trimmed %}Les séminaires Gɛlɛkan portent aussi sur les thématiques de formation comme la méthodologie de recherche et les astuces de publications académiques. Il s'agit de partage d'expérience des auteurs bien établis dans leurs domaines visant à initier et ou renforcer les jeunes chercheurs à la conduite de la recherche scientifique et de la communication scientifique.{% endblocktranslate %}</p>
+                    <p>{% blocktranslate trimmed %}Au-delà de la démarche méthodologique, les séminaires Gɛlɛkan mettent un accent particulier sur les débats épistémologiques, qui déterminent, dans une large mesure, la contribution à la connaissance scientifique.{% endblocktranslate %}</p>
+                    <p>{% blocktranslate trimmed %}La nécessité d'un tel cadre académique réside dans le caractère collectif de la production de la connaissance. Ainsi, débattre des résultats de recherche permettent de mettre en évidence leurs pertinence et limites éventuelles et par conséquent de les consolider, dans la mesure où ces limites seront adressées à la communauté scientifique. Dans ce contexte, la communication des résultats de recherche devient plus qu'une nécessité, elle contribue à la validation externe des connaissances et leur diffusion.{% endblocktranslate %}</p>
                 </div>
                 <aside class="activity-aside">
-                    <h4>Suivre les séminaires</h4>
-                    <p>Retrouvez les séances passées et à venir du séminaire Gɛlɛkan.</p>
-                    <a href="{% url 'public_article_list' %}?type=guelekan" class="btn btn-primary">Voir les séminaires</a>
-                    <a href="{% url 'public_event_list' %}" class="btn btn-outline-primary">Événements à venir</a>
+                    <h4>{% translate "Suivre les séminaires" %}</h4>
+                    <p>{% translate "Retrouvez les séances passées et à venir du séminaire Gɛlɛkan." %}</p>
+                    <a href="{% url 'public_article_list' %}?type=guelekan" class="btn btn-primary">{% translate "Voir les séminaires" %}</a>
+                    <a href="{% url 'public_event_list' %}" class="btn btn-outline-primary">{% translate "Événements à venir" %}</a>
                 </aside>
             </div>
         </div>
@@ -431,23 +431,23 @@
 <!-- Section Équipe - Photos indépendantes -->
 <section class="team-section" id="equipe">
     <div class="about-container">
-        <h2 class="section-title">Notre Équipe</h2>
+        <h2 class="section-title">{% translate "Notre Équipe" %}</h2>
         
         {% include 'site_web/includes/team_carousel.html' %}
 
         <!-- Lien vers la page complète de l'équipe -->
         <div class="text-center mt-5">
             <a href="{% url 'public_member_list' %}" class="btn btn-primary me-2 mb-2">
-                Voir tous les membres <i class="fas fa-arrow-right ms-2"></i>
+                {% translate "Voir tous les membres" %} <i class="fas fa-arrow-right ms-2"></i>
             </a>
-            <a href="{% url 'membership_apply' %}" class="btn btn-outline-primary mb-2">Rejoindre Zabantu</a>
+            <a href="{% url 'membership_apply' %}" class="btn btn-outline-primary mb-2">{% translate "Rejoindre Zabantu" %}</a>
         </div>
     </div>
 </section>
 
 <section class="section" id="partenaires">
     <div class="container text-center">
-        <h2 class="section-title">Nos Partenaires</h2>
+        <h2 class="section-title">{% translate "Nos Partenaires" %}</h2>
     </div>
 
     <div class="partners-container">

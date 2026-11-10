@@ -48,14 +48,22 @@ Mesure d'abord (base locale, temps serveur médian, visiteur anonyme) :
   et peut-être du réveil de l'application après inactivité (à vérifier sur le site réel).
 
 ────────────────────────────────────────
-4. BILINGUE FR / EN  (5 à 8 j)
+4. BILINGUE FR / EN  (5 à 8 j) — FAIT le 2026-11-10
 ────────────────────────────────────────
-- Textes fixes du site (menus, boutons, titres, pages fixes, e-mails) : tous traduits en anglais.
-- Contenus : pas de traduction rétroactive. Les champs existants restent le français.
-  Champs anglais facultatifs ajoutés, remplis pour les nouveaux contenus ; si l'anglais est vide, le français s'affiche.
-- Sélecteur de langue, adresses en /en/, balises hreflang, plan du site dans les deux langues.
-- Fichiers de traduction compilés (.mo) versionnés dans le dépôt (l'outil de compilation n'est pas sur le serveur).
-- Mettre la base en place tôt : les nouvelles pages (don, cours) sont écrites directement traduisibles.
+- [fait] Adresses : français inchangé (/zabantu/…), anglais sous /en/zabantu/… La langue vient de l'adresse seule :
+  le backoffice reste en français, même pour un navigateur anglais.
+- [fait] Textes fixes du site public traduits (menus, boutons, titres, formulaires, messages, pages d'erreur, e-mails),
+  dans locale/en (.po et .mo versionnés ; un test échoue si le .mo est en retard).
+- [fait] Pages légales : version anglaise à part, avec la mention « la version française fait foi ».
+- [fait] Contenus : champs anglais facultatifs (articles, Gɛlɛkan, événements, galeries, intervenants, profils des
+  membres) ; vides, le français s'affiche (marqué lang="fr" sur les pages de détail). Pas de traduction rétroactive.
+  Étape « Version anglaise (facultatif) » ajoutée aux formulaires du backoffice. Recherche dans les deux langues.
+- [fait] Sélecteur FR / EN dans l'en-tête (visible sur mobile), balises hreflang, og:locale, plan du site avec les
+  deux langues ; morceaux de pages en cache séparés par langue.
+- [fait] E-mails dans la langue du destinataire : langue gardée pour les abonnés (annonces), les demandes d'adhésion
+  (accusé de réception, validation) et les messages de contact (réponse ; signalé aux modérateurs).
+- Non traduits : titres des photos, noms des partenaires, campagnes d'info-lettre (texte libre des modérateurs).
+- Les nouvelles pages (app cours) sont à écrire directement traduisibles.
 
 ────────────────────────────────────────
 5. APP COURS ET COHORTES  (6 à 9 j)

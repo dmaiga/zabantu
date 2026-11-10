@@ -9,6 +9,7 @@ from django import forms
 from django.contrib import messages
 from django.core import signing
 from django.core.cache import caches
+from django.utils.translation import gettext_lazy as _
 
 HONEYPOT = 'company_site'   # champ caché que seuls les robots remplissent
 STAMP = 'form_ts'           # heure d'affichage du formulaire, signée
@@ -16,10 +17,10 @@ SALT = 'zabantu.antispam'
 MIN_SECONDS = 3             # un humain ne remplit pas un formulaire plus vite
 MAX_SECONDS = 24 * 3600     # au-delà, la page est considérée comme périmée
 
-MSG_HONEYPOT = "Envoi refusé : un champ réservé à la protection anti-robots a été rempli. Rechargez la page et réessayez."
-MSG_TOO_FAST = "Formulaire envoyé trop vite. Patientez quelques secondes, puis réessayez."
-MSG_BLOCKED = "Cette adresse e-mail ne peut plus envoyer de formulaire sur ce site. Si vous pensez qu'il s'agit d'une erreur, contactez le groupe par un autre moyen."
-MSG_EXPIRED = "Le formulaire a expiré ou n'est pas valide. Rechargez la page, puis réessayez."
+MSG_HONEYPOT = _("Envoi refusé : un champ réservé à la protection anti-robots a été rempli. Rechargez la page et réessayez.")
+MSG_TOO_FAST = _("Formulaire envoyé trop vite. Patientez quelques secondes, puis réessayez.")
+MSG_BLOCKED = _("Cette adresse e-mail ne peut plus envoyer de formulaire sur ce site. Si vous pensez qu'il s'agit d'une erreur, contactez le groupe par un autre moyen.")
+MSG_EXPIRED = _("Le formulaire a expiré ou n'est pas valide. Rechargez la page, puis réessayez.")
 
 
 def new_stamp():

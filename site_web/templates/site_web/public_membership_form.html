@@ -1,8 +1,8 @@
 {% extends 'base_public.html' %}
-{% load antispam_tags %}
+{% load antispam_tags i18n %}
 
-{% block title %}Adhésion - Zabantu{% endblock %}
-{% block banner_title %}Formulaire d'adhésion à Zabantu{% endblock %}
+{% block title %}{% translate "Adhésion" %} - Zabantu{% endblock %}
+{% block banner_title %}{% translate "Formulaire d'adhésion à Zabantu" %}{% endblock %}
 {% block banner_subtitle %}Economy | Conflict | State{% endblock %}
 
 {% block extra_css %}
@@ -81,30 +81,30 @@
 {% block content %}
 <div class="wizard">
     <div class="wizard-intro">
-        <p class="mb-2">Vous souhaitez rejoindre le Groupe de recherche Zabantu ? Ce formulaire permet aux personnes intéressées de manifester leur intérêt pour le groupe.</p>
-        <p class="mb-0">Zabantu promeut une recherche pluridisciplinaire et ancrée dans les réalités locales, autour des dynamiques économiques et sociales, des conflits et de l'État.</p>
+        <p class="mb-2">{% translate "Vous souhaitez rejoindre le Groupe de recherche Zabantu ? Ce formulaire permet aux personnes intéressées de manifester leur intérêt pour le groupe." %}</p>
+        <p class="mb-0">{% translate "Zabantu promeut une recherche pluridisciplinaire et ancrée dans les réalités locales, autour des dynamiques économiques et sociales, des conflits et de l'État." %}</p>
     </div>
 
     {% for message in messages %}
         <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">{{ message }}</div>
     {% endfor %}
 
-    <ol class="stepper" id="stepper" aria-label="Étapes du formulaire">
-        <li><button type="button" data-goto="0"><span class="dot">1</span><span class="label">Informations personnelles</span></button></li>
-        <li><button type="button" data-goto="1"><span class="dot">2</span><span class="label">Profil et recherche</span></button></li>
-        <li><button type="button" data-goto="2"><span class="dot">3</span><span class="label">Motivation</span></button></li>
-        <li><button type="button" data-goto="3"><span class="dot">4</span><span class="label">Profil public</span></button></li>
-        <li><button type="button" data-goto="4"><span class="dot">5</span><span class="label">Consentement</span></button></li>
+    <ol class="stepper" id="stepper" aria-label="{% translate 'Étapes du formulaire' %}">
+        <li><button type="button" data-goto="0"><span class="dot">1</span><span class="label">{% translate "Informations personnelles" %}</span></button></li>
+        <li><button type="button" data-goto="1"><span class="dot">2</span><span class="label">{% translate "Profil et recherche" %}</span></button></li>
+        <li><button type="button" data-goto="2"><span class="dot">3</span><span class="label">{% translate "Motivation" %}</span></button></li>
+        <li><button type="button" data-goto="3"><span class="dot">4</span><span class="label">{% translate "Profil public" %}</span></button></li>
+        <li><button type="button" data-goto="4"><span class="dot">5</span><span class="label">{% translate "Consentement" %}</span></button></li>
     </ol>
-    <p class="stepper-note">Naviguez librement entre les étapes : les champs obligatoires (*) sont vérifiés à l'envoi.</p>
+    <p class="stepper-note">{% translate "Naviguez librement entre les étapes : les champs obligatoires (*) sont vérifiés à l'envoi." %}</p>
 
     <form method="post" enctype="multipart/form-data" id="wizardForm" data-start="{{ start_step }}" novalidate>
         {% csrf_token %}{% antispam_fields %}
         {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
 
-        <fieldset class="wizard-step" data-title="Informations personnelles">
-            <legend>1. Informations personnelles</legend>
-            <p class="step-hint">Les champs marqués * sont obligatoires.</p>
+        <fieldset class="wizard-step">
+            <legend>1. {% translate "Informations personnelles" %}</legend>
+            <p class="step-hint">{% translate "Les champs marqués * sont obligatoires." %}</p>
             <div class="row g-3">
                 {% for f in form %}{% if f.name == 'full_name' or f.name == 'email' or f.name == 'phone' or f.name == 'city_country' %}
                 <div class="col-md-6">
@@ -116,31 +116,31 @@
             </div>
         </fieldset>
 
-        <fieldset class="wizard-step" data-title="Profil et recherche">
-            <legend>2. Profil académique ou professionnel</legend>
-            <p class="step-hint">Votre statut, votre institution et vos centres d'intérêt scientifiques.</p>
+        <fieldset class="wizard-step">
+            <legend>2. {% translate "Profil académique ou professionnel" %}</legend>
+            <p class="step-hint">{% translate "Votre statut, votre institution et vos centres d'intérêt scientifiques." %}</p>
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label for="{{ form.academic_status.id_for_label }}" class="form-label">Quel est votre statut académique ? *</label>
+                    <label for="{{ form.academic_status.id_for_label }}" class="form-label">{% translate "Quel est votre statut académique ?" %} *</label>
                     {{ form.academic_status }}
                     {% for e in form.academic_status.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
                 </div>
                 <div class="col-md-6">
-                    <label for="{{ form.institution.id_for_label }}" class="form-label">Quelle est votre institution d'affiliation ? *</label>
+                    <label for="{{ form.institution.id_for_label }}" class="form-label">{% translate "Quelle est votre institution d'affiliation ?" %} *</label>
                     {{ form.institution }}
                     {% for e in form.institution.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
                 </div>
                 <div class="col-12">
-                    <label for="{{ form.research_interests.id_for_label }}" class="form-label">Quels sont vos principaux centres de recherche ? *</label>
+                    <label for="{{ form.research_interests.id_for_label }}" class="form-label">{% translate "Quels sont vos principaux centres de recherche ?" %} *</label>
                     {{ form.research_interests }}
                     {% for e in form.research_interests.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
                 </div>
             </div>
         </fieldset>
 
-        <fieldset class="wizard-step" data-title="Motivation">
-            <legend>3. Adhésion au groupe</legend>
-            <p class="step-hint">Motivation et contribution.</p>
+        <fieldset class="wizard-step">
+            <legend>3. {% translate "Adhésion au groupe" %}</legend>
+            <p class="step-hint">{% translate "Motivation et contribution." %}</p>
             <div class="mb-3">
                 <label for="{{ form.contribution.id_for_label }}" class="form-label">{{ form.contribution.label }} *</label>
                 {{ form.contribution }}
@@ -154,7 +154,7 @@
                 {% for e in form.career_benefit.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
             </div>
             <div class="mb-3" id="howHeardGroup">
-                <div class="form-label">Comment avez-vous entendu parler de Zabantu ? * <small class="text-muted">(plusieurs réponses possibles)</small></div>
+                <div class="form-label">{% translate "Comment avez-vous entendu parler de Zabantu ?" %} * <small class="text-muted">{% translate "(plusieurs réponses possibles)" %}</small></div>
                 <div class="choice-list">
                     {% for choice in form.how_heard_choices %}
                     <label for="{{ choice.id_for_label }}">{{ choice.tag }}<span>{{ choice.choice_label }}</span></label>
@@ -162,25 +162,25 @@
                 </div>
                 {% for e in form.how_heard_choices.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
                 <div class="mt-2">
-                    <label for="{{ form.how_heard.id_for_label }}" class="form-label">Autre (précisez)</label>
+                    <label for="{{ form.how_heard.id_for_label }}" class="form-label">{% translate "Autre (précisez)" %}</label>
                     {{ form.how_heard }}
                     {% for e in form.how_heard.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
                 </div>
             </div>
         </fieldset>
 
-        <fieldset class="wizard-step" data-title="Votre profil public">
-            <legend>4. Votre profil de membre</legend>
-            <p class="step-hint">Facultatif. Si votre adhésion est validée, ces informations seront reprises sur votre page membre du site, ce qui vous évitera de les renseigner plus tard. Vous pouvez passer cette étape.</p>
+        <fieldset class="wizard-step">
+            <legend>4. {% translate "Votre profil de membre" %}</legend>
+            <p class="step-hint">{% translate "Facultatif. Si votre adhésion est validée, ces informations seront reprises sur votre page membre du site, ce qui vous évitera de les renseigner plus tard. Vous pouvez passer cette étape." %}</p>
             <div class="row g-3">
                 <div class="col-12">
-                    <label for="{{ form.profile_picture.id_for_label }}" class="form-label">Photo de profil <small class="text-muted">(5 Mo max)</small></label>
+                    <label for="{{ form.profile_picture.id_for_label }}" class="form-label">{% translate "Photo de profil" %} <small class="text-muted">{% translate "(5 Mo max)" %}</small></label>
                     {{ form.profile_picture }}
-                    <img id="photoPreview" class="photo-preview no-skeleton" alt="Aperçu de la photo">
+                    <img id="photoPreview" class="photo-preview no-skeleton" alt="{% translate 'Aperçu de la photo' %}">
                     {% for e in form.profile_picture.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
                 </div>
                 <div class="col-12">
-                    <label for="{{ form.bio.id_for_label }}" class="form-label">Courte biographie</label>
+                    <label for="{{ form.bio.id_for_label }}" class="form-label">{% translate "Courte biographie" %}</label>
                     {{ form.bio }}
                     {% for e in form.bio.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
                 </div>
@@ -194,22 +194,22 @@
             </div>
         </fieldset>
 
-        <fieldset class="wizard-step" data-title="Consentement">
-            <legend>5. Consentement</legend>
-            <p class="step-hint">Dernière étape avant l'envoi.</p>
+        <fieldset class="wizard-step">
+            <legend>5. {% translate "Consentement" %}</legend>
+            <p class="step-hint">{% translate "Dernière étape avant l'envoi." %}</p>
             <div class="form-check mb-3">
                 {{ form.consent }}
                 <label for="{{ form.consent.id_for_label }}" class="form-check-label">{{ form.consent.label }} *</label>
                 {% for e in form.consent.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
             </div>
-            <p class="text-muted small mb-0">Les informations de l'étape 4, si vous les renseignez, pourront être affichées sur votre page membre une fois votre adhésion validée.</p>
+            <p class="text-muted small mb-0">{% translate "Les informations de l'étape 4, si vous les renseignez, pourront être affichées sur votre page membre une fois votre adhésion validée." %}</p>
         </fieldset>
 
-        <p class="text-muted small text-center">Les informations transmises servent à examiner votre candidature. <a href="{% url 'privacy' %}" target="_blank" rel="noopener">Politique de confidentialité</a></p>
+        <p class="text-muted small text-center">{% translate "Les informations transmises servent à examiner votre candidature." %} <a href="{% url 'privacy' %}" target="_blank" rel="noopener">{% translate "Politique de confidentialité" %}</a></p>
         <div class="wizard-nav">
-            <button type="button" class="btn btn-outline-secondary" id="prevBtn">Précédent</button>
-            <button type="button" class="btn btn-wizard" id="nextBtn">Suivant</button>
-            <button type="submit" class="btn btn-wizard" id="submitBtn">Envoyer ma demande</button>
+            <button type="button" class="btn btn-outline-secondary" id="prevBtn">{% translate "Précédent" %}</button>
+            <button type="button" class="btn btn-wizard" id="nextBtn">{% translate "Suivant" %}</button>
+            <button type="submit" class="btn btn-wizard" id="submitBtn">{% translate "Envoyer ma demande" %}</button>
         </div>
     </form>
 </div>
@@ -218,6 +218,15 @@
 {% block extra_js %}
 <script>
 (function () {
+    var MSG = {
+        required: '{% filter escapejs %}{% translate "Ce champ est obligatoire." %}{% endfilter %}',
+        invalid: '{% filter escapejs %}{% translate "Valeur invalide." %}{% endfilter %}',
+        maxWords: '{% filter escapejs %}{% translate "Maximum %(n)s mots." %}{% endfilter %}',
+        words: '{% filter escapejs %}{% translate "mots" %}{% endfilter %}',
+        oneAnswer: '{% filter escapejs %}{% translate "Sélectionnez au moins une réponse." %}{% endfilter %}',
+        specify: '{% filter escapejs %}{% translate "Précisez votre réponse." %}{% endfilter %}',
+        photoSize: '{% filter escapejs %}{% translate "La photo ne doit pas dépasser %(n)s Mo." %}{% endfilter %}'
+    };
     var form = document.getElementById('wizardForm');
     var steps = Array.prototype.slice.call(form.querySelectorAll('.wizard-step'));
     var prev = document.getElementById('prevBtn'), next = document.getElementById('nextBtn'), submit = document.getElementById('submitBtn');
@@ -257,9 +266,9 @@
         steps[i].querySelectorAll('input, select, textarea').forEach(function (el) {
             if (el.name === 'how_heard_choices' || el.name === 'how_heard') return;
             var msg = '';
-            if (el.required && ((el.type === 'checkbox' && !el.checked) || (el.type !== 'checkbox' && !el.value.trim()))) msg = 'Ce champ est obligatoire.';
-            else if (el.type !== 'file' && el.value && !el.checkValidity()) msg = 'Valeur invalide.';
-            if (el.dataset.maxWords && el.value.trim() && el.value.trim().split(/\s+/).length > +el.dataset.maxWords) msg = 'Maximum ' + el.dataset.maxWords + ' mots.';
+            if (el.required && ((el.type === 'checkbox' && !el.checked) || (el.type !== 'checkbox' && !el.value.trim()))) msg = MSG.required;
+            else if (el.type !== 'file' && el.value && !el.checkValidity()) msg = MSG.invalid;
+            if (el.dataset.maxWords && el.value.trim() && el.value.trim().split(/\s+/).length > +el.dataset.maxWords) msg = MSG.maxWords.replace('%(n)s', el.dataset.maxWords);
             setError(el, msg);
             if (msg && !first) first = el;
         });
@@ -270,7 +279,7 @@
             var other = group.querySelector('input[value="autre"]');
             var otherText = document.getElementById('{{ form.how_heard.id_for_label }}');
             var old = group.querySelector('.js-error-group'); if (old) old.remove();
-            var msg2 = !any ? 'Sélectionnez au moins une réponse.' : (other.checked && !otherText.value.trim() ? 'Précisez votre réponse.' : '');
+            var msg2 = !any ? MSG.oneAnswer : (other.checked && !otherText.value.trim() ? MSG.specify : '');
             if (msg2) {
                 var d = document.createElement('div'); d.className = 'field-error js-error-group'; d.textContent = msg2;
                 group.querySelector('.choice-list').after(d);
@@ -321,7 +330,7 @@
         var field = document.getElementById(counter.dataset.for), max = parseInt(field.dataset.maxWords, 10);
         function update() {
             var n = field.value.trim() ? field.value.trim().split(/\s+/).length : 0;
-            counter.textContent = n + ' / ' + max + ' mots';
+            counter.textContent = n + ' / ' + max + ' ' + MSG.words;
             counter.classList.toggle('over', n > max);
         }
         field.addEventListener('input', update); update();
@@ -330,7 +339,7 @@
     var photo = document.getElementById('{{ form.profile_picture.id_for_label }}'), preview = document.getElementById('photoPreview');
     photo.addEventListener('change', function () {
         var f = photo.files[0];
-        if (f && f.size > 5 * 1024 * 1024) { setError(photo, 'La photo ne doit pas dépasser 5 Mo.'); photo.value = ''; preview.style.display = 'none'; return; }
+        if (f && f.size > 5 * 1024 * 1024) { setError(photo, MSG.photoSize.replace('%(n)s', '5')); photo.value = ''; preview.style.display = 'none'; return; }
         setError(photo, '');
         if (f) { preview.src = URL.createObjectURL(f); preview.style.display = 'block'; } else { preview.style.display = 'none'; }
     });

@@ -1,6 +1,7 @@
 {% extends 'base_public.html' %}
+{% load i18n %}
 
-{% block banner_subtitle %}Dernière mise à jour : {% block legal_updated %}1er novembre 2026{% endblock %}{% endblock %}
+{% block banner_subtitle %}{% translate "Dernière mise à jour :" %} {% block legal_updated %}{% if LANGUAGE_CODE == 'en' %}1 November 2026{% else %}1er novembre 2026{% endif %}{% endblock %}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -19,11 +20,12 @@
 
 {% block content %}
 <div class="legal-wrap">
-  <nav class="legal-nav" aria-label="Informations légales">
-    <a href="{% url 'legal_notice' %}" {% if legal_page == 'notice' %}class="active"{% endif %}>Mentions légales</a>
-    <a href="{% url 'privacy' %}" {% if legal_page == 'privacy' %}class="active"{% endif %}>Confidentialité</a>
-    <a href="{% url 'cookies' %}" {% if legal_page == 'cookies' %}class="active"{% endif %}>Cookies</a>
+  <nav class="legal-nav" aria-label="{% translate 'Informations légales' %}">
+    <a href="{% url 'legal_notice' %}" {% if legal_page == 'notice' %}class="active"{% endif %}>{% translate "Mentions légales" %}</a>
+    <a href="{% url 'privacy' %}" {% if legal_page == 'privacy' %}class="active"{% endif %}>{% translate "Confidentialité" %}</a>
+    <a href="{% url 'cookies' %}" {% if legal_page == 'cookies' %}class="active"{% endif %}>{% translate "Cookies" %}</a>
   </nav>
+  {% if LANGUAGE_CODE != 'fr' %}<p class="small text-muted"><em>This English version is provided for convenience. In case of difference, the <a href="{{ other_language_url }}" lang="fr" hreflang="fr">French version</a> prevails.</em></p>{% endif %}
   {% block legal_body %}{% endblock %}
 </div>
 {% endblock %}

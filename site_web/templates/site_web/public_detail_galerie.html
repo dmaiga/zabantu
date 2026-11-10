@@ -1,32 +1,32 @@
 {% extends 'base_public.html' %}
-{% load photo_tags %}
+{% load photo_tags i18n %}
 
-{% block title %}{{ galerie.title }} - Galerie Zabantu{% endblock %}
-{% block banner_title %}Galerie photos{% endblock %}
-{% block banner_subtitle %}{{ galerie.title }}{% endblock %}
+{% block title %}{{ galerie.t.title }} - {% translate "Galerie Zabantu" %}{% endblock %}
+{% block banner_title %}{% translate "Galerie photos" %}{% endblock %}
+{% block banner_subtitle %}{{ galerie.t.title }}{% endblock %}
 
 {% block extra_css %}{% include 'site_web/includes/photo_viewer_css.html' %}{% endblock %}
 
 {% block content %}
 <div class="container">
-    <nav aria-label="Fil d'Ariane" class="mb-3">
+    <nav aria-label="{% translate "Fil d'Ariane" %}" class="mb-3">
         <ol class="breadcrumb small mb-0">
-            <li class="breadcrumb-item"><a href="{% url 'home' %}">Accueil</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'liste_galeries' %}">Galerie</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ galerie.title|truncatechars:60 }}</li>
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">{% translate "Accueil" %}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'liste_galeries' %}">{% translate "Galerie" %}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ galerie.t.title|truncatechars:60 }}</li>
         </ol>
     </nav>
 
     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
         <div>
-            <h2 class="h3 mb-1">{{ galerie.title }}</h2>
-            <p class="text-muted mb-0"><i class="far fa-calendar-alt me-1"></i>{{ galerie.created_at|date:"j F Y" }} · {{ photo_total }} photo{{ photo_total|pluralize }}</p>
+            <h2 class="h3 mb-1">{{ galerie.t.title }}</h2>
+            <p class="text-muted mb-0"><i class="far fa-calendar-alt me-1"></i>{{ galerie.created_at|date:"j F Y" }} · {% blocktranslate count n=photo_total %}{{ n }} photo{% plural %}{{ n }} photos{% endblocktranslate %}</p>
         </div>
-        <a href="{% url 'toutes_photos' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-images me-1"></i>Toutes les photos</a>
+        <a href="{% url 'toutes_photos' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-images me-1"></i>{% translate "Toutes les photos" %}</a>
     </div>
 
     {% if galerie.description %}
-    <div class="mb-4 p-3 bg-light rounded">{{ galerie.description|linebreaks }}</div>
+    <div class="mb-4 p-3 bg-light rounded">{{ galerie.t.description|linebreaks }}</div>
     {% endif %}
 
     {% if photos %}
@@ -35,25 +35,25 @@
         {% thumb photo.image 640 as t %}
         <figure class="photo-tile">
             <a class="pswp-item" href="{{ photo.image.url }}" data-caption="{{ photo.display_title }}"{% if t.src_width %} data-pswp-width="{{ t.src_width }}" data-pswp-height="{{ t.src_height }}"{% endif %}>
-                <img src="{{ t.url }}"{% if t.width %} width="{{ t.width }}" height="{{ t.height }}"{% endif %} alt="{{ photo.display_title|default:'Photo de la galerie' }}" loading="lazy">
+                <img src="{{ t.url }}"{% if t.width %} width="{{ t.width }}" height="{{ t.height }}"{% endif %} alt="{% if photo.display_title %}{{ photo.display_title }}{% else %}{% translate 'Photo de la galerie' %}{% endif %}" loading="lazy">
             </a>
-            <a class="photo-info" href="{% url 'detail_photo' photo.pk %}" aria-label="Voir la fiche de la photo"><i class="fas fa-circle-info"></i></a>
+            <a class="photo-info" href="{% url 'detail_photo' photo.pk %}" aria-label="{% translate 'Voir la fiche de la photo' %}"><i class="fas fa-circle-info"></i></a>
             {% if photo.display_title %}<figcaption>{{ photo.display_title }}</figcaption>{% endif %}
         </figure>
         {% endfor %}
     </div>
 
     {% if photos.has_other_pages %}
-    <nav class="mt-4" aria-label="Pagination des photos">
+    <nav class="mt-4" aria-label="{% translate 'Pagination des photos' %}">
         <ul class="pagination justify-content-center flex-wrap">
-            {% if photos.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ photos.previous_page_number }}">Précédent</a></li>{% endif %}
-            <li class="page-item disabled"><span class="page-link">Page {{ photos.number }} sur {{ photos.paginator.num_pages }}</span></li>
-            {% if photos.has_next %}<li class="page-item"><a class="page-link" href="?page={{ photos.next_page_number }}">Suivant</a></li>{% endif %}
+            {% if photos.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ photos.previous_page_number }}">{% translate "Précédent" %}</a></li>{% endif %}
+            <li class="page-item disabled"><span class="page-link">{% blocktranslate with number=photos.number total=photos.paginator.num_pages %}Page {{ number }} sur {{ total }}{% endblocktranslate %}</span></li>
+            {% if photos.has_next %}<li class="page-item"><a class="page-link" href="?page={{ photos.next_page_number }}">{% translate "Suivant" %}</a></li>{% endif %}
         </ul>
     </nav>
     {% endif %}
     {% else %}
-    <div class="text-center py-5 text-muted"><i class="fas fa-images fa-3x mb-3"></i><p class="mb-0">Aucune photo dans cette galerie.</p></div>
+    <div class="text-center py-5 text-muted"><i class="fas fa-images fa-3x mb-3"></i><p class="mb-0">{% translate "Aucune photo dans cette galerie." %}</p></div>
     {% endif %}
 </div>
 {% endblock %}

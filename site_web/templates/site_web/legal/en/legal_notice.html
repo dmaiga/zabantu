@@ -1,0 +1,40 @@
+{% extends 'site_web/legal/_base_legal.html' %}
+{# Version anglaise des mentions légales (la version française, legal/legal_notice.html, fait foi) #}
+{% block title %}Legal notice - Zabantu{% endblock %}
+{% block banner_title %}Legal notice{% endblock %}
+
+{% block legal_body %}
+<h2>1. Website publisher and data controller</h2>
+<p>The website <strong>zabantu.net</strong> is published by the <strong>Zabantu research group</strong> (Economy | Conflict | State).</p>
+<ul>
+  <li><strong>Legal form:</strong> non-profit association (registration receipt being obtained)</li>
+  <li><strong>Address:</strong> Faculty of Economics and Management (FSEG), Badalabougou University Campus, Bamako, Mali</li>
+  <li><strong>Phone:</strong> <a href="tel:+22377941470">+223 77 94 14 70</a> · <a href="tel:+22376634515">+223 76 63 45 15</a></li>
+  <li><strong>E-mail:</strong> <a href="mailto:Info@zabantu.net">Info@zabantu.net</a></li>
+</ul>
+<p>The Zabantu group is the <strong>data controller</strong> for the personal data collected on this website (see the <a href="{% url 'privacy' %}">privacy policy</a>).</p>
+
+<h2>2. Publication director</h2>
+<p>Professor Mahamadou Bassirou Tangara, who can be reached at <a href="mailto:Info@zabantu.net">Info@zabantu.net</a>.</p>
+
+<h2>3. Hosting provider</h2>
+<ul>
+  <li><strong>Name:</strong> LWS (Ligne Web Services)</li>
+  <li><strong>Address:</strong> 10 rue de Penthièvre, 75008 Paris, France</li>
+  <li><strong>Phone:</strong> <a href="tel:+33177623003">+33 1 77 62 30 03</a></li>
+  <li><strong>Website:</strong> <a href="https://www.lws.fr" target="_blank" rel="noopener">www.lws.fr</a></li>
+</ul>
+
+<h2>4. Intellectual property</h2>
+<p>The texts, publications, photographs, logos and other content of the website are the property of the Zabantu group or of their authors, unless otherwise stated. Any reproduction or reuse, in whole or in part, requires the prior consent of the publisher, except for short quotations that mention the source and the author.</p>
+<p>Publications bear the names of their authors, who remain responsible for their opinions. They do not necessarily reflect the views of the Zabantu group.</p>
+
+<h2>5. Liability</h2>
+<p>The Zabantu group strives to publish accurate and up-to-date information but cannot guarantee that it is free of errors. The website contains links to third-party websites (LinkedIn, Facebook, WhatsApp…) for whose content it is not responsible.</p>
+
+<h2>6. Personal data and cookies</h2>
+<p>Information on the data collected, its purpose, how long it is kept and your rights is given in the <a href="{% url 'privacy' %}">privacy policy</a>. Information on trackers is given in the <a href="{% url 'cookies' %}">cookie policy</a>.</p>
+
+<h2>7. Governing law</h2>
+<p>This website is governed by Malian law. In the event of a dispute, and failing an amicable settlement, the competent courts of Bamako shall have jurisdiction.</p>
+{% endblock %}

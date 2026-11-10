@@ -1,7 +1,8 @@
 {% extends 'base_public.html' %}
+{% load i18n %}
 
-{% block title %}Merci - Zabantu{% endblock %}
-{% block banner_title %}Merci pour votre demande{% endblock %}
+{% block title %}{% translate "Merci" %} - Zabantu{% endblock %}
+{% block banner_title %}{% translate "Merci pour votre demande" %}{% endblock %}
 {% block banner_subtitle %}Economy | Conflict | State{% endblock %}
 
 {% block extra_css %}
@@ -20,18 +21,18 @@
 <div class="thanks">
     <div class="thanks-card">
         <div class="thanks-icon"><i class="fas fa-check"></i></div>
-        <h2 class="h3">{% if name %}Merci {{ name }} !{% else %}Merci !{% endif %}</h2>
-        <p class="mb-0">Votre demande d'adhésion au Groupe de recherche Zabantu a bien été enregistrée.</p>
+        <h2 class="h3">{% if name %}{% blocktranslate %}Merci {{ name }} !{% endblocktranslate %}{% else %}{% translate "Merci !" %}{% endif %}</h2>
+        <p class="mb-0">{% translate "Votre demande d'adhésion au Groupe de recherche Zabantu a bien été enregistrée." %}</p>
 
         <ul class="thanks-steps">
-            <li>L'équipe de Zabantu examine votre demande.</li>
-            <li>Si elle est validée, vous apparaîtrez dans la liste des membres du site, avec les informations de profil que vous avez renseignées.</li>
-            <li>Nous pourrons vous contacter à l'adresse e-mail ou au numéro indiqué.</li>
+            <li>{% translate "L'équipe de Zabantu examine votre demande." %}</li>
+            <li>{% translate "Si elle est validée, vous apparaîtrez dans la liste des membres du site, avec les informations de profil que vous avez renseignées." %}</li>
+            <li>{% translate "Nous pourrons vous contacter à l'adresse e-mail ou au numéro indiqué." %}</li>
         </ul>
 
         <div class="thanks-actions">
-            <a href="{% url 'home' %}" class="btn btn-outline-secondary">Retour à l'accueil</a>
-            <a href="{% url 'public_article_list' %}" class="btn" style="background:var(--zabantu-primary);color:#fff;">Découvrir nos publications</a>
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary">{% translate "Retour à l'accueil" %}</a>
+            <a href="{% url 'public_article_list' %}" class="btn" style="background:var(--zabantu-primary);color:#fff;">{% translate "Découvrir nos publications" %}</a>
         </div>
     </div>
 </div>

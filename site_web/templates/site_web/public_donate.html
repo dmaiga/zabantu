@@ -1,8 +1,8 @@
 {% extends 'base_public.html' %}
-
-{% block title %}Faire un don - Zabantu{% endblock %}
-{% block banner_title %}Soutenir Zabantu{% endblock %}
-{% block banner_subtitle %}Votre don fait avancer la recherche{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Faire un don" %} - Zabantu{% endblock %}
+{% block banner_title %}{% translate "Soutenir Zabantu" %}{% endblock %}
+{% block banner_subtitle %}{% translate "Votre don fait avancer la recherche" %}{% endblock %}
 {% block donate_band %}{% endblock %}
 
 {% block extra_css %}
@@ -40,24 +40,26 @@
 
     <section>
         <p class="donate-intro">
+            {% blocktranslate trimmed %}
             Zabantu est un groupe de recherche indépendant qui travaille sur le nexus <strong>Economy | Conflict | State</strong>.
             Pour mener ses travaux et les partager librement, le groupe accepte les dons des personnes et des organisations
             qui souhaitent le soutenir. Chaque contribution, quel que soit son montant, compte.
+            {% endblocktranslate %}
         </p>
-        <ul class="donate-uses" aria-label="À quoi servent les dons">
-            <li><i class="fas fa-magnifying-glass-chart" aria-hidden="true"></i><span>Financer les enquêtes de terrain et les travaux de recherche</span></li>
-            <li><i class="fas fa-people-group" aria-hidden="true"></i><span>Organiser les séminaires Gɛlɛkan, conférences et ateliers</span></li>
-            <li><i class="fas fa-book-open" aria-hidden="true"></i><span>Publier et diffuser nos analyses en accès libre</span></li>
-            <li><i class="fas fa-seedling" aria-hidden="true"></i><span>Accompagner les jeunes chercheuses et chercheurs</span></li>
+        <ul class="donate-uses" aria-label="{% translate 'À quoi servent les dons' %}">
+            <li><i class="fas fa-magnifying-glass-chart" aria-hidden="true"></i><span>{% translate "Financer les enquêtes de terrain et les travaux de recherche" %}</span></li>
+            <li><i class="fas fa-people-group" aria-hidden="true"></i><span>{% translate "Organiser les séminaires Gɛlɛkan, conférences et ateliers" %}</span></li>
+            <li><i class="fas fa-book-open" aria-hidden="true"></i><span>{% translate "Publier et diffuser nos analyses en accès libre" %}</span></li>
+            <li><i class="fas fa-seedling" aria-hidden="true"></i><span>{% translate "Accompagner les jeunes chercheuses et chercheurs" %}</span></li>
         </ul>
     </section>
 
     <section class="donate-block" aria-labelledby="donate-how">
-        <h2 id="donate-how">Comment faire un don</h2>
+        <h2 id="donate-how">{% translate "Comment faire un don" %}</h2>
         <ol class="donate-steps">
             <li>
-                <h3>Envoyez votre don par Mobile Money</h3>
-                <p>Faites un transfert vers l'un de ces numéros :</p>
+                <h3>{% translate "Envoyez votre don par Mobile Money" %}</h3>
+                <p>{% translate "Faites un transfert vers l'un de ces numéros :" %}</p>
                 <div class="donate-numbers">
                     {% for number in donation_numbers %}
                     <div class="donate-number">
@@ -65,38 +67,39 @@
                             <div class="label">{{ number.operator }}</div>
                             <a href="tel:{{ number.tel }}">{{ number.number }}</a>
                         </div>
-                        <button type="button" class="copy-btn" data-copy="{{ number.number }}" aria-label="Copier le numéro {{ number.number }}">
-                            <i class="far fa-copy" aria-hidden="true"></i> <span>Copier</span>
+                        <button type="button" class="copy-btn" data-copy="{{ number.number }}" aria-label="{% blocktranslate with number=number.number %}Copier le numéro {{ number }}{% endblocktranslate %}" data-label-copy="{% translate 'Copier' %}" data-label-copied="{% translate 'Copié' %}">
+                            <i class="far fa-copy" aria-hidden="true"></i> <span>{% translate "Copier" %}</span>
                         </button>
                     </div>
                     {% empty %}
-                    <p class="mb-0">Les numéros sont en cours de mise à jour : <a href="{% url 'contact' %}?sujet=don#formulaire">écrivez-nous</a> pour faire un don.</p>
+                    {% url 'contact' as contact_url %}
+                    <p class="mb-0">{% blocktranslate trimmed %}Les numéros sont en cours de mise à jour : <a href="{{ contact_url }}?sujet=don#formulaire">écrivez-nous</a> pour faire un don.{% endblocktranslate %}</p>
                     {% endfor %}
                 </div>
             </li>
             <li>
-                <h3>Confirmez votre don</h3>
-                <p>Envoyez-nous un message en indiquant votre nom, le montant, la date et le numéro utilisé : nous pourrons ainsi vérifier la réception et vous remercier.</p>
-                <a class="btn-donate-confirm" href="{% url 'contact' %}?sujet=don#formulaire"><i class="fas fa-envelope" aria-hidden="true"></i> Confirmer mon don</a>
-                <p class="small text-muted mt-2 mb-0">Vous pouvez aussi nous écrire à <a href="mailto:info@zabantu.net">info@zabantu.net</a>.</p>
+                <h3>{% translate "Confirmez votre don" %}</h3>
+                <p>{% translate "Envoyez-nous un message en indiquant votre nom, le montant, la date et le numéro utilisé : nous pourrons ainsi vérifier la réception et vous remercier." %}</p>
+                <a class="btn-donate-confirm" href="{% url 'contact' %}?sujet=don#formulaire"><i class="fas fa-envelope" aria-hidden="true"></i> {% translate "Confirmer mon don" %}</a>
+                <p class="small text-muted mt-2 mb-0">{% blocktranslate trimmed %}Vous pouvez aussi nous écrire à <a href="mailto:info@zabantu.net">info@zabantu.net</a>.{% endblocktranslate %}</p>
             </li>
             <li>
-                <h3>Nous vous répondons</h3>
-                <p class="mb-0">Nous vous confirmons la réception de votre don. Merci pour votre soutien !</p>
+                <h3>{% translate "Nous vous répondons" %}</h3>
+                <p class="mb-0">{% translate "Nous vous confirmons la réception de votre don. Merci pour votre soutien !" %}</p>
             </li>
         </ol>
     </section>
 
     <section class="donate-block">
-        <p class="donate-note mb-0"><i class="fas fa-circle-info me-2" aria-hidden="true"></i>Le don en ligne par carte bancaire et par Mobile Money sera bientôt disponible directement sur ce site. En attendant, merci d'utiliser les numéros ci-dessus.</p>
+        <p class="donate-note mb-0"><i class="fas fa-circle-info me-2" aria-hidden="true"></i>{% translate "Le don en ligne par carte bancaire et par Mobile Money sera bientôt disponible directement sur ce site. En attendant, merci d'utiliser les numéros ci-dessus." %}</p>
     </section>
 
     <section class="donate-block" aria-labelledby="donate-other">
-        <h2 id="donate-other">Soutenir autrement</h2>
+        <h2 id="donate-other">{% translate "Soutenir autrement" %}</h2>
         <div class="donate-other">
-            <a href="{% url 'membership_apply' %}">Rejoindre Zabantu</a>
-            <a href="{% url 'contact' %}">Proposer une collaboration</a>
-            <a href="https://whatsapp.com/channel/0029VbE1ds8GufIpCbIXZL1T" target="_blank" rel="noopener">Suivre la chaîne WhatsApp</a>
+            <a href="{% url 'membership_apply' %}">{% translate "Rejoindre Zabantu" %}</a>
+            <a href="{% url 'contact' %}">{% translate "Proposer une collaboration" %}</a>
+            <a href="https://whatsapp.com/channel/0029VbE1ds8GufIpCbIXZL1T" target="_blank" rel="noopener">{% translate "Suivre la chaîne WhatsApp" %}</a>
         </div>
     </section>
 </div>
@@ -108,8 +111,8 @@
         btn.addEventListener('click', function () {
             var label = btn.querySelector('span');
             navigator.clipboard.writeText(btn.dataset.copy).then(function () {
-                label.textContent = 'Copié';
-                setTimeout(function () { label.textContent = 'Copier'; }, 2000);
+                label.textContent = btn.dataset.labelCopied;
+                setTimeout(function () { label.textContent = btn.dataset.labelCopy; }, 2000);
             });
         });
     });

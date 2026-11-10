@@ -1,5 +1,6 @@
 # articles/models.py
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from zabantu.validators import validate_image, validate_pdf
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify, Truncator
@@ -8,6 +9,7 @@ from django.utils import timezone
 import uuid
 import re
 from intervenants.models import Intervenant
+from zabantu.i18n import TranslatableMixin
 from django.urls import reverse
 User = get_user_model()
 
@@ -16,7 +18,9 @@ def article_upload_path(instance, filename):
     return f'articles/{uuid.uuid4()}_{filename}'
 
 # articles/models.py
-class Article(models.Model):
+class Article(TranslatableMixin, models.Model):
+    TRANSLATED_FIELDS = ('title', 'subtitle', 'content', 'resume', 'abstract')
+    MAIN_FIELDS = ('title', ('content', 'resume', 'abstract'))
     STATUS_CHOICES = (
         ('draft', 'Brouillon'),
         ('scheduled', 'Programmé'),
@@ -25,24 +29,24 @@ class Article(models.Model):
     
     # État de la production (migration 0010) : « Zabantu » et « Analyse » ne font plus partie des choix du modèle.
     ARTICLE_TYPE_CHOICES = (
-        ('academic', 'Articles'),
-        ('independent', 'Indépendant'),
-        ('article', 'Articles'),
-        ('policy', 'Policy Briefs'),
-        ('ouvrage', 'Ouvrages'),
-        ('rapport', 'Rapports'),
-        ('working', 'Working Paper'),
+        ('academic', _('Articles')),
+        ('independent', _('Indépendant')),
+        ('article', _('Articles')),
+        ('policy', _('Policy Briefs')),
+        ('ouvrage', _('Ouvrages')),
+        ('rapport', _('Rapports')),
+        ('working', _('Working Paper')),
     )
 
     # Types proposés dans le menu de création et le filtre de la liste (comme en production)
     TYPE_MENU = (
-        ('analyse', 'Analyse'),
-        ('academic', 'Article'),
-        ('ouvrage', 'Ouvrage'),
-        ('policy', 'Policy Brief'),
-        ('rapport', 'Rapport'),
-        ('working', 'Working Paper'),
-        ('independent', 'Indépendant'),
+        ('analyse', _('Analyse')),
+        ('academic', _('Article')),
+        ('ouvrage', _('Ouvrage')),
+        ('policy', _('Policy Brief')),
+        ('rapport', _('Rapport')),
+        ('working', _('Working Paper')),
+        ('independent', _('Indépendant')),
     )
 
 
@@ -107,6 +111,15 @@ class Article(models.Model):
     # Métadonnées SEO
     meta_title = models.CharField(max_length=60, blank=True, verbose_name="Titre SEO")
     meta_description = models.CharField(max_length=160, blank=True, verbose_name="Description SEO")
+
+    # Version anglaise, facultative : vide, la page anglaise affiche le français (zabantu/i18n.py).
+    # null=True : SQLite (tests) ajoute alors la colonne sans reconstruire la table, ce qu'il ne sait pas faire avec
+    # l'index « NULLS LAST » de Meta.indexes.
+    title_en = models.CharField(max_length=255, blank=True, null=True, verbose_name="Titre (anglais)")
+    subtitle_en = models.CharField(max_length=500, blank=True, null=True, verbose_name="Sous-titre (anglais)")
+    content_en = HTMLField(blank=True, null=True, verbose_name="Contenu (anglais)")
+    resume_en = models.TextField(blank=True, null=True, verbose_name="Résumé (anglais)")
+    abstract_en = models.TextField(blank=True, null=True, verbose_name="Résumé (anglais)")
 
     class Meta:
         ordering = ['-created_at']
@@ -214,7 +227,9 @@ class Article(models.Model):
 
 def guelekan_upload_path(instance, filename):
     return f'guelekan/files/{uuid.uuid4()}_{filename}'
-class Guelekan(models.Model):
+class Guelekan(TranslatableMixin, models.Model):
+    TRANSLATED_FIELDS = ('title', 'subtitle', 'content')
+    MAIN_FIELDS = ('title', 'content')
     STATUS_CHOICES = (
         ('draft', 'Brouillon'),
         ('scheduled', 'Programmé'),
@@ -248,6 +263,11 @@ class Guelekan(models.Model):
 
     meta_title = models.CharField(max_length=60, blank=True, editable=False)  # editable=False
     meta_description = models.CharField(max_length=160, blank=True, editable=False)  # editable=False
+
+    # Version anglaise, facultative (null=True : voir Article)
+    title_en = models.CharField(max_length=255, blank=True, null=True, verbose_name="Titre (anglais)")
+    subtitle_en = models.CharField(max_length=500, blank=True, null=True, verbose_name="Sous-titre (anglais)")
+    content_en = HTMLField(blank=True, null=True, verbose_name="Contenu (anglais)")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

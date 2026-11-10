@@ -1,22 +1,28 @@
-{% load static %}
+{% load static i18n %}{% get_current_language as LANG %}
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ LANG }}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}Zabantu - Analyses et Séminaires{% endblock %}</title>
-    <meta name="description" content="{{ seo.description|default:'Blog Zabantu - un groupe de chercheurs en sciences sociales travaillant sur le développement économique et social.' }}">
+  <title>{% block title %}{% translate "Zabantu - Analyses et Séminaires" %}{% endblock %}</title>
+    {% translate "Blog Zabantu - un groupe de chercheurs en sciences sociales travaillant sur le développement économique et social." as default_description %}
+    <meta name="description" content="{{ seo.description|default:default_description }}">
     <meta property="og:site_name" content="Zabantu">
-    <meta property="og:locale" content="fr_FR">
+    <meta property="og:locale" content="{{ og_locale }}">
     <meta property="og:type" content="{{ seo.type|default:'website' }}">
-    <meta property="og:title" content="{{ seo.title|default:'Zabantu - Groupe de recherche : Economy | Conflict | State' }}">
-    <meta property="og:description" content="{{ seo.description|default:'Groupe de chercheurs en sciences sociales travaillant sur le développement économique et social.' }}">
+    {% translate "Zabantu - Groupe de recherche : Economy | Conflict | State" as default_og_title %}
+    {% translate "Groupe de chercheurs en sciences sociales travaillant sur le développement économique et social." as default_og_description %}
+    <meta property="og:title" content="{{ seo.title|default:default_og_title }}">
+    <meta property="og:description" content="{{ seo.description|default:default_og_description }}">
     <meta property="og:url" content="{{ SITE_ORIGIN }}{{ request.path }}">
     <meta property="og:image" content="{% firstof seo.image SEO_DEFAULT_IMAGE %}">
-    <meta property="og:image:alt" content="{% if seo.image %}{{ seo.title }}{% else %}Logo du groupe de recherche Zabantu{% endif %}">
+    <meta property="og:image:alt" content="{% if seo.image %}{{ seo.title }}{% else %}{% translate "Logo du groupe de recherche Zabantu" %}{% endif %}">
     <meta name="twitter:card" content="summary_large_image">
     {% if seo.published %}<meta property="article:published_time" content="{{ seo.published }}">{% endif %}
-    {% if seo.canonical %}<link rel="canonical" href="{{ seo.canonical }}">{% endif %}
+    {% if robots_noindex %}<meta name="robots" content="noindex,follow">{% elif seo.canonical %}<link rel="canonical" href="{{ seo.canonical }}">{% endif %}
+    {% if alternate_paths %}{% for code, path in alternate_paths.items %}
+    <link rel="alternate" hreflang="{{ code }}" href="{{ SITE_ORIGIN }}{{ path }}">{% endfor %}
+    <link rel="alternate" hreflang="x-default" href="{{ SITE_ORIGIN }}{{ alternate_paths.fr }}">{% endif %}
   <script>
     // Skeleton des photos : le fond animé reste jusqu'au chargement (ou à l'échec) de chaque image.
     // Écouteur posé dans le <head>, avant toute image, pour n'en manquer aucune (« load » ne remonte qu'en capture).
@@ -103,6 +109,22 @@
     .donate-link:hover, .donate-link:focus-visible { background: var(--zabantu-light); transform: translateY(-1px); }
     .donate-link.mobile { margin-left: auto; margin-right: .6rem; }
 
+    /* Sélecteur de langue (FR / EN) */
+    .lang-link {
+        display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 40px;
+        color: #fff !important; font-weight: 700; font-size: .85rem; letter-spacing: .05em; text-decoration: none;
+        border: 1px solid rgba(255,255,255,.35); border-radius: 4px; padding: 0 .6rem; margin-left: .6rem; transition: background .2s;
+    }
+    .lang-link:hover, .lang-link:focus-visible { background: rgba(255,255,255,.12); }
+    .lang-link.mobile { margin: 0 .6rem 0 0; }
+    @media (max-width: 399.98px) {   /* logo, don, langue et menu tiennent sur une ligne dès 360 px */
+      .zabantu-header .navbar-brand { margin-right: .5rem; }
+      .donate-link.mobile { padding: 5px 10px; margin-right: .4rem; }
+      .donate-link.mobile i { display: none; }
+      .lang-link.mobile { min-width: 40px; padding: 0 .4rem; margin-right: .4rem; }
+      .zabantu-header .navbar-toggler { padding: .25rem .5rem; }
+    }
+
     /* Bandeau de don avant le pied de page */
     .donate-band { background: var(--zabantu-light); border-top: 1px solid #e3e4b4; padding: 1.25rem 0; margin-top: 3rem; }
     .donate-band .container { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .75rem 1.5rem; text-align: center; }
@@ -159,13 +181,14 @@
         <div class="container-fluid">
           <!-- Logo à gauche -->
           <a class="navbar-brand" href="{% url 'home' %}">
-            <img src="{% static 'site_web/images/zabantu-logo-dark.png' %}" alt="Zabantu Logo" class="logo" height="56">
+            <img src="{% static 'site_web/images/zabantu-logo-dark.png' %}" alt="{% translate 'Logo Zabantu' %}" class="logo" height="56">
           
           </a>
 
-          <a href="{% url 'donate' %}" class="donate-link mobile d-lg-none"><i class="fas fa-hand-holding-heart" aria-hidden="true"></i> Faire un don</a>
+          <a href="{% url 'donate' %}" class="donate-link mobile d-lg-none"><i class="fas fa-hand-holding-heart" aria-hidden="true"></i> {% translate "Faire un don" %}</a>
+          {% include 'site_web/includes/language_link.html' with extra_class='mobile d-lg-none' %}
 
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="{% translate 'Ouvrir le menu' %}">
             <span class="navbar-toggler-icon"></span>
           </button>
 
@@ -173,45 +196,46 @@
             <!-- Liens de navigation au centre -->
             <ul class="navbar-nav mx-auto mb-2 mb-lg-0 text-center">
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">À propos</a>
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">{% translate "À propos" %}</a>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="{% url 'about' %}">Qui sommes-nous</a></li>
-                  <li><a class="dropdown-item" href="{% url 'public_member_list' %}">Membres</a></li>
+                  <li><a class="dropdown-item" href="{% url 'about' %}">{% translate "Qui sommes-nous" %}</a></li>
+                  <li><a class="dropdown-item" href="{% url 'public_member_list' %}">{% translate "Membres" %}</a></li>
                 </ul>
               </li>
 <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Publications</a>
+    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">{% translate "Publications" %}</a>
 
     <ul class="dropdown-menu nav-submenu-root">
-        <li><a class="dropdown-item fw-semibold" href="{% url 'public_article_list' %}">Toutes les publications</a></li>
-        <li><a class="dropdown-item fw-semibold" href="{% url 'public_article_list' %}?type=guelekan">Séminaire Gɛlɛkan</a></li>
+        <li><a class="dropdown-item fw-semibold" href="{% url 'public_article_list' %}">{% translate "Toutes les publications" %}</a></li>
+        <li><a class="dropdown-item fw-semibold" href="{% url 'public_article_list' %}?type=guelekan">{% translate "Séminaire Gɛlɛkan" %}</a></li>
         <li><hr class="dropdown-divider"></li>
 
-        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=analyse">Analyses</a></li>
-        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=academic">Articles</a></li>
-        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=ouvrage">Ouvrages</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=analyse">{% translate "Analyses" %}</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=academic">{% translate "Articles" %}</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=ouvrage">{% translate "Ouvrages" %}</a></li>
         <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=policy">Policy Briefs</a></li>
-        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=independent">Indépendantes</a></li>
-        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=rapport">Rapports</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=independent">{% translate "Indépendantes" %}</a></li>
+        <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=rapport">{% translate "Rapports" %}</a></li>
         <li><a class="dropdown-item" href="{% url 'public_article_list' %}?type=working">Working Papers</a></li>
     </ul>
 </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'public_event_list' %}">Événements</a>
+                <a class="nav-link" href="{% url 'public_event_list' %}">{% translate "Événements" %}</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'liste_galeries' %}">Galerie</a>
+                <a class="nav-link" href="{% url 'liste_galeries' %}">{% translate "Galerie" %}</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{%url 'contact' %}">Contact</a>
+                <a class="nav-link" href="{% url 'contact' %}">{% translate "Contact" %}</a>
               </li>
             </ul>
 
             <!-- Barre de recherche à droite -->
              <div class="d-flex align-items-center justify-content-center">
-                <a href="{% url 'donate' %}" class="donate-link d-none d-lg-inline-flex"><i class="fas fa-hand-holding-heart" aria-hidden="true"></i> Faire un don</a>
+                <a href="{% url 'donate' %}" class="donate-link d-none d-lg-inline-flex"><i class="fas fa-hand-holding-heart" aria-hidden="true"></i> {% translate "Faire un don" %}</a>
+                {% include 'site_web/includes/language_link.html' with extra_class='d-none d-lg-inline-flex' %}
                 <a href="{% url 'login' %}" class="admin-link">
-                  <i class="fas fa-sign-in-alt"></i> Connexion
+                  <i class="fas fa-sign-in-alt"></i> {% translate "Connexion" %}
                 </a>
                
             </div>
@@ -225,7 +249,7 @@
   {% block banner %}
   <section class="zabantu-banner text-white">
     <div class="container">
-      <h1>{% block banner_title %} Bienvenue au groupe de recherche Zabantu {% endblock %}</h1>
+      <h1>{% block banner_title %} {% translate "Bienvenue au groupe de recherche Zabantu" %} {% endblock %}</h1>
       <p class="lead">{% block banner_subtitle %}Economy | Conflict | State {% endblock %}</p>
     </div>
   </section>
@@ -246,40 +270,40 @@
         <div class="footer-brand">
           <img src="{% static 'site_web/images/zabantu-logo-dark.png' %}" alt="Zabantu" height="64">
         </div>
-        <p class="footer-tagline">Groupe de recherche : Economy, Conflict, State. Vers une recherche ancrée dans les dynamiques économiques et sociales.</p>
+        <p class="footer-tagline">{% translate "Groupe de recherche : Economy, Conflict, State. Vers une recherche ancrée dans les dynamiques économiques et sociales." %}</p>
         <div class="footer-social">
           <a href="https://www.linkedin.com/company/zabantu-ecs/about/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
           <a href="https://www.facebook.com/zabantu.ecs" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-          <a href="https://whatsapp.com/channel/0029VbE1ds8GufIpCbIXZL1T" target="_blank" rel="noopener" aria-label="Chaîne WhatsApp Zabantu" title="Suivre la chaîne Zabantu sur WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="https://whatsapp.com/channel/0029VbE1ds8GufIpCbIXZL1T" target="_blank" rel="noopener" aria-label="{% translate 'Chaîne WhatsApp Zabantu' %}" title="{% translate 'Suivre la chaîne Zabantu sur WhatsApp' %}"><i class="fab fa-whatsapp"></i></a>
         </div>
       </div>
 
       <div class="col-lg-2 col-md-3 col-6">
-        <h5>Explorer</h5>
+        <h5>{% translate "Explorer" %}</h5>
         <ul class="list-unstyled footer-navigation">
-          <li><a href="{% url 'home' %}">Accueil</a></li>
-          <li><a href="{% url 'about' %}">À propos</a></li>
-          <li><a href="{% url 'public_member_list' %}">Membres</a></li>
-          <li><a href="{% url 'public_article_list' %}">Publications</a></li>
-          <li><a href="{% url 'public_article_list' %}?type=guelekan">Séminaires Gɛlɛkan</a></li>
-          <li><a href="{% url 'public_event_list' %}">Événements</a></li>
-          <li><a href="{% url 'liste_galeries' %}">Galerie</a></li>
+          <li><a href="{% url 'home' %}">{% translate "Accueil" %}</a></li>
+          <li><a href="{% url 'about' %}">{% translate "À propos" %}</a></li>
+          <li><a href="{% url 'public_member_list' %}">{% translate "Membres" %}</a></li>
+          <li><a href="{% url 'public_article_list' %}">{% translate "Publications" %}</a></li>
+          <li><a href="{% url 'public_article_list' %}?type=guelekan">{% translate "Séminaires Gɛlɛkan" %}</a></li>
+          <li><a href="{% url 'public_event_list' %}">{% translate "Événements" %}</a></li>
+          <li><a href="{% url 'liste_galeries' %}">{% translate "Galerie" %}</a></li>
         </ul>
       </div>
 
       <div class="col-lg-3 col-md-3 col-6">
-        <h5>Participer</h5>
+        <h5>{% translate "Participer" %}</h5>
         <ul class="list-unstyled footer-navigation">
-          <li><a href="{% url 'contact' %}">Nous écrire</a></li>
-          <li><a href="{% url 'donate' %}">Faire un don</a></li>
+          <li><a href="{% url 'contact' %}">{% translate "Nous écrire" %}</a></li>
+          <li><a href="{% url 'donate' %}">{% translate "Faire un don" %}</a></li>
         </ul>
-        <a class="footer-cta" href="{% url 'membership_apply' %}">Rejoindre Zabantu</a>
+        <a class="footer-cta" href="{% url 'membership_apply' %}">{% translate "Rejoindre Zabantu" %}</a>
       </div>
 
       <div class="col-lg-3 col-md-6">
-        <h5>Contact</h5>
+        <h5>{% translate "Contact" %}</h5>
         <ul class="list-unstyled footer-contact">
-          <li><i class="fas fa-location-dot"></i><span>Faculté des Sciences Économiques et de Gestion (FSEG), Campus universitaire de Badalabougou, Bamako</span></li>
+          <li><i class="fas fa-location-dot"></i><span>{% translate "Faculté des Sciences Économiques et de Gestion (FSEG), Campus universitaire de Badalabougou, Bamako" %}</span></li>
           <li><i class="fas fa-envelope"></i><a href="mailto:Info@zabantu.net">Info@zabantu.net</a></li>
           <li><i class="fas fa-phone"></i><span><a href="tel:+22377941470">+223 77 94 14 70</a><br><a href="tel:+22376634515">+223 76 63 45 15</a></span></li>
         </ul>
@@ -288,12 +312,12 @@
     </div>
 
     <div class="footer-bottom">
-      <span>&copy; {% now "Y" %} Groupe de recherche Zabantu. Tous droits réservés.</span>
+      <span>&copy; {% now "Y" %} {% translate "Groupe de recherche Zabantu. Tous droits réservés." %}</span>
       <span class="footer-legal">
-        <a href="{% url 'legal_notice' %}">Mentions légales</a> ·
-        <a href="{% url 'privacy' %}">Confidentialité</a> ·
-        <a href="{% url 'cookies' %}">Cookies</a> ·
-        <button type="button" class="footer-link-btn" data-open-cookie-settings>Gérer mes cookies</button>
+        <a href="{% url 'legal_notice' %}">{% translate "Mentions légales" %}</a> ·
+        <a href="{% url 'privacy' %}">{% translate "Confidentialité" %}</a> ·
+        <a href="{% url 'cookies' %}">{% translate "Cookies" %}</a> ·
+        <button type="button" class="footer-link-btn" data-open-cookie-settings>{% translate "Gérer mes cookies" %}</button>
       </span>
     </div>
   </div>

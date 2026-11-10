@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.conf import settings
 from users.views import login_view 
@@ -28,14 +29,11 @@ urlpatterns = [
     path('sitemap.xml', seo_views.sitemap, name='sitemap'),
     path('robots.txt', seo_views.robots, name='robots'),
     path('admin/', admin.site.urls),
-    path('', HomeView.as_view(), name='home'),
-
     path('auth/', login_view, name='login'),  
 
     path('users/', include('users.urls')),              
     path('articles/', include('articles.urls')),
     path('tinymce/', include('tinymce.urls')),
-    path('zabantu/', include('site_web.urls')),
     path('events/', include('events.urls')),
     path('gallery/', include('gallery.urls')),
     path('intervenants/', include('intervenants.urls')),
@@ -68,8 +66,15 @@ urlpatterns = [
              template_name='users/password_reset_complete.html'
          ), 
          name='password_reset_complete'),
-]        
-        
+]
+
+# Site public : français sans préfixe (adresses inchangées), anglais sous /en/
+urlpatterns += i18n_patterns(
+    path('', HomeView.as_view(), name='home'),
+    path('zabantu/', include('site_web.urls')),
+    prefix_default_language=False,
+)
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

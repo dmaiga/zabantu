@@ -1,11 +1,12 @@
-{# Base des pages d'erreur sans dépendance (400, 500) : ni base de données, ni balise url ou static, qui pourraient échouer à leur tour. #}
-<!DOCTYPE html>
-<html lang="fr">
+{# Base des pages d'erreur sans dépendance (400, 500) : ni base de données, ni balise url ou static, qui pourraient échouer à leur tour.
+   La langue vient de l'adresse (PathLanguageMiddleware) ; aucune requête n'est nécessaire pour la lire. #}
+{% load i18n %}{% get_current_language as LANG %}<!DOCTYPE html>
+<html lang="{{ LANG }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex">
-  <title>{% block title %}Erreur{% endblock %} - Zabantu</title>
+  <title>{% block title %}{% translate "Erreur" %}{% endblock %} - Zabantu</title>
   <style>
     body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; font-family: Georgia, serif; background: #f8f9fa; color: #333; }
     header { background: #2c3e2c; border-bottom: 3px solid #bf9264; padding: 1rem 1.5rem; }
@@ -20,14 +21,14 @@
   </style>
 </head>
 <body>
-  <header><a href="/zabantu/"><img src="/static/site_web/images/zabantu-logo-dark.png" alt="Zabantu"></a></header>
+  <header><a href="{% if LANG == 'en' %}/en{% endif %}/zabantu/"><img src="/static/site_web/images/zabantu-logo-dark.png" alt="Zabantu"></a></header>
   <main>
     <div class="box">
       <p class="code">{% block code %}{% endblock %}</p>
       <h1>{% block heading %}{% endblock %}</h1>
       {% block message %}{% endblock %}
-      <p><a class="btn" href="/zabantu/">Retour à l'accueil</a></p>
-      <p>Besoin d'aide ? <a class="mail" href="mailto:Info@zabantu.net">Info@zabantu.net</a></p>
+      <p><a class="btn" href="{% if LANG == 'en' %}/en{% endif %}/zabantu/">{% translate "Retour à l'accueil" %}</a></p>
+      <p>{% translate "Besoin d'aide ?" %} <a class="mail" href="mailto:Info@zabantu.net">Info@zabantu.net</a></p>
     </div>
   </main>
 </body>

@@ -1,4 +1,4 @@
-{% load photo_tags %}
+{% load photo_tags i18n %}
 {# Carrousel de tous les membres (contexte : team_members, déjà dans l'ordre voulu). Défile seul, avec pause, flèches et clavier. #}
 {% include 'site_web/includes/team_photo_styles.html' %}
 <style>
@@ -18,11 +18,11 @@
     .team-btn:hover, .team-btn:focus-visible { border-color: var(--zabantu-primary); color: var(--zabantu-primary); }
 </style>
 <div class="team-bar"><div class="team-controls" data-team-controls hidden>
-    <button type="button" class="team-btn" data-team-prev aria-label="Membres précédents"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
-    <button type="button" class="team-btn" data-team-toggle aria-label="Mettre en pause le défilement" aria-pressed="false"><i class="fas fa-pause" aria-hidden="true"></i></button>
-    <button type="button" class="team-btn" data-team-next aria-label="Membres suivants"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+    <button type="button" class="team-btn" data-team-prev aria-label="{% translate 'Membres précédents' %}"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+    <button type="button" class="team-btn" data-team-toggle aria-label="{% translate 'Mettre en pause le défilement' %}" data-label-pause="{% translate 'Mettre en pause le défilement' %}" data-label-play="{% translate 'Reprendre le défilement' %}" aria-pressed="false"><i class="fas fa-pause" aria-hidden="true"></i></button>
+    <button type="button" class="team-btn" data-team-next aria-label="{% translate 'Membres suivants' %}"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
 </div></div>
-<div data-team-carousel role="region" aria-roledescription="carrousel" aria-label="Les membres du groupe Zabantu">
+<div data-team-carousel role="region" aria-roledescription="{% translate 'carrousel' %}" aria-label="{% translate 'Les membres du groupe Zabantu' %}">
     <ul class="team-track" tabindex="0">
         {% for member in team_members %}
         <li class="team-card">
@@ -34,7 +34,7 @@
                     {% else %}<span class="team-initials" aria-hidden="true">{{ member.prenom|slice:":1" }}{{ member.nom|slice:":1" }}</span>{% endif %}
                 </div>
                 <h3>{{ member.get_full_name }}</h3>
-                {% if member.job_title %}<p>{{ member.job_title }}</p>{% endif %}
+                {% if member.job_title %}<p>{{ member.t.job_title }}</p>{% endif %}
             </a>
         </li>
         {% endfor %}
@@ -66,7 +66,7 @@
     function render() {
         controls.hidden = !scrollable();
         toggle.setAttribute('aria-pressed', paused ? 'true' : 'false');
-        toggle.setAttribute('aria-label', paused ? 'Reprendre le défilement' : 'Mettre en pause le défilement');
+        toggle.setAttribute('aria-label', paused ? toggle.dataset.labelPlay : toggle.dataset.labelPause);
         toggle.firstElementChild.className = paused ? 'fas fa-play' : 'fas fa-pause';
     }
     function tick() { if (!paused && !hovered && !document.hidden && scrollable()) { go(1); } }

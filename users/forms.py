@@ -87,7 +87,8 @@ class CustomMemberCreationForm(SectionedFormMixin, forms.ModelForm):
             'phone_number', 'profile_picture',
             'bio', 'job_title', 'department', 'date_started',
             'social_facebook', 'social_linkedin', 'social_twitter',
-            'scholar_link','personal_website', 'backoffice_access'
+            'scholar_link','personal_website', 'backoffice_access',
+            'job_title_en', 'bio_en',
         ]
         labels = {'backoffice_access': _("Autoriser la connexion à l'espace de gestion")}
         widgets = {
@@ -164,6 +165,7 @@ class ProfileEditForm(SectionedFormMixin, forms.ModelForm):
             'department',
             'bio',
             'social_facebook',
+            'job_title_en', 'bio_en',
             'social_linkedin',
             'social_twitter',
             'social_instagram',
@@ -241,7 +243,8 @@ class CustomUserUpdateForm(SectionedFormMixin, UserChangeForm):
             'social_linkedin',
             'social_twitter',
             'social_instagram',
-              'scholar_link','personal_website', 'backoffice_access'
+              'scholar_link','personal_website', 'backoffice_access',
+            'job_title_en', 'bio_en',
         ]
         labels = {
             'is_active': _('Compte actif'),

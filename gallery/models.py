@@ -5,13 +5,19 @@ from zabantu.validators import validate_image, validate_pdf
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 import uuid
+from zabantu.i18n import TranslatableMixin
 
 User = get_user_model()
 
-class Gallery(models.Model):
+class Gallery(TranslatableMixin, models.Model):
+    TRANSLATED_FIELDS = ('title', 'description')
+    MAIN_FIELDS = ('title',)
     title = models.CharField(max_length=200, verbose_name="Titre")
     slug = models.SlugField(max_length=200, unique=True, blank=True)
     description = models.TextField(blank=True, verbose_name="Description")
+    # Version anglaise, facultative : vide, la page anglaise affiche le français (zabantu/i18n.py)
+    title_en = models.CharField(max_length=200, blank=True, verbose_name="Titre (anglais)")
+    description_en = models.TextField(blank=True, verbose_name="Description (anglais)")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_featured = models.BooleanField(

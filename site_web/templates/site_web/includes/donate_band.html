@@ -1,6 +1,6 @@
-<section class="donate-band" aria-label="Faire un don">
+{% load i18n %}<section class="donate-band" aria-label="{% translate 'Faire un don' %}">
   <div class="container">
-    <p><i class="fas fa-hand-holding-heart" aria-hidden="true"></i> Zabantu accepte les dons pour financer ses recherches et ses séminaires.</p>
-    <a href="{% url 'donate' %}" class="donate-band-btn">Faire un don</a>
+    <p><i class="fas fa-hand-holding-heart" aria-hidden="true"></i> {% translate "Zabantu accepte les dons pour financer ses recherches et ses séminaires." %}</p>
+    <a href="{% url 'donate' %}" class="donate-band-btn">{% translate "Faire un don" %}</a>
   </div>
 </section>

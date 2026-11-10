@@ -1,9 +1,10 @@
 {% extends 'base_public.html' %}
 {% load photo_tags %}
 {% load clean_tags %}
+{% load i18n %}
 
-{% block title %}{{ article.title }} | Zabantu{% endblock %}
-{% block banner_title %}Groupe de recherche Zabantu {% endblock %}
+{% block title %}{{ article.t.title }} | Zabantu{% endblock %}
+{% block banner_title %}{% translate "Groupe de recherche Zabantu" %} {% endblock %}
 {% block banner_subtitle %}{% endblock %}
 {% block content %}
 <style>
@@ -49,8 +50,8 @@
 
 <div class="article-detail">
     <header class="article-header">
-        <h1 class="article-title">{{ article.title }}</h1>
-        {% if article.subtitle %}<div class="article-subtitle">{{ article.subtitle }}</div>{% endif %}
+        <h1 class="article-title" lang="{{ article.t.lang_title }}">{{ article.t.title }}</h1>
+        {% if article.subtitle %}<div class="article-subtitle">{{ article.t.subtitle }}</div>{% endif %}
         
         <div class="article-meta">
             <span class="article-category">{{ article.type_label }}</span>
@@ -74,15 +75,15 @@
             <div class="article-content">
                 {# Gestion unifiée des résumés selon ton modèle #}
                 {% if article.article_type == 'academic' and article.abstract %}
-                    <h3>Résumé</h3>
-                    {{ article.abstract|clean_html }}
+                    <h3>{% translate "Résumé" %}</h3>
+                    {{ article.t.abstract|clean_html }}
                 {% elif article.resume %}
-                    <h3>Résumé</h3>
-                    {{ article.resume|clean_html }}
+                    <h3>{% translate "Résumé" %}</h3>
+                    {{ article.t.resume|clean_html }}
                 {% endif %}
                 
                 {% if article.content %}
-                    <div class="mt-4">{{ article.content|clean_html }}</div>
+                    <div class="mt-4" lang="{{ article.t.lang_content }}">{{ article.t.content|clean_html }}</div>
                 {% endif %}
             </div>
         </div>
@@ -91,19 +92,19 @@
             {# Utilisation de l'image de couverture appropriée #}
             {% if article.article_type == 'independent' and article.independent_cover %}
                 <div class="article-cover-container">
-                    {% thumb article.independent_cover 1600 as c %}<img src="{{ c.url }}"{% if c.width %} width="{{ c.width }}" height="{{ c.height }}"{% endif %} class="article-cover" alt="{{ article.title }}" fetchpriority="high">
+                    {% thumb article.independent_cover 1600 as c %}<img src="{{ c.url }}"{% if c.width %} width="{{ c.width }}" height="{{ c.height }}"{% endif %} class="article-cover" alt="{{ article.t.title }}" fetchpriority="high">
                 </div>
             {% elif article.cover_image %}
                 <div class="article-cover-container">
-                    {% thumb article.cover_image 1600 as c %}<img src="{{ c.url }}"{% if c.width %} width="{{ c.width }}" height="{{ c.height }}"{% endif %} class="article-cover" alt="{{ article.title }}" fetchpriority="high">
+                    {% thumb article.cover_image 1600 as c %}<img src="{{ c.url }}"{% if c.width %} width="{{ c.width }}" height="{{ c.height }}"{% endif %} class="article-cover" alt="{{ article.t.title }}" fetchpriority="high">
                 </div>
             {% endif %}
             
             <div class="metadata-card">
-                <h3 class="metadata-title">Informations</h3>
+                <h3 class="metadata-title">{% translate "Informations" %}</h3>
                 <div class="metadata-grid">
                     <div class="metadata-item">
-                        <span class="metadata-label">Type</span>
+                        <span class="metadata-label">{% translate "Type" %}</span>
                         <span class="metadata-value">{{ article.type_label }}</span>
                     </div>
 
@@ -111,13 +112,13 @@
                     {% if article.article_type == 'working' %}
                         {% if article.institution %}
                         <div class="metadata-item">
-                            <span class="metadata-label">Institution</span>
+                            <span class="metadata-label">{% translate "Institution" %}</span>
                             <span class="metadata-value">{{ article.institution }}</span>
                         </div>
                         {% endif %}
                         {% if article.working_series %}
                         <div class="metadata-item">
-                            <span class="metadata-label">Série / Numéro</span>
+                            <span class="metadata-label">{% translate "Série / Numéro" %}</span>
                             <span class="metadata-value">{{ article.working_series }} {% if article.working_number %}#{{ article.working_number }}{% endif %}</span>
                         </div>
                         {% endif %}
@@ -125,25 +126,25 @@
                     
                     {# Champs spécifiques Académiques #}
                     {% if article.article_type == 'academic' %}
-                        {% if article.journal %}<div class="metadata-item"><span class="metadata-label">Revue</span><span class="metadata-value">{{ article.journal }}</span></div>{% endif %}
-                        {% if article.publisher %}<div class="metadata-item"><span class="metadata-label">Éditeur</span><span class="metadata-value">{{ article.publisher }}</span></div>{% endif %}
+                        {% if article.journal %}<div class="metadata-item"><span class="metadata-label">{% translate "Revue" %}</span><span class="metadata-value">{{ article.journal }}</span></div>{% endif %}
+                        {% if article.publisher %}<div class="metadata-item"><span class="metadata-label">{% translate "Éditeur" %}</span><span class="metadata-value">{{ article.publisher }}</span></div>{% endif %}
                     {% endif %}
 
                     {# Champs spécifiques Ouvrages #}
                     {% if article.article_type == 'ouvrage' %}
-                        {% if article.publisher_book %}<div class="metadata-item"><span class="metadata-label">Maison d’édition</span><span class="metadata-value">{{ article.publisher_book }}</span></div>{% endif %}
-                        {% if article.publication_place %}<div class="metadata-item"><span class="metadata-label">Lieu de publication</span><span class="metadata-value">{{ article.publication_place }}</span></div>{% endif %}
-                        {% if article.page_count %}<div class="metadata-item"><span class="metadata-label">Nombre de pages</span><span class="metadata-value">{{ article.page_count }}</span></div>{% endif %}
-                        {% if article.publication_date %}<div class="metadata-item"><span class="metadata-label">Date de publication</span><span class="metadata-value">{{ article.publication_date|date:"d F Y" }}</span></div>{% endif %}
+                        {% if article.publisher_book %}<div class="metadata-item"><span class="metadata-label">{% translate "Maison d’édition" %}</span><span class="metadata-value">{{ article.publisher_book }}</span></div>{% endif %}
+                        {% if article.publication_place %}<div class="metadata-item"><span class="metadata-label">{% translate "Lieu de publication" %}</span><span class="metadata-value">{{ article.publication_place }}</span></div>{% endif %}
+                        {% if article.page_count %}<div class="metadata-item"><span class="metadata-label">{% translate "Nombre de pages" %}</span><span class="metadata-value">{{ article.page_count }}</span></div>{% endif %}
+                        {% if article.publication_date %}<div class="metadata-item"><span class="metadata-label">{% translate "Date de publication" %}</span><span class="metadata-value">{{ article.publication_date|date:"d F Y" }}</span></div>{% endif %}
                     {% endif %}
 
                     {# Liens Externes #}
                     {% with ext_link=article.external_link|default:article.external_link_academique %}
                     {% if ext_link %}
                     <div class="metadata-item">
-                        <span class="metadata-label">Lien externe</span>
+                        <span class="metadata-label">{% translate "Lien externe" %}</span>
                         <a href="{{ ext_link }}" target="_blank" class="external-link metadata-value">
-                            <i class="fas fa-external-link-alt"></i> Consulter l'article
+                            <i class="fas fa-external-link-alt"></i> {% translate "Consulter l'article" %}
                         </a>
                     </div>
                     {% endif %}
@@ -151,9 +152,9 @@
                     
                     {% if article.pdf_file %}
                     <div class="metadata-item">
-                        <span class="metadata-label">Document</span>
+                        <span class="metadata-label">{% translate "Document" %}</span>
                         <a href="{{ article.pdf_file.url }}" target="_blank" class="external-link">
-                            <i class="fas fa-file-pdf"></i> Télécharger le PDF
+                            <i class="fas fa-file-pdf"></i> {% translate "Télécharger le PDF" %}
                         </a>
                     </div>
                     {% endif %}
@@ -167,7 +168,7 @@
 
 {% if display_authors or article.external_author %}
 <div class="authors-section">
-    <h3 class="authors-title">Auteur(s)</h3>
+    <h3 class="authors-title">{% translate "Auteur(s)" %}</h3>
     <div class="authors-grid">
         
         {% for author in display_authors %}
@@ -182,7 +183,7 @@
                 </div>
                 <div class="author-info">
                     <div class="author-name">{{ author.name }}</div>
-                    <div class="author-role">Membre Zabantu</div>
+                    <div class="author-role">{% translate "Membre Zabantu" %}</div>
                 </div>
             </a>
             {% else %}
@@ -191,7 +192,7 @@
                 <div class="author-info">
                     <div class="author-name">{{ author.name }}</div>
                     <div class="author-role">
-                        {% if author.type == 'academic' %}Collaborateur Académique{% else %}Auteur externe{% endif %}
+                        {% if author.type == 'academic' %}{% translate "Collaborateur Académique" %}{% else %}{% translate "Auteur externe" %}{% endif %}
                     </div>
                 </div>
             </div>
@@ -207,7 +208,7 @@
     </div>
     <div class="author-info">
         <div class="author-name">{{ article.external_author }}</div>
-        <div class="author-role">Auteur externe</div>
+        <div class="author-role">{% translate "Auteur externe" %}</div>
     </div>
 </div>
 {% endif %}
@@ -219,7 +220,7 @@
     
     <div class="text-center mt-4">
         <a href="{% url 'public_article_list' %}" class="back-link">
-            <i class="fas fa-arrow-left"></i> Retour aux publications
+            <i class="fas fa-arrow-left"></i> {% translate "Retour aux publications" %}
         </a>
     </div>
 </div>

@@ -52,6 +52,17 @@ Déployée en production ; les sauvegardes ont été testées à la main avec su
 
 Aucune nouvelle variable obligatoire. `SEO_START_DATE` est facultative (1er novembre 2026 par défaut) : elle fixe la date à partir de laquelle un contenu publié figure dans le sitemap et reçoit une balise canonique.
 
+## 2 bis. Mise à jour suivante : lots 1 à 4 (don, photos, cache, site bilingue)
+
+Rien à faire de plus que la mise à jour de routine (section 1) : aucune variable `.env` nouvelle, aucune commande en plus.
+
+| Changement | À savoir |
+|------------|----------|
+| Migrations `articles.0014`, `events.0005`, `gallery.0004`, `intervenants.0004`, `users.0005`, `site_web.0015` | Ajout de colonnes seulement (champs anglais facultatifs, langue des abonnés, des demandes d'adhésion et des messages). Aucune donnée modifiée. |
+| Site anglais sous `/en/` (`/en/zabantu/…`) | Les adresses françaises ne changent pas. Le backoffice reste en français. |
+| Traductions compilées `locale/en/LC_MESSAGES/django.mo` | Versionnées : pas de `compilemessages` sur le serveur (`msgfmt` absent). |
+| Contenus existants | Pas de traduction rétroactive : sur les pages anglaises, ils s'affichent en français. |
+
 ## 3. Tâches planifiées (cPanel > Tâches Cron)
 
 Les trois tâches sont en place :
@@ -115,6 +126,7 @@ Sur le site réel :
 - [ ] Formulaires d'adhésion et de contact : envoi de test, réception côté tableau de bord. **Supprimer ensuite les données de test.**
 - [ ] Ajout d'une photo : une image valide passe, un faux fichier (`.png` qui n'en est pas un) est refusé.
 - [ ] Pages légales (`/zabantu/mentions-legales/`, `/confidentialite/`, `/cookies/`) et lien « Gérer mes cookies » du pied de page.
+- [ ] Site anglais : `https://zabantu.net/en/zabantu/` s'affiche en anglais ; le bouton « EN » / « FR » de l'en-tête mène à la même page dans l'autre langue ; le backoffice reste en français.
 - [ ] `https://zabantu.net/robots.txt` et `https://zabantu.net/sitemap.xml` s'affichent. Le sitemap ne liste que les contenus publiés à partir de `SEO_START_DATE`.
 - [ ] Aperçu d'un lien d'article, d'événement et de Gɛlɛkan sur WhatsApp, Facebook et LinkedIn (un réseau peut garder un ancien aperçu en cache).
 - [ ] Google Search Console : site déclaré, sitemap envoyé (une seule fois).
@@ -131,6 +143,7 @@ Sur le site réel :
 | Miniatures problématiques | Supprimer `MEDIA_ROOT/cache/thumbs/`. |
 | Contenu pas à jour sur l'accueil ou la liste des publications | Attendre 10 minutes au plus, ou vider `var/cache/`. Si le problème revient : `PAGE_CACHE_TIMEOUT=0` dans `.env`, redémarrer. |
 | Redirection HTTPS en boucle | `SECURE_SSL_REDIRECT=False` dans `.env`, redémarrer. |
+| Pages anglaises restées en français (textes fixes) | Le fichier `locale/en/LC_MESSAGES/django.mo` manque ou date : le recompiler en local, le pousser, redéployer, redémarrer. |
 
 ## 7. Points à surveiller
 
