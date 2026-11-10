@@ -12,7 +12,11 @@ def global_settings(request):
             status=MembershipApplication.Status.PENDING).count()
         from site_web.models import ContactMessage
         unread = ContactMessage.objects.filter(is_read=False).count()
+    from django.utils.functional import SimpleLazyObject
+    from site_web.content_cache import content_version
     return {
+        'content_version': SimpleLazyObject(content_version),  # lu seulement par les gabarits qui en ont besoin
+        'PAGE_CACHE_TIMEOUT': settings.PAGE_CACHE_TIMEOUT,
         'pending_applications_count': pending,
         'unread_messages_count': unread,
         'DEFAULT_FROM_EMAIL': settings.DEFAULT_FROM_EMAIL,

@@ -3,6 +3,7 @@
 {% load clean_tags %}
 {% load antispam_tags %}
 {% load static %}
+{% load cache %}
 
 {% block title %}Zabantu - Groupe de recherche : Economy | Conflict | State{% endblock %}
 {% block banner %}{% endblock %}
@@ -121,6 +122,8 @@
     }
 </style>
 
+{# Sections de contenu en cache (site_web/content_cache.py) ; l'équipe (ordre aléatoire) et la newsletter (formulaire) restent hors cache #}
+{% cache PAGE_CACHE_TIMEOUT home_content content_version %}
 <!-- 1. Héros -->
 <section class="home-hero">
     <div class="container">
@@ -280,6 +283,8 @@
     </div>
 </section>
 
+{% endcache %}
+
 <!-- 7. Équipe : carrousel de tous les membres, dans un ordre aléatoire -->
 {% if team_members %}
 <section class="home-section alt">
@@ -293,6 +298,7 @@
 </section>
 {% endif %}
 
+{% cache PAGE_CACHE_TIMEOUT home_partners content_version %}
 <!-- 8. Partenaires -->
 {% if partenaires %}
 <section class="home-section">
@@ -304,6 +310,8 @@
     </div>
 </section>
 {% endif %}
+
+{% endcache %}
 
 <!-- 9. Newsletter -->
 <section class="home-section alt">

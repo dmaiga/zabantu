@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from io import BytesIO
 from typing import Optional
 
+from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from PIL import Image, ImageOps
@@ -51,6 +52,22 @@ def _display_size(src):
     return (h, w) if orientation in _QUARTER_TURNS else (w, h)
 
 
+SIZE_CACHE_TIMEOUT = 30 * 24 * 3600
+
+
+def _original_size(name, storage):
+    """Taille affichée de l'original, gardée en cache : on n'ouvre le fichier qu'une fois.
+    Le poids du fichier entre dans la clé : un nom libéré puis réutilisé par une autre image n'hérite pas de l'ancienne taille."""
+    key = 'thumbsize:' + hashlib.sha1(f"{name}|{storage.size(name)}".encode()).hexdigest()
+    size = cache.get(key)
+    if size is None:
+        with storage.open(name) as fh:
+            with Image.open(fh) as src:
+                size = _display_size(src)
+        cache.set(key, size, SIZE_CACHE_TIMEOUT)
+    return size
+
+
 def get_thumbnail(image, width):
     """Renvoie un Thumb de largeur `width` ; repli sur l'original en cas de souci."""
     if not image:
@@ -58,9 +75,7 @@ def get_thumbnail(image, width):
     name, storage = _name_and_storage(image)
     original_url = storage.url(name)
     try:
-        with storage.open(name) as fh:
-            with Image.open(fh) as src:
-                src_w, src_h = _display_size(src)  # exif_transpose décoderait toute l'image à chaque affichage
+        src_w, src_h = _original_size(name, storage)  # exif_transpose décoderait toute l'image à chaque affichage
     except Exception:
         logger.warning("Miniature : original illisible %s", name, exc_info=True)
         return Thumb(url=original_url)

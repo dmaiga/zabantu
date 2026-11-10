@@ -17,3 +17,7 @@ from .settings import *  # noqa: E402,F401,F403
 DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': ':memory:'}}
 PASSWORD_HASHERS = ['django.contrib.auth.hashers.MD5PasswordHasher']  # tests plus rapides
 CACHES = {name: {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', 'LOCATION': name} for name in ('default', 'antispam')}
+
+# Pas de cache des morceaux de pages : une base remise à zéro entre deux tests ne doit pas croiser une page en cache.
+# Les tests du cache (site_web/tests_content_cache.py) le réactivent.
+PAGE_CACHE_TIMEOUT = 0

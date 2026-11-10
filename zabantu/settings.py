@@ -269,11 +269,18 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = SECURE_HSTS_SECONDS > 0
     SECURE_CONTENT_TYPE_NOSNIFF = True
 
-# Caches. « default » reste le cache en mémoire de Django (les signaux de site_web en dépendent).
-# « antispam » (fichiers, partagé entre les processus de l'hébergeur) garde les compteurs du blocage de la connexion.
+# Caches en fichiers : l'hébergeur fait tourner plusieurs processus, qui ne partagent pas la mémoire.
+# « default » : morceaux de pages publiques et tailles des photos (site_web/content_cache.py, site_web/thumbnails.py),
+#   dans un dossier du compte (var/cache, ignoré par git) ; il peut être vidé à tout moment sans perte.
+# « antispam » : compteurs du blocage de la connexion.
 import tempfile  # noqa: E402
+PAGE_CACHE_TIMEOUT = env.int('PAGE_CACHE_TIMEOUT', default=600)  # secondes ; 0 désactive le cache des pages
 CACHES = {
-    'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'},
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': env('PAGE_CACHE_DIR', default=str(BASE_DIR / 'var' / 'cache')),
+        'OPTIONS': {'MAX_ENTRIES': 2000},
+    },
     'antispam': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
         'LOCATION': env('CACHE_DIR', default=str(Path(tempfile.gettempdir()) / 'zabantu_antispam')),

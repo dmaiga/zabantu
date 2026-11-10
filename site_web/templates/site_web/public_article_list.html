@@ -1,6 +1,7 @@
 {% extends 'base_public.html' %}
 {% load photo_tags %}
 {% load clean_tags %}
+{% load cache %}
 
 {% block title %}
     {% if current_filter %}
@@ -281,6 +282,8 @@
         .pub-actions .btn { flex: 1 1 auto; justify-content: center; }
     }
 </style>
+{# Résultats en cache, selon l'adresse (filtres, recherche, tri, page) ; voir site_web/content_cache.py #}
+{% cache PAGE_CACHE_TIMEOUT publication_list content_version request.get_full_path %}
 
 <div class="container">
     <div class="publication-container">
@@ -438,4 +441,5 @@
         </div>
     </div>
 </div>
+{% endcache %}
 {% endblock %}

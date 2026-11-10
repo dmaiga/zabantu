@@ -302,6 +302,7 @@ def public_article_list(request):
         articles = articles.order_by('-title')
     else:
         articles = articles.order_by(*PUBLICATION_ORDER)
+    articles = articles.prefetch_related('authors')  # auteurs de chaque carte en une requête
 
     # ✅ COUNTS PAR TYPE
     type_counts_qs = Article.objects.filter(status='published') \

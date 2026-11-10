@@ -24,4 +24,5 @@ env/
 # Django
 media/
 staticfiles/
+var/
 data/

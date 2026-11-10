@@ -21,9 +21,10 @@ PYTHON=/home/cp2594820p30/virtualenv/repositories/zabantu/3.13/bin/python ./depl
 3. **Dépendances** : `pip install -r requirements.txt`.
 4. **Migrations** : le plan est affiché (`migrate --plan`), puis `migrate`.
 5. **Fichiers statiques** : `collectstatic` à **chaque** mise à jour (WhiteNoise sert des noms à empreinte : une page qui référence un fichier absent du manifeste échoue).
-6. **Miniatures** : `generate_thumbnails`.
-7. **Contrôle** : `check --deploy` (aucun avertissement bloquant).
-8. Option : `./deploy.sh <username> …` donne l'accès au backoffice à ces comptes.
+6. **Miniatures** : `generate_thumbnails` (photos des galeries, couvertures, affiches, portraits).
+7. **Cache des pages** : invalidé, pour que les gabarits modifiés s'affichent tout de suite.
+8. **Contrôle** : `check --deploy` (aucun avertissement bloquant).
+9. Option : `./deploy.sh <username> …` donne l'accès au backoffice à ces comptes.
 
 Ensuite :
 - **Redémarrer l'application** (cPanel > Setup Python App > Restart) : obligatoire pour les nouveaux fichiers Python et bibliothèques de balises.
@@ -101,6 +102,7 @@ Points d'attention :
 - `SITE_URL` sert aux liens des e-mails, aux balises de partage et au sitemap : une valeur fausse donne des liens faux.
 - `SECURE_SSL_REDIRECT` est actif par défaut avec `DEBUG=False`. Redirection en boucle : `SECURE_SSL_REDIRECT=False`, redémarrer.
 - `CACHE_DIR` (facultatif) : dossier inscriptible pour les compteurs de connexion bloquée. Pour débloquer quelqu'un tout de suite : vider ce dossier.
+- Cache des pages publiques (accueil, liste des publications) et des tailles de photos : fichiers dans `var/cache/` du dépôt (`PAGE_CACHE_DIR` pour un autre dossier, inscriptible). Il est invalidé dès qu'un contenu public est créé, modifié ou supprimé (backoffice ou cron `publish_scheduled`), et dure au plus 10 minutes (`PAGE_CACHE_TIMEOUT`, en secondes ; `0` le désactive). Le vider ne perd rien.
 - Test d'envoi d'e-mail : `python manage.py shell -c "from django.core.mail import send_mail; send_mail('Test','Bonjour','<expéditeur>',['<destinataire>'])"`.
 
 ## 5. Vérifications après une mise à jour
@@ -127,6 +129,7 @@ Sur le site réel :
 | Page en erreur après mise à jour | Revenir au commit précédent sur le serveur (`git reset --hard <commit>`, `collectstatic`), redémarrer. Ne pas relancer `deploy.sh` avant d'avoir corrigé GitHub : il réaligne le code sur `origin/main`. Les migrations ajoutées n'empêchent pas l'ancien code de fonctionner. |
 | Problème de base de données | Restaurer la sauvegarde : `pg_restore --no-owner -U <utilisateur> -d <base> <fichier>.dump`, sur une base vide, application arrêtée. En dernier recours : cela efface les données saisies depuis la sauvegarde. |
 | Miniatures problématiques | Supprimer `MEDIA_ROOT/cache/thumbs/`. |
+| Contenu pas à jour sur l'accueil ou la liste des publications | Attendre 10 minutes au plus, ou vider `var/cache/`. Si le problème revient : `PAGE_CACHE_TIMEOUT=0` dans `.env`, redémarrer. |
 | Redirection HTTPS en boucle | `SECURE_SSL_REDIRECT=False` dans `.env`, redémarrer. |
 
 ## 7. Points à surveiller

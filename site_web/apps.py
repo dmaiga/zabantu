@@ -6,4 +6,4 @@ class SiteWebConfig(AppConfig):
     name = 'site_web'
 
     def ready(self):
-        from . import signals  # noqa: F401
+        from . import content_cache, signals  # noqa: F401

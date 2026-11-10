@@ -47,6 +47,9 @@ main() {
   echo "==> generate_thumbnails"
   $PYTHON manage.py generate_thumbnails
 
+  echo "==> cache des pages : invalidation (les gabarits ont pu changer)"
+  $PYTHON manage.py shell -c "from site_web.content_cache import bump; bump()"
+
   echo "==> check --deploy"
   $PYTHON manage.py check --deploy
 
