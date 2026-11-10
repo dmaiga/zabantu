@@ -17,6 +17,7 @@ from .views import (
     detail_photo,
     toutes_photos,
     contact,
+    donate,
     membership_apply,
     membership_thanks,
     newsletter_subscribe,
@@ -43,6 +44,7 @@ urlpatterns = [
     #06_08
     
     path('contact/', contact, name='contact'),
+    path('soutenir/', donate, name='donate'),
     path('mentions-legales/', TemplateView.as_view(template_name='site_web/legal/legal_notice.html', extra_context={'legal_page': 'notice'}), name='legal_notice'),
     path('confidentialite/', TemplateView.as_view(template_name='site_web/legal/privacy.html', extra_context={'legal_page': 'privacy'}), name='privacy'),
     path('cookies/', TemplateView.as_view(template_name='site_web/legal/cookies.html', extra_context={'legal_page': 'cookies'}), name='cookies'),

@@ -69,6 +69,13 @@ from django.contrib import messages
 from .forms import ContactForm, MembershipApplicationForm, NewsletterSubscribeForm
 from . import antispam
 
+def donate(request):
+    """Page de don : pas encore de paiement en ligne, on indique les numéros gérés dans le backoffice."""
+    from .models import DonationNumber
+    numbers = DonationNumber.objects.filter(is_active=True)
+    return render(request, 'site_web/public_donate.html', {'donation_numbers': numbers})
+
+
 def contact(request):
     
     if request.method == 'POST':
@@ -82,7 +89,9 @@ def contact(request):
         else:
             messages.error(request, "Veuillez corriger les erreurs dans le formulaire.")
     else:
-        form = ContactForm()
+        # ?sujet=don : lien « Confirmer mon don » de la page de don
+        initial = {'subject': 'Confirmation de don'} if request.GET.get('sujet') == 'don' else {}
+        form = ContactForm(initial=initial)
     
       # Coordonnées pour la carte
     map_embed_url = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3859.227623693815!2d-7.987846684716715!3d12.672381921394377!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTLCsDQwJzIwLjYiTiA3wrA1OScxNS4xIlc!5e1!3m2!1sfr!2sfr!4v1620000000000!5m2!1sfr!2sfr"

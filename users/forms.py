@@ -340,3 +340,11 @@ class PartenaireForm(SectionedFormMixin, forms.ModelForm):
     class Meta:
         model = Partenaire
         fields = ['name', 'logo','is_active', 'order']
+
+class DonationNumberForm(SectionedFormMixin, forms.ModelForm):
+    sections = (('Numéro', ('number', 'operator')), ('Affichage sur le site', ('is_active', 'order')))
+
+    class Meta:
+        from site_web.models import DonationNumber
+        model = DonationNumber
+        fields = ['number', 'operator', 'is_active', 'order']

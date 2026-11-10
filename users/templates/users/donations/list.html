@@ -1,0 +1,39 @@
+{% extends 'list_base.html' %}
+
+{% block title %}Dons{% endblock %}
+{% block list_title %}Numéros de don{% endblock %}
+{% block list_noun %}numéro(s){% endblock %}
+
+{% block list_actions %}
+<a href="{% url 'donate' %}" class="btn btn-outline-secondary" target="_blank" rel="noopener"><i class="fas fa-up-right-from-square me-1"></i> Voir la page de don</a>
+<a href="{% url 'donation_number_create' %}" class="btn btn-primary"><i class="fas fa-plus me-1"></i> Nouveau numéro</a>
+{% endblock %}
+
+{% block list_filters %}
+<p class="text-muted">Numéros affichés sur la page « Faire un don » du site. Les donateurs y envoient leur don, puis le confirment par le formulaire de contact (sujet « Confirmation de don »).</p>
+{% endblock %}
+
+{% block list_table %}
+<table class="table align-middle mb-0">
+    <thead><tr><th>Numéro</th><th>Opérateur</th><th>Ordre</th><th>Visibilité</th><th class="text-end">Actions</th></tr></thead>
+    <tbody>
+    {% for n in page_obj %}
+        <tr>
+            <td class="fw-semibold">{{ n.number }}</td>
+            <td>{{ n.operator }}</td>
+            <td>{{ n.order }}</td>
+            <td><span class="badge {% if n.is_active %}bg-success{% else %}bg-secondary{% endif %}">{% if n.is_active %}Affiché sur le site{% else %}Masqué{% endif %}</span></td>
+            <td class="text-end">
+                <div class="d-inline-flex gap-1">
+                    {% url 'donation_number_update' n.pk as edit_url %}{% include 'includes/icon_action.html' with url=edit_url icon='fa-pen' title='Modifier' variant='secondary' %}
+                    {% url 'donation_number_toggle' n.pk as action_url %}{% include 'includes/post_action.html' with url=action_url label='' title=n.is_active|yesno:'Masquer sur le site,Afficher sur le site' btn_class='btn-sm btn-outline-warning' icon='fa-power-off' %}
+                    {% url 'donation_number_delete' n.pk as action_url %}{% include 'includes/post_action.html' with url=action_url label='' title='Supprimer' btn_class='btn-sm btn-outline-danger' icon='fa-trash' confirm='Supprimer ce numéro ? Cette action est définitive.' %}
+                </div>
+            </td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="5" class="text-center py-5 text-muted">Aucun numéro : la page de don invite alors à écrire via le formulaire de contact.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

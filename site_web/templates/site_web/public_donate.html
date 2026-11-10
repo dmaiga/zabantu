@@ -1,0 +1,117 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Faire un don - Zabantu{% endblock %}
+{% block banner_title %}Soutenir Zabantu{% endblock %}
+{% block banner_subtitle %}Votre don fait avancer la recherche{% endblock %}
+{% block donate_band %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .donate-wrap { max-width: 960px; margin: 0 auto; }
+    .donate-intro { font-size: 1.1rem; line-height: 1.7; color: #3f4a40; }
+    .donate-uses { list-style: none; padding: 0; margin: 1.5rem 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .9rem; }
+    .donate-uses li { background: #fff; border: 1px solid #e6e9e0; border-radius: 10px; padding: 1rem 1.1rem; display: flex; gap: .75rem; align-items: flex-start; }
+    .donate-uses i { color: var(--zabantu-secondary); font-size: 1.2rem; margin-top: .15rem; width: 1.3rem; text-align: center; }
+    .donate-block { margin-top: 2.75rem; }
+    .donate-block h2 { font-size: 1.5rem; font-weight: 700; color: var(--zabantu-dark); margin-bottom: 1.25rem; }
+    .donate-steps { list-style: none; padding: 0; margin: 0; counter-reset: step; }
+    .donate-steps > li { position: relative; padding: 0 0 1.75rem 3.5rem; counter-increment: step; }
+    .donate-steps > li::before { content: counter(step); position: absolute; left: 0; top: 0; width: 2.4rem; height: 2.4rem; border-radius: 50%; background: var(--zabantu-dark); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+    .donate-steps h3 { font-size: 1.15rem; font-weight: 700; color: var(--zabantu-dark); margin: .35rem 0 .5rem; }
+    .donate-steps p { color: #3f4a40; margin-bottom: .75rem; }
+    .donate-numbers { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .9rem; }
+    .donate-number { background: linear-gradient(160deg, #2c3e2c 0%, #3d5240 100%); color: #fff; border-radius: 12px; padding: 1.1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+    .donate-number .label { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.7); }
+    .donate-number a { color: #fff; text-decoration: none; font-size: 1.3rem; font-weight: 700; letter-spacing: .02em; white-space: nowrap; }
+    .donate-number a:hover, .donate-number a:focus-visible { color: var(--zabantu-accent); }
+    .copy-btn { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25); color: #fff; border-radius: 8px; min-height: 44px; padding: 0 .9rem; font-size: .9rem; white-space: nowrap; }
+    .copy-btn:hover, .copy-btn:focus-visible { background: var(--zabantu-secondary); color: #2c1c0c; }
+    .btn-donate-confirm { background: #566a52; color: #fff; border: 0; border-radius: 8px; min-height: 48px; padding: .75rem 1.5rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: .5rem; }
+    .btn-donate-confirm:hover { background: var(--zabantu-dark); color: #fff; }
+    .donate-note { background: rgba(191,146,100,.12); border-left: 4px solid var(--zabantu-secondary); border-radius: 8px; padding: 1rem 1.25rem; color: #4a3a28; }
+    .donate-other { display: flex; flex-wrap: wrap; gap: .75rem; }
+    .donate-other a { border: 1px solid var(--zabantu-primary); color: var(--zabantu-dark); border-radius: 30px; padding: .55rem 1.2rem; text-decoration: none; font-weight: 600; }
+    .donate-other a:hover { background: var(--zabantu-primary); color: #fff; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="donate-wrap">
+
+    <section>
+        <p class="donate-intro">
+            Zabantu est un groupe de recherche indépendant qui travaille sur le nexus <strong>Economy | Conflict | State</strong>.
+            Pour mener ses travaux et les partager librement, le groupe accepte les dons des personnes et des organisations
+            qui souhaitent le soutenir. Chaque contribution, quel que soit son montant, compte.
+        </p>
+        <ul class="donate-uses" aria-label="À quoi servent les dons">
+            <li><i class="fas fa-magnifying-glass-chart" aria-hidden="true"></i><span>Financer les enquêtes de terrain et les travaux de recherche</span></li>
+            <li><i class="fas fa-people-group" aria-hidden="true"></i><span>Organiser les séminaires Gɛlɛkan, conférences et ateliers</span></li>
+            <li><i class="fas fa-book-open" aria-hidden="true"></i><span>Publier et diffuser nos analyses en accès libre</span></li>
+            <li><i class="fas fa-seedling" aria-hidden="true"></i><span>Accompagner les jeunes chercheuses et chercheurs</span></li>
+        </ul>
+    </section>
+
+    <section class="donate-block" aria-labelledby="donate-how">
+        <h2 id="donate-how">Comment faire un don</h2>
+        <ol class="donate-steps">
+            <li>
+                <h3>Envoyez votre don par Mobile Money</h3>
+                <p>Faites un transfert vers l'un de ces numéros :</p>
+                <div class="donate-numbers">
+                    {% for number in donation_numbers %}
+                    <div class="donate-number">
+                        <div>
+                            <div class="label">{{ number.operator }}</div>
+                            <a href="tel:{{ number.tel }}">{{ number.number }}</a>
+                        </div>
+                        <button type="button" class="copy-btn" data-copy="{{ number.number }}" aria-label="Copier le numéro {{ number.number }}">
+                            <i class="far fa-copy" aria-hidden="true"></i> <span>Copier</span>
+                        </button>
+                    </div>
+                    {% empty %}
+                    <p class="mb-0">Les numéros sont en cours de mise à jour : <a href="{% url 'contact' %}?sujet=don#formulaire">écrivez-nous</a> pour faire un don.</p>
+                    {% endfor %}
+                </div>
+            </li>
+            <li>
+                <h3>Confirmez votre don</h3>
+                <p>Envoyez-nous un message en indiquant votre nom, le montant, la date et le numéro utilisé : nous pourrons ainsi vérifier la réception et vous remercier.</p>
+                <a class="btn-donate-confirm" href="{% url 'contact' %}?sujet=don#formulaire"><i class="fas fa-envelope" aria-hidden="true"></i> Confirmer mon don</a>
+                <p class="small text-muted mt-2 mb-0">Vous pouvez aussi nous écrire à <a href="mailto:info@zabantu.net">info@zabantu.net</a>.</p>
+            </li>
+            <li>
+                <h3>Nous vous répondons</h3>
+                <p class="mb-0">Nous vous confirmons la réception de votre don. Merci pour votre soutien !</p>
+            </li>
+        </ol>
+    </section>
+
+    <section class="donate-block">
+        <p class="donate-note mb-0"><i class="fas fa-circle-info me-2" aria-hidden="true"></i>Le don en ligne par carte bancaire et par Mobile Money sera bientôt disponible directement sur ce site. En attendant, merci d'utiliser les numéros ci-dessus.</p>
+    </section>
+
+    <section class="donate-block" aria-labelledby="donate-other">
+        <h2 id="donate-other">Soutenir autrement</h2>
+        <div class="donate-other">
+            <a href="{% url 'membership_apply' %}">Rejoindre Zabantu</a>
+            <a href="{% url 'contact' %}">Proposer une collaboration</a>
+            <a href="https://whatsapp.com/channel/0029VbE1ds8GufIpCbIXZL1T" target="_blank" rel="noopener">Suivre la chaîne WhatsApp</a>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.querySelectorAll('.copy-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var label = btn.querySelector('span');
+            navigator.clipboard.writeText(btn.dataset.copy).then(function () {
+                label.textContent = 'Copié';
+                setTimeout(function () { label.textContent = 'Copier'; }, 2000);
+            });
+        });
+    });
+</script>
+{% endblock %}

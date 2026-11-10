@@ -73,6 +73,7 @@ PAGE_SEO = {
     'liste_galeries': ('Galerie photos - Zabantu', "Les photos des séminaires et activités du groupe de recherche Zabantu."),
     'toutes_photos': ('Galerie photos - Zabantu', "Toutes les photos du groupe de recherche Zabantu."),
     'contact': ('Contact - Zabantu', "Écrivez au groupe de recherche Zabantu : collaboration, information, questions."),
+    'donate': ('Faire un don - Zabantu', "Soutenez le groupe de recherche Zabantu : vos dons financent la recherche, les séminaires Gɛlɛkan et les publications."),
     'membership_apply': ('Rejoindre Zabantu', "Faites une demande d'adhésion au groupe de recherche Zabantu."),
 }
 

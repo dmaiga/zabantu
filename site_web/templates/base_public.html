@@ -84,6 +84,24 @@
         color: var(--zabantu-dark) !important;
     }
 
+    /* Bouton « Faire un don » : toujours visible, y compris menu replié sur mobile */
+    .donate-link {
+        display: inline-flex; align-items: center; gap: .4rem; min-height: 40px;
+        background: var(--zabantu-secondary); color: #2c1c0c !important; font-weight: 700; font-size: .9rem;
+        padding: 5px 14px; border-radius: 30px; text-decoration: none; transition: background .2s, transform .2s;
+    }
+    .donate-link:hover, .donate-link:focus-visible { background: var(--zabantu-light); transform: translateY(-1px); }
+    .donate-link.mobile { margin-left: auto; margin-right: .6rem; }
+
+    /* Bandeau de don avant le pied de page */
+    .donate-band { background: var(--zabantu-light); border-top: 1px solid #e3e4b4; padding: 1.25rem 0; margin-top: 3rem; }
+    .donate-band .container { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .75rem 1.5rem; text-align: center; }
+    .donate-band p { margin: 0; color: var(--zabantu-dark); font-weight: 600; }
+    .donate-band p i { color: var(--zabantu-secondary); margin-right: .35rem; }
+    .donate-band-btn { background: var(--zabantu-dark); color: #fff; border-radius: 30px; padding: .55rem 1.4rem; font-weight: 700; text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
+    .donate-band-btn:hover, .donate-band-btn:focus-visible { background: var(--zabantu-primary); color: #fff; }
+    .donate-band + .zabantu-footer { margin-top: 0; }
+
     /* Footer & Banner standard... */
     .zabantu-banner { background: linear-gradient(135deg, var(--zabantu-primary), var(--zabantu-dark)); padding: 1rem 0; color: white; text-align: center; }
     .zabantu-footer { background: var(--zabantu-dark); color: #d6dfd0; margin-top: 3rem; border-top: 4px solid var(--zabantu-secondary); text-align: left; }
@@ -120,6 +138,8 @@
             <img src="{% static 'site_web/images/zabantu-logo-dark.png' %}" alt="Zabantu Logo" class="logo" height="56">
           
           </a>
+
+          <a href="{% url 'donate' %}" class="donate-link mobile d-lg-none"><i class="fas fa-hand-holding-heart" aria-hidden="true"></i> Faire un don</a>
 
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
             <span class="navbar-toggler-icon"></span>
@@ -164,10 +184,8 @@
             </ul>
 
             <!-- Barre de recherche à droite -->
-             <div class="d-flex align-items-center">
-
-
-              
+             <div class="d-flex align-items-center justify-content-center">
+                <a href="{% url 'donate' %}" class="donate-link d-none d-lg-inline-flex"><i class="fas fa-hand-holding-heart" aria-hidden="true"></i> Faire un don</a>
                 <a href="{% url 'login' %}" class="admin-link">
                   <i class="fas fa-sign-in-alt"></i> Connexion
                 </a>
@@ -193,6 +211,8 @@
   <main class="{% block main_class %}container my-5{% endblock %}">
     {% block content %}{% endblock %}
   </main>
+
+{% block donate_band %}{% include 'site_web/includes/donate_band.html' %}{% endblock %}
 
 <footer class="zabantu-footer py-5">
   <div class="container">
@@ -227,6 +247,7 @@
         <h5>Participer</h5>
         <ul class="list-unstyled footer-navigation">
           <li><a href="{% url 'contact' %}">Nous écrire</a></li>
+          <li><a href="{% url 'donate' %}">Faire un don</a></li>
         </ul>
         <a class="footer-cta" href="{% url 'membership_apply' %}">Rejoindre Zabantu</a>
       </div>

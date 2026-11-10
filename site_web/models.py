@@ -425,3 +425,28 @@ class BlockedSender(models.Model):
     def is_blocked(cls, email):
         email = (email or '').strip().lower()
         return bool(email) and cls.objects.filter(email=email).exists()
+
+
+class DonationNumber(models.Model):
+    """Numéro affiché sur la page de don (/soutenir/), en attendant un paiement en ligne."""
+    number = models.CharField(
+        "Numéro", max_length=30,
+        validators=[RegexValidator(r'^\+?[\d ]{8,}$', "Chiffres et espaces uniquement, avec l'indicatif (ex. +223 77 94 14 70).")],
+        help_text="Avec l'indicatif, tel qu'il doit s'afficher : +223 77 94 14 70")
+    operator = models.CharField("Opérateur", max_length=50, default='Orange Money',
+                                help_text="Ex. Orange Money, Moov Money")
+    is_active = models.BooleanField("Affiché sur le site", default=True)
+    order = models.PositiveIntegerField("Ordre d'affichage", default=0)
+
+    class Meta:
+        verbose_name = "Numéro de don"
+        verbose_name_plural = "Numéros de don"
+        ordering = ['order', 'pk']
+
+    def __str__(self):
+        return f"{self.number} ({self.operator})"
+
+    @property
+    def tel(self):
+        """Forme utilisée dans les liens tel: (sans espaces)."""
+        return self.number.replace(' ', '')

@@ -425,3 +425,75 @@ class ContactWithoutCaptchaTests(TestCase):
     def test_no_captcha_field_rendered(self):
         r = self.client.get(reverse('contact'))
         self.assertNotContains(r, 'captcha')
+
+
+class DonatePageTests(TestCase):
+    def test_donate_page_shows_numbers_and_confirmation_link(self):
+        r = self.client.get(reverse('donate'))
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, 'href="tel:+22377941470"')
+        self.assertContains(r, 'href="tel:+22376634515"')
+        self.assertContains(r, '<div class="label">Orange Money</div>', count=2)
+        self.assertContains(r, reverse('contact') + '?sujet=don#formulaire')
+        self.assertNotContains(r, 'class="donate-band"')           # pas de bandeau sur la page de don elle-même
+
+    def test_donate_link_on_every_public_page(self):
+        r = self.client.get(reverse('contact'))
+        self.assertContains(r, 'class="donate-link mobile d-lg-none"')  # navbar sur mobile
+        self.assertContains(r, 'class="donate-link d-none d-lg-inline-flex"')  # navbar sur ordinateur
+        self.assertContains(r, 'class="donate-band"')
+        self.assertContains(r, f'<li><a href="{reverse("donate")}">Faire un don</a></li>')  # pied de page
+
+    def test_contact_form_preselects_donation_subject(self):
+        r = self.client.get(reverse('contact') + '?sujet=don')
+        self.assertContains(r, '<option value="Confirmation de don" selected>')
+        r = self.client.get(reverse('contact'))
+        self.assertNotContains(r, '<option value="Confirmation de don" selected>')
+
+
+class DonationNumberBackofficeTests(TestCase):
+    def setUp(self):
+        from site_web.models import DonationNumber
+        from users.models import CustomUser
+        self.Number = DonationNumber
+        self.moderator = CustomUser.objects.create_user('modo', 'modo@example.org', 'pass-1234-x', role='moderateur')
+        self.member = CustomUser.objects.create_user('membre', 'membre@example.org', 'pass-1234-x', role='membre')
+
+    def test_initial_numbers_come_from_migration(self):
+        self.assertEqual(list(self.Number.objects.values_list('number', 'operator')),
+                         [('+223 77 94 14 70', 'Orange Money'), ('+223 76 63 45 15', 'Orange Money')])
+
+    def test_moderator_adds_number_shown_on_donate_page(self):
+        self.client.force_login(self.moderator)
+        r = self.client.post(reverse('donation_number_create'),
+                             {'number': '+223 66 00 00 00', 'operator': 'Moov Money', 'is_active': 'on', 'order': 3})
+        self.assertRedirects(r, reverse('donation_number_list'))
+        r = self.client.get(reverse('donate'))
+        self.assertContains(r, 'href="tel:+22366000000"')
+        self.assertContains(r, '<div class="label">Moov Money</div>')
+
+    def test_hidden_number_not_on_donate_page(self):
+        self.client.force_login(self.moderator)
+        number = self.Number.objects.get(number='+223 76 63 45 15')
+        self.client.post(reverse('donation_number_toggle', args=[number.pk]))
+        r = self.client.get(reverse('donate'))
+        self.assertNotContains(r, 'data-copy="+223 76 63 45 15"')        # carte retirée (le pied de page garde le numéro de contact)
+        self.assertContains(r, 'data-copy="+223 77 94 14 70"')
+
+    def test_invalid_number_rejected(self):
+        self.client.force_login(self.moderator)
+        r = self.client.post(reverse('donation_number_create'), {'number': 'abc', 'operator': 'Orange Money', 'order': 0})
+        self.assertEqual(r.status_code, 200)
+        self.assertFalse(self.Number.objects.filter(number='abc').exists())
+
+    def test_no_active_number_invites_to_write(self):
+        self.Number.objects.update(is_active=False)
+        self.assertContains(self.client.get(reverse('donate')), 'Les numéros sont en cours de mise à jour')
+
+    def test_reserved_to_moderators(self):
+        self.client.force_login(self.member)
+        r = self.client.get(reverse('donation_number_list'))
+        self.assertNotEqual(r.status_code, 200)
+        self.client.force_login(self.moderator)
+        r = self.client.get(reverse('donation_number_list'))
+        self.assertContains(r, '+223 77 94 14 70')

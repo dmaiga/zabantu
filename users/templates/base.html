@@ -234,6 +234,7 @@
                     </li>
                     {% if user.can_moderate %}
                     <li class="{% if 'partenaires' in request.path %}active{% endif %}"><a href="{% url 'partenaire_list' %}"><i class="fas fa-handshake"></i> Partenaires</a></li>
+                    <li class="{% if '/dons/' in request.path %}active{% endif %}"><a href="{% url 'donation_number_list' %}"><i class="fas fa-hand-holding-heart"></i> Dons</a></li>
                     {% endif %}
 
                     {% if user.can_moderate %}

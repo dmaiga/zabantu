@@ -41,6 +41,7 @@ class ContactForm(AntiSpamMixin, forms.ModelForm):
                 ('', 'Sélectionnez un sujet'),
                 ('collaboration', 'Collaboration'),
                 ('information', 'Demande d\'information'),
+                ('Confirmation de don', 'Confirmation de don'),
                 ('other', 'Autre')
             ]),
             'message': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Votre message'}),

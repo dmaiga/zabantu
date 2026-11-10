@@ -6,3 +6,4 @@ from .contact import *  # noqa: F401,F403
 from .newsletter import *  # noqa: F401,F403
 from .applications import *  # noqa: F401,F403
 from .partenaires import *  # noqa: F401,F403
+from .donations import *  # noqa: F401,F403

@@ -61,6 +61,11 @@ urlpatterns = [
     path("partenaires/<int:pk>/", views.partenaire_detail, name="partenaire_detail"),
     path("partenaires/<int:pk>/edit/", views.partenaire_update, name="partenaire_update"),
     path("partenaires/<int:pk>/delete/", views.partenaire_delete, name="partenaire_delete"),
-    path("partenaires/<int:pk>/toggle/", views.partenaire_toggle, name="partenaire_toggle"), 
+    path("partenaires/<int:pk>/toggle/", views.partenaire_toggle, name="partenaire_toggle"),
+    path("dons/", views.donation_number_list, name="donation_number_list"),
+    path("dons/create/", views.donation_number_create, name="donation_number_create"),
+    path("dons/<int:pk>/edit/", views.donation_number_update, name="donation_number_update"),
+    path("dons/<int:pk>/toggle/", views.donation_number_toggle, name="donation_number_toggle"),
+    path("dons/<int:pk>/delete/", views.donation_number_delete, name="donation_number_delete"), 
 
 ]
