@@ -111,6 +111,9 @@ class Article(models.Model):
     class Meta:
         ordering = ['-created_at']
         verbose_name = "Article"
+        indexes = [  # listes publiques, accueil, sitemap et cron publish_scheduled : statut, puis date (même ordre que PUBLICATION_ORDER)
+            models.Index('status', models.F('publish_at').desc(nulls_last=True), name='article_status_publish_idx'),
+        ]
         verbose_name_plural = "Articles"
 
     def __str__(self):
@@ -257,6 +260,7 @@ class Guelekan(models.Model):
     class Meta:
         ordering = ['-created_at']
         verbose_name = "Séminaire Guelekan"
+        indexes = [models.Index('status', models.F('publish_at').desc(nulls_last=True), name='guelekan_status_publish_idx')]
         verbose_name_plural = "Séminaires Guelekan"
 
     def __str__(self):

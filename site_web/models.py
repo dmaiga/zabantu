@@ -150,6 +150,9 @@ class ContactMessage(models.Model):
         ordering = ['-created_at']
         verbose_name = "Message de contact"
         verbose_name_plural = "Messages de contact"
+        indexes = [  # compteur des non lus, affiché sur chaque page du backoffice
+            models.Index(fields=['-created_at'], condition=models.Q(is_read=False), name='contact_unread_idx'),
+        ]
     
     def __str__(self):
         return f"{self.name} - {self.subject}"
@@ -399,6 +402,9 @@ class PublicationDelivery(models.Model):
         verbose_name = _("envoi d'annonce")
         verbose_name_plural = _("envois d'annonces")
         unique_together = ('notice', 'subscriber')
+        indexes = [  # envois en attente, lus par le cron toutes les 5 minutes ; les envois faits ne sont pas indexés
+            models.Index(fields=['attempts'], condition=models.Q(sent_at__isnull=True), name='delivery_pending_idx'),
+        ]
 
 
 class BlockedSender(models.Model):
