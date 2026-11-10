@@ -53,6 +53,7 @@ def public_member_detail(request, pk):
     return render(request, 'site_web/public_member_detail.html', {
         'member': member,
         'articles': articles,
+        'seo': seo.member_seo(request, member),
         **page_translation_context(member),
     })
 

@@ -6,6 +6,7 @@ from django.utils import timezone
 
 from articles.models import Article, Guelekan
 from events.models import Event
+from gallery.models import Gallery, Photo
 from users.testing import make_user
 
 START = datetime.date(2026, 11, 1)
@@ -46,7 +47,12 @@ class SeoTests(TestCase):
                        'content="https://zabantu.net/static/site_web/images/og-default.jpg"',
                        'name="twitter:card" content="summary_large_image"'):
             self.assertIn(needle, html, needle)
-        self.assertNotIn('rel="canonical"', html)
+        self.assertIn('rel="canonical" href="https://zabantu.net/zabantu/"', html)
+
+    def test_root_redirects_to_the_canonical_home_in_each_language(self):
+        self.assertRedirects(self.client.get('/'), '/zabantu/', status_code=301, fetch_redirect_response=False)
+        self.assertRedirects(self.client.get('/en/'), '/en/zabantu/', status_code=301,
+                             fetch_redirect_response=False)
 
     def test_old_article_gets_share_tags_but_no_canonical(self):
         html = self.page(self.old)
@@ -82,6 +88,25 @@ class SeoTests(TestCase):
         for excluded in (self.old.slug, self.draft.slug, self.future.slug):
             self.assertNotIn(excluded, xml)
         self.assertNotIn(f'/zabantu/evenements/{self.event_old.pk}/', xml)
+        for path in ('/zabantu/', '/zabantu/publications/', '/zabantu/evenements/', '/zabantu/membres/',
+                     '/zabantu/galeries/', '/zabantu/about/'):
+            self.assertIn(f'<loc>https://zabantu.net{path}</loc>', xml)
+
+    def test_sitemap_uses_created_at_for_a_published_guelekan_without_publish_at(self):
+        guelekan = Guelekan.objects.create(title='Compte-rendu', content='Texte', status='published')
+        Guelekan.objects.filter(pk=guelekan.pk).update(publish_at=None, created_at=at(START))
+        xml = self.client.get('/sitemap.xml').content.decode()
+        self.assertIn(f'https://zabantu.net/zabantu/guelekans/{guelekan.slug}/', xml)
+
+    def test_photo_title_uses_album_when_the_stored_title_is_a_raw_filename(self):
+        gallery = Gallery.objects.create(title='Atelier de Bamako')
+        raw = Photo.objects.create(gallery=gallery, title='IMG-20240803-WA0047.jpg', image='photos/raw.jpg')
+        descriptive = Photo.objects.create(gallery=gallery, title='Présentation des résultats',
+                                           image='photos/titled.jpg')
+        raw_html = self.client.get(reverse('detail_photo', args=[raw.pk])).content.decode()
+        titled_html = self.client.get(reverse('detail_photo', args=[descriptive.pk])).content.decode()
+        self.assertIn('<title>Atelier de Bamako – Photo | Zabantu</title>', raw_html)
+        self.assertIn('<title>Présentation des résultats – Atelier de Bamako | Zabantu</title>', titled_html)
 
     def test_robots_blocks_only_private_areas(self):
         r = self.client.get('/robots.txt')
@@ -96,6 +121,6 @@ class SeoTests(TestCase):
     def test_list_pages_have_their_own_share_title(self):
         html = self.client.get(reverse('public_article_list')).content.decode()
         self.assertIn('property="og:title" content="Publications - Zabantu"', html)
-        self.assertNotIn('rel="canonical"', html)
+        self.assertIn('rel="canonical" href="https://zabantu.net/zabantu/publications/"', html)
         self.assertIn('property="og:title" content="Zabantu - Groupe de recherche',
                       self.client.get(reverse('home')).content.decode())

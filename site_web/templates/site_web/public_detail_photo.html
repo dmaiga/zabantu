@@ -1,7 +1,7 @@
 {% extends 'base_public.html' %}
 {% load photo_tags i18n %}
 
-{% block title %}{% translate "Photo" %} - Zabantu{% endblock %}
+{% block title %}{% if photo.display_title %}{{ photo.display_title }}{% if photo.gallery %} – {{ photo.gallery.t.title }}{% endif %} | Zabantu{% elif photo.gallery %}{{ photo.gallery.t.title }} – {% translate "Photo" %} | Zabantu{% else %}{% translate "Photo" %} – Zabantu{% endif %}{% endblock %}
 {% block banner_title %}{% translate "Galerie photos" %}{% endblock %}
 {% block banner_subtitle %}{% if photo.gallery %}{{ photo.gallery.t.title }}{% else %}{% translate "Photo" %}{% endif %}{% endblock %}
 
@@ -34,7 +34,7 @@
             <div class="photo-stage">
                 {% thumb photo.image 1600 as t %}
                 <a href="{{ photo.image.url }}" target="_blank" rel="noopener noreferrer" title="{% translate "Ouvrir l'image en taille réelle" %}">
-                    <img src="{{ t.url }}"{% if t.width %} width="{{ t.width }}" height="{{ t.height }}"{% endif %} alt="{% translate 'Photo' %}">
+                    <img src="{{ t.url }}"{% if t.width %} width="{{ t.width }}" height="{{ t.height }}"{% endif %} alt="{% if photo.display_title %}{{ photo.display_title }}{% elif photo.gallery %}{{ photo.gallery.t.title }}{% else %}{% translate 'Photo' %}{% endif %}">
                 </a>
             </div>
             {% if photo.caption %}<p class="lead mt-3">{{ photo.caption }}</p>{% endif %}

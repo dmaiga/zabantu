@@ -20,10 +20,10 @@ from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.conf import settings
 from users.views import login_view 
-from site_web.views import HomeView
 from site_web import seo_views
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
+from django.views.generic import RedirectView
 
 urlpatterns = [
     path('sitemap.xml', seo_views.sitemap, name='sitemap'),
@@ -70,7 +70,8 @@ urlpatterns = [
 
 # Site public : français sans préfixe (adresses inchangées), anglais sous /en/
 urlpatterns += i18n_patterns(
-    path('', HomeView.as_view(), name='home'),
+    # L'accueil canonique est /zabantu/ (et /en/zabantu/). Les anciennes racines restent accessibles par une 301.
+    path('', RedirectView.as_view(pattern_name='home', permanent=True), name='home_redirect'),
     path('zabantu/', include('site_web.urls')),
     prefix_default_language=False,
 )

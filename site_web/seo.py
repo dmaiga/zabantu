@@ -69,6 +69,8 @@ def build(request, obj, *, title, description, image=None, type_='website', publ
 
 # Titres de partage des pages sans contenu propre (listes, présentation). Les vues de détail les remplacent.
 PAGE_SEO = {
+    'home': (_('Zabantu - Groupe de recherche : Economy | Conflict | State'),
+             _("Groupe de chercheurs en sciences sociales travaillant sur le développement économique et social.")),
     'public_article_list': (_('Publications - Zabantu'), _("Analyses, articles, ouvrages, policy briefs et rapports du groupe de recherche Zabantu.")),
     'public_event_list': (_('Événements - Zabantu'), _("Séminaires Gɛlɛkan, conférences, ateliers et webinaires du groupe de recherche Zabantu.")),
     'public_member_list': (_('Membres - Zabantu'), _("Les chercheurs et chercheuses du groupe de recherche Zabantu.")),
@@ -82,10 +84,14 @@ PAGE_SEO = {
 
 
 def page_seo(request):
-    """Titre et description de partage d'une page sans contenu propre ; vide pour l'accueil et les autres pages."""
+    """Titre, description et canonical d'une page publique sans contenu propre."""
     match = getattr(request, 'resolver_match', None)
     found = PAGE_SEO.get(match.url_name) if match else None
-    return {'title': str(found[0]), 'description': str(found[1])} if found else {}
+    return {
+        'title': str(found[0]),
+        'description': str(found[1]),
+        'canonical': origin() + request.path,
+    } if found else {}
 
 
 def _description(obj, *fields):
@@ -107,6 +113,12 @@ def gallery_seo(request, gallery):
     return build(request, gallery, title=translated(gallery, 'title'),
                  description=_description(gallery, 'description') or PAGE_SEO['liste_galeries'][1],
                  image=gallery.cover_image)
+
+
+def member_seo(request, member):
+    return build(request, member, title=f'{member.get_full_name()} - Zabantu',
+                 description=translated(member, 'bio') or translated(member, 'job_title') or PAGE_SEO['public_member_list'][1],
+                 image=member.profile_picture)
 
 
 def article_seo(request, article):

@@ -50,7 +50,7 @@ Déployée en production ; les sauvegardes ont été testées à la main avec su
 | Empreintes SRI sur Bootstrap, Font Awesome, PhotoSwipe CSS, jQuery | En service. Si la mise en page ou les icônes disparaissent, la console du navigateur indique la balise en cause (« integrity »). |
 | Scripts de sauvegarde `scripts/backup_*.sh` et leurs cron | En place et testés (3.2). |
 
-Aucune nouvelle variable obligatoire. `SEO_START_DATE` est facultative (1er novembre 2026 par défaut) : elle fixe la date à partir de laquelle un contenu publié figure dans le sitemap et reçoit une balise canonique.
+Aucune nouvelle variable obligatoire. `SEO_START_DATE` est facultative (1er janvier 2025 par défaut) : elle conserve le garde-fou historique tout en couvrant les données de production vérifiées.
 
 ## 2 bis. Mise à jour suivante : lots 1 à 4 (don, photos, cache, site bilingue)
 
@@ -127,7 +127,7 @@ Sur le site réel :
 - [ ] Ajout d'une photo : une image valide passe, un faux fichier (`.png` qui n'en est pas un) est refusé.
 - [ ] Pages légales (`/zabantu/mentions-legales/`, `/confidentialite/`, `/cookies/`) et lien « Gérer mes cookies » du pied de page.
 - [ ] Site anglais : `https://zabantu.net/en/zabantu/` s'affiche en anglais ; le bouton « EN » / « FR » de l'en-tête mène à la même page dans l'autre langue ; le backoffice reste en français.
-- [ ] `https://zabantu.net/robots.txt` et `https://zabantu.net/sitemap.xml` s'affichent. Le sitemap ne liste que les contenus publiés à partir de `SEO_START_DATE`.
+- [ ] `https://zabantu.net/robots.txt` et `https://zabantu.net/sitemap.xml` s'affichent. Le sitemap liste les pages publiques principales et les contenus publiés admis par `SEO_START_DATE`.
 - [ ] Aperçu d'un lien d'article, d'événement et de Gɛlɛkan sur WhatsApp, Facebook et LinkedIn (un réseau peut garder un ancien aperçu en cache).
 - [ ] Google Search Console : site déclaré, sitemap envoyé (une seule fois).
 - [ ] Console du navigateur (accueil et tableau de bord) : aucune erreur « integrity » ni ressource bloquée ; mise en page et icônes intactes.
