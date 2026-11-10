@@ -1,4 +1,5 @@
 {% extends 'base_public.html' %}
+{% load photo_tags %}
 {% load clean_tags %}
 {% load antispam_tags %}
 {% load static %}
@@ -134,7 +135,7 @@
                 </div>
             </div>
             <div class="col-lg-6">
-                <img src="{% static 'site_web/images/hero-image_2.jpeg' %}" alt="Réunion de chercheurs du groupe Zabantu">
+                <img src="{% static 'site_web/images/hero-image_2.jpeg' %}" alt="Réunion de chercheurs du groupe Zabantu" fetchpriority="high">
             </div>
         </div>
     </div>
@@ -170,7 +171,7 @@
             <div class="col-md-4">
                 <article class="gk-card">
                     <a class="gk-card-cover" href="{% url 'public_guelekan_detail' gk.slug %}" tabindex="-1" aria-hidden="true">
-                        {% if gk.cover_image %}<img src="{{ gk.cover_image.url }}" alt="" loading="lazy">{% else %}<i class="fas fa-microphone-lines"></i>{% endif %}
+                        {% if gk.cover_image %}<img src="{{ gk.cover_image|thumb_url:640 }}" alt="" loading="lazy" decoding="async">{% else %}<i class="fas fa-microphone-lines"></i>{% endif %}
                     </a>
                     <div class="gk-card-body">
                         <h3><a href="{% url 'public_guelekan_detail' gk.slug %}">{{ gk.title }}</a></h3>
@@ -201,8 +202,8 @@
             <div class="col-sm-6 col-lg-3">
                 <article class="home-card">
                     <a class="home-card-cover" href="{% url 'public_article_detail' article.slug %}" tabindex="-1" aria-hidden="true">
-                        {% if article.article_type == 'independent' and article.independent_cover %}<img src="{{ article.independent_cover.url }}" alt="" loading="lazy">
-                        {% elif article.cover_image %}<img src="{{ article.cover_image.url }}" alt="" loading="lazy">
+                        {% if article.article_type == 'independent' and article.independent_cover %}<img src="{{ article.independent_cover|thumb_url:640 }}" alt="" loading="lazy" decoding="async">
+                        {% elif article.cover_image %}<img src="{{ article.cover_image|thumb_url:640 }}" alt="" loading="lazy" decoding="async">
                         {% else %}<i class="fas fa-file-lines"></i>{% endif %}
                     </a>
                     <div class="home-card-body">
@@ -298,7 +299,7 @@
     <div class="container">
         <h2 class="home-title text-center mb-4">Nos partenaires</h2>
         <div class="partners-row">
-            {% for partenaire in partenaires %}<img src="{{ partenaire.logo.url }}" alt="{{ partenaire.name }}" loading="lazy">{% endfor %}
+            {% for partenaire in partenaires %}<img src="{{ partenaire.logo.url }}" alt="{{ partenaire.name }}" loading="lazy" decoding="async">{% endfor %}
         </div>
     </div>
 </section>

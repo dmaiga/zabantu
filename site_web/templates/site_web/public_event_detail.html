@@ -1,4 +1,5 @@
 {% extends 'base_public.html' %}
+{% load photo_tags %}
 {% load clean_tags %}
 
 {% block title %}{{ event.title }} | Zabantu{% endblock %}
@@ -378,10 +379,10 @@
         <!-- Image de l'événement -->
         {% if event.image %}
         <div class="event-image-container">
-            <img src="{{ event.image.url }}" 
+            {% thumb event.image 1600 as c %}<img src="{{ c.url }}"{% if c.width %} width="{{ c.width }}" height="{{ c.height }}"{% endif %}
                  class="event-image" 
                  alt="{{ event.title }}"
-                 loading="lazy">
+                 fetchpriority="high">
         </div>
         {% else %}
         <div class="event-image-container bg-light d-flex align-items-center justify-content-center">
@@ -506,10 +507,10 @@
                 <div class="intervenant-card">
                     <div class="intervenant-header">
                         {% if intervenant.photo %}
-                        <img src="{{ intervenant.photo.url }}" 
+                        <img src="{{ intervenant.photo|thumb_url:320 }}" 
                              class="intervenant-photo" 
                              alt="{{ intervenant.full_name }}"
-                             loading="lazy">
+                             loading="lazy" decoding="async">
                         {% else %}
                         <div class="intervenant-photo bg-light d-flex align-items-center justify-content-center">
                             <i class="fas fa-user fa-2x text-muted"></i>
@@ -600,7 +601,7 @@
                 <div class="card h-100 event-card">
                     <div class="event-image-container" style="height: 200px; min-height: 0;">
                         {% if similar.image %}
-                        <img src="{{ similar.image.url }}" class="event-image" alt="{{ similar.title }}" style="height: 100%; max-height: none;">
+                        <img src="{{ similar.image|thumb_url:640 }}" class="event-image" alt="{{ similar.title }}" style="height: 100%; max-height: none;" loading="lazy" decoding="async">
                         {% else %}
                         <div class="d-flex align-items-center justify-content-center h-100 bg-light text-muted">
                             <i class="fas fa-calendar-alt fa-2x opacity-25"></i>

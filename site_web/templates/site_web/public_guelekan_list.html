@@ -1,4 +1,5 @@
 {% extends "base_public.html" %}
+{% load photo_tags %}
 
 {% block title %}Séminaires Gɛlɛkan | {{ block.super }}{% endblock %}
 
@@ -19,7 +20,7 @@
                         <div class="card h-100 shadow-sm border-0 overflow-hidden seminar-card">
                             {% if guelekan.cover_image %}
                             <div class="card-img-top overflow-hidden" style="height: 180px;">
-                                <img src="{{ guelekan.cover_image.url }}" alt="{{ guelekan.title }}" class="img-fluid w-100 h-100 object-fit-cover">
+                                <img src="{{ guelekan.cover_image|thumb_url:640 }}" alt="{{ guelekan.title }}" class="img-fluid w-100 h-100 object-fit-cover" loading="lazy" decoding="async">
                             </div>
                             {% else %}
                             <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 180px;">

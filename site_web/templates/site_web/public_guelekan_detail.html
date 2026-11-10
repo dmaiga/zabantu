@@ -1,4 +1,5 @@
 {% extends "base_public.html" %}
+{% load photo_tags %}
 {% load clean_tags %}
 {% load static %}
 
@@ -56,10 +57,10 @@
             <!-- Cover Image -->
             {% if guelekan.cover_image %}
             <div class="guelekan-cover-container">
-                <img src="{{ guelekan.cover_image.url }}" 
+                <img src="{{ guelekan.cover_image|thumb_url:1600 }}" 
                      class="guelekan-cover-image" 
                      alt="{{ guelekan.title }}"
-                     loading="eager"
+                     fetchpriority="high"
                      onerror="this.style.display='none'">
             </div>
             {% endif %}
@@ -116,9 +117,9 @@
         <article class="gallery-card">
             <div class="gallery-card-image">
                 {% if gallery.cover_image %}
-                <img src="{{ gallery.cover_image.url }}" 
+                <img src="{{ gallery.cover_image|thumb_url:640 }}" 
                      alt="{{ gallery.title }}"
-                     loading="lazy"
+                     loading="lazy" decoding="async"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                 {% endif %}
                 <div class="gallery-placeholder" {% if gallery.cover_image %}style="display: none;"{% endif %}>

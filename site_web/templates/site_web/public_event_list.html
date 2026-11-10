@@ -1,4 +1,5 @@
 {% extends 'base_public.html' %}
+{% load photo_tags %}
 {% load clean_tags %}
 {% block title %}Événements - Zabantu{% endblock %}
 {% block banner_title %}Nos Événements{% endblock %}
@@ -125,7 +126,7 @@
             <div class="col-xl-4 col-md-6">
                 <article class="ev-card">
                     <a class="ev-cover" href="{% url 'public_event_detail' event.pk %}" tabindex="-1" aria-hidden="true">
-                        {% if event.image %}<img src="{{ event.image.url }}" alt="" loading="lazy">{% else %}<i class="fas fa-calendar-days"></i>{% endif %}
+                        {% if event.image %}<img src="{{ event.image|thumb_url:640 }}" alt="" loading="lazy" decoding="async">{% else %}<i class="fas fa-calendar-days"></i>{% endif %}
                     </a>
                     <div class="ev-body">
                         <div class="ev-date"><strong>{{ event.date|date:"j" }}</strong><span>{{ event.date|date:"M" }}</span></div>

@@ -497,3 +497,42 @@ class DonationNumberBackofficeTests(TestCase):
         self.client.force_login(self.moderator)
         r = self.client.get(reverse('donation_number_list'))
         self.assertContains(r, '+223 77 94 14 70')
+
+
+@override_settings(MEDIA_ROOT=_MEDIA)
+class PhotoLoadingTests(TestCase):
+    """Lot 2 : skeleton des photos et miniatures dans les cartes."""
+
+    def test_size_read_from_header_with_exif_rotation(self):
+        from unittest import mock
+        from PIL import Image, ImageOps
+        from django.core.files.base import ContentFile
+        from django.core.files.storage import default_storage
+        from site_web.thumbnails import get_thumbnail
+        img = Image.new('RGB', (1200, 800), (90, 140, 90))
+        exif = img.getexif()
+        exif[0x0112] = 6                                   # photo prise en portrait : un quart de tour
+        buf = io.BytesIO()
+        img.save(buf, 'JPEG', exif=exif)
+        name = default_storage.save('tests/portrait.jpg', ContentFile(buf.getvalue()))
+        with mock.patch.object(ImageOps, 'exif_transpose', wraps=ImageOps.exif_transpose) as transpose:
+            get_thumbnail(name, 640)                       # crée la miniature (décodage normal)
+            transpose.reset_mock()
+            t = get_thumbnail(name, 640)                   # affichage suivant : en-tête seulement
+        transpose.assert_not_called()
+        self.assertEqual((t.src_width, t.src_height), (800, 1200))
+        self.assertEqual((t.width, t.height), (640, 960))
+
+    def test_cards_use_thumbnails(self):
+        from articles.models import Article
+        Article.objects.create(title='Couverture', content='x', status='published',
+                               cover_image=_png('cover.png', (2000, 1200)))
+        r = self.client.get(reverse('public_article_list'))
+        self.assertContains(r, 'cache/thumbs/640/')
+        self.assertNotContains(r, 'src="/media/articles/covers/cover')
+
+    def test_skeleton_on_public_pages(self):
+        r = self.client.get(reverse('home'))
+        self.assertContains(r, "document.documentElement.classList.add('js')")
+        self.assertContains(r, '.js main img:not(.is-loaded):not(.no-skeleton)')
+        self.assertContains(r, 'fetchpriority="high"')     # image d'en-tête chargée en priorité

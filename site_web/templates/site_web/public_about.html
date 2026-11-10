@@ -454,13 +454,13 @@
         <div class="partners-slider">
             {% for partenaire in partenaires %}
                 <div class="partner-slide">
-                    <img src="{{ partenaire.logo.url }}" alt="{{ partenaire.name }}" class="partner-logo">
+                    <img src="{{ partenaire.logo.url }}" alt="{{ partenaire.name }}" class="partner-logo" loading="lazy" decoding="async">
                 </div>
             {% endfor %}
             
             {% for partenaire in partenaires %}
                 <div class="partner-slide">
-                    <img src="{{ partenaire.logo.url }}" alt="{{ partenaire.name }}" class="partner-logo">
+                    <img src="{{ partenaire.logo.url }}" alt="{{ partenaire.name }}" class="partner-logo" loading="lazy" decoding="async">
                 </div>
             {% endfor %}
         </div>

@@ -1,3 +1,4 @@
+{% load photo_tags %}
 {# Carrousel de tous les membres (contexte : team_members, déjà dans l'ordre voulu). Défile seul, avec pause, flèches et clavier. #}
 {% include 'site_web/includes/team_photo_styles.html' %}
 <style>
@@ -28,8 +29,8 @@
             <a class="team-mini" href="{% url 'public_member_detail' member.pk %}">
                 <div class="team-photo">
                     {% if member.profile_picture %}
-                    <img class="team-photo-bg" src="{{ member.profile_picture.url }}" alt="" aria-hidden="true" loading="lazy">
-                    <img class="team-photo-img" src="{{ member.profile_picture.url }}" alt="{{ member.get_full_name }}" loading="lazy">
+                    <img class="team-photo-bg" src="{{ member.profile_picture|thumb_url:640 }}" alt="" aria-hidden="true" loading="lazy" decoding="async">
+                    <img class="team-photo-img" src="{{ member.profile_picture|thumb_url:640 }}" alt="{{ member.get_full_name }}" loading="lazy" decoding="async">
                     {% else %}<span class="team-initials" aria-hidden="true">{{ member.prenom|slice:":1" }}{{ member.nom|slice:":1" }}</span>{% endif %}
                 </div>
                 <h3>{{ member.get_full_name }}</h3>

@@ -1,4 +1,5 @@
 {% extends 'base_public.html' %}
+{% load photo_tags %}
 {% load clean_tags %}
 
 {% block title %}
@@ -327,7 +328,7 @@
                 {% for g in guelekans %}
                 <article class="pub-card">
                     <a class="pub-cover" href="{% url 'public_guelekan_detail' g.slug %}" tabindex="-1" aria-hidden="true">
-                        {% if g.cover_image %}<img src="{{ g.cover_image.url }}" alt="" loading="lazy">{% else %}<i class="fas fa-microphone-lines"></i>{% endif %}
+                        {% if g.cover_image %}<img src="{{ g.cover_image|thumb_url:640 }}" alt="" loading="lazy" decoding="async">{% else %}<i class="fas fa-microphone-lines"></i>{% endif %}
                     </a>
                     <div class="pub-body">
                         <div class="pub-meta-top">
@@ -356,9 +357,9 @@
                 <article class="pub-card">
                     <a class="pub-cover" href="{% url 'public_article_detail' article.slug %}" tabindex="-1" aria-hidden="true">
                         {% if article.article_type == 'independent' and article.independent_cover %}
-                        <img src="{{ article.independent_cover.url }}" alt="" loading="lazy">
+                        <img src="{{ article.independent_cover|thumb_url:640 }}" alt="" loading="lazy" decoding="async">
                         {% elif article.cover_image %}
-                        <img src="{{ article.cover_image.url }}" alt="" loading="lazy">
+                        <img src="{{ article.cover_image|thumb_url:640 }}" alt="" loading="lazy" decoding="async">
                         {% else %}
                         <i class="fas fa-file-lines"></i>
                         {% endif %}

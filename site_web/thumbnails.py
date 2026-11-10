@@ -37,6 +37,20 @@ def _name_and_storage(image):
     return str(image), default_storage
 
 
+# Orientations EXIF qui tournent l'image d'un quart de tour (largeur et hauteur échangées).
+_QUARTER_TURNS = {5, 6, 7, 8}
+
+
+def _display_size(src):
+    """Taille affichée (orientation EXIF comprise), lue dans l'en-tête sans décoder les pixels."""
+    w, h = src.size
+    try:
+        orientation = src.getexif().get(0x0112)
+    except Exception:
+        orientation = None
+    return (h, w) if orientation in _QUARTER_TURNS else (w, h)
+
+
 def get_thumbnail(image, width):
     """Renvoie un Thumb de largeur `width` ; repli sur l'original en cas de souci."""
     if not image:
@@ -46,7 +60,7 @@ def get_thumbnail(image, width):
     try:
         with storage.open(name) as fh:
             with Image.open(fh) as src:
-                src_w, src_h = ImageOps.exif_transpose(src).size
+                src_w, src_h = _display_size(src)  # exif_transpose décoderait toute l'image à chaque affichage
     except Exception:
         logger.warning("Miniature : original illisible %s", name, exc_info=True)
         return Thumb(url=original_url)

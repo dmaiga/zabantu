@@ -17,6 +17,16 @@
     <meta name="twitter:card" content="summary_large_image">
     {% if seo.published %}<meta property="article:published_time" content="{{ seo.published }}">{% endif %}
     {% if seo.canonical %}<link rel="canonical" href="{{ seo.canonical }}">{% endif %}
+  <script>
+    // Skeleton des photos : le fond animé reste jusqu'au chargement (ou à l'échec) de chaque image.
+    // Écouteur posé dans le <head>, avant toute image, pour n'en manquer aucune (« load » ne remonte qu'en capture).
+    document.documentElement.classList.add('js');
+    ['load', 'error'].forEach(function (type) {
+      document.addEventListener(type, function (e) {
+        if (e.target.tagName === 'IMG') e.target.classList.add('is-loaded');
+      }, true);
+    });
+  </script>
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="{% static 'site_web/images/zabantu_logo.jpg' %}" />
   <link rel="apple-touch-icon" href="{% static 'site_web/images/zabantu_logo.jpg' %}" />
@@ -124,6 +134,20 @@
     .footer-link-btn { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
     .footer-link-btn:hover { text-decoration: underline; }
     .footer-bottom { border-top: 1px solid rgba(255,255,255,.12); margin-top: 2.25rem; padding-top: 1.25rem; font-size: .85rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem; }
+
+    /* Skeleton des photos du contenu (main) ; .no-skeleton pour exclure une image */
+    .js main img:not(.is-loaded):not(.no-skeleton) {
+      background: linear-gradient(90deg, #e6e9e0 25%, #f3f5ef 50%, #e6e9e0 75%) 0 0 / 200% 100%;
+      animation: sk-shimmer 1.4s ease-in-out infinite;
+      color: transparent;   /* pas de texte alternatif visible pendant le chargement */
+    }
+    .js main img.is-loaded:not(.no-skeleton) { animation: sk-fade .3s ease-out; }
+    @keyframes sk-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+    @keyframes sk-fade { from { opacity: 0; } to { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) {
+      .js main img:not(.is-loaded):not(.no-skeleton) { animation: none; }
+      .js main img.is-loaded:not(.no-skeleton) { animation: none; }
+    }
   </style>
   {% block extra_css %}{% endblock %}
 </head>
