@@ -1,0 +1,88 @@
+TODO — mis à jour le 2026-11-10
+Ordre de réalisation : 1 → 5. Efforts en jours de développement.
+
+────────────────────────────────────────
+1. DON  (0,5 j) — FAIT le 2026-11-10
+────────────────────────────────────────
+- [fait] Page /soutenir/ : intention, numéros de la page contact, étapes (envoyer, confirmer par message, réponse).
+- [fait] Bouton « Faire un don » dans la navbar (visible sur mobile sans ouvrir le menu).
+- [fait] Bandeau de don avant le pied de page sur toutes les pages publiques, lien dans le footer.
+- [fait] « Confirmer mon don » ouvre le formulaire de contact avec le sujet « Confirmation de don ».
+- [fait] Les deux numéros sont Orange Money (indiqué sur la page).
+- [fait] Numéros gérés dans le backoffice (menu « Dons ») : ajout, modification, masquage, suppression.
+- Plus tard : paiement en ligne avec CinetPay ou PayDunya (carte bancaire et Mobile Money). Non bloquant.
+
+────────────────────────────────────────
+2. SKELETON SUR LES PHOTOS  (0,5 j) — FAIT le 2026-11-10
+────────────────────────────────────────
+- [fait] Fond animé sur chaque photo des pages publiques jusqu'à son chargement, puis apparition en fondu
+  (désactivé si l'utilisateur préfère moins d'animations ; classe .no-skeleton pour exclure une image).
+- [fait] Place réservée : cartes à hauteur fixe, dimensions réelles sur les couvertures d'articles et les affiches.
+- [fait] Chargement différé des images hors écran ; image d'en-tête chargée en priorité.
+- [fait] Miniatures dans les cartes (640 px) et les pages de détail (1600 px) au lieu des originaux.
+- [fait] Correctif de performance : la taille d'une photo était lue en décodant toute l'image à chaque affichage
+  (~90 ms par photo de 12 Mpx sur un poste rapide) ; elle est maintenant lue dans l'en-tête (~0,06 ms).
+- [fait] generate_thumbnails prépare aussi les couvertures, les affiches et les portraits.
+
+────────────────────────────────────────
+3. CACHE FICHIER INVALIDÉ PAR SIGNAL  (1 à 1,5 j) — FAIT le 2026-11-10
+────────────────────────────────────────
+Mesure d'abord (base locale, temps serveur médian, visiteur anonyme) :
+  page            avant              après corrections     après cache
+  accueil         37 ms, 11 req.     11 ms, 11 req.        7 ms, 6 req.
+  publications    60 ms, 28 req.     10 ms, 5 req.         3 ms, 3 req.
+  autres pages    ≤ 15 ms            ≤ 9 ms                inchangé
+- [fait] N+1 corrigé : auteurs de la liste des publications préchargés (28 → 5 requêtes).
+- [fait] Taille des photos gardée en cache : le fichier original n'est plus ouvert à chaque affichage
+  (les PNG étaient encore entièrement décodés pour lire leurs données EXIF).
+- [fait] Cache par défaut en fichiers (var/cache, ignoré par git), partagé entre les processus.
+- [fait] Numéro de version des contenus, changé par signal (création, modification, suppression, liens
+  plusieurs-à-plusieurs) sur articles, Gɛlɛkan, événements, galeries, photos, intervenants, membres, partenaires.
+  Ignore les simples connexions des membres. Le cron publish_scheduled passe par save() : il invalide aussi.
+- [fait] Morceaux en cache 10 min au plus : sections de l'accueil (sauf carrousel de l'équipe et newsletter),
+  résultats de la liste des publications (selon filtres, recherche, tri, page).
+- [fait] deploy.sh invalide le cache à chaque mise à jour ; guide de production complété.
+- [fait] Index : statut + date de publication (articles, Gɛlɛkan) ; index partiels des envois d'annonces
+  en attente et des messages non lus. Événements et adhésions étaient déjà indexés.
+- Constat : les pages sont rapides côté serveur ; la lenteur ressentie venait surtout des photos (lot 2)
+  et peut-être du réveil de l'application après inactivité (à vérifier sur le site réel).
+
+────────────────────────────────────────
+4. BILINGUE FR / EN  (5 à 8 j)
+────────────────────────────────────────
+- Textes fixes du site (menus, boutons, titres, pages fixes, e-mails) : tous traduits en anglais.
+- Contenus : pas de traduction rétroactive. Les champs existants restent le français.
+  Champs anglais facultatifs ajoutés, remplis pour les nouveaux contenus ; si l'anglais est vide, le français s'affiche.
+- Sélecteur de langue, adresses en /en/, balises hreflang, plan du site dans les deux langues.
+- Fichiers de traduction compilés (.mo) versionnés dans le dépôt (l'outil de compilation n'est pas sur le serveur).
+- Mettre la base en place tôt : les nouvelles pages (don, cours) sont écrites directement traduisibles.
+
+────────────────────────────────────────
+5. APP COURS ET COHORTES  (6 à 9 j)
+────────────────────────────────────────
+Nouvelle app, distincte des ressources déjà publiées sur le site.
+
+Compte étudiant
+- Inscription simple sur le site (lien depuis la page de connexion) : nom, e-mail, mot de passe, confirmation par e-mail.
+- Un compte étudiant donne accès gratuitement aux ressources déjà publiées.
+
+Cours (backoffice)
+- Les modérateurs créent des cours : titre, résumé, fichiers (surtout des PDF).
+- Fichiers téléchargeables pour l'instant (restriction éventuelle à décider plus tard).
+- Fichiers servis par une vue qui vérifie l'accès (pas dans media/, qui est public).
+
+Cohortes
+- Les modérateurs créent une cohorte : nom, dates d'ouverture et de fermeture des inscriptions, cours rattachés.
+- Quand une cohorte est ouverte, un étudiant connecté s'y inscrit avec un petit formulaire (motivation, etc.).
+- Les modérateurs acceptent, refusent ou révoquent (un par un ou en lot).
+- Un étudiant accepté voit les cours de sa cohorte dans « Mes cours ».
+- Statuts d'une inscription : en attente, acceptée, refusée, révoquée.
+
+Annonce des cohortes ouvertes
+- Page publique « Formations » : cohortes ouvertes, cours proposés, bouton « S'inscrire ».
+- Bandeau sur l'accueil et lien dans la navbar tant qu'une cohorte est ouverte.
+- E-mail aux comptes étudiants à l'ouverture d'une cohorte (file d'envoi déjà utilisée pour les publications).
+- E-mail à l'étudiant à chaque décision (acceptée, refusée, révoquée).
+
+À décider plus tard
+- Restreindre ou non le téléchargement des fichiers de cours.
