@@ -16,7 +16,7 @@
     <tbody>
     {% for p in page_obj %}
         <tr>
-            <td class="fw-semibold">{{ p.get_full_name }}</td>
+            <td class="fw-semibold"><a href="{% url 'participant_admin_detail' p.pk %}?retour={{ request.get_full_path|urlencode }}">{{ p.get_full_name }}</a>{% if p.role == 'membre' %} <span class="badge bg-success">Membre</span>{% endif %}</td>
             <td><a href="mailto:{{ p.email }}">{{ p.email }}</a></td>
             <td>{{ p.participant_profile.get_status_display|default:"—" }}</td>
             <td>{{ p.participant_profile.organization|default:"—" }}</td>

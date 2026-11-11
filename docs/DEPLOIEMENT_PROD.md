@@ -63,7 +63,7 @@ Le cron `publish_scheduled` (3.1) envoie aussi les annonces d'ouverture des form
 | Site anglais sous `/en/` (`/en/zabantu/…`) | Les adresses françaises ne changent pas. Le backoffice reste en français. |
 | Traductions compilées `locale/en/LC_MESSAGES/django.mo` | Versionnées : pas de `compilemessages` sur le serveur (`msgfmt` absent). |
 | Contenus existants | Pas de traduction rétroactive : sur les pages anglaises, ils s'affichent en français. |
-| Migrations `courses.0001` (nouvelle app des formations) et `users.0006` (rôle « participant » ajouté aux choix, aucune colonne) | Nouvelles tables seulement. |
+| Migrations `courses.0001` et `courses.0002` (nouvelle app des formations) et `users.0006` (rôle « participant » ajouté aux choix, aucune colonne) | Nouvelles tables seulement. |
 | Fichiers des cours | Rangés hors de `media/`, dans `private_media/` à la racine du dépôt (variable facultative `PRIVATE_MEDIA_ROOT` pour un autre dossier, **hors de public_html**). Jamais servis directement : une vue vérifie l'accès. `scripts/backup_media.sh` les sauvegarde dans une seconde archive (`zabantu_private_media_*.tar.gz`). |
 | Comptes participants | Créés sur le site (`/zabantu/compte/inscription/`), confirmés par e-mail. Aucun accès au backoffice (toutes ses adresses les renvoient vers « Mon espace »). |
 

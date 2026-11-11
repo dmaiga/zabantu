@@ -14,7 +14,7 @@
         <tr class="{% if cohort.n_pending %}table-warning{% endif %}">
             <td><a href="{% url 'cohort_admin_detail' cohort.pk %}" class="fw-semibold">{{ cohort.name }}</a></td>
             <td>du {{ cohort.opens_on|date:"d/m/Y" }} au {{ cohort.closes_on|date:"d/m/Y" }}</td>
-            <td>{% if cohort.state == 'open' %}<span class="badge bg-success">Ouverte</span>{% elif cohort.state == 'upcoming' %}<span class="badge bg-info text-dark">À venir</span>{% else %}<span class="badge bg-secondary">Fermée</span>{% endif %}</td>
+            <td>{% if cohort.state == 'open' %}<span class="badge bg-success">Ouverte</span>{% elif cohort.state == 'upcoming' %}<span class="badge bg-info text-dark">À venir</span>{% elif cohort.state == 'disabled' %}<span class="badge bg-dark">Désactivée</span>{% else %}<span class="badge bg-secondary">Fermée</span>{% endif %}</td>
             <td>{{ cohort.n_courses }}</td>
             <td>{% if cohort.n_pending %}<span class="badge bg-danger">{{ cohort.n_pending }}</span>{% else %}0{% endif %}</td>
             <td>{{ cohort.n_accepted }}</td>

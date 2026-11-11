@@ -93,6 +93,9 @@ Cohortes
 - Les modérateurs acceptent, refusent ou révoquent (un par un ou en lot).
 - Un participant accepté voit les cours de sa cohorte dans « Mon espace ».
 - Statuts d'une inscription : en attente, acceptée, refusée, révoquée.
+- Cohorte désactivable : invisible sur le site, plus d'inscription ni d'annonce ; les acceptés gardent leurs cours.
+- Fiche du participant (depuis la cohorte ou la liste des participants) : chaque demande en entier, historique des
+  formations, assiduité (documents ouverts par cours, téléchargements), adhésion ; décisions depuis la fiche.
 
 Annonce des cohortes ouvertes
 - Page publique « Formations » : cohortes ouvertes, cours proposés, bouton « S'inscrire ».
@@ -100,6 +103,8 @@ Annonce des cohortes ouvertes
 - E-mail aux comptes participants à l'ouverture d'une cohorte (envoi par lots, comme les annonces de publication ;
   désactivable depuis « Mon espace »).
 - E-mail au participant à chaque décision (acceptée, refusée, révoquée), dans sa langue.
+- Après la création d'une cohorte : campagne d'annonce (message prérempli, modifiable) aux abonnés de l'info-lettre
+  et aux anciens participants, une seule fois par adresse ; visible dans Communication.
 
 À décider plus tard
 - Restreindre ou non le téléchargement des fichiers de cours.

@@ -384,3 +384,134 @@ class MembershipFromTheSpaceTests(TestCase):
         application.revoke(moderator)
         self.user.refresh_from_db()
         self.assertEqual((self.user.role, self.user.is_active), ('participant', True))
+
+
+class EnrollmentActionSafetyTests(TestCase):
+    def setUp(self):
+        self.enrollment = Enrollment.objects.create(cohort=cohort(), user=participant(), motivation='x')
+        self.client.force_login(make_user('moderateur'))
+
+    def test_external_return_address_is_ignored(self):
+        r = self.client.post(reverse('enrollment_admin_action', args=[self.enrollment.pk, 'accept']),
+                             {'next': 'https://exemple.com/piege'})
+        self.assertRedirects(r, reverse('cohort_admin_detail', args=[self.enrollment.cohort_id]),
+                             fetch_redirect_response=False)
+
+    def test_unknown_action_is_a_404(self):
+        r = self.client.post(reverse('enrollment_admin_action', args=[self.enrollment.pk, 'supprimer']))
+        self.assertEqual(r.status_code, 404)
+
+
+@override_settings(PRIVATE_MEDIA_ROOT=_PRIVATE)
+class CohortActivationTests(TestCase):
+    def setUp(self):
+        self.cohort = cohort('Méthodes')
+        self.moderator = make_user('moderateur')
+
+    def test_disabled_cohort_disappears_and_refuses_enrollment(self):
+        self.client.force_login(self.moderator)
+        self.client.post(reverse('cohort_admin_toggle', args=[self.cohort.pk]))
+        self.cohort.refresh_from_db()
+        self.assertFalse(self.cohort.is_active)
+        self.assertContains(self.client.get(reverse('cohort_admin_list')), 'Désactivée')
+        self.client.logout()
+        self.assertNotContains(self.client.get(reverse('training_list')), 'Méthodes')
+        self.client.force_login(participant(), backend='courses.backends.ParticipantBackend')
+        self.assertEqual(self.client.get(reverse('training_enroll', args=[self.cohort.pk])).status_code, 404)
+        self.assertEqual(mailing.queue_open_cohorts(), 0)                     # pas d'annonce automatique
+
+    def test_accepted_participants_keep_their_courses(self):
+        course = Course.objects.create(title='Cours')
+        item = CourseFile.objects.create(course=course, file=pdf())
+        self.cohort.courses.add(course)
+        user = participant()
+        Enrollment.objects.create(cohort=self.cohort, user=user, motivation='x').decide('accept', self.moderator)
+        Cohort.objects.filter(pk=self.cohort.pk).update(is_active=False)
+        self.client.force_login(user, backend='courses.backends.ParticipantBackend')
+        self.assertEqual(self.client.get(reverse('participant_course_file', args=[item.pk])).status_code, 200)
+
+
+@override_settings(PRIVATE_MEDIA_ROOT=_PRIVATE)
+class ParticipantDetailTests(TestCase):
+    def setUp(self):
+        self.course = Course.objects.create(title='Économétrie')
+        self.files = [CourseFile.objects.create(course=self.course, file=pdf(f'{n}.pdf')) for n in 'ab']
+        self.old = cohort('Session 2025', days_open=(-60, -30))
+        self.old.courses.add(self.course)
+        self.new = cohort('Session 2026')
+        self.user = participant()
+        self.moderator = make_user('moderateur')
+        Enrollment.objects.create(cohort=self.old, user=self.user, motivation='Ancienne').decide('accept', self.moderator)
+        long_text = 'Je souhaite approfondir mes méthodes. ' * 80
+        self.enrollment = Enrollment.objects.create(cohort=self.new, user=self.user, motivation=long_text)
+
+    def test_cohort_table_shows_an_extract_and_a_link_to_the_detail(self):
+        self.client.force_login(self.moderator)
+        r = self.client.get(reverse('cohort_admin_detail', args=[self.new.pk]))
+        self.assertContains(r, 'Examiner')
+        self.assertContains(r, f"{reverse('participant_admin_detail', args=[self.user.pk])}?inscription={self.enrollment.pk}")
+        self.assertNotContains(r, self.enrollment.motivation)                       # pas le texte entier
+
+    def test_detail_shows_history_full_requests_and_assiduity(self):
+        self.client.force_login(self.user, backend='courses.backends.ParticipantBackend')
+        self.client.get(reverse('participant_course_file', args=[self.files[0].pk]))
+        self.client.get(reverse('participant_course_file', args=[self.files[0].pk]))
+        self.client.force_login(self.moderator)
+        self.client.get(reverse('participant_course_file', args=[self.files[1].pk]))   # l'équipe n'est pas comptée
+        r = self.client.get(reverse('participant_admin_detail', args=[self.user.pk]))
+        self.assertContains(r, 'Session 2025')
+        self.assertContains(r, 'Session 2026')
+        self.assertContains(r, self.enrollment.motivation.strip()[:60])
+        self.assertContains(r, '1 / 2')                                              # documents ouverts
+        self.assertEqual(r.context['progress'][0]['downloads'], 2)
+
+    def test_decision_from_the_detail_returns_to_it(self):
+        self.client.force_login(self.moderator)
+        detail = reverse('participant_admin_detail', args=[self.user.pk])
+        r = self.client.post(reverse('enrollment_admin_action', args=[self.enrollment.pk, 'accept']), {'next': detail})
+        self.assertRedirects(r, detail, fetch_redirect_response=False)
+        self.enrollment.refresh_from_db()
+        self.assertEqual(self.enrollment.status, 'accepted')
+
+
+class CohortAnnouncementCampaignTests(TestCase):
+    def setUp(self):
+        from site_web.models import NewsletterSubscriber
+        self.moderator = make_user('moderateur')
+        self.client.force_login(self.moderator)
+        previous = cohort('Session 2025', days_open=(-60, -30))
+        self.former = participant('ancien@example.org', language='en')
+        Enrollment.objects.create(cohort=previous, user=self.former, motivation='x')
+        participant('jamais-inscrit@example.org')
+        NewsletterSubscriber.objects.create(email='lecteur@example.org')
+        NewsletterSubscriber.objects.create(email='ANCIEN@example.org')         # aussi ancien participant
+
+    def test_creating_a_cohort_leads_to_the_announcement(self):
+        today = timezone.localdate()
+        r = self.client.post(reverse('cohort_admin_create'), {
+            'name': 'Session 2026', 'description': 'Méthodes mixtes', 'opens_on': today + timedelta(days=7),
+            'closes_on': today + timedelta(days=30)})
+        new = Cohort.objects.get(name='Session 2026')
+        self.assertRedirects(r, reverse('cohort_admin_announce', args=[new.pk]), fetch_redirect_response=False)
+        r = self.client.get(reverse('cohort_admin_announce', args=[new.pk]))
+        self.assertContains(r, 'Nouvelle formation Zabantu : Session 2026')        # objet prérempli
+        self.assertContains(r, 'Méthodes mixtes')                                 # message prérempli
+
+    def test_announcement_reaches_subscribers_and_former_participants_once(self):
+        from site_web.models import NewsletterCampaign
+        new = cohort('Session 2026', days_open=(7, 30))
+        r = self.client.post(reverse('cohort_admin_announce', args=[new.pk]), {
+            'subject': 'Session 2026 ouverte', 'message': '<p>Inscrivez-vous !</p>',
+            'to_subscribers': 'on', 'to_participants': 'on'})
+        self.assertRedirects(r, reverse('cohort_admin_detail', args=[new.pk]), fetch_redirect_response=False)
+        to = sorted(m.to[0].lower() for m in mail.outbox)
+        self.assertEqual(to, ['ancien@example.org', 'lecteur@example.org'])        # une seule fois chacun
+        self.assertTrue(all(m.subject == 'Session 2026 ouverte' for m in mail.outbox))
+        self.assertIn('Inscrivez-vous !', mail.outbox[0].alternatives[0][0])
+        campaign = NewsletterCampaign.objects.get()
+        self.assertEqual((campaign.status, campaign.content_object), ('sent', new))  # visible dans Communication
+
+    def test_disabled_cohort_cannot_be_announced(self):
+        new = cohort('Session 2026', is_active=False)
+        r = self.client.get(reverse('cohort_admin_announce', args=[new.pk]))
+        self.assertRedirects(r, reverse('cohort_admin_detail', args=[new.pk]), fetch_redirect_response=False)

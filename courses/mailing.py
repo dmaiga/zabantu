@@ -95,9 +95,10 @@ def _announcement_message(announcement):
             'closes_on': cohort.closes_on,
             'courses': [translated(course, 'title') for course in cohort.courses.all()],
             'url': site_mailing.absolute_url(reverse('training_list')),
-            'settings_url': site_mailing.absolute_url(reverse('participant_space')),
+            'settings_url': site_mailing.absolute_url(reverse('participant_profile')),
+            'custom_message': cohort.announcement_message,   # campagne rédigée au backoffice, si elle existe
         }
-        subject = _("Nouvelle formation ouverte : %(cohort)s") % {'cohort': context['cohort']}
+        subject = cohort.announcement_subject or _("Nouvelle formation ouverte : %(cohort)s") % {'cohort': context['cohort']}
         html_body = render_to_string('courses/emails/cohort_opened.html', context)
     message = EmailMultiAlternatives(subject=subject, body=strip_tags(html_body),
                                      from_email=settings.DEFAULT_FROM_EMAIL_NEWS, to=[user.email])
@@ -120,3 +121,44 @@ def send_pending_announcements():
     for pk in failed:
         CohortAnnouncement.objects.filter(pk=pk).update(attempts=F('attempts') + 1, last_error=errors.get(pk, ''))
     return len(sent), len(failed)
+
+
+def former_participants(cohort):
+    """Comptes ayant déjà demandé une autre formation, actifs et d'accord pour être prévenus."""
+    User = get_user_model()
+    return (User.objects.filter(is_active=True, participant_profile__notify_cohorts=True, enrollments__isnull=False)
+            .exclude(enrollments__cohort=cohort).distinct())
+
+
+def announce_cohort(cohort, by, subject, message, to_subscribers, to_participants):
+    """Campagne d'annonce d'une cohorte, envoyée tout de suite.
+
+    - anciens participants : file des annonces (une par personne et par cohorte, jamais deux) avec ce message ;
+      l'annonce automatique du jour d'ouverture ne leur sera donc pas renvoyée ;
+    - abonnés de l'info-lettre : campagne d'info-lettre (visible dans Communication), sans les adresses déjà
+      prévenues comme participants.
+    Renvoie {'participants': (envoyés, échecs), 'subscribers': (envoyés, échecs) ou None, 'campaign': campagne}.
+    """
+    from django.contrib.contenttypes.models import ContentType
+    from site_web.models import NewsletterCampaign, NewsletterRecipient, NewsletterSubscriber
+
+    cohort.announcement_subject, cohort.announcement_message = subject, message
+    cohort.save(update_fields=['announcement_subject', 'announcement_message'])
+    result = {'participants': (0, 0), 'subscribers': None, 'campaign': None}
+    participant_emails = set()
+    if to_participants:
+        people = list(former_participants(cohort))
+        CohortAnnouncement.objects.bulk_create(
+            [CohortAnnouncement(cohort=cohort, user=user) for user in people], ignore_conflicts=True)
+        participant_emails = {user.email.lower() for user in people}
+        result['participants'] = send_pending_announcements()
+    if to_subscribers:
+        subscribers = [s for s in NewsletterSubscriber.objects.filter(is_active=True)
+                       if s.email.lower() not in participant_emails]
+        campaign = NewsletterCampaign.objects.create(
+            title=f"Annonce de la cohorte « {cohort.name} »", subject=subject, content=message, created_by=by,
+            content_type=ContentType.objects.get_for_model(cohort), object_id=cohort.pk)
+        NewsletterRecipient.objects.bulk_create(NewsletterRecipient(campaign=campaign, subscriber=s) for s in subscribers)
+        result['campaign'] = campaign
+        result['subscribers'] = campaign.send() if subscribers else (0, 0)
+    return result

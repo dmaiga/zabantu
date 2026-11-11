@@ -3,7 +3,7 @@
 {% block title %}{% translate "Inscription" %}{% endblock %}
 {% block page_title %}{% translate "Inscription à une formation" %}{% endblock %}
 {% block content %}
-<section class="sp-card" style="max-width: 720px;">
+<section class="sp-card sp-narrow">
   <h2>{{ cohort.t.name }}</h2>
   <p class="text-muted">{% blocktranslate with date=cohort.closes_on|date:"j F Y" %}Quelques lignes suffisent : l'équipe examine chaque demande et vous répond par e-mail. Inscriptions jusqu'au {{ date }}.{% endblocktranslate %}</p>
   <form method="post" novalidate>

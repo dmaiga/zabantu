@@ -2,6 +2,7 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Q
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
@@ -10,10 +11,20 @@ from users.listing import paginate
 from users.permissions import moderator_required
 
 from . import mailing
-from .forms import CohortForm, CourseFilesForm, CourseFileTitleForm, CourseForm
-from .models import Cohort, Course, CourseFile, Enrollment
+from .forms import CohortAnnounceForm, CohortForm, CourseFilesForm, CourseFileTitleForm, CourseForm
+from .models import Cohort, Course, CourseFile, CourseFileDownload, Enrollment
 
 User = get_user_model()
+
+def _back(request, default):
+    """Retour à la page d'origine (filtres conservés), uniquement s'il s'agit d'une adresse de ce site."""
+    from django.utils.http import url_has_allowed_host_and_scheme
+    target = request.POST.get('next')
+    if target and url_has_allowed_host_and_scheme(target, allowed_hosts={request.get_host()},
+                                                  require_https=request.is_secure()):
+        return target
+    return default
+
 
 ACTION_LABELS = {'accept': 'acceptée(s)', 'reject': 'refusée(s)', 'revoke': 'révoquée(s)'}
 
@@ -131,8 +142,8 @@ def cohort_create(request):
         cohort.created_by = request.user
         cohort.save()
         form.save_m2m()
-        messages.success(request, "Cohorte créée.")
-        return redirect('cohort_admin_detail', pk=cohort.pk)
+        messages.success(request, "Cohorte créée. Vous pouvez maintenant l'annoncer par e-mail (ou passer cette étape).")
+        return redirect('cohort_admin_announce', pk=cohort.pk)
     return _form_page(request, form, "Nouvelle cohorte", reverse('cohort_admin_list'),
                       "La cohorte apparaît sur la page « Formations » pendant ses dates d'inscription ; les participants "
                       "sont prévenus par e-mail le jour de l'ouverture.")
@@ -205,10 +216,10 @@ def _report(request, done, skipped, mail_failures, action):
 def enrollment_action(request, pk, action):
     enrollment = get_object_or_404(Enrollment.objects.select_related('user', 'cohort'), pk=pk)
     if action not in ACTION_LABELS:
-        raise ValueError(action)
+        raise Http404
     done, failures = _decide(request, [enrollment], action)
     _report(request, done, 0 if done else 1, failures, action)
-    return redirect(request.POST.get('next') or reverse('cohort_admin_detail', args=[enrollment.cohort_id]))
+    return redirect(_back(request, reverse('cohort_admin_detail', args=[enrollment.cohort_id])))
 
 
 @require_POST
@@ -222,7 +233,7 @@ def enrollment_bulk(request, pk):
     selected = list(cohort.enrollments.filter(pk__in=request.POST.getlist('ids')).select_related('user'))
     done, failures = _decide(request, selected, action)
     _report(request, done, len(selected) - done, failures, action)
-    return redirect(request.POST.get('next') or reverse('cohort_admin_detail', args=[pk]))
+    return redirect(_back(request, reverse('cohort_admin_detail', args=[pk])))
 
 
 # ----- Participants -----
@@ -238,3 +249,116 @@ def participant_list(request):
     page_obj, querystring = paginate(request, participants)
     return render(request, 'courses/admin/participant_list.html',
                   {'page_obj': page_obj, 'querystring': querystring, 'query': query})
+
+
+@moderator_required
+def participant_detail(request, pk):
+    """Fiche d'un participant pour décider : profil, chaque demande en entier, historique des formations,
+    assiduité (téléchargements des documents de cours), adhésion."""
+    from site_web.models import MembershipApplication
+    person = get_object_or_404(User.objects.select_related('participant_profile'), pk=pk,
+                               participant_profile__isnull=False)
+    enrollments = list(person.enrollments.select_related('cohort', 'decided_by').prefetch_related('cohort__courses__files'))
+    downloads = CourseFileDownload.objects.filter(user=person)
+    by_file = {}
+    for course_file_id, downloaded_at in downloads.values_list('course_file_id', 'downloaded_at'):
+        count, last = by_file.get(course_file_id, (0, None))
+        by_file[course_file_id] = (count + 1, max(last, downloaded_at) if last else downloaded_at)
+    progress = []   # par cours accessible : fichiers ouverts / fichiers du cours, dernier téléchargement
+    seen = set()
+    for enrollment in enrollments:
+        if enrollment.status != Enrollment.Status.ACCEPTED:
+            continue
+        for course in enrollment.cohort.courses.all():
+            if course.pk in seen:
+                continue
+            seen.add(course.pk)
+            files = list(course.files.all())
+            opened = [by_file[f.pk] for f in files if f.pk in by_file]
+            progress.append({
+                'course': course, 'cohort': enrollment.cohort, 'files': len(files), 'opened': len(opened),
+                'downloads': sum(n for n, _last in opened), 'last': max((last for _n, last in opened), default=None),
+            })
+    return render(request, 'courses/admin/participant_detail.html', {
+        'person': person,
+        'profile': person.participant_profile,
+        'enrollments': enrollments,
+        'highlight': request.GET.get('inscription', ''),
+        'progress': progress,
+        'download_count': downloads.count(),
+        'last_download': downloads.values_list('downloaded_at', flat=True).first(),
+        'applications': MembershipApplication.objects.filter(email__iexact=person.email).order_by('-created_at'),
+        'back': _back_get(request),
+    })
+
+
+def _back_get(request):
+    """Page d'origine (liste des participants ou cohorte), passée en ?retour=, si elle appartient au site."""
+    from django.utils.http import url_has_allowed_host_and_scheme
+    target = request.GET.get('retour', '')
+    if target and url_has_allowed_host_and_scheme(target, allowed_hosts={request.get_host()}):
+        return target
+    return reverse('participant_admin_list')
+
+
+@require_POST
+@moderator_required
+def cohort_toggle(request, pk):
+    cohort = get_object_or_404(Cohort, pk=pk)
+    cohort.is_active = not cohort.is_active
+    cohort.save(update_fields=['is_active'])
+    if cohort.is_active:
+        messages.success(request, f"Cohorte « {cohort.name} » réactivée : elle réapparaît sur le site pendant ses dates d'inscription.")
+    else:
+        messages.success(request, f"Cohorte « {cohort.name} » désactivée : elle n'apparaît plus sur le site et n'accepte plus "
+                                  "d'inscription. Les participants acceptés gardent l'accès à leurs cours.")
+    return redirect(_back(request, reverse('cohort_admin_detail', args=[pk])))
+
+
+def _default_announcement(request, cohort):
+    from django.utils.formats import date_format
+    from django.utils.html import escape, linebreaks
+    from site_web.mailing import absolute_url
+    url = absolute_url(reverse('training_list'))   # adresse officielle du site (SITE_URL), comme les autres e-mails
+    courses = ''.join(f'<li>{escape(c.title)}</li>' for c in cohort.courses.all())
+    parts = [f'<p>Une nouvelle formation du groupe de recherche Zabantu ouvre ses inscriptions : <strong>{escape(cohort.name)}</strong>.</p>']
+    if cohort.description:
+        parts.append(linebreaks(escape(cohort.description)))
+    if courses:
+        parts.append(f'<p>Cours proposés :</p><ul>{courses}</ul>')
+    parts.append(f"<p>Inscriptions du {date_format(cohort.opens_on, 'j F Y')} au {date_format(cohort.closes_on, 'j F Y')}, "
+                 f"avec un compte participant gratuit : <a href=\"{url}\">voir la formation et s'inscrire</a>.</p>")
+    return {'subject': cohort.announcement_subject or f"Nouvelle formation Zabantu : {cohort.name}",
+            'message': cohort.announcement_message or ''.join(parts)}
+
+
+@moderator_required
+def cohort_announce(request, pk):
+    """Campagne e-mail annonçant la cohorte aux abonnés de l'info-lettre et aux anciens participants."""
+    from site_web.models import NewsletterSubscriber
+    cohort = get_object_or_404(Cohort.objects.prefetch_related('courses'), pk=pk)
+    if not cohort.is_active:
+        messages.error(request, "Cette cohorte est désactivée : réactivez-la avant de l'annoncer.")
+        return redirect('cohort_admin_detail', pk=pk)
+    form = CohortAnnounceForm(request.POST or None, initial=_default_announcement(request, cohort))
+    if request.method == 'POST' and form.is_valid():
+        data = form.cleaned_data
+        result = mailing.announce_cohort(cohort, request.user, data['subject'], data['message'],
+                                         data['to_subscribers'], data['to_participants'])
+        parts = []
+        if data['to_participants']:
+            parts.append(f"{result['participants'][0]} participant(s)")
+        if result['subscribers'] is not None:
+            parts.append(f"{result['subscribers'][0]} abonné(s)")
+        failed = result['participants'][1] + (result['subscribers'][1] if result['subscribers'] else 0)
+        if failed:
+            messages.warning(request, f"Annonce envoyée à {', '.join(parts)} ; {failed} envoi(s) en échec, retentés plus tard ou depuis « Envois e-mail ».")
+        else:
+            messages.success(request, f"Annonce envoyée à {', '.join(parts)}.")
+        return redirect('cohort_admin_detail', pk=pk)
+    return render(request, 'courses/admin/cohort_announce.html', {
+        'cohort': cohort, 'form': form, 'submit_label': "Envoyer l'annonce",
+        'back_url': reverse('cohort_admin_detail', args=[pk]), 'back_label': 'Passer et voir la cohorte',
+        'subscriber_count': NewsletterSubscriber.objects.filter(is_active=True).count(),
+        'participant_count': mailing.former_participants(cohort).count(),
+    })

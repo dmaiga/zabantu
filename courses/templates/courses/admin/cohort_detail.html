@@ -6,13 +6,16 @@
     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mt-2 mb-3">
         <div>
             <h1 class="h3 mb-1">{{ cohort.name }}
-                {% if cohort.state == 'open' %}<span class="badge bg-success align-middle fs-6">Ouverte</span>{% elif cohort.state == 'upcoming' %}<span class="badge bg-info text-dark align-middle fs-6">À venir</span>{% else %}<span class="badge bg-secondary align-middle fs-6">Fermée</span>{% endif %}</h1>
+                {% if cohort.state == 'open' %}<span class="badge bg-success align-middle fs-6">Ouverte</span>{% elif cohort.state == 'upcoming' %}<span class="badge bg-info text-dark align-middle fs-6">À venir</span>{% elif cohort.state == 'disabled' %}<span class="badge bg-dark align-middle fs-6">Désactivée</span>{% else %}<span class="badge bg-secondary align-middle fs-6">Fermée</span>{% endif %}</h1>
+            {% if not cohort.is_active %}<div class="alert alert-warning py-2 my-2">Cohorte désactivée : invisible sur le site, aucune nouvelle inscription. Les participants acceptés gardent l'accès à leurs cours.</div>{% endif %}
             <p class="text-muted mb-0">Inscriptions du {{ cohort.opens_on|date:"d/m/Y" }} au {{ cohort.closes_on|date:"d/m/Y" }}
                 {% if cohort.announced_at %}· annoncée aux participants le {{ cohort.announced_at|date:"d/m/Y" }}{% endif %}</p>
             <p class="small mb-0">Cours : {% for course in cohort.courses.all %}<a href="{% url 'course_admin_detail' course.pk %}">{{ course.title }}</a>{% if not forloop.last %}, {% endif %}{% empty %}<span class="text-danger">aucun</span>{% endfor %}</p>
         </div>
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 flex-wrap">
+            {% if cohort.is_active %}<a href="{% url 'cohort_admin_announce' cohort.pk %}" class="btn btn-primary"><i class="fas fa-bullhorn me-1"></i> Annoncer par e-mail</a>{% endif %}
             <a href="{% url 'cohort_admin_update' cohort.pk %}" class="btn btn-outline-secondary"><i class="fas fa-pen me-1"></i> Modifier</a>
+            {% url 'cohort_admin_toggle' cohort.pk as url %}{% if cohort.is_active %}{% include 'includes/post_action.html' with url=url label='Désactiver' btn_class='btn-outline-warning' icon='fa-power-off' confirm='Désactiver cette cohorte ? Elle disparaît du site et n’accepte plus d’inscription ; les participants acceptés gardent l’accès à leurs cours.' %}{% else %}{% include 'includes/post_action.html' with url=url label='Réactiver' btn_class='btn-outline-success' icon='fa-power-off' %}{% endif %}
             {% if not total %}{% url 'cohort_admin_delete' cohort.pk as url %}{% include 'includes/post_action.html' with url=url label='Supprimer' btn_class='btn-outline-danger' icon='fa-trash' confirm='Supprimer cette cohorte ?' %}{% endif %}
         </div>
     </div>
@@ -40,7 +43,7 @@
             <table class="table align-middle mb-0">
                 <thead><tr>
                     <th style="width:2.5rem"><input type="checkbox" class="form-check-input" id="selectAll" aria-label="Tout sélectionner"></th>
-                    <th>Participant</th><th>Profil</th><th>Motivation</th><th>Reçue le</th><th>Statut</th><th class="text-end">Décision</th>
+                    <th>Participant</th><th>Profil</th><th>Motivation (extrait)</th><th>Reçue le</th><th>Statut</th><th class="text-end">Décision</th>
                 </tr></thead>
                 <tbody>
                 {% for e in page_obj %}
@@ -48,18 +51,14 @@
                         <td><input type="checkbox" class="form-check-input row-check" name="ids" value="{{ e.pk }}" aria-label="Sélectionner {{ e.user.get_full_name }}"></td>
                         <td><strong>{{ e.user.get_full_name }}</strong><br><a href="mailto:{{ e.user.email }}" class="small">{{ e.user.email }}</a></td>
                         <td class="small">{{ e.user.participant_profile.get_status_display }}{% if e.user.participant_profile.organization %}<br><span class="text-muted">{{ e.user.participant_profile.organization }}</span>{% endif %}</td>
-                        <td class="small" style="max-width: 420px;">
-                            <details><summary>{{ e.motivation|truncatewords:14 }}</summary>
-                                <p class="mt-2 mb-1">{{ e.motivation|linebreaksbr }}</p>
-                                {% if e.expectations %}<p class="mb-0"><strong>Attentes :</strong> {{ e.expectations|linebreaksbr }}</p>{% endif %}
-                            </details>
-                        </td>
+                        <td class="small text-muted" style="max-width: 320px;">{{ e.motivation|truncatechars:110 }}</td>
                         <td class="small">{{ e.created_at|date:"d/m/Y H:i" }}</td>
                         <td>
                             {% if e.status == 'pending' %}<span class="badge bg-warning text-dark">En attente</span>{% elif e.status == 'accepted' %}<span class="badge bg-success">Acceptée</span>{% elif e.status == 'rejected' %}<span class="badge bg-secondary">Refusée</span>{% else %}<span class="badge bg-danger">Révoquée</span>{% endif %}
                             {% if e.decided_by %}<br><small class="text-muted">{{ e.decided_by.get_full_name }}, {{ e.decided_at|date:"d/m/Y" }}</small>{% endif %}
                         </td>
                         <td class="text-end"><div class="d-inline-flex gap-1">
+                            <a href="{% url 'participant_admin_detail' e.user_id %}?inscription={{ e.pk }}&amp;retour={{ request.get_full_path|urlencode }}#inscription-{{ e.pk }}" class="btn btn-sm btn-primary" title="Examiner la demande et l'historique"><i class="fas fa-eye me-1"></i>Examiner</a>
                             {% if e.status != 'accepted' %}<button type="submit" form="act-{{ e.pk }}-accept" class="btn btn-sm btn-outline-success" title="Accepter" aria-label="Accepter"><i class="fas fa-check"></i></button>{% endif %}
                             {% if e.status == 'pending' %}<button type="submit" form="act-{{ e.pk }}-reject" class="btn btn-sm btn-outline-warning" title="Refuser" aria-label="Refuser"><i class="fas fa-xmark"></i></button>{% endif %}
                             {% if e.status == 'accepted' %}<button type="submit" form="act-{{ e.pk }}-revoke" class="btn btn-sm btn-outline-danger" title="Révoquer" aria-label="Révoquer" onclick="return confirm('Révoquer cette inscription ? Le participant perd l’accès aux cours.')"><i class="fas fa-ban"></i></button>{% endif %}

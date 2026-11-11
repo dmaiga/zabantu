@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabantu\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 01:12+0000\n"
+"POT-Creation-Date: 2026-11-11 01:58+0000\n"
 "PO-Revision-Date: 2026-11-10 23:00+0000\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
@@ -66,7 +66,8 @@ msgstr "First name"
 msgid "Nom"
 msgstr "Last name"
 
-#: courses/forms.py site_web/models.py
+#: courses/forms.py courses/templates/courses/space/profile.html
+#: site_web/models.py
 msgid "Adresse e-mail"
 msgstr "E-mail address"
 
@@ -78,7 +79,8 @@ msgstr "You are"
 msgid "Organisation (université, entreprise, institution…)"
 msgstr "Organisation (university, company, institution…)"
 
-#: courses/forms.py
+#: courses/forms.py courses/templates/courses/space/base.html
+#: courses/templates/courses/space/password.html
 msgid "Mot de passe"
 msgstr "Password"
 
@@ -115,19 +117,63 @@ msgid "Les deux mots de passe ne correspondent pas."
 msgstr "The two passwords do not match."
 
 #: courses/forms.py
+msgid "Adresse e-mail ou identifiant"
+msgstr "E-mail address or username"
+
+#: courses/forms.py
 msgid ""
 "Votre adresse n'est pas encore confirmée : ouvrez le lien reçu par e-mail."
 msgstr ""
 "Your address is not confirmed yet: open the link you received by e-mail."
 
 #: courses/forms.py
-msgid "Adresse e-mail ou mot de passe incorrect."
-msgstr "Incorrect e-mail address or password."
+msgid ""
+"Ce compte ne permet pas de se connecter. Contactez l'équipe Zabantu si "
+"besoin."
+msgstr "This account cannot log in. Contact the Zabantu team if needed."
+
+#: courses/forms.py
+msgid "Identifiant ou mot de passe incorrect."
+msgstr "Incorrect username or password."
 
 #: courses/forms.py site_web/forms.py
 #, python-format
 msgid "Maximum %(n)s mots."
 msgstr "Maximum %(n)s words."
+
+#: courses/forms.py site_web/models.py
+msgid "Ville et pays de résidence"
+msgstr "City and country of residence"
+
+#: courses/forms.py site_web/models.py
+msgid "Institution d'affiliation"
+msgstr "Institution of affiliation"
+
+#: courses/forms.py site_web/models.py
+msgid "Téléphone (WhatsApp, si disponible)"
+msgstr "Phone (WhatsApp, if available)"
+
+#: courses/forms.py site_web/models.py
+msgid "Principaux centres de recherche"
+msgstr "Main research interests"
+
+#: courses/forms.py site_web/forms.py
+msgid ""
+"Comment souhaitez-vous contribuer aux activités de Zabantu ? (max 100 mots)"
+msgstr ""
+"How would you like to contribute to Zabantu’s activities? (max 100 words)"
+
+#: courses/forms.py site_web/forms.py
+msgid ""
+"J'autorise l'utilisation des informations fournies pour le traitement de ma "
+"demande d'adhésion et la prise de contact avec moi."
+msgstr ""
+"I authorise the use of the information provided to process my membership "
+"application and to contact me."
+
+#: courses/forms.py site_web/forms.py
+msgid "Votre consentement est nécessaire pour traiter la demande."
+msgstr "Your consent is required to process the application."
 
 #: courses/mailing.py
 msgid "Confirmez votre compte Zabantu"
@@ -248,6 +294,7 @@ msgstr ""
 
 #: courses/templates/courses/emails/decision.html
 #: courses/templates/courses/public/training_list.html
+#: courses/templates/courses/space/trainings.html
 msgid "Inscription acceptée"
 msgstr "Enrolment accepted"
 
@@ -363,65 +410,30 @@ msgstr "Create an account"
 msgid "Nous écrire"
 msgstr "Write to us"
 
-#: courses/templates/courses/public/course_detail.html
-#: courses/templates/courses/public/space.html
-#: courses/templates/courses/public/training_list.html
-#: site_web/templates/base_public.html site_web/templates/site_web/index.html
-msgid "Mon espace"
-msgstr "My space"
-
-#: courses/templates/courses/public/course_detail.html
-msgid "Documents du cours"
-msgstr "Course documents"
-
-#: courses/templates/courses/public/course_detail.html
-#: site_web/templates/site_web/public_guelekan_detail.html
-msgid "Télécharger"
-msgstr "Download"
-
-#: courses/templates/courses/public/course_detail.html
-msgid "Aucun document pour le moment."
-msgstr "No documents yet."
-
-#: courses/templates/courses/public/enroll.html
-msgid "Inscription"
-msgstr "Enrolment"
-
-#: courses/templates/courses/public/enroll.html
-msgid "Inscription à une formation"
-msgstr "Training enrolment"
-
-#: courses/templates/courses/public/enroll.html
-#, python-format
-msgid ""
-"Quelques lignes suffisent : l'équipe examine chaque demande et vous répond "
-"par e-mail. Inscriptions jusqu'au %(date)s."
-msgstr ""
-"A few lines are enough: the team reviews each request and replies by e-mail. "
-"Enrolment open until %(date)s."
-
-#: courses/templates/courses/public/enroll.html
-msgid "150 mots au plus par réponse."
-msgstr "150 words at most per answer."
-
-#: courses/templates/courses/public/enroll.html
-#: site_web/templates/site_web/public_membership_form.html
-msgid "Envoyer ma demande"
-msgstr "Send my application"
-
-#: courses/templates/courses/public/enroll.html
-#: site_web/templates/site_web/newsletter_unsubscribe_confirm.html
-msgid "Annuler"
-msgstr "Cancel"
-
 #: courses/templates/courses/public/login.html
 #: site_web/templates/base_public.html
 msgid "Connexion"
 msgstr "Log in"
 
 #: courses/templates/courses/public/login.html
-msgid "Votre espace de formation"
-msgstr "Your training space"
+msgid "Équipe Zabantu et participants aux formations"
+msgstr "Zabantu team and training participants"
+
+#: courses/templates/courses/public/login.html
+msgid "Afficher le mot de passe"
+msgstr "Show password"
+
+#: courses/templates/courses/public/login.html
+msgid "Masquer le mot de passe"
+msgstr "Hide password"
+
+#: courses/templates/courses/public/login.html
+msgid "Mot de passe oublié ?"
+msgstr "Forgot your password?"
+
+#: courses/templates/courses/public/login.html
+msgid "Connexion…"
+msgstr "Logging in…"
 
 #: courses/templates/courses/public/login.html
 #: courses/templates/courses/public/password_reset_complete.html
@@ -431,21 +443,13 @@ msgid "Se connecter"
 msgstr "Log in"
 
 #: courses/templates/courses/public/login.html
-msgid "Mot de passe oublié ?"
-msgstr "Forgot your password?"
-
-#: courses/templates/courses/public/login.html
-msgid "Pas encore de compte ?"
-msgstr "No account yet?"
+msgid "Vous souhaitez suivre une formation ?"
+msgstr "Would you like to take a training course?"
 
 #: courses/templates/courses/public/login.html
 #: site_web/templates/site_web/index.html
 msgid "Créer un compte gratuit"
 msgstr "Create a free account"
-
-#: courses/templates/courses/public/login.html
-msgid "Équipe Zabantu : espace de gestion"
-msgstr "Zabantu team: management area"
 
 #: courses/templates/courses/public/password_reset.html
 #: courses/templates/courses/public/password_reset_confirm.html
@@ -474,6 +478,7 @@ msgid "Votre mot de passe est enregistré. Vous pouvez vous connecter."
 msgstr "Your password has been saved. You can log in."
 
 #: courses/templates/courses/public/password_reset_confirm.html
+#: courses/templates/courses/space/password.html
 msgid "Enregistrer le mot de passe"
 msgstr "Save the password"
 
@@ -547,81 +552,8 @@ msgid ""
 "indésirables."
 msgstr "Open it to activate your account. Remember to check your spam folder."
 
-#: courses/templates/courses/public/space.html
-msgid "Mes cours"
-msgstr "My courses"
-
-#: courses/templates/courses/public/space.html
-#, python-format
-msgid "%(n)s fichier"
-msgid_plural "%(n)s fichiers"
-msgstr[0] "%(n)s file"
-msgstr[1] "%(n)s files"
-
-#: courses/templates/courses/public/space.html
-msgid "Ouvrir"
-msgstr "Open"
-
-#: courses/templates/courses/public/space.html
-msgid "Les cours de cette formation seront bientôt disponibles."
-msgstr "The courses of this training will be available soon."
-
-#: courses/templates/courses/public/space.html
-msgid ""
-"Vos cours apparaîtront ici dès que votre inscription à une formation sera "
-"acceptée."
-msgstr ""
-"Your courses will appear here as soon as your enrolment in a training is "
-"accepted."
-
-#: courses/templates/courses/public/space.html
-msgid "Mes inscriptions"
-msgstr "My enrolments"
-
-#: courses/templates/courses/public/space.html
-#, python-format
-msgid "Demande du %(date)s"
-msgstr "Request of %(date)s"
-
-#: courses/templates/courses/public/space.html
-msgid "Vous n'êtes inscrit(e) à aucune formation pour le moment."
-msgstr "You are not enrolled in any training yet."
-
-#: courses/templates/courses/public/space.html
-#, python-format
-msgid "%(n)s formation ouverte"
-msgid_plural "%(n)s formations ouvertes"
-msgstr[0] "%(n)s training open"
-msgstr[1] "%(n)s trainings open"
-
-#: courses/templates/courses/public/space.html
-msgid "Mon profil"
-msgstr "My profile"
-
-#: courses/templates/courses/public/space.html
-msgid "Enregistrer"
-msgstr "Save"
-
-#: courses/templates/courses/public/space.html
-msgid "Ressources"
-msgstr "Resources"
-
-#: courses/templates/courses/public/space.html
-msgid ""
-"Les publications et les comptes rendus des séminaires Gɛlɛkan sont en accès "
-"libre."
-msgstr "Publications and Gɛlɛkan seminar reports are freely available."
-
-#: courses/templates/courses/public/space.html
-#: site_web/templates/site_web/index.html
-msgid "Voir les publications"
-msgstr "See the publications"
-
-#: courses/templates/courses/public/space.html
-msgid "Se déconnecter"
-msgstr "Log out"
-
 #: courses/templates/courses/public/training_list.html
+#: courses/templates/courses/space/base.html
 #: site_web/templates/base_public.html site_web/templates/site_web/index.html
 msgid "Formations"
 msgstr "Training"
@@ -631,6 +563,8 @@ msgid "Des parcours ouverts aux étudiants, chercheurs et professionnels"
 msgstr "Programmes open to students, researchers and professionals"
 
 #: courses/templates/courses/public/training_list.html
+#: courses/templates/courses/space/dashboard.html
+#: courses/templates/courses/space/trainings.html
 #: site_web/templates/site_web/index.html
 #, python-format
 msgid "Inscriptions jusqu'au %(date)s"
@@ -648,14 +582,24 @@ msgid "Cours proposés"
 msgstr "Courses offered"
 
 #: courses/templates/courses/public/training_list.html
+#: courses/templates/courses/space/trainings.html
 msgid "Demande en attente"
 msgstr "Request pending"
 
 #: courses/templates/courses/public/training_list.html
+#: courses/templates/courses/space/trainings.html
 msgid "Inscription non retenue"
 msgstr "Enrolment not accepted"
 
 #: courses/templates/courses/public/training_list.html
+#: courses/templates/courses/space/base.html
+#: site_web/templates/base_public.html site_web/templates/site_web/index.html
+msgid "Mon espace"
+msgstr "My space"
+
+#: courses/templates/courses/public/training_list.html
+#: courses/templates/courses/space/dashboard.html
+#: courses/templates/courses/space/trainings.html
 msgid "S'inscrire"
 msgstr "Enrol"
 
@@ -675,6 +619,290 @@ msgstr ""
 msgid "L'inscription demande un compte participant, gratuit."
 msgstr "Enrolment requires a free participant account."
 
+#: courses/templates/courses/space/base.html
+msgid "Menu de mon espace"
+msgstr "My space menu"
+
+#: courses/templates/courses/space/base.html
+msgid "Formations Zabantu"
+msgstr "Zabantu training"
+
+#: courses/templates/courses/space/base.html
+msgid "Membre du groupe"
+msgstr "Group member"
+
+#: courses/templates/courses/space/base.html users/models.py
+msgid "Participant(e)"
+msgstr "Participant"
+
+#: courses/templates/courses/space/base.html
+#: courses/templates/courses/space/dashboard.html
+msgid "Tableau de bord"
+msgstr "Dashboard"
+
+#: courses/templates/courses/space/base.html
+#: courses/templates/courses/space/course_detail.html
+#: courses/templates/courses/space/courses.html
+#: courses/templates/courses/space/dashboard.html
+msgid "Mes cours"
+msgstr "My courses"
+
+#: courses/templates/courses/space/base.html
+#: courses/templates/courses/space/trainings.html
+msgid "Mes formations"
+msgstr "My training"
+
+#: courses/templates/courses/space/base.html
+msgid "Compte"
+msgstr "Account"
+
+#: courses/templates/courses/space/base.html
+#: courses/templates/courses/space/profile.html
+msgid "Mon profil"
+msgstr "My profile"
+
+#: courses/templates/courses/space/base.html
+#: courses/templates/courses/space/membership.html
+msgid "Mon adhésion"
+msgstr "My membership"
+
+#: courses/templates/courses/space/base.html
+#: courses/templates/courses/space/dashboard.html
+#: courses/templates/courses/space/membership.html
+msgid "Devenir membre"
+msgstr "Become a member"
+
+#: courses/templates/courses/space/base.html
+msgid "Retour au site"
+msgstr "Back to the website"
+
+#: courses/templates/courses/space/base.html
+msgid "Se déconnecter"
+msgstr "Log out"
+
+#: courses/templates/courses/space/base.html
+#: site_web/templates/base_public.html
+msgid "Ouvrir le menu"
+msgstr "Open the menu"
+
+#: courses/templates/courses/space/course_detail.html
+msgid "Aperçu de l'équipe : voici ce que voient les participants acceptés."
+msgstr "Team preview: this is what accepted participants see."
+
+#: courses/templates/courses/space/course_detail.html
+#: site_web/templates/site_web/public_member_detail.html
+msgid "Présentation"
+msgstr "About"
+
+#: courses/templates/courses/space/course_detail.html
+msgid "Documents du cours"
+msgstr "Course documents"
+
+#: courses/templates/courses/space/course_detail.html
+#: site_web/templates/site_web/public_guelekan_detail.html
+msgid "Télécharger"
+msgstr "Download"
+
+#: courses/templates/courses/space/course_detail.html
+msgid "Aucun document pour le moment."
+msgstr "No documents yet."
+
+#: courses/templates/courses/space/courses.html
+#: courses/templates/courses/space/dashboard.html
+#, python-format
+msgid "%(n)s fichier"
+msgid_plural "%(n)s fichiers"
+msgstr[0] "%(n)s file"
+msgstr[1] "%(n)s files"
+
+#: courses/templates/courses/space/courses.html
+#: courses/templates/courses/space/dashboard.html
+msgid "Ouvrir"
+msgstr "Open"
+
+#: courses/templates/courses/space/courses.html
+msgid "Les cours de cette formation seront bientôt disponibles."
+msgstr "The courses of this training will be available soon."
+
+#: courses/templates/courses/space/courses.html
+#: courses/templates/courses/space/dashboard.html
+msgid ""
+"Vos cours apparaîtront ici dès que votre inscription à une formation sera "
+"acceptée."
+msgstr ""
+"Your courses will appear here as soon as your enrolment in a training is "
+"accepted."
+
+#: courses/templates/courses/space/courses.html
+msgid "Voir les formations"
+msgstr "See the training"
+
+#: courses/templates/courses/space/dashboard.html
+#, python-format
+msgid "Bonjour %(name)s"
+msgstr "Hello %(name)s"
+
+#: courses/templates/courses/space/dashboard.html
+msgid "Cours accessibles"
+msgstr "Available courses"
+
+#: courses/templates/courses/space/dashboard.html
+msgid "Formations en cours"
+msgstr "Ongoing training"
+
+#: courses/templates/courses/space/dashboard.html
+msgid "Demandes en attente"
+msgstr "Pending requests"
+
+#: courses/templates/courses/space/dashboard.html
+#: courses/templates/courses/space/trainings.html
+msgid "Formations ouvertes"
+msgstr "Open training"
+
+#: courses/templates/courses/space/dashboard.html
+msgid "Voir tous mes cours"
+msgstr "See all my courses"
+
+#: courses/templates/courses/space/dashboard.html
+#: courses/templates/courses/space/trainings.html
+#, python-format
+msgid "Demande du %(date)s"
+msgstr "Request of %(date)s"
+
+#: courses/templates/courses/space/dashboard.html
+msgid ""
+"Aucune nouvelle formation ouverte. Vous serez prévenu(e) par e-mail à la "
+"prochaine ouverture."
+msgstr ""
+"No new training open. You will be notified by e-mail when the next one opens."
+
+#: courses/templates/courses/space/dashboard.html
+msgid "Votre demande d'adhésion est en cours d'examen."
+msgstr "Your membership application is being reviewed."
+
+#: courses/templates/courses/space/dashboard.html
+msgid ""
+"Chercheur(e) ou professionnel(le), vous pouvez rejoindre le groupe de "
+"recherche : vos informations sont déjà connues, la demande est courte."
+msgstr ""
+"Researcher or professional, you can join the research group: we already have "
+"your details, so the application is short."
+
+#: courses/templates/courses/space/dashboard.html
+msgid "Faire ma demande"
+msgstr "Apply"
+
+#: courses/templates/courses/space/enroll.html
+msgid "Inscription"
+msgstr "Enrolment"
+
+#: courses/templates/courses/space/enroll.html
+msgid "Inscription à une formation"
+msgstr "Training enrolment"
+
+#: courses/templates/courses/space/enroll.html
+#, python-format
+msgid ""
+"Quelques lignes suffisent : l'équipe examine chaque demande et vous répond "
+"par e-mail. Inscriptions jusqu'au %(date)s."
+msgstr ""
+"A few lines are enough: the team reviews each request and replies by e-mail. "
+"Enrolment open until %(date)s."
+
+#: courses/templates/courses/space/enroll.html
+msgid "150 mots au plus par réponse."
+msgstr "150 words at most per answer."
+
+#: courses/templates/courses/space/enroll.html
+#: courses/templates/courses/space/membership.html
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Envoyer ma demande"
+msgstr "Send my application"
+
+#: courses/templates/courses/space/enroll.html
+#: site_web/templates/site_web/newsletter_unsubscribe_confirm.html
+msgid "Annuler"
+msgstr "Cancel"
+
+#: courses/templates/courses/space/membership.html
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Adhésion"
+msgstr "Membership"
+
+#: courses/templates/courses/space/membership.html
+msgid "Vous êtes membre du groupe de recherche"
+msgstr "You are a member of the research group"
+
+#: courses/templates/courses/space/membership.html
+msgid ""
+"Votre profil figure parmi les membres sur le site. Vous gardez l'accès à vos "
+"formations depuis cet espace."
+msgstr ""
+"Your profile appears among the members on the website. You keep access to "
+"your training from this space."
+
+#: courses/templates/courses/space/membership.html
+msgid "Demande en cours d'examen"
+msgstr "Application under review"
+
+#: courses/templates/courses/space/membership.html
+msgid "L'équipe examine votre demande d'adhésion et vous répondra par e-mail."
+msgstr ""
+"The team is reviewing your membership application and will reply by e-mail."
+
+#: courses/templates/courses/space/membership.html
+msgid "Demande non retenue"
+msgstr "Application not accepted"
+
+#: courses/templates/courses/space/membership.html
+msgid ""
+"Votre précédente demande n'a pas été retenue. Pour en reparler, écrivez-nous "
+"depuis le formulaire de contact."
+msgstr ""
+"Your previous application was not accepted. To discuss it, write to us using "
+"the contact form."
+
+#: courses/templates/courses/space/membership.html
+#, python-format
+msgid ""
+"Votre nom (%(name)s), votre adresse (%(email)s) et votre profil sont déjà "
+"connus : il reste quelques informations sur votre recherche."
+msgstr ""
+"We already have your name (%(name)s), your address (%(email)s) and your "
+"profile: only a few details about your research remain."
+
+#: courses/templates/courses/space/password.html
+msgid "Changer de mot de passe"
+msgstr "Change password"
+
+#: courses/templates/courses/space/profile.html
+msgid "Pour changer d'adresse, écrivez-nous depuis le formulaire de contact."
+msgstr "To change your address, write to us using the contact form."
+
+#: courses/templates/courses/space/profile.html
+msgid "Enregistrer"
+msgstr "Save"
+
+#: courses/templates/courses/space/trainings.html
+msgid ""
+"Aucune formation ouverte pour le moment. Vous serez prévenu(e) par e-mail à "
+"la prochaine ouverture."
+msgstr ""
+"No training open at the moment. You will be notified by e-mail when the next "
+"one opens."
+
+#: courses/templates/courses/space/trainings.html
+msgid "Mes inscriptions"
+msgstr "My enrolments"
+
+#: courses/templates/courses/space/trainings.html
+msgid "Vous n'êtes inscrit(e) à aucune formation pour le moment."
+msgstr "You are not enrolled in any training yet."
+
+#: courses/views.py
+msgid "Vous êtes déconnecté."
+msgstr "You are logged out."
+
 #: courses/views.py
 msgid "Votre adresse est déjà confirmée : connectez-vous."
 msgstr "Your address is already confirmed: log in."
@@ -682,14 +910,6 @@ msgstr "Your address is already confirmed: log in."
 #: courses/views.py
 msgid "Votre compte est confirmé. Bienvenue !"
 msgstr "Your account is confirmed. Welcome!"
-
-#: courses/views.py
-msgid "Vous êtes déconnecté."
-msgstr "You are logged out."
-
-#: courses/views.py
-msgid "Vos préférences sont enregistrées."
-msgstr "Your preferences have been saved."
 
 #: courses/views.py
 msgid "Connectez-vous ou créez un compte gratuit pour vous inscrire."
@@ -701,17 +921,31 @@ msgstr "Training enrolment requires a participant account."
 
 #: courses/views.py
 msgid ""
-"Vous êtes déjà inscrit(e) à cette formation : suivez votre demande dans « Mon"
-" espace »."
+"Vous êtes déjà inscrit(e) à cette formation : suivez votre demande dans « Mes"
+" formations »."
 msgstr ""
 "You have already enrolled in this training: follow your request in “My "
-"space”."
+"training”."
 
 #: courses/views.py
 msgid ""
 "Votre demande est envoyée. Vous recevrez la réponse de l'équipe par e-mail."
 msgstr ""
 "Your request has been sent. You will receive the team’s answer by e-mail."
+
+#: courses/views.py
+msgid "Votre profil est enregistré."
+msgstr "Your profile has been saved."
+
+#: courses/views.py
+msgid "Votre mot de passe est modifié."
+msgstr "Your password has been changed."
+
+#: courses/views.py
+msgid ""
+"Votre demande d'adhésion est envoyée. L'équipe vous répondra par e-mail."
+msgstr ""
+"Your membership application has been sent. The team will reply by e-mail."
 
 #: events/models.py
 msgid "Conférence"
@@ -855,12 +1089,6 @@ msgstr "If “Other”, please specify"
 
 #: site_web/forms.py
 msgid ""
-"Comment souhaitez-vous contribuer aux activités de Zabantu ? (max 100 mots)"
-msgstr ""
-"How would you like to contribute to Zabantu’s activities? (max 100 words)"
-
-#: site_web/forms.py
-msgid ""
 "Comment adhérer à Zabantu peut-il vous aider à avancer dans votre carrière de"
 " chercheur(se) ? (max 100 mots)"
 msgstr ""
@@ -873,20 +1101,8 @@ msgid "Courte biographie"
 msgstr "Short biography"
 
 #: site_web/forms.py
-msgid ""
-"J'autorise l'utilisation des informations fournies pour le traitement de ma "
-"demande d'adhésion et la prise de contact avec moi."
-msgstr ""
-"I authorise the use of the information provided to process my membership "
-"application and to contact me."
-
-#: site_web/forms.py
 msgid "Sélectionnez votre statut"
 msgstr "Select your status"
-
-#: site_web/forms.py
-msgid "Votre consentement est nécessaire pour traiter la demande."
-msgstr "Your consent is required to process the application."
 
 #: site_web/forms.py
 #, python-format
@@ -1097,24 +1313,8 @@ msgid "Nom et prénom(s)"
 msgstr "Full name"
 
 #: site_web/models.py
-msgid "Téléphone (WhatsApp, si disponible)"
-msgstr "Phone (WhatsApp, if available)"
-
-#: site_web/models.py
-msgid "Ville et pays de résidence"
-msgstr "City and country of residence"
-
-#: site_web/models.py
 msgid "Statut"
 msgstr "Status"
-
-#: site_web/models.py
-msgid "Institution d'affiliation"
-msgstr "Institution of affiliation"
-
-#: site_web/models.py
-msgid "Principaux centres de recherche"
-msgstr "Main research interests"
 
 #: site_web/models.py site_web/templates/site_web/public_membership_form.html
 msgid "Autre (précisez)"
@@ -1428,10 +1628,6 @@ msgid "Faire un don"
 msgstr "Donate"
 
 #: site_web/templates/base_public.html
-msgid "Ouvrir le menu"
-msgstr "Open the menu"
-
-#: site_web/templates/base_public.html
 #: site_web/templates/site_web/public_about.html
 msgid "À propos"
 msgstr "About"
@@ -1514,12 +1710,10 @@ msgid "S'impliquer"
 msgstr "Get involved"
 
 #: site_web/templates/base_public.html
-#| msgid "Rejoindre les membres"
 msgid "Rejoindre le groupe"
 msgstr "Join the group"
 
 #: site_web/templates/base_public.html
-#| msgid "Découvrir les formations"
 msgid "Suivre une formation"
 msgstr "Take a training course"
 
@@ -1528,7 +1722,6 @@ msgid "Recevoir l'info-lettre"
 msgstr "Get the newsletter"
 
 #: site_web/templates/base_public.html
-#| msgid "Formulaire expiré"
 msgid "Formulaire de contact"
 msgstr "Contact form"
 
@@ -1796,6 +1989,10 @@ msgstr ""
 "grounded in local realities."
 
 #: site_web/templates/site_web/index.html
+msgid "Voir les publications"
+msgstr "See the publications"
+
+#: site_web/templates/site_web/index.html
 msgid "Réunion de chercheurs du groupe Zabantu"
 msgstr "Meeting of researchers from the Zabantu group"
 
@@ -1885,13 +2082,10 @@ msgid "Faire une demande d'adhésion"
 msgstr "Apply for membership"
 
 #: site_web/templates/site_web/index.html
-#| msgid "Membre Zabantu"
 msgid "Se former avec Zabantu"
 msgstr "Learn with Zabantu"
 
 #: site_web/templates/site_web/index.html
-#| msgid ""
-#| "Des parcours ouverts aux étudiants, chercheurs et professionnels"
 msgid ""
 "Des formations animées par les chercheurs du groupe, ouvertes aux étudiants, "
 "aux chercheurs et aux professionnels."
@@ -1900,7 +2094,6 @@ msgstr ""
 "professionals."
 
 #: site_web/templates/site_web/index.html
-#| msgid "Confirmez votre compte"
 msgid "Créez votre compte"
 msgstr "Create your account"
 
@@ -1909,7 +2102,6 @@ msgid "Gratuit, en quelques secondes."
 msgstr "Free, in a few seconds."
 
 #: site_web/templates/site_web/index.html
-#| msgid "Inscription à une formation"
 msgid "Inscrivez-vous à une formation"
 msgstr "Enrol in a training course"
 
@@ -1918,7 +2110,6 @@ msgid "Pendant ses dates d'inscription ; l'équipe vous répond par e-mail."
 msgstr "During its enrolment dates; the team replies by e-mail."
 
 #: site_web/templates/site_web/index.html
-#| msgid "Mes cours"
 msgid "Suivez vos cours"
 msgstr "Follow your courses"
 
@@ -1927,19 +2118,14 @@ msgid "Documents et supports dans « Mon espace »."
 msgstr "Documents and materials in “My space”."
 
 #: site_web/templates/site_web/index.html
-#| msgid "Voir la formation et s'inscrire"
 msgid "Voir les formations et s'inscrire"
 msgstr "See the training and enrol"
 
 #: site_web/templates/site_web/index.html
-#| msgid "Informations"
 msgid "Prochaines formations"
 msgstr "Upcoming training"
 
 #: site_web/templates/site_web/index.html
-#| msgid ""
-#| "Créez un compte gratuit : vous serez prévenu(e) par e-mail à l'ouverture des "
-#| "prochaines formations."
 msgid ""
 "Aucune formation n'est ouverte en ce moment. Créez votre compte : vous serez "
 "prévenu(e) par e-mail dès l'ouverture des inscriptions."
@@ -2898,10 +3084,6 @@ msgid "Membre depuis :"
 msgstr "Member since:"
 
 #: site_web/templates/site_web/public_member_detail.html
-msgid "Présentation"
-msgstr "About"
-
-#: site_web/templates/site_web/public_member_detail.html
 msgid "Ce membre n'a pas encore rédigé de biographie."
 msgstr "This member has not written a biography yet."
 
@@ -2940,10 +3122,6 @@ msgstr "See the profile"
 #: site_web/templates/site_web/public_member_list.html
 msgid "Aucun membre à afficher pour le moment."
 msgstr "No members to show yet."
-
-#: site_web/templates/site_web/public_membership_form.html
-msgid "Adhésion"
-msgstr "Membership"
 
 #: site_web/templates/site_web/public_membership_form.html
 msgid "Formulaire d'adhésion à Zabantu"
@@ -3219,10 +3397,6 @@ msgstr ""
 #: users/models.py
 msgid "Membre"
 msgstr ""
-
-#: users/models.py
-msgid "Participant(e)"
-msgstr "Participant"
 
 #: users/models.py
 msgid "nom"

@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import authenticate, get_user_model, password_validation
 from django.utils.translation import gettext_lazy as _
+from django_summernote.widgets import SummernoteWidget
 
 from site_web.antispam import AntiSpamMixin
 from users.formsupport import SectionedFormMixin
@@ -258,3 +259,19 @@ class CohortForm(SectionedFormMixin, forms.ModelForm):
             'closes_on': "Dernier jour pour s'inscrire.",
             'courses': "Cours que les participants acceptés pourront consulter.",
         }
+
+
+class CohortAnnounceForm(SectionedFormMixin, forms.Form):
+    """Campagne e-mail annonçant une cohorte : abonnés de l'info-lettre et anciens participants."""
+    sections = (('Message', ('subject', 'message')), ('Destinataires', ('to_subscribers', 'to_participants')))
+    subject = forms.CharField(label="Objet de l'e-mail", max_length=200)
+    message = forms.CharField(label="Message", widget=SummernoteWidget())
+    to_subscribers = forms.BooleanField(label="Abonnés de l'info-lettre", required=False, initial=True)
+    to_participants = forms.BooleanField(label="Anciens participants (déjà inscrits à une autre formation)",
+                                         required=False, initial=True)
+
+    def clean(self):
+        cleaned = super().clean()
+        if not cleaned.get('to_subscribers') and not cleaned.get('to_participants'):
+            raise forms.ValidationError("Choisissez au moins un public.")
+        return cleaned

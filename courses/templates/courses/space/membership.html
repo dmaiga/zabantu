@@ -3,7 +3,7 @@
 {% block title %}{% translate "Adhésion" %}{% endblock %}
 {% block page_title %}{% if state == 'member' %}{% translate "Mon adhésion" %}{% else %}{% translate "Devenir membre" %}{% endif %}{% endblock %}
 {% block content %}
-<section class="sp-card" style="max-width: 760px;">
+<section class="sp-card sp-narrow">
   {% if state == 'member' %}
   <h2>{% translate "Vous êtes membre du groupe de recherche" %}</h2>
   <p class="mb-0">{% translate "Votre profil figure parmi les membres sur le site. Vous gardez l'accès à vos formations depuis cet espace." %}</p>

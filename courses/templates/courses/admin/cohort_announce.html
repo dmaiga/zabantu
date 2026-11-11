@@ -1,0 +1,4 @@
+{% extends 'form_page.html' %}
+{% block title %}Annoncer « {{ cohort.name }} »{% endblock %}
+{% block form_title %}Annoncer la cohorte « {{ cohort.name }} »{% endblock %}
+{% block form_intro %}Le message est prérempli à partir de la cohorte : relisez-le et ajustez-le. L'envoi part tout de suite. {{ subscriber_count }} abonné(s) actif(s) à l'info-lettre, {{ participant_count }} ancien(s) participant(s) d'accord pour être prévenu(s). Une même adresse ne reçoit l'annonce qu'une fois ; les autres comptes participants sont de toute façon prévenus le jour de l'ouverture.{% endblock %}

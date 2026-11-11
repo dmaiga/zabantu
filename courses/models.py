@@ -135,9 +135,9 @@ class CourseFile(models.Model):
 
 class CohortQuerySet(models.QuerySet):
     def open(self, day=None):
-        """Cohortes dont les inscriptions sont ouvertes aujourd'hui (dates incluses)."""
+        """Cohortes actives dont les inscriptions sont ouvertes aujourd'hui (dates incluses)."""
         day = day or timezone.localdate()
-        return self.filter(opens_on__lte=day, closes_on__gte=day)
+        return self.filter(is_active=True, opens_on__lte=day, closes_on__gte=day)
 
 
 class Cohort(TranslatableMixin, models.Model):
@@ -152,6 +152,12 @@ class Cohort(TranslatableMixin, models.Model):
     closes_on = models.DateField("Fermeture des inscriptions")
     courses = models.ManyToManyField(Course, blank=True, related_name='cohorts', verbose_name="Cours")
     announced_at = models.DateTimeField("Annoncée le", null=True, blank=True, editable=False)
+    # Désactivée : la cohorte disparaît du site et n'accepte plus d'inscription ; les participants déjà acceptés
+    # gardent l'accès à leurs cours (ils les ont suivis), sauf révocation.
+    is_active = models.BooleanField("Active", default=True)
+    # Message de la campagne d'annonce (rédigé au backoffice), repris dans l'e-mail envoyé aux participants
+    announcement_subject = models.CharField("Objet de l'annonce", max_length=200, blank=True)
+    announcement_message = models.TextField("Message de l'annonce", blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
                                    related_name='created_cohorts', verbose_name="Créée par")
     created_at = models.DateTimeField("Créée le", auto_now_add=True)
@@ -172,10 +178,12 @@ class Cohort(TranslatableMixin, models.Model):
 
     @property
     def is_open(self):
-        return self.opens_on <= timezone.localdate() <= self.closes_on
+        return self.is_active and self.opens_on <= timezone.localdate() <= self.closes_on
 
     @property
     def state(self):
+        if not self.is_active:
+            return 'disabled'
         today = timezone.localdate()
         if today < self.opens_on:
             return 'upcoming'
@@ -242,3 +250,15 @@ class CohortAnnouncement(models.Model):
     class Meta:
         constraints = [models.UniqueConstraint(fields=['cohort', 'user'], name='unique_cohort_announcement')]
         indexes = [models.Index(fields=['cohort'], condition=models.Q(sent_at=None), name='announcement_pending_idx')]
+
+
+class CourseFileDownload(models.Model):
+    """Téléchargement d'un fichier de cours par un participant : sert à mesurer l'intérêt et l'assiduité
+    (fiche du participant au backoffice). Les téléchargements de l'équipe ne sont pas comptés."""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='course_downloads')
+    course_file = models.ForeignKey(CourseFile, on_delete=models.CASCADE, related_name='downloads')
+    downloaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-downloaded_at']
+        indexes = [models.Index(fields=['user', 'course_file'], name='download_user_file_idx')]

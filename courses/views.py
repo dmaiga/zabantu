@@ -29,7 +29,7 @@ from site_web.models import MembershipApplication
 from . import mailing
 from .backends import PARTICIPANT_ROLE, has_space
 from .forms import EnrollmentForm, MembershipLightForm, ParticipantProfileForm, SignupForm, SiteLoginForm
-from .models import Cohort, Course, CourseFile, Enrollment, ParticipantProfile
+from .models import Cohort, Course, CourseFile, CourseFileDownload, Enrollment, ParticipantProfile
 
 User = get_user_model()
 
@@ -253,6 +253,8 @@ def course_file(request, pk):
         handle = item.file.open('rb')
     except FileNotFoundError:
         raise Http404
+    if has_space(request.user):   # assiduité, visible dans la fiche du participant (l'équipe n'est pas comptée)
+        CourseFileDownload.objects.create(user=request.user, course_file=item)
     content_type = mimetypes.guess_type(item.filename)[0] or 'application/octet-stream'
     response = FileResponse(handle, as_attachment=True, filename=item.filename, content_type=content_type)
     response['X-Robots-Tag'] = 'noindex'
