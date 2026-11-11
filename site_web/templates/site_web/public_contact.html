@@ -6,6 +6,8 @@
 {% block banner_title %}{% translate "Contactez-nous" %}{% endblock %}
 {% block banner_subtitle %}Economy | Conflict | State{% endblock %}
 
+{% block donate_band %}{% endblock %}{# le don a son encadré dans la page #}
+
 {% block extra_css %}
 <style>
     .contact-wrap { max-width: 1140px; margin: 0 auto; padding: 0 1rem; }
@@ -23,7 +25,7 @@
     .btn-submit:hover { background: var(--zabantu-dark); color: #fff; transform: translateY(-1px); }
 
     /* Colonne droite : coordonnées en liste */
-    .contact-aside { background: linear-gradient(160deg, #2c3e2c 0%, #3d5240 100%); color: #fff; border-radius: 12px; padding: 2rem; position: sticky; top: 1rem; }
+    .contact-aside { background: linear-gradient(160deg, #2c3e2c 0%, #3d5240 100%); color: #fff; border-radius: 12px; padding: 2rem; }
     .contact-aside h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 1.25rem; color: #fff; }
     .contact-list { list-style: none; margin: 0; padding: 0; }
     .contact-list li { display: flex; gap: 1rem; padding: .9rem 0; border-top: 1px solid rgba(255,255,255,.14); }
@@ -37,17 +39,32 @@
     .contact-social a { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,.12); color: #fff; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: background .2s; }
     .contact-social a:hover { background: var(--zabantu-secondary); }
 
-    /* Carte et FAQ */
+    /* Petite carte dans la colonne des coordonnées */
+    .contact-map { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,.14); }
+    .contact-map .map-frame { border-radius: 10px; overflow: hidden; height: 190px; background: rgba(255,255,255,.08); }
+    .contact-map iframe { width: 100%; height: 100%; border: 0; }
+    .contact-map a { display: inline-flex; align-items: center; gap: .4rem; min-height: 40px; margin-top: .5rem; color: #fff; font-weight: 500; text-decoration: none; }
+    .contact-map a:hover, .contact-map a:focus-visible { color: var(--zabantu-accent); text-decoration: underline; }
+
+    /* Encadré don */
+    .contact-donate { margin-top: 1.25rem; background: var(--zabantu-light); border: 1px solid #e3e4b4; border-radius: 12px; padding: 1.5rem; }
+    .contact-donate h2 { font-size: 1.15rem; font-weight: 700; color: var(--zabantu-dark); margin-bottom: .4rem; }
+    .contact-donate h2 i { color: var(--zabantu-secondary); margin-right: .4rem; }
+    .contact-donate p { color: #3f4a40; margin-bottom: 1rem; font-size: .95rem; }
+    .contact-donate .actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .contact-donate .btn-donate { background: var(--zabantu-dark); color: #fff; border-radius: 30px; min-height: 44px; padding: 0 1.3rem; display: inline-flex; align-items: center; font-weight: 600; text-decoration: none; }
+    .contact-donate .btn-donate:hover { background: var(--zabantu-primary); color: #fff; }
+    .contact-donate .btn-confirm { border: 1px solid var(--zabantu-dark); color: var(--zabantu-dark); border-radius: 30px; min-height: 44px; padding: 0 1.1rem; display: inline-flex; align-items: center; text-decoration: none; }
+    .contact-donate .btn-confirm:hover { background: #fff; }
+
+    /* FAQ */
     .contact-block { margin-top: 3rem; }
     .contact-block h2 { font-size: 1.5rem; font-weight: 700; color: var(--zabantu-dark); margin-bottom: 1.25rem; }
-    .map-container { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,.08); height: 380px; }
-    .map-container iframe { width: 100%; height: 100%; border: 0; }
     .faq .accordion-item { border: 1px solid #e6e9e0; border-radius: 10px !important; overflow: hidden; margin-bottom: .6rem; }
     .faq .accordion-button { font-weight: 600; color: var(--zabantu-dark); background: #fff; min-height: 56px; }
     .faq .accordion-button:not(.collapsed) { background: rgba(111,130,106,.1); color: var(--zabantu-dark); box-shadow: none; }
     .faq .accordion-body { color: #3f4a40; line-height: 1.6; }
 
-    @media (max-width: 991.98px) { .contact-aside { position: static; } }
     @media (max-width: 575.98px) { .contact-card, .contact-aside { padding: 1.25rem; } .btn-submit { width: 100%; } }
 </style>
 {% endblock %}
@@ -149,17 +166,26 @@
                     <a href="https://www.linkedin.com/company/zabantu-ecs/posts/?feedView=all" target="_blank" rel="noopener noreferrer" aria-label="{% translate 'LinkedIn de Zabantu' %}"><i class="fab fa-linkedin-in"></i></a>
                     <a href="https://www.facebook.com/zabantu.ecs" target="_blank" rel="noopener noreferrer" aria-label="{% translate 'Facebook de Zabantu' %}"><i class="fab fa-facebook-f"></i></a>
                 </div>
+                <!-- Carte : petite, l'itinéraire s'ouvre dans Google Maps -->
+                <div class="contact-map">
+                    <div class="map-frame">
+                        <iframe src="{{ map_embed_url }}" title="{% translate 'Carte : localisation de Zabantu' %}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                    <a href="{{ map_link_url }}" target="_blank" rel="noopener noreferrer"><i class="fas fa-diamond-turn-right" aria-hidden="true"></i>{% translate "Itinéraire dans Google Maps" %}</a>
+                </div>
             </aside>
+
+            <!-- Don -->
+            <section class="contact-donate" aria-labelledby="contact-donate-title">
+                <h2 id="contact-donate-title"><i class="fas fa-hand-holding-heart" aria-hidden="true"></i>{% translate "Soutenir nos travaux" %}</h2>
+                <p>{% translate "Zabantu accepte les dons pour financer ses recherches, ses séminaires Gɛlɛkan et ses publications en accès libre. Vous avez déjà fait un don ? Confirmez-le avec le formulaire." %}</p>
+                <div class="actions">
+                    <a class="btn-donate" href="{% url 'donate' %}">{% translate "Faire un don" %}</a>
+                    <a class="btn-confirm" href="{% url 'contact' %}?sujet=don#formulaire">{% translate "Confirmer mon don" %}</a>
+                </div>
+            </section>
         </div>
     </div>
-
-    <!-- Carte -->
-    <section class="contact-block">
-        <h2>{% translate "Nous trouver" %}</h2>
-        <div class="map-container">
-            <iframe src="{{ map_embed_url }}" title="{% translate 'Carte : localisation de Zabantu' %}" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-        </div>
-    </section>
 
     <!-- FAQ -->
     <section class="contact-block faq">
@@ -179,6 +205,15 @@
                 </h3>
                 <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                     <div class="accordion-body">{% translate "Nos publications sont disponibles dans la section dédiée de notre site web. Certains travaux peuvent être disponibles sur demande." %}</div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4" aria-expanded="false" aria-controls="faq4">{% translate "Comment soutenir Zabantu ?" %}</button>
+                </h3>
+                <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    {% url 'donate' as donate_url %}
+                    <div class="accordion-body">{% blocktranslate trimmed %}Par un don Mobile Money (les numéros figurent sur la <a href="{{ donate_url }}">page de don</a>), en rejoignant le groupe ou en partageant nos publications. Pour un don, envoyez-nous ensuite un message avec le sujet « Confirmation de don ».{% endblocktranslate %}</div>
                 </div>
             </div>
             <div class="accordion-item">

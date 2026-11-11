@@ -59,7 +59,7 @@ python manage.py collectstatic         # fichiers statiques (à chaque déploiem
 - Pages légales : un gabarit par langue (`site_web/templates/site_web/legal/en/`) ; la version française fait foi.
 - Après avoir ajouté ou modifié un texte :
   ```bash
-  python manage.py makemessages -l en --ignore=.venv --ignore=staticfiles --ignore=media --ignore=data --ignore=var --add-location=file
+  python manage.py makemessages -l en --ignore=.venv --ignore=staticfiles --ignore=media --ignore=data --ignore=var --add-location=file --no-obsolete
   # traduire les nouvelles entrées de locale/en/LC_MESSAGES/django.po (msgstr), puis :
   python manage.py compilemessages -l en --ignore=.venv
   ```

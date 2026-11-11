@@ -1,0 +1,34 @@
+{% load i18n clean_tags %}
+{# Liste des publications vide (filtre ou recherche) : message adapté, catégories qui ont des publications, publications récentes. #}
+<div class="empty-state">
+    <div class="empty-state-icon"><i class="fas fa-magnifying-glass" aria-hidden="true"></i></div>
+    {% if search_query %}
+    <h3 class="empty-state-title">{% blocktranslate trimmed %}Aucun résultat pour « {{ search_query }} »{% endblocktranslate %}</h3>
+    <p class="empty-state-text">{% translate "Vérifiez l'orthographe ou essayez un mot plus général." %}</p>
+    <p><a href="{% url 'public_article_list' %}{% if current_filter %}?type={{ current_filter|urlencode }}{% endif %}" class="btn btn-primary">{% translate "Effacer la recherche" %}</a></p>
+    {% elif current_label %}
+    <h3 class="empty-state-title">{% blocktranslate trimmed with label=current_label %}Pas encore de publication dans « {{ label }} »{% endblocktranslate %}</h3>
+    <p class="empty-state-text">{% translate "Cette catégorie sera bientôt alimentée. En attendant, explorez nos autres publications :" %}</p>
+    {% else %}
+    <h3 class="empty-state-title">{% translate "Aucune publication à afficher" %}</h3>
+    <p class="empty-state-text">{% translate "Explorez nos publications par catégorie :" %}</p>
+    {% endif %}
+
+    <ul class="empty-state-chips">
+        {% if guelekan_count and current_filter != 'guelekan' %}<li><a href="{% url 'public_article_list' %}?type=guelekan">{% translate "Séminaire Gɛlɛkan" %} <span class="n">{{ guelekan_count }}</span></a></li>{% endif %}
+        {% for key, label, count in category_data %}{% if count and key != current_filter %}
+        <li><a href="{% url 'public_article_list' %}?type={{ key }}">{{ label }} <span class="n">{{ count }}</span></a></li>
+        {% endif %}{% endfor %}
+    </ul>
+
+    {% if suggestions %}
+    <div class="empty-state-suggest">
+        <h4>{% translate "Publications récentes" %}</h4>
+        <ul>
+            {% for article in suggestions %}
+            <li><a href="{% url 'public_article_detail' article.slug %}">{{ article.t.title|plain_text }}<small>{{ article.type_label }} · {{ article.publish_at|default:article.created_at|date:"j F Y" }}</small></a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>

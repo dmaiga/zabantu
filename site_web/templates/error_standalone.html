@@ -1,5 +1,5 @@
-{# Base des pages d'erreur sans dépendance (400, 500) : ni base de données, ni balise url ou static, qui pourraient échouer à leur tour.
-   La langue vient de l'adresse (PathLanguageMiddleware) ; aucune requête n'est nécessaire pour la lire. #}
+{% comment %} Base des pages d'erreur sans dépendance (400, 500) : ni base de données, ni balise url ou static, qui pourraient échouer à leur tour.
+   La langue vient de l'adresse (PathLanguageMiddleware) ; aucune requête n'est nécessaire pour la lire. {% endcomment %}
 {% load i18n %}{% get_current_language as LANG %}<!DOCTYPE html>
 <html lang="{{ LANG }}">
 <head>

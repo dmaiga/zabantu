@@ -1,0 +1,72 @@
+{% load i18n %}
+{% comment %} Boutons de partage. Paramètres : share_title (texte), share_label (titre du bloc, facultatif), share_class.
+   L'adresse partagée est celle de la page (SITE_ORIGIN + chemin) : les réseaux en lisent l'aperçu Open Graph.
+   Le bouton « Partager… » ouvre la feuille de partage du téléphone quand le navigateur la propose. {% endcomment %}
+{% with share_url=SITE_ORIGIN|add:request.path %}
+<div class="share-bar {{ share_class }}" data-share data-url="{{ share_url }}" data-title="{{ share_title }}">
+  {% if share_label %}<span class="share-label">{{ share_label }}</span>{% endif %}
+  <ul class="share-list">
+    <li class="share-native-item" hidden><button type="button" class="share-btn share-native" data-share-native aria-label="{% translate 'Partager…' %}" title="{% translate 'Partager…' %}"><i class="fas fa-share-nodes" aria-hidden="true"></i></button></li>
+    <li><a class="share-btn share-whatsapp" href="https://wa.me/?text={{ share_title|urlencode:"" }}%20{{ share_url|urlencode:"" }}" target="_blank" rel="noopener noreferrer" aria-label="{% translate 'Partager sur WhatsApp' %}" title="WhatsApp"><i class="fab fa-whatsapp" aria-hidden="true"></i></a></li>
+    <li><a class="share-btn share-facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ share_url|urlencode:"" }}" target="_blank" rel="noopener noreferrer" aria-label="{% translate 'Partager sur Facebook' %}" title="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a></li>
+    <li><a class="share-btn share-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url={{ share_url|urlencode:"" }}" target="_blank" rel="noopener noreferrer" aria-label="{% translate 'Partager sur LinkedIn' %}" title="LinkedIn"><i class="fab fa-linkedin-in" aria-hidden="true"></i></a></li>
+    <li><a class="share-btn share-x" href="https://twitter.com/intent/tweet?url={{ share_url|urlencode:"" }}&amp;text={{ share_title|urlencode:"" }}" target="_blank" rel="noopener noreferrer" aria-label="{% translate 'Partager sur X (Twitter)' %}" title="X"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a></li>
+    <li><a class="share-btn share-mail" href="mailto:?subject={{ share_title|urlencode:"" }}&amp;body={{ share_url|urlencode:"" }}" aria-label="{% translate 'Envoyer par e-mail' %}" title="{% translate 'E-mail' %}"><i class="fas fa-envelope" aria-hidden="true"></i></a></li>
+    <li><button type="button" class="share-btn share-copy" data-share-copy data-copied="{% translate 'Lien copié' %}"><i class="fas fa-link" aria-hidden="true"></i><span>{% translate "Copier le lien" %}</span></button></li>
+  </ul>
+  <span class="share-status visually-hidden" role="status" aria-live="polite"></span>
+</div>
+{% endwith %}
+{% if not share_assets_loaded %}
+<style>
+  .share-bar { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem .75rem; }
+  .share-label { font-weight: 600; color: var(--zabantu-dark); font-size: .95rem; }
+  .share-list { display: flex; flex-wrap: wrap; gap: .45rem; margin: 0; padding: 0; list-style: none; }
+  .share-btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; min-width: 42px; height: 42px; padding: 0 .75rem; border-radius: 999px; border: 1px solid #d5dacb; background: #fff; color: var(--zabantu-dark); font-size: .95rem; text-decoration: none; cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
+  .share-btn:hover, .share-btn:focus-visible { color: #fff; border-color: transparent; }
+  .share-whatsapp:hover, .share-whatsapp:focus-visible { background: #1f9e55; }
+  .share-facebook:hover, .share-facebook:focus-visible { background: #1877f2; }
+  .share-linkedin:hover, .share-linkedin:focus-visible { background: #0a66c2; }
+  .share-x:hover, .share-x:focus-visible { background: #111; }
+  .share-mail:hover, .share-mail:focus-visible, .share-native:hover, .share-native:focus-visible,
+  .share-copy:hover, .share-copy:focus-visible { background: var(--zabantu-primary); }
+  .share-copy.is-copied { background: var(--zabantu-primary); color: #fff; border-color: transparent; }
+  .share-btn:not(.share-copy) { padding: 0; width: 42px; }
+</style>
+<script>
+(function () {
+  if (window.zabantuShareReady) { return; }
+  window.zabantuShareReady = true;
+  function copy(text) {
+    if (navigator.clipboard && window.isSecureContext) { return navigator.clipboard.writeText(text); }
+    return new Promise(function (resolve, reject) {   // repli : ancien navigateur ou page en http
+      var field = document.createElement('textarea');
+      field.value = text; field.setAttribute('readonly', ''); field.style.position = 'fixed'; field.style.opacity = '0';
+      document.body.appendChild(field); field.select();
+      try { document.execCommand('copy') ? resolve() : reject(); } catch (e) { reject(e); }
+      document.body.removeChild(field);
+    });
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-share]').forEach(function (bar) {
+      var url = bar.dataset.url, title = bar.dataset.title, status = bar.querySelector('.share-status');
+      var native = bar.querySelector('[data-share-native]');
+      if (native && navigator.share) {
+        native.parentNode.hidden = false;
+        native.addEventListener('click', function () { navigator.share({ title: title, url: url }).catch(function () {}); });
+      }
+      var button = bar.querySelector('[data-share-copy]');
+      if (!button) { return; }
+      var label = button.querySelector('span'), initial = label.textContent;
+      button.addEventListener('click', function () {
+        copy(url).then(function () {
+          label.textContent = button.dataset.copied; status.textContent = button.dataset.copied;
+          button.classList.add('is-copied');
+          setTimeout(function () { label.textContent = initial; status.textContent = ''; button.classList.remove('is-copied'); }, 2000);
+        }).catch(function () { window.prompt('', url); });
+      });
+    });
+  });
+})();
+</script>
+{% endif %}

@@ -116,6 +116,7 @@ def contact(request):
     context = {
         'form': form,  # ton formulaire
         'map_embed_url': map_embed_url,
+        'map_link_url': "https://www.google.com/maps/search/?api=1&query=FSEG+Badalabougou+Bamako",
         'page_title': _("Contact - Zabantu"),
         'social_links': {
             'linkedin': "https://www.linkedin.com/company/zabantu-ecs/about/",
@@ -207,10 +208,18 @@ def toutes_photos(request):
 
     photos = Paginator(photos_list, 36).get_page(request.GET.get('page'))
 
+    # Plus de barres de filtres sur la page ; ?tag= (mots-clés d'une photo) et ?gallery= restent pris en charge
+    selection = []
+    if gallery_slug:
+        gallery = Gallery.objects.filter(slug=gallery_slug).first()
+        selection.append(gallery.t.title if gallery else gallery_slug)
+    if tag_slug:
+        tag = PhotoTag.objects.filter(slug=tag_slug).first()
+        selection.append(f'#{tag.name if tag else tag_slug}')
+
     return render(request, 'site_web/public_toutes_photos.html', {
         'photos': photos,
-        'gallery_filters': Gallery.objects.annotate(n=Count('photos')).filter(n__gt=0).order_by('title'),
-        'tag_filters': PhotoTag.objects.annotate(n=Count('photo')).filter(n__gt=0).order_by('name'),
+        'selection_label': ' · '.join(selection),
         'current_gallery': gallery_slug,
         'current_tag': tag_slug,
         'page_title': _("Toutes les photos")
@@ -272,6 +281,17 @@ def _search(query, fields):
     return condition
 
 
+def _empty_list_help(page_obj, current_filter):
+    """Liste vide (filtre ou recherche sans résultat) : publications récentes à proposer à la place.
+    Les catégories qui ont des publications sont déjà dans category_data."""
+    if page_obj.object_list:
+        return {}
+    suggestions = Article.objects.filter(status='published', publish_at__lte=timezone.now())
+    if current_filter and current_filter != 'guelekan':
+        suggestions = suggestions.exclude(article_type=current_filter)
+    return {'suggestions': suggestions.order_by(*PUBLICATION_ORDER)[:3]}
+
+
 def public_article_list(request):
     current_filter = request.GET.get('type')
     search_query = request.GET.get('q')
@@ -299,6 +319,7 @@ def public_article_list(request):
             'guelekan_count': guelekan_count,
             'category_data': [(k, CATEGORY_LABELS[k], type_counts.get(k, 0)) for k in CATEGORY_LABELS],
             'total_count': total_articles,
+            **_empty_list_help(page_obj, current_filter),
         })
 
     articles = Article.objects.filter(status='published')
@@ -348,6 +369,7 @@ def public_article_list(request):
         'category_data': category_data,
         'total_count': sum(type_counts.values()),
         'is_paginated': paginator.num_pages > 1,
+        **_empty_list_help(page_obj, current_filter),
     })
 
 def public_article_detail(request, slug):
@@ -415,7 +437,7 @@ def public_event_list(request):
     gelekan_upcoming = gelekan_events.filter(date__gte=now).order_by('date') if show_gelekan else []
     gelekan_past = gelekan_events.filter(date__lt=now).order_by('-date') if show_gelekan else []
     if show_gelekan and not current_type:
-        gelekan_past = gelekan_past[:3]
+        gelekan_past = gelekan_past[:6]  # les 6 dernières éditions ; le filtre « Séminaires Gɛlɛkan » les montre toutes
 
     past_events = Paginator(past_qs, 9).get_page(request.GET.get('page'))
 
@@ -552,12 +574,12 @@ class HomeView(TemplateView):
         context['team_members'] = members.order_by('?')
 
         # Chiffres clés (seules les valeurs non nulles sont affichées)
-        context['stats'] = [
+        context['stats'] = [stat for stat in (
             (_('Publications'), published_articles.count(), 'fa-file-lines'),
             (_('Membres'), members.count(), 'fa-users'),
             (_('Séminaires Gɛlɛkan'), Guelekan.objects.filter(status='published').count(), 'fa-microphone-lines'),
             (_('Événements'), Event.objects.filter(status='published').count(), 'fa-calendar-days'),
-        ]
+        ) if stat[1]]
 
         context['partenaires'] = Partenaire.objects.filter(is_active=True).order_by('order')
         return context

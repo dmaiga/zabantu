@@ -1,12 +1,12 @@
 # Traductions anglaises du site public Zabantu (le français est la langue source).
-# Mise à jour : python manage.py makemessages -l en --ignore=.venv --ignore=staticfiles --ignore=media --ignore=data --ignore=var --add-location=file
+# Mise à jour : python manage.py makemessages -l en --ignore=.venv --ignore=staticfiles --ignore=media --ignore=data --ignore=var --add-location=file --no-obsolete
 # puis traduire les nouvelles entrées et compiler : python manage.py compilemessages -l en --ignore=.venv
 # Le fichier .mo compilé est versionné : msgfmt n'est pas installé sur le serveur.
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabantu\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 23:14+0000\n"
+"POT-Creation-Date: 2026-11-11 00:12+0000\n"
 "PO-Revision-Date: 2026-11-10 23:00+0000\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
@@ -67,6 +67,7 @@ msgid "Formation"
 msgstr "Training"
 
 #: events/models.py site_web/templates/base_public.html
+#: site_web/templates/site_web/includes/publication_empty.html
 #: site_web/templates/site_web/public_about.html
 #: site_web/templates/site_web/public_article_list.html
 msgid "Séminaire Gɛlɛkan"
@@ -550,6 +551,19 @@ msgstr ""
 msgid "envois d'annonces"
 msgstr ""
 
+#: site_web/seo.py site_web/templates/base_public.html
+#: site_web/templates/site_web/index.html
+msgid "Zabantu - Groupe de recherche : Economy | Conflict | State"
+msgstr "Zabantu - Research group: Economy | Conflict | State"
+
+#: site_web/seo.py site_web/templates/base_public.html
+msgid ""
+"Groupe de chercheurs en sciences sociales travaillant sur le développement "
+"économique et social."
+msgstr ""
+"A group of social science researchers working on economic and social "
+"development."
+
 #: site_web/seo.py
 msgid "Publications - Zabantu"
 msgstr "Publications - Zabantu"
@@ -766,18 +780,6 @@ msgstr ""
 "Zabantu blog - a group of social science researchers working on economic and "
 "social development."
 
-#: site_web/templates/base_public.html site_web/templates/site_web/index.html
-msgid "Zabantu - Groupe de recherche : Economy | Conflict | State"
-msgstr "Zabantu - Research group: Economy | Conflict | State"
-
-#: site_web/templates/base_public.html
-msgid ""
-"Groupe de chercheurs en sciences sociales travaillant sur le développement "
-"économique et social."
-msgstr ""
-"A group of social science researchers working on economic and social "
-"development."
-
 #: site_web/templates/base_public.html
 msgid "Logo du groupe de recherche Zabantu"
 msgstr "Logo of the Zabantu research group"
@@ -788,6 +790,7 @@ msgstr "Zabantu logo"
 
 #: site_web/templates/base_public.html
 #: site_web/templates/site_web/includes/donate_band.html
+#: site_web/templates/site_web/public_contact.html
 #: site_web/templates/site_web/public_donate.html site_web/tests_i18n.py
 msgid "Faire un don"
 msgstr "Donate"
@@ -1030,6 +1033,81 @@ msgid ""
 "Zabantu accepte les dons pour financer ses recherches et ses séminaires."
 msgstr "Zabantu welcomes donations to fund its research and seminars."
 
+#: site_web/templates/site_web/includes/publication_empty.html
+#, python-format
+msgid "Aucun résultat pour « %(search_query)s »"
+msgstr "No results for “%(search_query)s”"
+
+#: site_web/templates/site_web/includes/publication_empty.html
+msgid "Vérifiez l'orthographe ou essayez un mot plus général."
+msgstr "Check the spelling or try a more general word."
+
+#: site_web/templates/site_web/includes/publication_empty.html
+msgid "Effacer la recherche"
+msgstr "Clear the search"
+
+#: site_web/templates/site_web/includes/publication_empty.html
+#, python-format
+msgid "Pas encore de publication dans « %(label)s »"
+msgstr "No publications in “%(label)s” yet"
+
+#: site_web/templates/site_web/includes/publication_empty.html
+msgid ""
+"Cette catégorie sera bientôt alimentée. En attendant, explorez nos autres "
+"publications :"
+msgstr ""
+"This category will be filled soon. In the meantime, explore our other "
+"publications:"
+
+#: site_web/templates/site_web/includes/publication_empty.html
+msgid "Aucune publication à afficher"
+msgstr "No publications to show"
+
+#: site_web/templates/site_web/includes/publication_empty.html
+msgid "Explorez nos publications par catégorie :"
+msgstr "Explore our publications by category:"
+
+#: site_web/templates/site_web/includes/publication_empty.html
+msgid "Publications récentes"
+msgstr "Recent publications"
+
+#: site_web/templates/site_web/includes/share_buttons.html
+msgid "Partager…"
+msgstr "Share…"
+
+#: site_web/templates/site_web/includes/share_buttons.html
+msgid "Partager sur WhatsApp"
+msgstr "Share on WhatsApp"
+
+#: site_web/templates/site_web/includes/share_buttons.html
+msgid "Partager sur Facebook"
+msgstr "Share on Facebook"
+
+#: site_web/templates/site_web/includes/share_buttons.html
+msgid "Partager sur LinkedIn"
+msgstr "Share on LinkedIn"
+
+#: site_web/templates/site_web/includes/share_buttons.html
+msgid "Partager sur X (Twitter)"
+msgstr "Share on X (Twitter)"
+
+#: site_web/templates/site_web/includes/share_buttons.html
+msgid "Envoyer par e-mail"
+msgstr "Send by e-mail"
+
+#: site_web/templates/site_web/includes/share_buttons.html
+#: site_web/templates/site_web/public_contact.html
+msgid "E-mail"
+msgstr "E-mail"
+
+#: site_web/templates/site_web/includes/share_buttons.html
+msgid "Lien copié"
+msgstr "Link copied"
+
+#: site_web/templates/site_web/includes/share_buttons.html
+msgid "Copier le lien"
+msgstr "Copy link"
+
 #: site_web/templates/site_web/includes/team_carousel.html
 msgid "Membres précédents"
 msgstr "Previous members"
@@ -1102,6 +1180,7 @@ msgid "Prochain séminaire"
 msgstr "Next seminar"
 
 #: site_web/templates/site_web/index.html
+#: site_web/templates/site_web/public_event_detail.html
 #: site_web/templates/site_web/public_event_list.html
 msgid "En ligne"
 msgstr "Online"
@@ -1122,17 +1201,12 @@ msgid "Les travaux récents des membres et partenaires du groupe."
 msgstr "Recent work by the group’s members and partners."
 
 #: site_web/templates/site_web/index.html
-#: site_web/templates/site_web/public_article_list.html
 msgid "Voir toutes les publications"
 msgstr "See all publications"
 
 #: site_web/templates/site_web/index.html
 msgid "Lire"
 msgstr "Read"
-
-#: site_web/templates/site_web/index.html
-msgid "Aucune publication pour le moment."
-msgstr "No publications yet."
 
 #: site_web/templates/site_web/index.html
 #: site_web/templates/site_web/public_about.html
@@ -1144,14 +1218,6 @@ msgstr "Upcoming events"
 #: site_web/templates/site_web/public_event_detail.html
 msgid "Tous les événements"
 msgstr "All events"
-
-#: site_web/templates/site_web/index.html
-msgid "Aucun événement prévu pour le moment."
-msgstr "No events scheduled for now."
-
-#: site_web/templates/site_web/index.html
-msgid "Voir les événements passés"
-msgstr "See past events"
 
 #: site_web/templates/site_web/index.html
 msgid "Rejoignez le Groupe de recherche Zabantu"
@@ -1391,6 +1457,12 @@ msgid "Nos Partenaires"
 msgstr "Our Partners"
 
 #: site_web/templates/site_web/public_article_detail.html
+#: site_web/templates/site_web/public_event_detail.html
+#: site_web/templates/site_web/public_guelekan_detail.html
+msgid "Partager :"
+msgstr "Share:"
+
+#: site_web/templates/site_web/public_article_detail.html
 msgid "Résumé"
 msgstr "Abstract"
 
@@ -1500,29 +1572,8 @@ msgid "Voir le compte-rendu"
 msgstr "Read the report"
 
 #: site_web/templates/site_web/public_article_list.html
-msgid "Aucun séminaire trouvé"
-msgstr "No seminar found"
-
-#: site_web/templates/site_web/public_article_list.html
-msgid "Aucun séminaire Gɛlɛkan ne correspond à votre recherche."
-msgstr "No Gɛlɛkan seminar matches your search."
-
-#: site_web/templates/site_web/public_article_list.html
 msgid "Article source"
 msgstr "Source article"
-
-#: site_web/templates/site_web/public_article_list.html
-msgid "Aucun article trouvé"
-msgstr "No article found"
-
-#: site_web/templates/site_web/public_article_list.html
-#, python-format
-msgid "Aucun résultat pour « %(search_query)s ». Essayez avec d'autres termes."
-msgstr "No results for “%(search_query)s”. Try other terms."
-
-#: site_web/templates/site_web/public_article_list.html
-msgid "Aucune publication disponible dans cette catégorie pour le moment."
-msgstr "No publications in this category yet."
 
 #: site_web/templates/site_web/public_article_list.html
 msgid "Pagination des publications"
@@ -1601,10 +1652,6 @@ msgid "Adresse"
 msgstr "Address"
 
 #: site_web/templates/site_web/public_contact.html
-msgid "E-mail"
-msgstr "E-mail"
-
-#: site_web/templates/site_web/public_contact.html
 msgid "Horaires"
 msgstr "Opening hours"
 
@@ -1621,12 +1668,30 @@ msgid "Facebook de Zabantu"
 msgstr "Zabantu on Facebook"
 
 #: site_web/templates/site_web/public_contact.html
-msgid "Nous trouver"
-msgstr "Find us"
-
-#: site_web/templates/site_web/public_contact.html
 msgid "Carte : localisation de Zabantu"
 msgstr "Map: Zabantu’s location"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Itinéraire dans Google Maps"
+msgstr "Directions in Google Maps"
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Soutenir nos travaux"
+msgstr "Support our work"
+
+#: site_web/templates/site_web/public_contact.html
+msgid ""
+"Zabantu accepte les dons pour financer ses recherches, ses séminaires Gɛlɛkan"
+" et ses publications en accès libre. Vous avez déjà fait un don ? Confirmez-"
+"le avec le formulaire."
+msgstr ""
+"Zabantu welcomes donations to fund its research, its Gɛlɛkan seminars and its"
+" open-access publications. Already made a donation? Confirm it with the form."
+
+#: site_web/templates/site_web/public_contact.html
+#: site_web/templates/site_web/public_donate.html
+msgid "Confirmer mon don"
+msgstr "Confirm my donation"
 
 #: site_web/templates/site_web/public_contact.html
 msgid "Questions fréquentes"
@@ -1657,6 +1722,23 @@ msgid ""
 msgstr ""
 "Our publications are available in the dedicated section of our website. Some "
 "work may be available on request."
+
+#: site_web/templates/site_web/public_contact.html
+msgid "Comment soutenir Zabantu ?"
+msgstr "How can I support Zabantu?"
+
+#: site_web/templates/site_web/public_contact.html
+#, python-format
+msgid ""
+"Par un don Mobile Money (les numéros figurent sur la <a "
+"href=\"%(donate_url)s\">page de don</a>), en rejoignant le groupe ou en "
+"partageant nos publications. Pour un don, envoyez-nous ensuite un message "
+"avec le sujet « Confirmation de don »."
+msgstr ""
+"By making a Mobile Money donation (the numbers are on the <a "
+"href=\"%(donate_url)s\">donation page</a>), by joining the group or by "
+"sharing our publications. After a donation, send us a message with the "
+"subject “Donation confirmation”."
 
 #: site_web/templates/site_web/public_contact.html
 msgid "Quels sont vos horaires d'ouverture ?"
@@ -1849,10 +1931,6 @@ msgstr ""
 "this lets us check that it has arrived and thank you."
 
 #: site_web/templates/site_web/public_donate.html
-msgid "Confirmer mon don"
-msgstr "Confirm my donation"
-
-#: site_web/templates/site_web/public_donate.html
 msgid ""
 "Vous pouvez aussi nous écrire à <a "
 "href=\"mailto:info@zabantu.net\">info@zabantu.net</a>."
@@ -1911,6 +1989,11 @@ msgid "À venir"
 msgstr "Upcoming"
 
 #: site_web/templates/site_web/public_event_detail.html
+#| msgid "Informations"
+msgid "Infos pratiques"
+msgstr "Practical information"
+
+#: site_web/templates/site_web/public_event_detail.html
 msgid "Date et heure"
 msgstr "Date and time"
 
@@ -1923,20 +2006,20 @@ msgid "Autre agenda (.ics)"
 msgstr "Other calendar (.ics)"
 
 #: site_web/templates/site_web/public_event_detail.html
-msgid "Informations d'accès"
-msgstr "How to attend"
-
-#: site_web/templates/site_web/public_event_detail.html
 msgid "Événement en ligne"
 msgstr "Online event"
 
 #: site_web/templates/site_web/public_event_detail.html
-msgid "Rejoindre la réunion"
-msgstr "Join the meeting"
-
-#: site_web/templates/site_web/public_event_detail.html
 msgid "Cet événement est terminé."
 msgstr "This event is over."
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Le lien de connexion est ci-dessous."
+msgstr "The joining link is below."
+
+#: site_web/templates/site_web/public_event_detail.html
+msgid "Le lien de connexion sera communiqué."
+msgstr "The joining link will be shared."
 
 #: site_web/templates/site_web/public_event_detail.html
 msgid "Présentiel"
@@ -1950,10 +2033,6 @@ msgstr "Venue to be confirmed"
 #: site_web/templates/site_web/public_event_detail.html
 msgid "Itinéraire"
 msgstr "Directions"
-
-#: site_web/templates/site_web/public_event_detail.html
-msgid "Détails de l'emplacement à venir."
-msgstr "Venue details to follow."
 
 #: site_web/templates/site_web/public_event_detail.html
 msgid "Public concerné"
@@ -1975,6 +2054,15 @@ msgid "Thème principal"
 msgstr "Main theme"
 
 #: site_web/templates/site_web/public_event_detail.html
+msgid "Rejoindre le webinaire"
+msgstr "Join the webinar"
+
+#: site_web/templates/site_web/public_event_detail.html
+#| msgid "Tous les événements"
+msgid "À propos de l'événement"
+msgstr "About the event"
+
+#: site_web/templates/site_web/public_event_detail.html
 msgid "Nos Intervenants"
 msgstr "Our Speakers"
 
@@ -1985,18 +2073,6 @@ msgstr "Expertise:"
 #: site_web/templates/site_web/public_event_detail.html
 msgid "Site web"
 msgstr "Website"
-
-#: site_web/templates/site_web/public_event_detail.html
-msgid "Rejoignez-nous pour cet événement"
-msgstr "Join us for this event"
-
-#: site_web/templates/site_web/public_event_detail.html
-msgid "Ne manquez pas cette opportunité unique d'échanger et d'apprendre"
-msgstr "Don’t miss this unique opportunity to exchange and learn"
-
-#: site_web/templates/site_web/public_event_detail.html
-msgid "Rejoindre le webinaire"
-msgstr "Join the webinar"
 
 #: site_web/templates/site_web/public_event_detail.html
 msgid "Événements similaires"
@@ -2043,18 +2119,6 @@ msgid "Plus d'informations"
 msgstr "More information"
 
 #: site_web/templates/site_web/public_event_list.html
-msgid "Aucun événement à venir dans cette catégorie"
-msgstr "No upcoming events in this category"
-
-#: site_web/templates/site_web/public_event_list.html
-msgid "Aucun événement à venir"
-msgstr "No upcoming events"
-
-#: site_web/templates/site_web/public_event_list.html
-msgid "Revenez bientôt, ou consultez les événements passés ci-dessous."
-msgstr "Come back soon, or see the past events below."
-
-#: site_web/templates/site_web/public_event_list.html
 msgid "Autres événements passés"
 msgstr "Other past events"
 
@@ -2067,8 +2131,21 @@ msgid "Pagination des événements passés"
 msgstr "Past events pagination"
 
 #: site_web/templates/site_web/public_event_list.html
-msgid "Aucun événement passé à afficher pour le moment."
-msgstr "No past events to show yet."
+msgid "Aucun événement dans cette catégorie pour le moment"
+msgstr "No events in this category yet"
+
+#: site_web/templates/site_web/public_event_list.html
+msgid "Aucun événement pour le moment"
+msgstr "No events yet"
+
+#: site_web/templates/site_web/public_event_list.html
+msgid "Voir tous les événements"
+msgstr "See all events"
+
+#: site_web/templates/site_web/public_event_list.html
+msgid ""
+"Revenez bientôt : nos prochains séminaires et rencontres seront annoncés ici."
+msgstr "Come back soon: our next seminars and meetings will be announced here."
 
 #: site_web/templates/site_web/public_guelekan_detail.html
 msgid "Séminaire de recherche"
@@ -2115,6 +2192,7 @@ msgstr[0] "%(n)s gallery"
 msgstr[1] "%(n)s galleries"
 
 #: site_web/templates/site_web/public_liste_galeries.html
+#: site_web/templates/site_web/public_toutes_photos.html
 msgid "Voir toutes les photos"
 msgstr "See all photos"
 
@@ -2383,20 +2461,9 @@ msgid "Toutes les photos du groupe Zabantu"
 msgstr "All the photos of the Zabantu group"
 
 #: site_web/templates/site_web/public_toutes_photos.html
-msgid "Filtrer par galerie"
-msgstr "Filter by gallery"
-
-#: site_web/templates/site_web/public_toutes_photos.html
-msgid "Toutes les galeries"
-msgstr "All galleries"
-
-#: site_web/templates/site_web/public_toutes_photos.html
-msgid "Filtrer par mot-clé"
-msgstr "Filter by keyword"
-
-#: site_web/templates/site_web/public_toutes_photos.html
-msgid "Tous les mots-clés"
-msgstr "All keywords"
+#, python-format
+msgid "Sélection : %(label)s"
+msgstr "Selection: %(label)s"
 
 #: site_web/templates/site_web/public_toutes_photos.html
 msgid "Aucune photo pour cette sélection."

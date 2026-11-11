@@ -428,7 +428,8 @@
     </section>
 </div>
 
-<!-- Section Équipe - Photos indépendantes -->
+<!-- Section Équipe - Photos indépendantes (masquée sans membre) -->
+{% if team_members %}
 <section class="team-section" id="equipe">
     <div class="about-container">
         <h2 class="section-title">{% translate "Notre Équipe" %}</h2>
@@ -444,7 +445,9 @@
         </div>
     </div>
 </section>
+{% endif %}
 
+{% if partenaires %}
 <section class="section" id="partenaires">
     <div class="container text-center">
         <h2 class="section-title">{% translate "Nos Partenaires" %}</h2>
@@ -466,4 +469,5 @@
         </div>
     </div>
 </section>
+{% endif %}
 {% endblock %}

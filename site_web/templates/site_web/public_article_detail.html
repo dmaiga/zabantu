@@ -68,6 +68,8 @@
                 {% endif %}
             </span>
         </div>
+        {% translate "Partager :" as share_label %}
+        {% include 'site_web/includes/share_buttons.html' with share_title=article.t.title share_label=share_label share_class='mt-3' %}
     </header>
 
     <div class="article-grid">

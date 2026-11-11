@@ -207,7 +207,7 @@ class GuelekanFilterTests(TestCase):
     def test_guelekan_filter_page_loads(self):
         r = self.client.get(reverse('public_article_list'), {'type': 'guelekan'})
         self.assertEqual(r.status_code, 200)
-        self.assertContains(r, 'Aucun séminaire trouvé')
+        self.assertContains(r, 'Pas encore de publication dans « Séminaires Gɛlɛkan »')
 
     def test_home_has_no_independent_seminar_block(self):
         r = self.client.get(reverse('home'))
@@ -438,11 +438,15 @@ class DonatePageTests(TestCase):
         self.assertNotContains(r, 'class="donate-band"')           # pas de bandeau sur la page de don elle-même
 
     def test_donate_link_on_every_public_page(self):
-        r = self.client.get(reverse('contact'))
+        r = self.client.get(reverse('about'))
         self.assertContains(r, 'class="donate-link mobile d-lg-none"')  # navbar sur mobile
         self.assertContains(r, 'class="donate-link d-none d-lg-inline-flex"')  # navbar sur ordinateur
         self.assertContains(r, 'class="donate-band"')
         self.assertContains(r, f'<li><a href="{reverse("donate")}">Faire un don</a></li>')  # pied de page
+        # Contact : encadré de don dans la page, à la place du bandeau
+        r = self.client.get(reverse('contact'))
+        self.assertContains(r, 'class="contact-donate"')
+        self.assertNotContains(r, 'class="donate-band"')
 
     def test_contact_form_preselects_donation_subject(self):
         r = self.client.get(reverse('contact') + '?sujet=don')

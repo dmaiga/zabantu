@@ -159,6 +159,16 @@
         color: var(--zabantu-primary);
         margin-bottom: 0.5rem;
     }
+    .empty-state-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; margin: 0 0 1.75rem; padding: 0; list-style: none; }
+    .empty-state-chips a { display: inline-flex; align-items: center; gap: .4rem; min-height: 40px; padding: .35rem .9rem; border: 1px solid #d5dacb; border-radius: 999px; text-decoration: none; color: var(--zabantu-dark); background: #fff; }
+    .empty-state-chips a:hover, .empty-state-chips a:focus-visible { border-color: var(--zabantu-primary); background: #f3f5ef; }
+    .empty-state-chips .n { font-size: .78rem; background: #eef0e8; border-radius: 999px; padding: 0 .45rem; }
+    .empty-state-suggest { text-align: left; margin-top: 1rem; }
+    .empty-state-suggest h4 { font-size: 1rem; text-transform: uppercase; letter-spacing: .06em; color: #5b6559; margin-bottom: .75rem; }
+    .empty-state-suggest ul { list-style: none; padding: 0; margin: 0; display: grid; gap: .5rem; }
+    .empty-state-suggest a { display: block; padding: .75rem 1rem; border: 1px solid #e6e9e0; border-radius: 8px; text-decoration: none; color: var(--zabantu-dark); background: #fafbf7; }
+    .empty-state-suggest a:hover { border-color: var(--zabantu-primary); }
+    .empty-state-suggest small { display: block; color: #6c757d; margin-top: .15rem; }
     .empty-state-text {
         color: var(--zabantu-gray);
         margin-bottom: 1.5rem;
@@ -337,10 +347,7 @@
                     </div>
                 </article>
                 {% empty %}
-                <div class="empty-state">
-                    <h3 class="empty-state-title">{% translate "Aucun séminaire trouvé" %}</h3>
-                    <p class="empty-state-text">{% translate "Aucun séminaire Gɛlɛkan ne correspond à votre recherche." %}</p>
-                </div>
+                {% include 'site_web/includes/publication_empty.html' %}
                 {% endfor %}
             {% elif articles %}
                 {% for article in articles %}
@@ -401,20 +408,7 @@
                 </article>
                 {% endfor %}
             {% else %}
-                <div class="empty-state">
-                    <div class="empty-state-icon">📭</div>
-                    <h3 class="empty-state-title">{% translate "Aucun article trouvé" %}</h3>
-                    <p class="empty-state-text">
-                        {% if search_query %}
-                            {% blocktranslate trimmed %}Aucun résultat pour « {{ search_query }} ». Essayez avec d'autres termes.{% endblocktranslate %}
-                        {% else %}
-                            {% translate "Aucune publication disponible dans cette catégorie pour le moment." %}
-                        {% endif %}
-                    </p>
-                    <a href="{% url 'public_article_list' %}" class="btn btn-primary">
-                        {% translate "Voir toutes les publications" %}
-                    </a>
-                </div>
+                {% include 'site_web/includes/publication_empty.html' %}
             {% endif %}
             {% if page_obj.has_other_pages %}
             <nav aria-label="{% translate 'Pagination des publications' %}" class="mt-4">

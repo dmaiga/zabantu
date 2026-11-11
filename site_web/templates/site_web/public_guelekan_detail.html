@@ -55,6 +55,9 @@
                 </div>
             </div>
             
+            {% translate "Partager :" as share_label %}
+            {% include 'site_web/includes/share_buttons.html' with share_title=guelekan.t.title share_label=share_label share_class='mt-3' %}
+
             <!-- Cover Image -->
             {% if guelekan.cover_image %}
             <div class="guelekan-cover-container">

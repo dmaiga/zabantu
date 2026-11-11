@@ -190,7 +190,8 @@
 </section>
 {% endif %}
 
-<!-- 3. Dernières publications -->
+<!-- 3. Dernières publications (section masquée tant qu'il n'y a rien à montrer) -->
+{% if latest_articles %}
 <section id="publications" class="home-section alt">
     <div class="container">
         <div class="home-head">
@@ -200,7 +201,6 @@
             </div>
             <a class="home-more" href="{% url 'public_article_list' %}">{% translate "Voir toutes les publications" %} <i class="fas fa-arrow-right ms-1"></i></a>
         </div>
-        {% if latest_articles %}
         <div class="row g-4 home-swipe">
             {% for article in latest_articles %}
             <div class="col-sm-6 col-lg-3">
@@ -223,13 +223,12 @@
             </div>
             {% endfor %}
         </div>
-        {% else %}
-        <div class="events-empty">{% translate "Aucune publication pour le moment." %}</div>
-        {% endif %}
     </div>
 </section>
+{% endif %}
 
-<!-- 4. Événements à venir -->
+<!-- 4. Événements à venir (section masquée s'il n'y en a aucun) -->
+{% if upcoming_events %}
 <section id="events" class="home-section">
     <div class="container">
         <div class="home-head">
@@ -247,12 +246,11 @@
                     </div>
                 </a>
             </div>
-            {% empty %}
-            <div class="col-12"><div class="events-empty"><i class="fas fa-calendar-check me-2"></i>{% translate "Aucun événement prévu pour le moment." %} <a href="{% url 'public_event_list' %}">{% translate "Voir les événements passés" %}</a>.</div></div>
             {% endfor %}
         </div>
     </div>
 </section>
+{% endif %}
 
 <!-- 5. Adhésion -->
 <section class="join-band">
@@ -273,16 +271,18 @@
     </div>
 </section>
 
-<!-- 6. Chiffres clés -->
+<!-- 6. Chiffres clés (seules les valeurs non nulles ; section masquée si toutes le sont) -->
+{% if stats %}
 <section class="home-section">
     <div class="container">
         <div class="stats-strip">
-            {% for label, value, icon in stats %}{% if value %}
+            {% for label, value, icon in stats %}
             <div class="stat"><i class="fas {{ icon }}"></i><strong>{{ value }}</strong><span>{{ label }}</span></div>
-            {% endif %}{% endfor %}
+            {% endfor %}
         </div>
     </div>
 </section>
+{% endif %}
 
 {% endcache %}
 

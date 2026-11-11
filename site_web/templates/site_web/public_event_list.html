@@ -118,10 +118,11 @@
     {% endif %}
 
     {% if current_type != 'seminaire' %}
+    {# Sections vides masquées ; un seul message si la page n'a aucun événement à montrer #}
+    {% if upcoming_events %}
     <!-- Événements à venir -->
     <section class="mb-5">
         <h2 class="ev-title">{% if gelekan_upcoming or gelekan_past %}{% translate "Autres événements à venir" %}{% else %}{% translate "Événements à venir" %}{% endif %} <small>{{ upcoming_events|length }}</small></h2>
-        {% if upcoming_events %}
         <div class="row g-4">
             {% for event in upcoming_events %}
             <div class="col-xl-4 col-md-6">
@@ -150,19 +151,13 @@
             </div>
             {% endfor %}
         </div>
-        {% else %}
-        <div class="ev-empty">
-            <i class="fas fa-calendar-plus"></i>
-            <h3 class="h5">{% if current_type %}{% translate "Aucun événement à venir dans cette catégorie" %}{% else %}{% translate "Aucun événement à venir" %}{% endif %}</h3>
-            <p class="mb-0">{% translate "Revenez bientôt, ou consultez les événements passés ci-dessous." %}</p>
-        </div>
-        {% endif %}
     </section>
+    {% endif %}
 
+    {% if past_events %}
     <!-- Événements passés -->
     <section class="mb-5">
         <h2 class="ev-title">{% if gelekan_upcoming or gelekan_past %}{% translate "Autres événements passés" %}{% else %}{% translate "Événements passés" %}{% endif %} <small>{{ past_events.paginator.count }}</small></h2>
-        {% if past_events %}
         <div class="row g-3">
             {% for event in past_events %}
             <div class="col-lg-4 col-md-6">
@@ -186,10 +181,16 @@
             </ul>
         </nav>
         {% endif %}
-        {% else %}
-        <div class="ev-empty"><i class="fas fa-clock-rotate-left"></i><p class="mb-0">{% translate "Aucun événement passé à afficher pour le moment." %}</p></div>
-        {% endif %}
     </section>
+    {% endif %}
+
+    {% if not upcoming_events and not past_events and not gelekan_upcoming and not gelekan_past %}
+    <div class="ev-empty">
+        <i class="fas fa-calendar-plus"></i>
+        <h3 class="h5">{% if current_type %}{% translate "Aucun événement dans cette catégorie pour le moment" %}{% else %}{% translate "Aucun événement pour le moment" %}{% endif %}</h3>
+        <p class="mb-0">{% if current_type %}<a href="{% url 'public_event_list' %}">{% translate "Voir tous les événements" %}</a>{% else %}{% translate "Revenez bientôt : nos prochains séminaires et rencontres seront annoncés ici." %}{% endif %}</p>
+    </div>
+    {% endif %}
     {% endif %}
 </div>
 {% endblock %}

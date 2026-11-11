@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% load form_tags %}
-{# Formulaire en assistant : une section = une étape ; formulaire à gauche, sommaire des étapes à droite.
+{% comment %} Formulaire en assistant : une section = une étape ; formulaire à gauche, sommaire des étapes à droite.
    Blocs : form_title, form_intro, form_extra. Contexte : form, back_url, back_label, submit_label.
-   Sans JavaScript, toutes les sections s'affichent à la suite. #}
+   Sans JavaScript, toutes les sections s'affichent à la suite. {% endcomment %}
 {% block content %}
 {% with steps=form.grouped_fields %}
 <div class="container-fluid py-4">

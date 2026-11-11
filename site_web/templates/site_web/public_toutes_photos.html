@@ -5,7 +5,18 @@
 {% block banner_title %}{% translate "Galerie photos" %}{% endblock %}
 {% block banner_subtitle %}{% translate "Toutes les photos du groupe Zabantu" %}{% endblock %}
 
-{% block extra_css %}{% include 'site_web/includes/photo_viewer_css.html' %}{% endblock %}
+{% block extra_css %}{% include 'site_web/includes/photo_viewer_css.html' %}
+<style>
+    /* Mur de photos en maçonnerie : chaque photo garde ses proportions (pas de recadrage) */
+    .photo-masonry { column-count: 2; column-gap: 8px; }
+    @media (min-width: 768px) { .photo-masonry { column-count: 3; column-gap: 14px; } }
+    @media (min-width: 1200px) { .photo-masonry { column-count: 4; } }
+    .photo-masonry .photo-tile { aspect-ratio: auto; display: block; break-inside: avoid; margin: 0 0 8px; }
+    @media (min-width: 768px) { .photo-masonry .photo-tile { margin-bottom: 14px; } }
+    .photo-masonry .photo-tile img { height: auto; }
+    .photo-selection { background: #f3f5ef; border: 1px solid #e3e7dc; border-radius: 8px; padding: .6rem 1rem; margin-bottom: 1rem; }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -14,25 +25,13 @@
         <a href="{% url 'liste_galeries' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-arrow-left me-1"></i>{% translate "Retour aux galeries" %}</a>
     </div>
 
-    {% if gallery_filters %}
-    <nav class="page-filters" aria-label="{% translate 'Filtrer par galerie' %}">
-        <a href="{% url 'toutes_photos' %}{% if current_tag %}?tag={{ current_tag }}{% endif %}" class="{% if not current_gallery %}active{% endif %}">{% translate "Toutes les galeries" %}</a>
-        {% for g in gallery_filters %}
-        <a href="?gallery={{ g.slug }}{% if current_tag %}&tag={{ current_tag }}{% endif %}" class="{% if current_gallery == g.slug %}active{% endif %}">{{ g.t.title }}</a>
-        {% endfor %}
-    </nav>
-    {% endif %}
-    {% if tag_filters %}
-    <nav class="page-filters" aria-label="{% translate 'Filtrer par mot-clé' %}">
-        <a href="{% url 'toutes_photos' %}{% if current_gallery %}?gallery={{ current_gallery }}{% endif %}" class="{% if not current_tag %}active{% endif %}">{% translate "Tous les mots-clés" %}</a>
-        {% for t in tag_filters %}
-        <a href="?tag={{ t.slug }}{% if current_gallery %}&gallery={{ current_gallery }}{% endif %}" class="{% if current_tag == t.slug %}active{% endif %}"># {{ t.name }}</a>
-        {% endfor %}
-    </nav>
+    {# Pas de barres de filtres (les galeries jouent ce rôle) ; une sélection arrive par les mots-clés d'une photo #}
+    {% if selection_label %}
+    <p class="photo-selection"><i class="fas fa-filter me-1" aria-hidden="true"></i>{% blocktranslate with label=selection_label %}Sélection : {{ label }}{% endblocktranslate %} · <a href="{% url 'toutes_photos' %}">{% translate "Voir toutes les photos" %}</a></p>
     {% endif %}
 
     {% if photos %}
-    <div class="photo-grid pswp-gallery">
+    <div class="photo-masonry pswp-gallery">
         {% for photo in photos %}
         {% thumb photo.image 640 as t %}
         <figure class="photo-tile">
