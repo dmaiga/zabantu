@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabantu\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 00:12+0000\n"
+"POT-Creation-Date: 2026-11-11 00:30+0000\n"
 "PO-Revision-Date: 2026-11-10 23:00+0000\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
@@ -1457,18 +1457,17 @@ msgid "Nos Partenaires"
 msgstr "Our Partners"
 
 #: site_web/templates/site_web/public_article_detail.html
+msgid "Auteur(s)"
+msgstr "Author(s)"
+
+#: site_web/templates/site_web/public_article_detail.html
 #: site_web/templates/site_web/public_event_detail.html
 #: site_web/templates/site_web/public_guelekan_detail.html
 msgid "Partager :"
 msgstr "Share:"
 
 #: site_web/templates/site_web/public_article_detail.html
-msgid "Résumé"
-msgstr "Abstract"
-
-#: site_web/templates/site_web/public_article_detail.html
-#: site_web/templates/site_web/public_detail_photo.html
-msgid "Informations"
+msgid "Détails"
 msgstr "Details"
 
 #: site_web/templates/site_web/public_article_detail.html
@@ -1508,24 +1507,16 @@ msgid "Date de publication"
 msgstr "Publication date"
 
 #: site_web/templates/site_web/public_article_detail.html
-msgid "Lien externe"
-msgstr "External link"
+msgid "Télécharger le PDF"
+msgstr "Download the PDF"
 
 #: site_web/templates/site_web/public_article_detail.html
 msgid "Consulter l'article"
 msgstr "View the article"
 
 #: site_web/templates/site_web/public_article_detail.html
-msgid "Document"
-msgstr "Document"
-
-#: site_web/templates/site_web/public_article_detail.html
-msgid "Télécharger le PDF"
-msgstr "Download the PDF"
-
-#: site_web/templates/site_web/public_article_detail.html
-msgid "Auteur(s)"
-msgstr "Author(s)"
+msgid "Résumé"
+msgstr "Abstract"
 
 #: site_web/templates/site_web/public_article_detail.html
 msgid "Membre Zabantu"
@@ -1821,6 +1812,10 @@ msgid "Photo suivante"
 msgstr "Next photo"
 
 #: site_web/templates/site_web/public_detail_photo.html
+msgid "Informations"
+msgstr "Details"
+
+#: site_web/templates/site_web/public_detail_photo.html
 msgid "Ajoutée le"
 msgstr "Added on"
 
@@ -1989,7 +1984,6 @@ msgid "À venir"
 msgstr "Upcoming"
 
 #: site_web/templates/site_web/public_event_detail.html
-#| msgid "Informations"
 msgid "Infos pratiques"
 msgstr "Practical information"
 
@@ -1998,12 +1992,16 @@ msgid "Date et heure"
 msgstr "Date and time"
 
 #: site_web/templates/site_web/public_event_detail.html
+msgid "Ajouter à mon agenda"
+msgstr "Add to my calendar"
+
+#: site_web/templates/site_web/public_event_detail.html
 msgid "Google Agenda"
 msgstr "Google Calendar"
 
 #: site_web/templates/site_web/public_event_detail.html
-msgid "Autre agenda (.ics)"
-msgstr "Other calendar (.ics)"
+msgid "Apple, Outlook… (fichier .ics)"
+msgstr "Apple, Outlook… (.ics file)"
 
 #: site_web/templates/site_web/public_event_detail.html
 msgid "Événement en ligne"
@@ -2014,8 +2012,8 @@ msgid "Cet événement est terminé."
 msgstr "This event is over."
 
 #: site_web/templates/site_web/public_event_detail.html
-msgid "Le lien de connexion est ci-dessous."
-msgstr "The joining link is below."
+msgid "Rejoindre le webinaire"
+msgstr "Join the webinar"
 
 #: site_web/templates/site_web/public_event_detail.html
 msgid "Le lien de connexion sera communiqué."
@@ -2054,11 +2052,6 @@ msgid "Thème principal"
 msgstr "Main theme"
 
 #: site_web/templates/site_web/public_event_detail.html
-msgid "Rejoindre le webinaire"
-msgstr "Join the webinar"
-
-#: site_web/templates/site_web/public_event_detail.html
-#| msgid "Tous les événements"
 msgid "À propos de l'événement"
 msgstr "About the event"
 

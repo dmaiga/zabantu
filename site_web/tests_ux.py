@@ -152,3 +152,9 @@ class EventPagesTests(TestCase):
         self.assertNotContains(r, 'event-cta')
         self.assertLess(html.index('class="event-poster"'), html.index('class="event-info-card"'))
         self.assertLess(html.index('class="event-info-card"'), html.index('class="event-content"'))
+
+
+class PublicationCardAuthorsTests(TestCase):
+    def test_external_authors_of_a_book_are_listed(self):
+        publish('Un ouvrage', article_type='ouvrage', academic_authors='Modibo TRAORE')
+        self.assertContains(self.client.get(reverse('public_article_list')), '<i class="fas fa-user"></i>Modibo TRAORE</p>')

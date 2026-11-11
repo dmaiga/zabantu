@@ -47,8 +47,20 @@
     .info-label { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: #6c757d; margin-bottom: .15rem; }
     .info-value { margin: 0; color: var(--zabantu-dark); font-weight: 500; line-height: 1.45; }
     .info-actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .6rem; }
-    .btn-event { min-height: 40px; display: inline-flex; align-items: center; padding: .35rem .9rem; font-size: .9rem; }
-    .event-main-action { display: flex; width: 100%; justify-content: center; min-height: 48px; margin-top: 1rem; font-weight: 600; }
+    .btn-event { min-height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: .45rem; padding: .35rem .9rem; font-size: .9rem; }
+    .btn-event i { line-height: 1; }
+    .event-join { width: 100%; min-height: 46px; font-weight: 600; }
+
+    /* « Ajouter à mon agenda » : un bouton, deux choix (menu natif <details>, sans JavaScript) */
+    .add-calendar { position: relative; display: inline-block; }
+    .add-calendar > summary { list-style: none; cursor: pointer; }
+    .add-calendar > summary::-webkit-details-marker { display: none; }
+    .add-calendar > summary .fa-chevron-down { font-size: .7rem; transition: transform .2s; }
+    .add-calendar[open] > summary .fa-chevron-down { transform: rotate(180deg); }
+    .add-calendar-menu { position: absolute; z-index: 5; top: calc(100% + .35rem); left: 0; min-width: 240px; background: #fff; border: 1px solid #e3e7dc; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.12); padding: .35rem; }
+    .add-calendar-menu a { display: flex; align-items: center; gap: .6rem; min-height: 44px; padding: .4rem .75rem; border-radius: 8px; color: var(--zabantu-dark); text-decoration: none; font-size: .92rem; }
+    .add-calendar-menu a:hover, .add-calendar-menu a:focus-visible { background: #f3f5ef; }
+    .add-calendar-menu i { width: 1.1rem; text-align: center; color: var(--zabantu-primary); }
 
     /* Intervenants */
     .role-title { color: var(--zabantu-primary); font-size: 1.05rem; font-weight: 700; margin: 1.25rem 0 .75rem; }
@@ -129,8 +141,13 @@
                         <p class="info-value">{{ time_range }}</p>
                         {% if not is_past_event %}
                         <div class="info-actions">
-                            <a href="{{ google_calendar_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm btn-event"><i class="far fa-calendar-plus me-1"></i>{% translate "Google Agenda" %}</a>
-                            <a href="{% url 'public_event_ics' event.pk %}" class="btn btn-outline-primary btn-sm btn-event"><i class="fas fa-download me-1"></i>{% translate "Autre agenda (.ics)" %}</a>
+                            <details class="add-calendar">
+                                <summary class="btn btn-outline-primary btn-sm btn-event"><i class="far fa-calendar-plus" aria-hidden="true"></i>{% translate "Ajouter à mon agenda" %}<i class="fas fa-chevron-down" aria-hidden="true"></i></summary>
+                                <div class="add-calendar-menu">
+                                    <a href="{{ google_calendar_url }}" target="_blank" rel="noopener noreferrer"><i class="fab fa-google" aria-hidden="true"></i>{% translate "Google Agenda" %}</a>
+                                    <a href="{% url 'public_event_ics' event.pk %}"><i class="far fa-calendar" aria-hidden="true"></i>{% translate "Apple, Outlook… (fichier .ics)" %}</a>
+                                </div>
+                            </details>
                         </div>
                         {% endif %}
                     </div>
@@ -141,7 +158,9 @@
                     <span class="info-icon"><i class="fas fa-video" aria-hidden="true"></i></span>
                     <div>
                         <div class="info-label">{% translate "Événement en ligne" %}</div>
-                        <p class="info-value">{% if is_past_event %}{% translate "Cet événement est terminé." %}{% elif event.webinar_link %}{% translate "Le lien de connexion est ci-dessous." %}{% else %}{% translate "Le lien de connexion sera communiqué." %}{% endif %}</p>
+                        {% if is_past_event %}<p class="info-value">{% translate "Cet événement est terminé." %}</p>
+                        {% elif event.webinar_link %}<div class="info-actions"><a href="{{ event.webinar_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-event event-join"><i class="fas fa-video" aria-hidden="true"></i>{% translate "Rejoindre le webinaire" %}</a></div>
+                        {% else %}<p class="info-value">{% translate "Le lien de connexion sera communiqué." %}</p>{% endif %}
                     </div>
                 </div>
                 {% endif %}
@@ -153,7 +172,7 @@
                         <div class="info-label">{% translate "Présentiel" %}</div>
                         <p class="info-value">{% if event.location %}{{ event.location }}{% else %}{% translate "Lieu à confirmer" %}{% endif %}</p>
                         {% if event.lieu_gps %}
-                        <div class="info-actions"><a href="{{ event.lieu_gps }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm btn-event"><i class="fas fa-directions me-1"></i>{% translate "Itinéraire" %}</a></div>
+                        <div class="info-actions"><a href="{{ event.lieu_gps }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm btn-event"><i class="fas fa-directions" aria-hidden="true"></i>{% translate "Itinéraire" %}</a></div>
                         {% endif %}
                     </div>
                 </div>
@@ -189,9 +208,6 @@
                 </div>
                 {% endif %}
 
-                {% if not is_past_event and event.is_webinar and event.webinar_link %}
-                <a href="{{ event.webinar_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary event-main-action"><i class="fas fa-video me-2" aria-hidden="true"></i>{% translate "Rejoindre le webinaire" %}</a>
-                {% endif %}
             </div>
         </aside>
 
@@ -243,6 +259,16 @@
     <div class="text-center mt-5">
         <a href="{% url 'public_event_list' %}" class="btn btn-outline-primary"><i class="fas fa-arrow-left me-2"></i>{% translate "Tous les événements" %}</a>
     </div>
+    <script>
+    // Menu « Ajouter à mon agenda » : se ferme au clic ailleurs, avec Échap, ou après le choix
+    (function () {
+        var menu = document.querySelector('.add-calendar');
+        if (!menu) { return; }
+        document.addEventListener('click', function (e) { if (menu.open && !menu.contains(e.target)) { menu.open = false; } });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.open) { menu.open = false; menu.querySelector('summary').focus(); } });
+        menu.querySelectorAll('.add-calendar-menu a').forEach(function (a) { a.addEventListener('click', function () { menu.open = false; }); });
+    })();
+    </script>
 
     <!-- Événements similaires -->
     {% if similar_events %}

@@ -267,9 +267,10 @@
     @media (max-width: 992px) {
         .pub-card { grid-template-columns: 150px minmax(0, 1fr); gap: 1.1rem; }
     }
-    @media (max-width: 768px) {
-        .publication-container { flex-direction: column; }
-        .filter-sidebar { width: 100%; position: static; margin-bottom: 2rem; }
+    /* Sous 992 px : catégories en barre défilante au-dessus de la liste (même seuil que la barre latérale) */
+    @media (max-width: 991.98px) {
+        .publication-container { flex-direction: column; gap: 0; }
+        .filter-sidebar { width: 100%; min-width: 0; position: static; margin-bottom: 1.5rem; }
     }
     @media (max-width: 576px) {
         .pub-card { grid-template-columns: 1fr; padding: 1rem; }
@@ -379,7 +380,7 @@
                         {% if article.article_type == 'independent' and article.external_author %}
                         <p class="pub-authors"><i class="fas fa-user"></i>{{ article.external_author }}</p>
                         {% elif article.authors.all or article.academic_authors %}
-                        <p class="pub-authors"><i class="fas fa-user"></i>{% for author in article.authors.all %}{{ author.get_full_name }}{% if not forloop.last or article.academic_authors and article.article_type == 'academic' %}, {% endif %}{% endfor %}{% if article.article_type == 'academic' %}{{ article.academic_authors|default:"" }}{% endif %}</p>
+                        <p class="pub-authors"><i class="fas fa-user"></i>{% for author in article.authors.all %}{{ author.get_full_name }}{% if not forloop.last or article.academic_authors %}, {% endif %}{% endfor %}{{ article.academic_authors|default:"" }}</p>
                         {% endif %}
 
                         {% if article.article_type == 'ouvrage' and article.publisher_book or article.article_type == 'ouvrage' and article.publication_date %}

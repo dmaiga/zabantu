@@ -144,11 +144,11 @@ class ContentFallbackTests(TestCase):
         translated_article = publish('Titre français', title_en='English title', content_en='<p>English body</p>')
         french_only = publish('Seulement en français')
         r = self.client.get(en('public_article_detail', translated_article.slug))
-        self.assertContains(r, '<h1 class="article-title" lang="en">English title</h1>', html=True)
+        self.assertContains(r, '<h1 class="pub-title" lang="en">English title</h1>', html=True)
         self.assertContains(r, 'English body')
         self.assertContains(r, '<meta property="og:title" content="English title">')
         r = self.client.get(en('public_article_detail', french_only.slug))
-        self.assertContains(r, '<h1 class="article-title" lang="fr">Seulement en français</h1>', html=True)
+        self.assertContains(r, '<h1 class="pub-title" lang="fr">Seulement en français</h1>', html=True)
         self.assertContains(self.client.get(reverse('public_article_detail', args=[translated_article.slug])),
                             'Titre français')
 
