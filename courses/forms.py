@@ -5,6 +5,7 @@ from django_summernote.widgets import SummernoteWidget
 
 from site_web.antispam import AntiSpamMixin
 from users.formsupport import SectionedFormMixin
+from zabantu.validators import validate_image
 
 from .backends import PARTICIPANT_ROLE
 from .models import Cohort, Course, CourseFile, Enrollment, ParticipantProfile
@@ -168,9 +169,36 @@ class MembershipLightForm(forms.Form):
                                          widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}))
     contribution = forms.CharField(label=_("Comment souhaitez-vous contribuer aux activités de Zabantu ? (max 100 mots)"),
                                    widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4}))
+    # Profil public (facultatif) : repris sur la page « Membres » si l'adhésion est validée
+    profile_picture = forms.ImageField(label=_("Photo de profil"), required=False, validators=[validate_image],
+                                       widget=forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'}))
+    bio = forms.CharField(label=_("Courte biographie"), required=False,
+                          widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4}))
+    social_linkedin = forms.URLField(label=_("LinkedIn"), required=False,
+                                     widget=forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://www.linkedin.com/in/…'}))
+    scholar_link = forms.URLField(label=_("Google Scholar"), required=False,
+                                  widget=forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://scholar.google.com/…'}))
+    personal_website = forms.URLField(label=_("Site web personnel"), required=False,
+                                      widget=forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://…'}))
+    social_facebook = forms.URLField(label=_("Facebook"), required=False,
+                                     widget=forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://www.facebook.com/…'}))
+    social_twitter = forms.URLField(label=_("Twitter / X"), required=False,
+                                    widget=forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://x.com/…'}))
+    social_instagram = forms.URLField(label=_("Instagram"), required=False,
+                                      widget=forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://www.instagram.com/…'}))
+    PUBLIC_FIELDS = ('bio', 'social_linkedin', 'scholar_link', 'personal_website', 'social_facebook',
+                     'social_twitter', 'social_instagram')
+
     consent = forms.BooleanField(label=_("J'autorise l'utilisation des informations fournies pour le traitement de ma demande d'adhésion et la prise de contact avec moi."),
                                  widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
                                  error_messages={'required': _("Votre consentement est nécessaire pour traiter la demande.")})
+
+    def clean_profile_picture(self):
+        from site_web.forms import MAX_PHOTO_MB
+        photo = self.cleaned_data.get('profile_picture')
+        if photo and photo.size > MAX_PHOTO_MB * 1024 * 1024:
+            raise forms.ValidationError(_("La photo ne doit pas dépasser %(n)s Mo.") % {'n': MAX_PHOTO_MB})
+        return photo
 
     def clean_contribution(self):
         value = self.cleaned_data['contribution'].strip()
@@ -186,7 +214,9 @@ class MembershipLightForm(forms.Form):
             full_name=user.get_full_name(), email=user.email, phone=data['phone'], city_country=data['city_country'],
             academic_status=profile.status, institution=data['institution'],
             research_interests=data['research_interests'], contribution=data['contribution'], career_benefit='',
-            how_heard_choices=['autre'], how_heard="Compte participant (formations)", consent=True, language=language)
+            how_heard_choices=['autre'], how_heard="Compte participant (formations)", consent=True, language=language,
+            profile_picture=data.get('profile_picture') or None,
+            **{name: data.get(name) or '' for name in self.PUBLIC_FIELDS})
 
 
 # ----- Backoffice (en français) -----

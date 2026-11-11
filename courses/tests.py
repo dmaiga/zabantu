@@ -515,3 +515,37 @@ class CohortAnnouncementCampaignTests(TestCase):
         new = cohort('Session 2026', is_active=False)
         r = self.client.get(reverse('cohort_admin_announce', args=[new.pk]))
         self.assertRedirects(r, reverse('cohort_admin_detail', args=[new.pk]), fetch_redirect_response=False)
+
+
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp())
+class MembershipPublicProfileTests(TestCase):
+    def test_public_profile_is_sent_and_shown_on_the_members_page_once_approved(self):
+        from site_web.models import MembershipApplication
+        from site_web.tests import _png
+        user = participant()
+        self.client.force_login(user, backend='courses.backends.ParticipantBackend')
+        r = self.client.get(reverse('participant_membership'))
+        self.assertContains(r, 'Votre profil public')
+        self.assertContains(r, 'enctype="multipart/form-data"')
+        self.client.post(reverse('participant_membership'), {
+            'city_country': 'Bamako, Mali', 'institution': 'ONG Sahel', 'research_interests': 'Économie rurale',
+            'contribution': 'Séminaires', 'consent': 'on', 'bio': 'Économiste rurale.',
+            'social_linkedin': 'https://www.linkedin.com/in/awa', 'profile_picture': _png('awa.png')})
+        application = MembershipApplication.objects.get()
+        self.assertEqual((application.bio, application.social_linkedin), ('Économiste rurale.', 'https://www.linkedin.com/in/awa'))
+        self.assertTrue(application.profile_picture)
+        application.approve(make_user('moderateur'))
+        user.refresh_from_db()
+        self.assertIn('Économiste rurale.', user.bio)
+        self.assertEqual(user.social_linkedin, 'https://www.linkedin.com/in/awa')
+        self.assertTrue(user.profile_picture)
+
+    def test_public_profile_is_optional_and_photo_is_checked(self):
+        self.client.force_login(participant(), backend='courses.backends.ParticipantBackend')
+        r = self.client.post(reverse('participant_membership'), {
+            'city_country': 'Bamako', 'institution': 'X', 'research_interests': 'Y', 'contribution': 'Z',
+            'consent': 'on', 'profile_picture': SimpleUploadedFile('faux.png', b'pas une image')})
+        self.assertContains(r, 'field-error')                                          # fausse image refusée
+        r = self.client.post(reverse('participant_membership'), {
+            'city_country': 'Bamako', 'institution': 'X', 'research_interests': 'Y', 'contribution': 'Z', 'consent': 'on'})
+        self.assertRedirects(r, reverse('participant_membership'))                     # sans profil public : accepté

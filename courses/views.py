@@ -319,7 +319,7 @@ def membership(request):
     state = _membership(request.user)
     form = None
     if state is None:
-        form = MembershipLightForm(request.POST or None,
+        form = MembershipLightForm(request.POST or None, request.FILES or None,
                                    initial={'institution': request.user.participant_profile.organization})
         if request.method == 'POST' and form.is_valid():
             from site_web import mailing as site_mailing

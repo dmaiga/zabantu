@@ -15,8 +15,9 @@
   <p class="mb-0">{% translate "Votre précédente demande n'a pas été retenue. Pour en reparler, écrivez-nous depuis le formulaire de contact." %}</p>
   {% else %}
   <p class="text-muted">{% blocktranslate with name=user.get_full_name email=user.email %}Votre nom ({{ name }}), votre adresse ({{ email }}) et votre profil sont déjà connus : il reste quelques informations sur votre recherche.{% endblocktranslate %}</p>
-  <form method="post" novalidate>
+  <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
+    <h2 class="h6 text-uppercase text-muted mt-2 mb-3">{% translate "Votre recherche" %}</h2>
     <div class="row g-0 gap-sm-3 flex-sm-nowrap">
       <div class="col-sm">{% include 'courses/public/_field.html' with field=form.city_country %}</div>
       <div class="col-sm">{% include 'courses/public/_field.html' with field=form.institution %}</div>
@@ -24,9 +25,48 @@
     {% include 'courses/public/_field.html' with field=form.phone %}
     {% include 'courses/public/_field.html' with field=form.research_interests %}
     {% include 'courses/public/_field.html' with field=form.contribution %}
+
+    <hr class="my-4">
+    <h2 class="h6 text-uppercase text-muted mb-1">{% translate "Votre profil public" %} <span class="text-lowercase fw-normal">{% translate "(facultatif)" %}</span></h2>
+    <p class="field-help mb-3">{% translate "Si votre adhésion est validée, ces informations s'affichent sur votre page dans la liste des membres du site. Vous pourrez les compléter plus tard." %}</p>
+    <div class="mb-3">
+      <label class="form-label" for="{{ form.profile_picture.id_for_label }}">{{ form.profile_picture.label }} <small class="text-muted fw-normal">{% translate "(5 Mo max)" %}</small></label>
+      {{ form.profile_picture }}
+      <img id="photoPreview" alt="{% translate 'Aperçu de la photo' %}" style="display:none; width:96px; height:96px; object-fit:cover; border-radius:50%; margin-top:.75rem; border:2px solid #e3e7dc;">
+      {% for error in form.profile_picture.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+    </div>
+    {% include 'courses/public/_field.html' with field=form.bio %}
+    <div class="row g-0 gap-sm-3 flex-sm-nowrap">
+      <div class="col-sm">{% include 'courses/public/_field.html' with field=form.social_linkedin %}</div>
+      <div class="col-sm">{% include 'courses/public/_field.html' with field=form.scholar_link %}</div>
+    </div>
+    <div class="row g-0 gap-sm-3 flex-sm-nowrap">
+      <div class="col-sm">{% include 'courses/public/_field.html' with field=form.personal_website %}</div>
+      <div class="col-sm">{% include 'courses/public/_field.html' with field=form.social_facebook %}</div>
+    </div>
+    <div class="row g-0 gap-sm-3 flex-sm-nowrap">
+      <div class="col-sm">{% include 'courses/public/_field.html' with field=form.social_twitter %}</div>
+      <div class="col-sm">{% include 'courses/public/_field.html' with field=form.social_instagram %}</div>
+    </div>
+
+    <hr class="my-4">
     {% include 'courses/public/_field.html' with field=form.consent %}
     <button type="submit" class="btn-zb"><i class="fas fa-paper-plane" aria-hidden="true"></i>{% translate "Envoyer ma demande" %}</button>
   </form>
   {% endif %}
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  // Aperçu immédiat de la photo choisie
+  var input = document.getElementById('id_profile_picture'), preview = document.getElementById('photoPreview');
+  if (!input || !preview) { return; }
+  input.addEventListener('change', function () {
+    var file = input.files[0];
+    if (file) { preview.src = URL.createObjectURL(file); preview.style.display = 'block'; } else { preview.style.display = 'none'; }
+  });
+})();
+</script>
 {% endblock %}

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabantu\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-11 01:58+0000\n"
+"POT-Creation-Date: 2026-11-11 02:19+0000\n"
 "PO-Revision-Date: 2026-11-10 23:00+0000\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
@@ -163,6 +163,41 @@ msgid ""
 msgstr ""
 "How would you like to contribute to Zabantu’s activities? (max 100 words)"
 
+#: courses/forms.py site_web/models.py
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Photo de profil"
+msgstr "Profile photo"
+
+#: courses/forms.py site_web/forms.py site_web/models.py
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Courte biographie"
+msgstr "Short biography"
+
+#: courses/forms.py site_web/models.py users/models.py
+msgid "LinkedIn"
+msgstr "LinkedIn"
+
+#: courses/forms.py site_web/models.py users/models.py
+msgid "Google Scholar"
+msgstr "Google Scholar"
+
+#: courses/forms.py site_web/models.py
+#: site_web/templates/site_web/public_member_list.html users/models.py
+msgid "Site web personnel"
+msgstr "Personal website"
+
+#: courses/forms.py site_web/models.py users/models.py
+msgid "Facebook"
+msgstr "Facebook"
+
+#: courses/forms.py site_web/models.py
+msgid "Twitter / X"
+msgstr "Twitter / X"
+
+#: courses/forms.py site_web/models.py users/models.py
+msgid "Instagram"
+msgstr "Instagram"
+
 #: courses/forms.py site_web/forms.py
 msgid ""
 "J'autorise l'utilisation des informations fournies pour le traitement de ma "
@@ -174,6 +209,11 @@ msgstr ""
 #: courses/forms.py site_web/forms.py
 msgid "Votre consentement est nécessaire pour traiter la demande."
 msgstr "Your consent is required to process the application."
+
+#: courses/forms.py site_web/forms.py
+#, python-format
+msgid "La photo ne doit pas dépasser %(n)s Mo."
+msgstr "The photo must not exceed %(n)s MB."
 
 #: courses/mailing.py
 msgid "Confirmez votre compte Zabantu"
@@ -871,6 +911,43 @@ msgstr ""
 "We already have your name (%(name)s), your address (%(email)s) and your "
 "profile: only a few details about your research remain."
 
+#: courses/templates/courses/space/membership.html
+#| msgid "Profil et recherche"
+msgid "Votre recherche"
+msgstr "Your research"
+
+#: courses/templates/courses/space/membership.html
+#| msgid "Profil public"
+msgid "Votre profil public"
+msgstr "Your public profile"
+
+#: courses/templates/courses/space/membership.html
+#: site_web/templates/site_web/public_contact.html
+msgid "(facultatif)"
+msgstr "(optional)"
+
+#: courses/templates/courses/space/membership.html
+#| msgid ""
+#| "Facultatif. Si votre adhésion est validée, ces informations seront reprises "
+#| "sur votre page membre du site, ce qui vous évitera de les renseigner plus "
+#| "tard. Vous pouvez passer cette étape."
+msgid ""
+"Si votre adhésion est validée, ces informations s'affichent sur votre page "
+"dans la liste des membres du site. Vous pourrez les compléter plus tard."
+msgstr ""
+"If your membership is approved, this information appears on your page in the "
+"list of members on the website. You can complete it later."
+
+#: courses/templates/courses/space/membership.html
+#: site_web/templates/site_web/public_membership_form.html
+msgid "(5 Mo max)"
+msgstr "(5 MB max)"
+
+#: courses/templates/courses/space/membership.html
+#: site_web/templates/site_web/public_membership_form.html
+msgid "Aperçu de la photo"
+msgstr "Photo preview"
+
 #: courses/templates/courses/space/password.html
 msgid "Changer de mot de passe"
 msgstr "Change password"
@@ -1095,19 +1172,9 @@ msgstr ""
 "How can joining Zabantu help you advance your career as a researcher? (max "
 "100 words)"
 
-#: site_web/forms.py site_web/models.py
-#: site_web/templates/site_web/public_membership_form.html
-msgid "Courte biographie"
-msgstr "Short biography"
-
 #: site_web/forms.py
 msgid "Sélectionnez votre statut"
 msgstr "Select your status"
-
-#: site_web/forms.py
-#, python-format
-msgid "La photo ne doit pas dépasser %(n)s Mo."
-msgstr "The photo must not exceed %(n)s MB."
 
 #: site_web/forms.py site_web/templates/site_web/public_membership_form.html
 msgid "Précisez votre réponse."
@@ -1327,35 +1394,6 @@ msgstr "Contribution to Zabantu’s activities"
 #: site_web/models.py
 msgid "Apport de l'adhésion pour votre carrière"
 msgstr "Benefit of membership for your career"
-
-#: site_web/models.py site_web/templates/site_web/public_membership_form.html
-msgid "Photo de profil"
-msgstr "Profile photo"
-
-#: site_web/models.py users/models.py
-msgid "LinkedIn"
-msgstr "LinkedIn"
-
-#: site_web/models.py users/models.py
-msgid "Facebook"
-msgstr "Facebook"
-
-#: site_web/models.py
-msgid "Twitter / X"
-msgstr "Twitter / X"
-
-#: site_web/models.py users/models.py
-msgid "Instagram"
-msgstr "Instagram"
-
-#: site_web/models.py users/models.py
-msgid "Google Scholar"
-msgstr "Google Scholar"
-
-#: site_web/models.py site_web/templates/site_web/public_member_list.html
-#: users/models.py
-msgid "Site web personnel"
-msgstr "Personal website"
 
 #: site_web/models.py
 msgid "Consentement au traitement de la demande"
@@ -2500,10 +2538,6 @@ msgstr ""
 " you."
 
 #: site_web/templates/site_web/public_contact.html
-msgid "(facultatif)"
-msgstr "(optional)"
-
-#: site_web/templates/site_web/public_contact.html
 msgid "Ces informations servent uniquement à répondre à votre message."
 msgstr "This information is only used to reply to your message."
 
@@ -3225,14 +3259,6 @@ msgstr ""
 "Optional. If your membership is approved, this information will be used on "
 "your member page on the website, so you will not have to fill it in later. "
 "You can skip this step."
-
-#: site_web/templates/site_web/public_membership_form.html
-msgid "(5 Mo max)"
-msgstr "(5 MB max)"
-
-#: site_web/templates/site_web/public_membership_form.html
-msgid "Aperçu de la photo"
-msgstr "Photo preview"
 
 #: site_web/templates/site_web/public_membership_form.html
 msgid "Dernière étape avant l'envoi."
