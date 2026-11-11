@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}{{ course.title }}{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <a href="{% url 'course_admin_list' %}" class="text-decoration-none small"><i class="fas fa-arrow-left me-1"></i> Cours</a>
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mt-2 mb-3">
+        <div>
+            <h1 class="h3 mb-1">{{ course.title }}</h1>
+            {% if course.title_en %}<p class="text-muted mb-0"><span class="badge bg-light text-dark border">EN</span> {{ course.title_en }}</p>{% endif %}
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'course_admin_update' course.pk %}" class="btn btn-outline-secondary"><i class="fas fa-pen me-1"></i> Modifier</a>
+            <a href="{% url 'participant_course' course.pk %}" class="btn btn-outline-secondary" target="_blank" rel="noopener"><i class="fas fa-eye me-1"></i> Vue participant</a>
+            {% url 'course_admin_delete' course.pk as url %}{% include 'includes/post_action.html' with url=url label='Supprimer' btn_class='btn-outline-danger' icon='fa-trash' confirm='Supprimer ce cours et tous ses fichiers ? Les participants n’y auront plus accès.' %}
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-white"><h2 class="h6 mb-0">Fichiers ({{ course.files.count }})</h2></div>
+                <ul class="list-group list-group-flush">
+                    {% for item in course.files.all %}
+                    <li class="list-group-item">
+                        <form method="post" action="{% url 'course_file_admin_update' item.pk %}" class="row g-2 align-items-center">
+                            {% csrf_token %}
+                            <div class="col-md-6"><input type="text" name="title" value="{{ item.title }}" class="form-control form-control-sm" placeholder="{{ item.filename }}" aria-label="Titre affiché"></div>
+                            <div class="col-md-2"><input type="number" name="order" value="{{ item.order }}" min="0" class="form-control form-control-sm" aria-label="Ordre"></div>
+                            <div class="col-md-4 d-flex gap-1 justify-content-md-end">
+                                <button class="btn btn-sm btn-outline-primary" type="submit" title="Enregistrer"><i class="fas fa-check"></i></button>
+                                <a class="btn btn-sm btn-outline-secondary" href="{% url 'participant_course_file' item.pk %}" title="Télécharger"><i class="fas fa-download"></i></a>
+                            </div>
+                        </form>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <small class="text-muted">{{ item.filename }} · {{ item.file.size|filesizeformat }} · ajouté le {{ item.uploaded_at|date:"d/m/Y" }}</small>
+                            {% url 'course_file_admin_delete' item.pk as url %}{% include 'includes/post_action.html' with url=url label='' title='Supprimer le fichier' btn_class='btn-sm btn-link text-danger' icon='fa-trash' confirm='Supprimer ce fichier ?' %}
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item text-muted">Aucun fichier pour le moment.</li>
+                    {% endfor %}
+                </ul>
+                <div class="card-body border-top">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <label for="{{ files_form.files.id_for_label }}" class="form-label fw-semibold">Ajouter des fichiers</label>
+                        {{ files_form.files }}
+                        <div class="form-text">{{ files_form.files.help_text }} Les fichiers ne sont jamais publics : seuls les participants acceptés et l'équipe peuvent les télécharger.</div>
+                        {% for error in files_form.files.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                        <button type="submit" class="btn btn-primary mt-2"><i class="fas fa-upload me-1"></i> Envoyer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card mb-4"><div class="card-body">
+                <h2 class="h6">Résumé</h2>
+                <p class="mb-0 small">{{ course.summary|default:"—"|linebreaksbr }}</p>
+            </div></div>
+            <div class="card"><div class="card-body">
+                <h2 class="h6">Cohortes</h2>
+                {% for cohort in cohorts %}<a href="{% url 'cohort_admin_detail' cohort.pk %}" class="d-block">{{ cohort.name }}</a>
+                {% empty %}<p class="small text-muted mb-0">Rattaché à aucune cohorte : les participants ne le voient pas encore.</p>{% endfor %}
+            </div></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

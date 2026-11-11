@@ -1,0 +1,69 @@
+{% extends 'base_public.html' %}
+{% load i18n %}
+{% comment %}
+  Connexion commune à tout le monde : équipe (administrateurs, modérateurs, membres autorisés) et participants.
+  Le serveur oriente ensuite chacun vers son espace. Pas de lien d'adhésion ici : la page ne sert qu'à se connecter
+  ou, pour suivre les formations, à créer un compte.
+{% endcomment %}
+{% block title %}{% translate "Connexion" %} - Zabantu{% endblock %}
+{% block banner_title %}{% translate "Connexion" %}{% endblock %}
+{% block banner_subtitle %}{% translate "Équipe Zabantu et participants aux formations" %}{% endblock %}
+{% block donate_band %}{% endblock %}
+{% block extra_css %}{% include 'courses/public/_styles.html' %}
+<style>
+  .pw-wrap { position: relative; }
+  .pw-wrap .form-control { padding-right: 3rem; }
+  .pw-toggle { position: absolute; top: 0; right: 0; width: 46px; height: 46px; border: 0; background: transparent; color: #5b6559; }
+  .btn-zb .spinner-border { width: 1.1rem; height: 1.1rem; border-width: .15em; }
+  .btn-zb[disabled] { opacity: .85; cursor: progress; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tr-narrow">
+  {% for message in messages %}<div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>{% endfor %}
+  <div class="tr-card">
+    <form method="post" id="loginForm" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+      {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors.0 }}</div>{% endif %}
+      {% include 'courses/public/_field.html' with field=form.identifier %}
+      <div class="mb-2">
+        <label class="form-label" for="{{ form.password.id_for_label }}">{{ form.password.label }} *</label>
+        <div class="pw-wrap">
+          {{ form.password }}
+          <button type="button" class="pw-toggle" id="pwToggle" aria-label="{% translate 'Afficher le mot de passe' %}" data-show="{% translate 'Afficher le mot de passe' %}" data-hide="{% translate 'Masquer le mot de passe' %}"><i class="fas fa-eye" aria-hidden="true"></i></button>
+        </div>
+        {% for error in form.password.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+      </div>
+      <p class="mb-3"><a href="{% url 'participant_password_reset' %}">{% translate "Mot de passe oublié ?" %}</a></p>
+      <button type="submit" class="btn-zb w-100" id="loginBtn" data-loading="{% translate 'Connexion…' %}">
+        <i class="fas fa-sign-in-alt" aria-hidden="true"></i><span>{% translate "Se connecter" %}</span>
+      </button>
+    </form>
+  </div>
+  <p class="tr-alt">{% translate "Vous souhaitez suivre une formation ?" %} <a href="{% url 'participant_signup' %}{% if next %}?next={{ next|urlencode }}{% endif %}">{% translate "Créer un compte gratuit" %}</a></p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  var form = document.getElementById('loginForm'), button = document.getElementById('loginBtn');
+  // Pendant la vérification par le serveur : bouton désactivé et spinner (évite aussi les doubles envois)
+  form.addEventListener('submit', function () {
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner-border" role="status" aria-hidden="true"></span><span>' + button.dataset.loading + '</span>';
+  });
+  // Page rouverte depuis l'historique : le bouton redevient utilisable
+  window.addEventListener('pageshow', function (e) { if (e.persisted) { window.location.reload(); } });
+  var toggle = document.getElementById('pwToggle'), field = document.getElementById('{{ form.password.id_for_label }}');
+  toggle.addEventListener('click', function () {
+    var show = field.type === 'password';
+    field.type = show ? 'text' : 'password';
+    toggle.setAttribute('aria-label', show ? toggle.dataset.hide : toggle.dataset.show);
+    toggle.firstElementChild.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
+  });
+})();
+</script>
+{% endblock %}

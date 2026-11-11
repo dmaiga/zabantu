@@ -8,31 +8,38 @@ class LoginPageTests(TestCase):
         self.user = get_user_model().objects.create_user(
             username='admin1', password='secret-pass-123', email='a@x.org', nom='A', prenom='B', role='admin')
 
-    def test_page_has_enrolment_door_and_forgot_link(self):
+    def test_single_login_page_with_signup_and_forgot_links(self):
+        # Une seule page de connexion pour tout le monde ; pas de lien d'adhésion (il est dans l'espace participant)
         r = self.client.get(reverse('login'))
-        self.assertContains(r, reverse('membership_apply'))
-        self.assertContains(r, reverse('password_reset'))
-        self.assertContains(r, 'Faire une demande d')
+        self.assertEqual(reverse('login'), '/zabantu/connexion/')
+        self.assertContains(r, reverse('participant_signup'))
+        self.assertContains(r, reverse('participant_password_reset'))
+        page = r.content.decode()
+        main = page[page.index('<main'):page.index('</main>')]
+        self.assertNotIn(reverse('membership_apply'), main)                 # (le pied de page garde son lien)
+        self.assertContains(r, 'data-loading=')                            # spinner pendant la vérification
+        self.assertRedirects(self.client.get('/auth/?next=/users/'), '/zabantu/connexion/?next=/users/',
+                             fetch_redirect_response=False)                  # ancienne adresse de l'équipe
 
     def test_wrong_password_shows_an_error(self):
-        r = self.client.post(reverse('login'), {'username': 'admin1', 'password': 'faux'})
+        r = self.client.post(reverse('login'), {'identifier': 'admin1', 'password': 'faux'})
         self.assertEqual(r.status_code, 200)
-        self.assertContains(r, 'Identifiants invalides')
+        self.assertContains(r, 'Identifiant ou mot de passe incorrect')
 
     def test_login_redirects_to_dashboard(self):
-        r = self.client.post(reverse('login'), {'username': 'admin1', 'password': 'secret-pass-123'})
+        r = self.client.post(reverse('login'), {'identifier': 'admin1', 'password': 'secret-pass-123'})
         self.assertRedirects(r, reverse('dashboard'), fetch_redirect_response=False)
 
     def test_safe_next_is_followed(self):
         r = self.client.post(reverse('login') + '?next=/users/adhesions/',
-                             {'username': 'admin1', 'password': 'secret-pass-123'})
+                             {'identifier': 'admin1', 'password': 'secret-pass-123'})
         self.assertRedirects(r, '/users/adhesions/', fetch_redirect_response=False)
 
     def test_external_next_is_ignored(self):
         for target in ('https://exemple.com/piege', '//exemple.com', 'javascript:alert(1)'):
             self.client.logout()
             r = self.client.post(reverse('login') + '?next=' + target,
-                                 {'username': 'admin1', 'password': 'secret-pass-123'})
+                                 {'identifier': 'admin1', 'password': 'secret-pass-123'})
             self.assertRedirects(r, reverse('dashboard'), fetch_redirect_response=False, msg_prefix=target)
 
 
@@ -45,11 +52,14 @@ class PasswordResetFlowTests(TestCase):
             username='adm', password='secret-pass-123', email='adm@x.org', nom='A', prenom='B', role='admin')
 
     def test_pages_share_the_login_layout(self):
+        # Même mise en page que le site public : en-tête, bandeau « Espace de gestion », carte centrée, pied de page
         for name in ('password_reset', 'password_reset_done', 'password_reset_complete'):
             r = self.client.get(reverse(name))
             self.assertEqual(r.status_code, 200, name)
-            self.assertContains(r, 'login-wrapper', msg_prefix=name)
-            self.assertContains(r, 'brand-section', msg_prefix=name)
+            self.assertContains(r, 'class="auth-card"', msg_prefix=name)
+            self.assertContains(r, 'class="zabantu-header"', msg_prefix=name)
+            self.assertContains(r, 'class="zabantu-footer', msg_prefix=name)
+            self.assertNotContains(r, 'brand-section', msg_prefix=name)
 
     def test_done_page_does_not_claim_password_was_changed(self):
         r = self.client.get(reverse('password_reset_done'))
@@ -120,21 +130,21 @@ class BackofficeAccessTests(TestCase):
     PASSWORD = 'secret-pass-123'
 
     def login(self, user):
-        return self.client.post(reverse('login'), {'username': user.username, 'password': self.PASSWORD})
+        return self.client.post(reverse('login'), {'identifier': user.username, 'password': self.PASSWORD})
 
     def test_member_cannot_log_in_by_default(self):
         from users.testing import make_user
         member = make_user('membre', backoffice_access=False)
         r = self.login(member)
         self.assertEqual(r.status_code, 200)
-        self.assertContains(r, 'pas accès')
+        self.assertContains(r, 'ne permet pas de se connecter')
         self.assertNotIn('_auth_user_id', self.client.session)
 
     def test_wrong_password_still_says_invalid_credentials(self):
         from users.testing import make_user
         member = make_user('membre', backoffice_access=False)
-        r = self.client.post(reverse('login'), {'username': member.username, 'password': 'faux'})
-        self.assertContains(r, 'Identifiants invalides')
+        r = self.client.post(reverse('login'), {'identifier': member.username, 'password': 'faux'})
+        self.assertContains(r, 'Identifiant ou mot de passe incorrect')
 
     def test_allowed_member_moderator_and_admin_can_log_in(self):
         from users.testing import make_user
@@ -152,7 +162,7 @@ class BackofficeAccessTests(TestCase):
         member.save()
         r = self.client.get(reverse('dashboard'))
         self.assertEqual(r.status_code, 302)
-        self.assertIn('/auth/', r.url)
+        self.assertIn('/zabantu/connexion/', r.url)
 
     def test_creating_a_member_defaults_to_no_access_and_sends_no_email(self):
         from users.testing import make_user
@@ -215,7 +225,7 @@ class SuperuserAccessTests(TestCase):
         root.save()
         self.assertEqual(root.role, 'admin')
         self.assertTrue(root.can_access_backoffice and root.can_moderate)
-        r = self.client.post(reverse('login'), {'username': 'root', 'password': 'secret-pass-123'})
+        r = self.client.post(reverse('login'), {'identifier': 'root', 'password': 'secret-pass-123'})
         self.assertRedirects(r, reverse('dashboard'), fetch_redirect_response=False)
 
     def test_superuser_keeps_access_even_if_role_was_changed_in_bulk(self):
@@ -235,7 +245,7 @@ class ManagementScreensAccessTests(TestCase):
         for name in self.NAMES:
             r = self.client.get(reverse(name))
             self.assertEqual(r.status_code, 302, name)
-            self.assertIn('/auth/', r.url, name)
+            self.assertIn('/zabantu/connexion/', r.url, name)
 
     def test_member_with_access_is_refused(self):
         from users.testing import make_user

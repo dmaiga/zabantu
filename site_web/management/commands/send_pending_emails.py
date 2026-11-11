@@ -9,7 +9,7 @@ from site_web import mailing
 
 class Command(BaseCommand):
     help = (
-        "Envoie par lots les annonces de publication en attente et retente celles en échec. "
+        "Envoie par lots les annonces de publication et d'ouverture des formations en attente, et retente celles en échec. "
         "Déjà appelée par publish_scheduled ; à lancer seule si besoin (voir docs/DEPLOIEMENT_PROD.md)."
     )
 
@@ -22,4 +22,7 @@ class Command(BaseCommand):
                 self.stdout.write("Envoi déjà en cours : rien à faire")
                 return
             sent, failed = mailing.send_pending()
+            from courses import mailing as courses_mailing   # ouverture des cohortes (formations)
+            course_sent, course_failed = courses_mailing.send_pending_announcements()
         self.stdout.write(f"{sent} e-mail(s) envoyé(s), {failed} échec(s)")
+        self.stdout.write(f"Formations : {course_sent} annonce(s) envoyée(s), {course_failed} échec(s)")

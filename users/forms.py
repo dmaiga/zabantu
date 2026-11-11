@@ -270,6 +270,9 @@ class CustomUserUpdateForm(SectionedFormMixin, UserChangeForm):
                 self.fields.pop(name)
         elif not editor.is_admin:
             self.fields.pop('role')
+        if 'role' in self.fields and self.instance.role != 'participant':
+            # Les comptes participants se créent sur le site : un membre de l'équipe n'en devient pas un ici
+            self.fields['role'].choices = [c for c in self.fields['role'].choices if c[0] != 'participant']
 
 
 class ContactReplyForm(forms.Form):

@@ -1,0 +1,32 @@
+{% extends 'courses/space/base.html' %}
+{% load i18n %}
+{% block title %}{% translate "Adhésion" %}{% endblock %}
+{% block page_title %}{% if state == 'member' %}{% translate "Mon adhésion" %}{% else %}{% translate "Devenir membre" %}{% endif %}{% endblock %}
+{% block content %}
+<section class="sp-card" style="max-width: 760px;">
+  {% if state == 'member' %}
+  <h2>{% translate "Vous êtes membre du groupe de recherche" %}</h2>
+  <p class="mb-0">{% translate "Votre profil figure parmi les membres sur le site. Vous gardez l'accès à vos formations depuis cet espace." %}</p>
+  {% elif state == 'pending' %}
+  <h2>{% translate "Demande en cours d'examen" %}</h2>
+  <p class="mb-0">{% translate "L'équipe examine votre demande d'adhésion et vous répondra par e-mail." %}</p>
+  {% elif state == 'rejected' %}
+  <h2>{% translate "Demande non retenue" %}</h2>
+  <p class="mb-0">{% translate "Votre précédente demande n'a pas été retenue. Pour en reparler, écrivez-nous depuis le formulaire de contact." %}</p>
+  {% else %}
+  <p class="text-muted">{% blocktranslate with name=user.get_full_name email=user.email %}Votre nom ({{ name }}), votre adresse ({{ email }}) et votre profil sont déjà connus : il reste quelques informations sur votre recherche.{% endblocktranslate %}</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="row g-0 gap-sm-3 flex-sm-nowrap">
+      <div class="col-sm">{% include 'courses/public/_field.html' with field=form.city_country %}</div>
+      <div class="col-sm">{% include 'courses/public/_field.html' with field=form.institution %}</div>
+    </div>
+    {% include 'courses/public/_field.html' with field=form.phone %}
+    {% include 'courses/public/_field.html' with field=form.research_interests %}
+    {% include 'courses/public/_field.html' with field=form.contribution %}
+    {% include 'courses/public/_field.html' with field=form.consent %}
+    <button type="submit" class="btn-zb"><i class="fas fa-paper-plane" aria-hidden="true"></i>{% translate "Envoyer ma demande" %}</button>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}

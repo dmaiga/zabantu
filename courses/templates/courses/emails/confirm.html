@@ -1,0 +1,9 @@
+{% extends 'emails/base_email.html' %}{% load i18n %}
+{% block title %}{% translate "Confirmez votre compte" %}{% endblock %}
+{% block heading %}{% translate "Confirmez votre compte" %}{% endblock %}
+{% block body %}
+<p style="margin:0 0 16px;">{% blocktranslate %}Bonjour {{ name }},{% endblocktranslate %}</p>
+<p style="margin:0 0 16px;">{% translate "Merci d'avoir créé votre compte sur le site de Zabantu. Confirmez votre adresse e-mail pour l'activer :" %}</p>
+<p style="text-align:center; margin:24px 0;"><a href="{{ url }}" style="display:inline-block; background:#bf9264; color:#ffffff; text-decoration:none; padding:12px 28px; border-radius:30px; font-weight:bold;">{% translate "Confirmer mon adresse" %}</a></p>
+<p style="margin:0; font-size:14px;">{% translate "Si vous n'êtes pas à l'origine de cette demande, ignorez ce message : aucun compte ne sera activé." %}</p>
+{% endblock %}

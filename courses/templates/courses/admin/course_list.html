@@ -1,0 +1,38 @@
+{% extends 'list_base.html' %}
+{% block title %}Cours{% endblock %}
+{% block list_title %}Formations{% endblock %}
+{% block list_noun %}cours{% endblock %}
+{% block list_actions %}
+<a href="{% url 'training_list' %}" class="btn btn-outline-secondary" target="_blank" rel="noopener"><i class="fas fa-up-right-from-square me-1"></i> Page « Formations »</a>
+<a href="{% url 'course_admin_create' %}" class="btn btn-primary"><i class="fas fa-plus me-1"></i> Nouveau cours</a>
+{% endblock %}
+{% block list_filters %}
+{% include 'courses/admin/_tabs.html' with tab='courses' %}
+<form method="get" class="d-flex gap-2 mb-3" style="max-width: 420px;">
+    <input type="search" name="q" value="{{ query }}" class="form-control" placeholder="Titre ou résumé">
+    <button class="btn btn-outline-primary" type="submit" aria-label="Rechercher"><i class="fas fa-search"></i></button>
+</form>
+{% endblock %}
+{% block list_table %}
+<table class="table align-middle mb-0">
+    <thead><tr><th>Cours</th><th>Fichiers</th><th>Cohortes</th><th>Modifié le</th><th class="text-end">Actions</th></tr></thead>
+    <tbody>
+    {% for course in page_obj %}
+        <tr>
+            <td><a href="{% url 'course_admin_detail' course.pk %}" class="fw-semibold">{{ course.title }}</a>{% if course.title_en %} <span class="badge bg-light text-dark border">EN</span>{% endif %}</td>
+            <td>{{ course.n_files }}</td>
+            <td>{{ course.n_cohorts }}</td>
+            <td>{{ course.updated_at|date:"d/m/Y" }}</td>
+            <td class="text-end">
+                <div class="d-inline-flex gap-1">
+                    {% url 'course_admin_detail' course.pk as url %}{% include 'includes/icon_action.html' with url=url icon='fa-folder-open' title='Fiche et fichiers' variant='primary' %}
+                    {% url 'course_admin_update' course.pk as url %}{% include 'includes/icon_action.html' with url=url icon='fa-pen' title='Modifier' %}
+                </div>
+            </td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="5" class="text-center py-5 text-muted">Aucun cours. Créez un cours, ajoutez ses fichiers, puis rattachez-le à une cohorte.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

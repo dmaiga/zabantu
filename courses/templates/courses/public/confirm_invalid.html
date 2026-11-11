@@ -1,0 +1,15 @@
+{% extends 'base_public.html' %}
+{% load i18n %}
+{% block title %}{% translate "Lien invalide" %} - Zabantu{% endblock %}
+{% block banner_title %}{% translate "Lien invalide ou expiré" %}{% endblock %}
+{% block extra_css %}{% include 'courses/public/_styles.html' %}{% endblock %}
+
+{% block content %}
+<div class="tr-narrow">
+  <div class="tr-card text-center">
+    <p class="tr-lead">{% translate "Ce lien de confirmation n'est plus valable. Créez à nouveau votre compte, ou écrivez-nous si le problème persiste." %}</p>
+    <a class="btn-zb" href="{% url 'participant_signup' %}">{% translate "Créer un compte" %}</a>
+    <a class="btn-zb-outline ms-sm-2 mt-2 mt-sm-0" href="{% url 'contact' %}">{% translate "Nous écrire" %}</a>
+  </div>
+</div>
+{% endblock %}

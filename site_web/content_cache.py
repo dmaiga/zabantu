@@ -45,6 +45,8 @@ def _on_save(sender, raw=False, update_fields=None, **kwargs):
         return
     if update_fields and set(update_fields) <= {'last_login'}:  # simple connexion d'un membre
         return
+    if getattr(kwargs.get('instance'), 'role', None) == 'participant':  # compte des formations : jamais affiché
+        return
     bump()
 
 

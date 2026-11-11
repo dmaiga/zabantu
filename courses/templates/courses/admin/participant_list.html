@@ -1,0 +1,32 @@
+{% extends 'list_base.html' %}
+{% block title %}Participants{% endblock %}
+{% block list_title %}Formations{% endblock %}
+{% block list_noun %}participant(s){% endblock %}
+{% block list_filters %}
+{% include 'courses/admin/_tabs.html' with tab='participants' %}
+<p class="text-muted">Comptes créés sur le site pour suivre les formations (étudiants, chercheurs, professionnels…). Ils n'ont pas accès à l'espace de gestion et n'apparaissent pas parmi les membres.</p>
+<form method="get" class="d-flex gap-2 mb-3" style="max-width: 420px;">
+    <input type="search" name="q" value="{{ query }}" class="form-control" placeholder="Nom, e-mail, organisation">
+    <button class="btn btn-outline-primary" type="submit" aria-label="Rechercher"><i class="fas fa-search"></i></button>
+</form>
+{% endblock %}
+{% block list_table %}
+<table class="table align-middle mb-0">
+    <thead><tr><th>Nom</th><th>E-mail</th><th>Profil</th><th>Organisation</th><th>Compte</th><th>Inscriptions</th><th>Créé le</th></tr></thead>
+    <tbody>
+    {% for p in page_obj %}
+        <tr>
+            <td class="fw-semibold">{{ p.get_full_name }}</td>
+            <td><a href="mailto:{{ p.email }}">{{ p.email }}</a></td>
+            <td>{{ p.participant_profile.get_status_display|default:"—" }}</td>
+            <td>{{ p.participant_profile.organization|default:"—" }}</td>
+            <td>{% if p.is_active %}<span class="badge bg-success">Confirmé</span>{% else %}<span class="badge bg-secondary">Adresse non confirmée</span>{% endif %}</td>
+            <td>{{ p.n_enrollments }}</td>
+            <td>{{ p.date_joined|date:"d/m/Y" }}</td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="7" class="text-center py-5 text-muted">Aucun participant pour le moment.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

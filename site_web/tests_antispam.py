@@ -81,17 +81,17 @@ class LoginLockoutTests(AntiSpamBase):
 
     def fail(self, times):
         for _ in range(times):
-            r = self.client.post(self.url, {'username': 'adm', 'password': 'faux'}, follow=True)
+            r = self.client.post(self.url, {'identifier': 'adm', 'password': 'faux'}, follow=True)
         return r
 
     def test_fourth_failure_is_still_a_plain_error(self):
         r = self.fail(4)
-        self.assertContains(r, 'Identifiants invalides')
+        self.assertContains(r, 'Identifiant ou mot de passe incorrect')
 
     def test_fifth_failure_blocks_for_five_minutes_even_with_good_password(self):
         r = self.fail(5)
         self.assertContains(r, 'Réessayez dans 5 minutes')
-        r = self.client.post(self.url, {'username': 'adm', 'password': 'bon-mot-de-passe'}, follow=True)
+        r = self.client.post(self.url, {'identifier': 'adm', 'password': 'bon-mot-de-passe'}, follow=True)
         self.assertContains(r, 'Trop de tentatives')
         self.assertNotIn('_auth_user_id', self.client.session)
 
@@ -105,14 +105,14 @@ class LoginLockoutTests(AntiSpamBase):
 
     def test_success_resets_the_counters(self):
         self.fail(4)
-        self.client.post(self.url, {'username': 'adm', 'password': 'bon-mot-de-passe'})
+        self.client.post(self.url, {'identifier': 'adm', 'password': 'bon-mot-de-passe'})
         self.client.logout()
         r = self.fail(4)
-        self.assertContains(r, 'Identifiants invalides')
+        self.assertContains(r, 'Identifiant ou mot de passe incorrect')
 
     def test_lock_applies_to_the_identifier_only(self):
         self.fail(5)
         get_user_model().objects.create_user(
             username='autre', password='mdp-autre', email='autre@x.org', nom='C', prenom='D', role='admin')
-        r = self.client.post(self.url, {'username': 'autre', 'password': 'mdp-autre'})
+        r = self.client.post(self.url, {'identifier': 'autre', 'password': 'mdp-autre'})
         self.assertEqual(r.status_code, 302)

@@ -1,0 +1,24 @@
+{% extends 'courses/space/base.html' %}
+{% load i18n %}
+{% block title %}{% translate "Mes cours" %}{% endblock %}
+{% block page_title %}{% translate "Mes cours" %}{% endblock %}
+{% block content %}
+{% for enrollment in accepted %}
+<section class="sp-card">
+  <h2>{{ enrollment.cohort.t.name }}</h2>
+  {% for course in enrollment.cohort.courses.all %}
+  <div class="sp-row">
+    <div><h3 lang="{{ course.t.lang_title }}">{{ course.t.title }}</h3><small>{% blocktranslate count n=course.files.all|length %}{{ n }} fichier{% plural %}{{ n }} fichiers{% endblocktranslate %}</small></div>
+    <a class="btn-zb-outline" href="{% url 'participant_course' course.pk %}">{% translate "Ouvrir" %}</a>
+  </div>
+  {% empty %}
+  <p class="sp-empty">{% translate "Les cours de cette formation seront bientôt disponibles." %}</p>
+  {% endfor %}
+</section>
+{% empty %}
+<section class="sp-card">
+  <p class="sp-empty mb-3">{% translate "Vos cours apparaîtront ici dès que votre inscription à une formation sera acceptée." %}</p>
+  <a class="btn-zb" href="{% url 'participant_trainings' %}"><i class="fas fa-graduation-cap" aria-hidden="true"></i>{% translate "Voir les formations" %}</a>
+</section>
+{% endfor %}
+{% endblock %}

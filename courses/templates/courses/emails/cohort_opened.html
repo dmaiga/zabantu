@@ -1,0 +1,13 @@
+{% extends 'emails/base_email.html' %}{% load i18n %}
+{% block title %}{{ cohort }}{% endblock %}
+{% block heading %}{% translate "Nouvelle formation ouverte" %}{% endblock %}
+{% block body %}
+<p style="margin:0 0 16px;">{% blocktranslate %}Bonjour {{ name }},{% endblocktranslate %}</p>
+<h2 style="margin:0 0 12px; color:#2c3e2c;">{{ cohort }}</h2>
+{% if description %}<p style="margin:0 0 16px;">{{ description|linebreaksbr }}</p>{% endif %}
+{% if courses %}<p style="margin:0 0 8px;">{% translate "Cours proposés :" %}</p>
+<ul style="margin:0 0 16px; padding-left:20px;">{% for course in courses %}<li>{{ course }}</li>{% endfor %}</ul>{% endif %}
+<p style="margin:0 0 16px;">{% blocktranslate with date=closes_on|date:"j F Y" %}Inscriptions ouvertes jusqu'au {{ date }}.{% endblocktranslate %}</p>
+<p style="text-align:center; margin:24px 0;"><a href="{{ url }}" style="display:inline-block; background:#bf9264; color:#ffffff; text-decoration:none; padding:12px 28px; border-radius:30px; font-weight:bold;">{% translate "Voir la formation et s'inscrire" %}</a></p>
+<p style="margin:0; font-size:13px; color:#5b6559;">{% blocktranslate %}Vous recevez ce message parce que vous avez un compte participant. Pour ne plus être prévenu(e), décochez l'option dans <a href="{{ settings_url }}" style="color:#6f826a;">Mon espace</a>.{% endblocktranslate %}</p>
+{% endblock %}

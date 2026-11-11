@@ -239,6 +239,19 @@
 
                     {% if user.can_moderate %}
                     <hr class="sidebar-divider">
+                    <li class="sidebar-group">Formations</li>
+                    <li class="{% if '/courses/' in request.path and '/cohortes/' not in request.path and '/participants/' not in request.path %}active{% endif %}"><a href="{% url 'course_admin_list' %}"><i class="fas fa-book-open"></i> Cours</a></li>
+                    <li class="{% if '/courses/cohortes/' in request.path or '/courses/inscriptions/' in request.path %}active{% endif %}">
+                        <a href="{% url 'cohort_admin_list' %}" style="display:flex; align-items:center; justify-content:space-between; gap:.5rem;">
+                            <span><i class="fas fa-people-group"></i> Cohortes</span>
+                            {% if pending_enrollments_count %}<span class="badge bg-danger">{{ pending_enrollments_count }}</span>{% endif %}
+                        </a>
+                    </li>
+                    <li class="{% if '/courses/participants/' in request.path %}active{% endif %}"><a href="{% url 'participant_admin_list' %}"><i class="fas fa-user-graduate"></i> Participants</a></li>
+                    {% endif %}
+
+                    {% if user.can_moderate %}
+                    <hr class="sidebar-divider">
                     <li class="{% if 'contact-messages' in request.path or 'newsletter' in request.path %}active{% endif %}">
                         <a href="{% url 'contact_message_list' %}" style="display:flex; align-items:center; justify-content:space-between; gap:.5rem;">
                             <span><i class="fas fa-comments"></i> Communication</span>

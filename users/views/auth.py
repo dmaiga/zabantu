@@ -8,7 +8,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import DetailView, UpdateView
-from ..forms import CustomPasswordChangeForm, LoginForm, ProfileEditForm
+from ..forms import CustomPasswordChangeForm, ProfileEditForm
 from site_web import antispam
 from ..models import CustomUser
 
@@ -49,54 +49,9 @@ class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
         return super().form_valid(form)
 
 
-def _valid_credentials_without_access(username, password):
-    """Vrai si l'identifiant et le mot de passe sont corrects mais que le compte n'a pas l'accès."""
-    candidate = CustomUser.objects.filter(is_active=True).filter(
-        Q(username__iexact=username) | Q(email__iexact=username)).first()
-    return bool(candidate and candidate.check_password(password) and not candidate.can_access_backoffice)
-
-
-def login_view(request):
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        wait = antispam.login_wait_seconds(request.POST.get('username'))
-        if wait:
-            messages.error(request, antispam.login_block_message(wait))
-        elif form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(request, username=username, password=password)
-            
-            if user is not None:
-                antispam.login_succeeded(username)
-                login(request, user)
-                messages.success(request, f"Bienvenue {user.get_full_name()} !")
-                
-                # Redirection vers la page demandée (si elle appartient à ce site) ou dashboard
-                next_url = request.GET.get('next') or request.POST.get('next')
-                if next_url and url_has_allowed_host_and_scheme(
-                        next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
-                    return redirect(next_url)
-                return redirect('dashboard')
-            else:
-                blocked = antispam.login_failed(username)
-                if blocked:
-                    messages.error(request, antispam.login_block_message(blocked))
-                elif _valid_credentials_without_access(username, password):
-                    messages.error(request, "Votre compte n'a pas accès à l'espace de gestion.")
-                else:
-                    messages.error(request, "Identifiants invalides")
-        else:
-            messages.error(request, "Veuillez corriger les erreurs ci-dessous")
-    else:
-        form = LoginForm()
-    
-    return render(request, 'users/login.html', {'form': form})
-
-
 @login_required
 def logout_view(request):
     from django.contrib.auth import logout
     logout(request)
     messages.success(request, "Vous avez été déconnecté avec succès.")
-    return redirect('login')
+    return redirect('home')

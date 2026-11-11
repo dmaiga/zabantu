@@ -1,0 +1,24 @@
+{% extends 'courses/space/base.html' %}
+{% load i18n %}
+{% block title %}{% translate "Mon profil" %}{% endblock %}
+{% block page_title %}{% translate "Mon profil" %}{% endblock %}
+{% block content %}
+<section class="sp-card" style="max-width: 720px;">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="row g-0 gap-sm-3 flex-sm-nowrap">
+      <div class="col-sm">{% include 'courses/public/_field.html' with field=form.prenom %}</div>
+      <div class="col-sm">{% include 'courses/public/_field.html' with field=form.nom %}</div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">{% translate "Adresse e-mail" %}</label>
+      <input type="email" class="form-control" value="{{ user.email }}" disabled>
+      <div class="field-help">{% translate "Pour changer d'adresse, écrivez-nous depuis le formulaire de contact." %}</div>
+    </div>
+    {% include 'courses/public/_field.html' with field=form.status %}
+    {% include 'courses/public/_field.html' with field=form.organization %}
+    {% include 'courses/public/_field.html' with field=form.notify_cohorts %}
+    <button type="submit" class="btn-zb">{% translate "Enregistrer" %}</button>
+  </form>
+</section>
+{% endblock %}

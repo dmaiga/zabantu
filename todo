@@ -66,31 +66,40 @@ Mesure d'abord (base locale, temps serveur médian, visiteur anonyme) :
 - Les nouvelles pages (app cours) sont à écrire directement traduisibles.
 
 ────────────────────────────────────────
-5. APP COURS ET COHORTES  (6 à 9 j)
+5. APP FORMATIONS : COURS ET COHORTES  (6 à 9 j) — FAIT le 2026-11-11
 ────────────────────────────────────────
-Nouvelle app, distincte des ressources déjà publiées sur le site.
+Nouvelle app (courses), distincte des ressources déjà publiées sur le site.
 
-Compte étudiant
-- Inscription simple sur le site (lien depuis la page de connexion) : nom, e-mail, mot de passe, confirmation par e-mail.
-- Un compte étudiant donne accès gratuitement aux ressources déjà publiées.
+Persona : « participant(e) », pas seulement des étudiants. Le public varie : étudiant(e)s, doctorant(e)s,
+enseignant(e)s-chercheur(e)s, chercheur(e)s, professionnel(le)s… Le profil est demandé à l'inscription (mêmes choix
+que le formulaire d'adhésion) avec l'organisation, facultative.
+
+Compte participant
+- Inscription sur le site (/zabantu/compte/inscription/, lien depuis les pages de connexion) : prénom, nom, e-mail,
+  profil, organisation (facultatif), mot de passe ; compte actif après confirmation par e-mail.
+- Connexion publique par e-mail (bilingue), mot de passe oublié ; l'équipe garde sa page /auth/.
+- Rôle « participant » : jamais dans les membres du site, ni parmi les auteurs ; aucun accès au backoffice
+  (garde-fou global sur toutes les adresses du backoffice).
+- Un compte participant donne accès gratuitement aux ressources déjà publiées (elles restent publiques).
 
 Cours (backoffice)
-- Les modérateurs créent des cours : titre, résumé, fichiers (surtout des PDF).
+- Les modérateurs créent des cours : titre, résumé, fichiers (PDF surtout, aussi Word, PowerPoint, Excel, ZIP).
 - Fichiers téléchargeables pour l'instant (restriction éventuelle à décider plus tard).
-- Fichiers servis par une vue qui vérifie l'accès (pas dans media/, qui est public).
+- Fichiers servis par une vue qui vérifie l'accès, rangés hors de media/ (dossier privé PRIVATE_MEDIA_ROOT, sauvegardé).
 
 Cohortes
-- Les modérateurs créent une cohorte : nom, dates d'ouverture et de fermeture des inscriptions, cours rattachés.
-- Quand une cohorte est ouverte, un étudiant connecté s'y inscrit avec un petit formulaire (motivation, etc.).
+- Les modérateurs créent une cohorte : nom, présentation, dates d'ouverture et de fermeture des inscriptions, cours.
+- Quand une cohorte est ouverte, un participant connecté s'y inscrit avec un petit formulaire (motivation, attentes).
 - Les modérateurs acceptent, refusent ou révoquent (un par un ou en lot).
-- Un étudiant accepté voit les cours de sa cohorte dans « Mes cours ».
+- Un participant accepté voit les cours de sa cohorte dans « Mon espace ».
 - Statuts d'une inscription : en attente, acceptée, refusée, révoquée.
 
 Annonce des cohortes ouvertes
 - Page publique « Formations » : cohortes ouvertes, cours proposés, bouton « S'inscrire ».
 - Bandeau sur l'accueil et lien dans la navbar tant qu'une cohorte est ouverte.
-- E-mail aux comptes étudiants à l'ouverture d'une cohorte (file d'envoi déjà utilisée pour les publications).
-- E-mail à l'étudiant à chaque décision (acceptée, refusée, révoquée).
+- E-mail aux comptes participants à l'ouverture d'une cohorte (envoi par lots, comme les annonces de publication ;
+  désactivable depuis « Mon espace »).
+- E-mail au participant à chaque décision (acceptée, refusée, révoquée), dans sa langue.
 
 À décider plus tard
 - Restreindre ou non le téléchargement des fichiers de cours.

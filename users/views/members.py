@@ -28,7 +28,8 @@ def create_user_view(request):
 @moderator_required
 def user_list_view(request):
     form = MemberFilterForm(request.GET)
-    members = form.apply(CustomUser.objects.exclude(role='admin').order_by('nom', 'prenom'))
+    # Participants des formations exclus : ils ont leur propre liste (Formations > Participants)
+    members = form.apply(CustomUser.objects.filter(role__in=('moderateur', 'membre')).order_by('nom', 'prenom'))
     page_obj, querystring = paginate(request, members)
     return render(request, 'users/user_list.html', {
         'form': form,

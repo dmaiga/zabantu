@@ -80,6 +80,20 @@
     .gk-guests { font-size: .85rem; color: #5b6559; margin: 0; }
     .gk-band .btn-gk { background: transparent; border: 1px solid var(--zabantu-secondary); color: #7a5427; font-weight: 600; border-radius: 30px; }
     .gk-band .btn-gk:hover { background: var(--zabantu-secondary); border-color: var(--zabantu-secondary); color: #fff; }
+    /* Formations : porte d'entrée, toujours visible ; le contenu suit les cohortes ouvertes */
+    .home-training { background: #fff; border-top: 1px solid #e6e9e0; border-bottom: 1px solid #e6e9e0; }
+    .training-eyebrow { display: inline-flex; align-items: center; gap: .45rem; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; font-weight: 600; color: var(--zabantu-secondary); margin-bottom: .6rem; }
+    .training-steps { list-style: none; padding: 0; margin: 1.5rem 0 0; display: grid; gap: .85rem; }
+    .training-steps li { display: flex; gap: .85rem; align-items: flex-start; }
+    .training-steps .n { flex: 0 0 34px; height: 34px; border-radius: 50%; background: var(--zabantu-dark); color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .training-steps strong { display: block; color: var(--zabantu-dark); }
+    .training-steps span.t { color: #5b6559; font-size: .93rem; }
+    .training-card { background: #f6f7f1; border: 1px solid #e3e7dc; border-top: 4px solid var(--zabantu-secondary); border-radius: 12px; padding: 1.5rem; }
+    .training-card h3 { font-size: 1.1rem; font-weight: 700; color: var(--zabantu-dark); margin-bottom: 1rem; }
+    .training-open { list-style: none; padding: 0; margin: 0 0 1.25rem; display: grid; gap: .6rem; }
+    .training-open a { display: block; background: #fff; border: 1px solid #e3e7dc; border-radius: 8px; padding: .75rem 1rem; text-decoration: none; color: var(--zabantu-dark); font-weight: 600; }
+    .training-open a:hover { border-color: var(--zabantu-primary); }
+    .training-open small { display: block; font-weight: 400; color: #6c757d; }
     /* 5. Adhésion */
     .join-band { background: linear-gradient(135deg, var(--zabantu-primary), var(--zabantu-dark)); color: #fff; padding: 3.5rem 0; }
     .join-band h2 { font-weight: 700; font-size: 1.9rem; text-wrap: balance; }
@@ -286,6 +300,45 @@
 
 {% endcache %}
 
+<!-- Formations : porte d'entrée (hors cache : dépend des dates d'inscription) -->
+<section id="formations" class="home-section home-training">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-7">
+                <span class="training-eyebrow"><i class="fas fa-graduation-cap" aria-hidden="true"></i>{% translate "Formations" %}</span>
+                <h2 class="home-title">{% translate "Se former avec Zabantu" %}</h2>
+                <p class="home-lead mb-0">{% translate "Des formations animées par les chercheurs du groupe, ouvertes aux étudiants, aux chercheurs et aux professionnels." %}</p>
+                <ol class="training-steps">
+                    <li><span class="n">1</span><div><strong>{% translate "Créez votre compte" %}</strong><span class="t">{% translate "Gratuit, en quelques secondes." %}</span></div></li>
+                    <li><span class="n">2</span><div><strong>{% translate "Inscrivez-vous à une formation" %}</strong><span class="t">{% translate "Pendant ses dates d'inscription ; l'équipe vous répond par e-mail." %}</span></div></li>
+                    <li><span class="n">3</span><div><strong>{% translate "Suivez vos cours" %}</strong><span class="t">{% translate "Documents et supports dans « Mon espace »." %}</span></div></li>
+                </ol>
+            </div>
+            <div class="col-lg-5">
+                <div class="training-card">
+                    {% if open_cohorts %}
+                    <h3>{% translate "Inscriptions ouvertes" %}</h3>
+                    <ul class="training-open">
+                        {% for cohort in open_cohorts|slice:":3" %}
+                        <li><a href="{% url 'training_list' %}">{{ cohort.t.name }}<small>{% blocktranslate with date=cohort.closes_on|date:"j F Y" %}Inscriptions jusqu'au {{ date }}{% endblocktranslate %}</small></a></li>
+                        {% endfor %}
+                    </ul>
+                    <a class="btn btn-primary btn-lg w-100" href="{% url 'training_list' %}">{% translate "Voir les formations et s'inscrire" %}</a>
+                    {% else %}
+                    <h3>{% translate "Prochaines formations" %}</h3>
+                    <p class="mb-3">{% translate "Aucune formation n'est ouverte en ce moment. Créez votre compte : vous serez prévenu(e) par e-mail dès l'ouverture des inscriptions." %}</p>
+                    {% if user_has_space %}
+                    <a class="btn btn-primary btn-lg w-100" href="{% url 'participant_space' %}">{% translate "Mon espace" %}</a>
+                    {% else %}
+                    <a class="btn btn-primary btn-lg w-100" href="{% url 'participant_signup' %}">{% translate "Créer un compte gratuit" %}</a>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- 7. Équipe : carrousel de tous les membres, dans un ordre aléatoire -->
 {% if team_members %}
 <section class="home-section alt">
@@ -315,7 +368,7 @@
 {% endcache %}
 
 <!-- 9. Newsletter -->
-<section class="home-section alt">
+<section id="newsletter" class="home-section alt">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">

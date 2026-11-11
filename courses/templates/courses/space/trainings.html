@@ -1,0 +1,34 @@
+{% extends 'courses/space/base.html' %}
+{% load i18n %}
+{% block title %}{% translate "Mes formations" %}{% endblock %}
+{% block page_title %}{% translate "Mes formations" %}{% endblock %}
+{% block content %}
+<section class="sp-card" aria-labelledby="open-trainings">
+  <h2 id="open-trainings">{% translate "Formations ouvertes" %}</h2>
+  {% for cohort in open_cohorts %}
+  <div class="sp-row">
+    <div>
+      <h3 lang="{{ cohort.t.lang_name }}">{{ cohort.t.name }}</h3>
+      <small>{% blocktranslate with date=cohort.closes_on|date:"j F Y" %}Inscriptions jusqu'au {{ date }}{% endblocktranslate %}{% if cohort.courses.all %} · {% for course in cohort.courses.all %}{{ course.t.title }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}</small>
+    </div>
+    {% if cohort.my_status %}<span class="tr-status {{ cohort.my_status }}">{% if cohort.my_status == 'pending' %}{% translate "Demande en attente" %}{% elif cohort.my_status == 'accepted' %}{% translate "Inscription acceptée" %}{% else %}{% translate "Inscription non retenue" %}{% endif %}</span>
+    {% else %}<a class="btn-zb" href="{% url 'training_enroll' cohort.pk %}">{% translate "S'inscrire" %}</a>{% endif %}
+  </div>
+  {% if cohort.description %}<p class="small text-muted mb-0" lang="{{ cohort.t.lang_description }}">{{ cohort.t.description|truncatewords:40 }}</p>{% endif %}
+  {% empty %}
+  <p class="sp-empty">{% translate "Aucune formation ouverte pour le moment. Vous serez prévenu(e) par e-mail à la prochaine ouverture." %}</p>
+  {% endfor %}
+</section>
+
+<section class="sp-card" aria-labelledby="my-enrollments">
+  <h2 id="my-enrollments">{% translate "Mes inscriptions" %}</h2>
+  {% for enrollment in enrollments %}
+  <div class="sp-row">
+    <div><h3>{{ enrollment.cohort.t.name }}</h3><small>{% blocktranslate with date=enrollment.created_at|date:"j F Y" %}Demande du {{ date }}{% endblocktranslate %}</small></div>
+    <span class="tr-status {{ enrollment.status }}">{{ enrollment.get_status_display }}</span>
+  </div>
+  {% empty %}
+  <p class="sp-empty">{% translate "Vous n'êtes inscrit(e) à aucune formation pour le moment." %}</p>
+  {% endfor %}
+</section>
+{% endblock %}

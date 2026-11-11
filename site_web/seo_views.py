@@ -16,7 +16,7 @@ from . import seo
 
 # Zones privées (connexion obligatoire). Aucune page publique ni /media/ n'y figure.
 PRIVATE_PATHS = ('/admin/', '/auth/', '/users/', '/articles/', '/events/', '/gallery/', '/intervenants/',
-                 '/tinymce/', '/password-reset')
+                 '/courses/', '/tinymce/', '/password-reset', '/zabantu/compte/', '/en/zabantu/compte/')
 
 
 STATIC_ENTRIES = ('home', 'public_article_list', 'public_event_list', 'public_member_list', 'liste_galeries', 'about')

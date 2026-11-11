@@ -1,0 +1,33 @@
+{% extends 'base_public.html' %}
+{% load i18n antispam_tags %}
+{% block title %}{% translate "Créer un compte" %} - Zabantu{% endblock %}
+{% block banner_title %}{% translate "Créer un compte participant" %}{% endblock %}
+{% block banner_subtitle %}{% translate "Gratuit, pour s'inscrire aux formations de Zabantu" %}{% endblock %}
+{% block extra_css %}{% include 'courses/public/_styles.html' %}{% endblock %}
+
+{% block content %}
+<div class="tr-narrow">
+  {% for message in messages %}<div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">{{ message }}</div>{% endfor %}
+  <div class="tr-card">
+    <p class="tr-lead">{% translate "Étudiant(e), chercheur(e), professionnel(le)… : votre compte vous permet de vous inscrire aux formations et de retrouver vos cours dans « Mon espace »." %}</p>
+    <form method="post" novalidate>
+      {% csrf_token %}{% antispam_fields %}
+      <input type="hidden" name="next" value="{{ next }}">
+      {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+      <div class="row g-0 gap-sm-3 flex-sm-nowrap">
+        <div class="col-sm">{% include 'courses/public/_field.html' with field=form.prenom %}</div>
+        <div class="col-sm">{% include 'courses/public/_field.html' with field=form.nom %}</div>
+      </div>
+      {% include 'courses/public/_field.html' with field=form.email %}
+      {% include 'courses/public/_field.html' with field=form.status %}
+      {% include 'courses/public/_field.html' with field=form.organization %}
+      {% include 'courses/public/_field.html' with field=form.password1 %}
+      {% include 'courses/public/_field.html' with field=form.password2 %}
+      {% include 'courses/public/_field.html' with field=form.consent %}
+      <p class="field-help">{% url 'privacy' as privacy_url %}{% blocktranslate trimmed %}Un e-mail de confirmation vous sera envoyé. <a href="{{ privacy_url }}">Politique de confidentialité</a>{% endblocktranslate %}</p>
+      <button type="submit" class="btn-zb">{% translate "Créer mon compte" %}</button>
+    </form>
+  </div>
+  <p class="tr-alt">{% translate "Vous avez déjà un compte ?" %} <a href="{% url 'login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">{% translate "Se connecter" %}</a></p>
+</div>
+{% endblock %}

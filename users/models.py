@@ -13,7 +13,10 @@ class CustomUser(TranslatableMixin, AbstractUser):
         ('admin', _('Administrateur')),
         ('moderateur', _('Modérateur')),
         ('membre', _('Membre')),
+        # Compte public des formations (étudiant, chercheur, professionnel…) : ni membre du site ni accès au backoffice
+        ('participant', _('Participant(e)')),
     ]
+    TEAM_ROLES = ('admin', 'moderateur', 'membre')
     
     
     # Identité

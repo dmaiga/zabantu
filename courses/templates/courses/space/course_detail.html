@@ -1,0 +1,34 @@
+{% extends 'courses/space/base.html' %}
+{% load i18n %}
+{% block title %}{{ course.t.title }}{% endblock %}
+{% block page_title %}{{ course.t.title }}{% endblock %}
+{% block extra_css %}
+<style>
+  .course-files { list-style: none; padding: 0; margin: 0; }
+  .course-files li { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .85rem 0; border-top: 1px solid #eef0e8; }
+  .course-files li:first-child { border-top: 0; padding-top: 0; }
+  .course-files .name { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+  .course-files .name i { font-size: 1.4rem; color: var(--zb-primary); flex-shrink: 0; }
+  .course-files .name span { overflow-wrap: anywhere; }
+</style>
+{% endblock %}
+{% block content %}
+{% if preview %}<div class="alert alert-info">{% translate "Aperçu de l'équipe : voici ce que voient les participants acceptés." %}</div>{% endif %}
+<p><a href="{% url 'participant_courses' %}"><i class="fas fa-arrow-left me-1" aria-hidden="true"></i>{% translate "Mes cours" %}</a></p>
+{% if course.summary %}
+<section class="sp-card"><h2>{% translate "Présentation" %}</h2><div lang="{{ course.t.lang_summary }}">{{ course.t.summary|linebreaks }}</div></section>
+{% endif %}
+<section class="sp-card" aria-labelledby="course-files">
+  <h2 id="course-files">{% translate "Documents du cours" %}</h2>
+  <ul class="course-files">
+    {% for item in course.files.all %}
+    <li>
+      <div class="name"><i class="far {% if item.extension == 'pdf' %}fa-file-pdf{% elif item.extension in 'doc docx odt' %}fa-file-word{% elif item.extension in 'ppt pptx odp' %}fa-file-powerpoint{% elif item.extension in 'xls xlsx ods csv' %}fa-file-excel{% elif item.extension == 'zip' %}fa-file-zipper{% else %}fa-file-lines{% endif %}" aria-hidden="true"></i><span>{{ item.display_name }}</span></div>
+      <a class="btn-zb-outline" href="{% url 'participant_course_file' item.pk %}"><i class="fas fa-download" aria-hidden="true"></i>{% translate "Télécharger" %}</a>
+    </li>
+    {% empty %}
+    <li class="sp-empty">{% translate "Aucun document pour le moment." %}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

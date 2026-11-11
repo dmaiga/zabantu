@@ -52,9 +52,10 @@ Déployée en production ; les sauvegardes ont été testées à la main avec su
 
 Aucune nouvelle variable obligatoire. `SEO_START_DATE` est facultative (1er janvier 2025 par défaut) : elle conserve le garde-fou historique tout en couvrant les données de production vérifiées.
 
-## 2 bis. Mise à jour suivante : lots 1 à 4 (don, photos, cache, site bilingue)
+## 2 bis. Mise à jour suivante : lots 1 à 5 (don, photos, cache, site bilingue, formations)
 
-Rien à faire de plus que la mise à jour de routine (section 1) : aucune variable `.env` nouvelle, aucune commande en plus.
+Rien à faire de plus que la mise à jour de routine (section 1) : aucune variable `.env` obligatoire, aucune commande en plus.
+Le cron `publish_scheduled` (3.1) envoie aussi les annonces d'ouverture des formations.
 
 | Changement | À savoir |
 |------------|----------|
@@ -62,6 +63,9 @@ Rien à faire de plus que la mise à jour de routine (section 1) : aucune variab
 | Site anglais sous `/en/` (`/en/zabantu/…`) | Les adresses françaises ne changent pas. Le backoffice reste en français. |
 | Traductions compilées `locale/en/LC_MESSAGES/django.mo` | Versionnées : pas de `compilemessages` sur le serveur (`msgfmt` absent). |
 | Contenus existants | Pas de traduction rétroactive : sur les pages anglaises, ils s'affichent en français. |
+| Migrations `courses.0001` (nouvelle app des formations) et `users.0006` (rôle « participant » ajouté aux choix, aucune colonne) | Nouvelles tables seulement. |
+| Fichiers des cours | Rangés hors de `media/`, dans `private_media/` à la racine du dépôt (variable facultative `PRIVATE_MEDIA_ROOT` pour un autre dossier, **hors de public_html**). Jamais servis directement : une vue vérifie l'accès. `scripts/backup_media.sh` les sauvegarde dans une seconde archive (`zabantu_private_media_*.tar.gz`). |
+| Comptes participants | Créés sur le site (`/zabantu/compte/inscription/`), confirmés par e-mail. Aucun accès au backoffice (toutes ses adresses les renvoient vers « Mon espace »). |
 
 ## 3. Tâches planifiées (cPanel > Tâches Cron)
 
@@ -127,6 +131,7 @@ Sur le site réel :
 - [ ] Ajout d'une photo : une image valide passe, un faux fichier (`.png` qui n'en est pas un) est refusé.
 - [ ] Pages légales (`/zabantu/mentions-legales/`, `/confidentialite/`, `/cookies/`) et lien « Gérer mes cookies » du pied de page.
 - [ ] Site anglais : `https://zabantu.net/en/zabantu/` s'affiche en anglais ; le bouton « EN » / « FR » de l'en-tête mène à la même page dans l'autre langue ; le backoffice reste en français.
+- [ ] Formations : créer un compte participant de test (e-mail de confirmation reçu), une cohorte ouverte avec un cours et un PDF ; s'inscrire, accepter dans le backoffice (e-mail reçu), télécharger le PDF depuis « Mon espace ». Avec le compte participant, `https://zabantu.net/users/dashboard/` doit renvoyer vers « Mon espace ». **Supprimer ensuite les données de test.**
 - [ ] `https://zabantu.net/robots.txt` et `https://zabantu.net/sitemap.xml` s'affichent. Le sitemap liste les pages publiques principales et les contenus publiés admis par `SEO_START_DATE`.
 - [ ] Aperçu d'un lien d'article, d'événement et de Gɛlɛkan sur WhatsApp, Facebook et LinkedIn (un réseau peut garder un ancien aperçu en cache).
 - [ ] Google Search Console : site déclaré, sitemap envoyé (une seule fois).

@@ -1,0 +1,50 @@
+{% extends 'base_public.html' %}
+{% load i18n %}
+{% block title %}{% translate "Formations" %} - Zabantu{% endblock %}
+{% block banner_title %}{% translate "Formations" %}{% endblock %}
+{% block banner_subtitle %}{% translate "Des parcours ouverts aux étudiants, chercheurs et professionnels" %}{% endblock %}
+{% block extra_css %}{% include 'courses/public/_styles.html' %}{% endblock %}
+
+{% block content %}
+<div class="tr-wrap">
+  {% for message in messages %}<div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">{{ message }}</div>{% endfor %}
+
+  {% for cohort in cohorts %}
+  <article class="tr-card">
+    <h2 lang="{{ cohort.t.lang_name }}">{{ cohort.t.name }}</h2>
+    <div class="tr-meta">
+      <span><i class="far fa-calendar-check" aria-hidden="true"></i>{% blocktranslate with date=cohort.closes_on|date:"j F Y" %}Inscriptions jusqu'au {{ date }}{% endblocktranslate %}</span>
+      {% with n=cohort.courses.all|length %}{% if n %}<span><i class="fas fa-book-open" aria-hidden="true"></i>{% blocktranslate count n=n %}{{ n }} cours{% plural %}{{ n }} cours{% endblocktranslate %}</span>{% endif %}{% endwith %}
+    </div>
+    {% if cohort.description %}<p lang="{{ cohort.t.lang_description }}">{{ cohort.t.description|linebreaksbr }}</p>{% endif %}
+    {% if cohort.courses.all %}
+    <h3 class="h6 text-uppercase text-muted mt-3 mb-0">{% translate "Cours proposés" %}</h3>
+    <ul class="tr-courses">
+      {% for course in cohort.courses.all %}
+      <li><i class="fas fa-circle-check" aria-hidden="true"></i><div><strong lang="{{ course.t.lang_title }}">{{ course.t.title }}</strong>{% if course.summary %}<br><span class="text-muted small" lang="{{ course.t.lang_summary }}">{{ course.t.summary|truncatewords:30 }}</span>{% endif %}</div></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    <div class="mt-4">
+      {% if cohort.my_status %}
+      <span class="tr-status {{ cohort.my_status }}">{% if cohort.my_status == 'pending' %}{% translate "Demande en attente" %}{% elif cohort.my_status == 'accepted' %}{% translate "Inscription acceptée" %}{% else %}{% translate "Inscription non retenue" %}{% endif %}</span>
+      <a class="btn-zb-outline ms-2" href="{% url 'participant_space' %}">{% translate "Mon espace" %}</a>
+      {% else %}
+      <a class="btn-zb" href="{% url 'training_enroll' cohort.pk %}"><i class="fas fa-pen-to-square" aria-hidden="true"></i>{% translate "S'inscrire" %}</a>
+      {% endif %}
+    </div>
+  </article>
+  {% empty %}
+  <div class="tr-card tr-empty">
+    <i class="fas fa-graduation-cap" aria-hidden="true"></i>
+    <h2>{% translate "Aucune formation ouverte pour le moment" %}</h2>
+    <p class="mb-3">{% translate "Créez un compte gratuit : vous serez prévenu(e) par e-mail à l'ouverture des prochaines formations." %}</p>
+    {% if not user.is_authenticated %}<a class="btn-zb" href="{% url 'participant_signup' %}">{% translate "Créer un compte" %}</a>{% endif %}
+  </div>
+  {% endfor %}
+
+  {% if cohorts and not user.is_authenticated %}
+  <p class="tr-alt">{% translate "L'inscription demande un compte participant, gratuit." %} <a href="{% url 'participant_signup' %}">{% translate "Créer un compte" %}</a> · <a href="{% url 'login' %}">{% translate "Se connecter" %}</a></p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -26,7 +26,8 @@ env = environ.Env(
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 AUTH_USER_MODEL = 'users.CustomUser'
-AUTHENTICATION_BACKENDS = ['users.backends.BackofficeBackend']
+# Équipe (backoffice), puis participants des formations (espace public « Mon espace »)
+AUTHENTICATION_BACKENDS = ['users.backends.BackofficeBackend', 'courses.backends.ParticipantBackend']
 
 
 LOGIN_URL = 'login'
@@ -79,7 +80,7 @@ INSTALLED_APPS = [
     'events',
     'gallery',
     'intervenants',
- 
+    'courses',
 ]
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
@@ -93,6 +94,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'courses.middleware.BackofficeGuardMiddleware',  # backoffice fermé aux comptes participants (après les messages)
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -200,6 +202,9 @@ def _files_root(name, dev_default):
 STATIC_ROOT = _files_root('STATIC_ROOT', 'staticfiles')
 MEDIA_URL = env('MEDIA_URL', default='/media/')
 MEDIA_ROOT = _files_root('MEDIA_ROOT', 'media')
+# Fichiers des cours (formations) : hors de MEDIA_ROOT, jamais servis directement ; une vue vérifie l'accès.
+# Défaut : private_media/ à la racine du dépôt (hors du dossier public du serveur web). Sauvegardé par backup_media.sh.
+PRIVATE_MEDIA_ROOT = str(BASE_DIR / env('PRIVATE_MEDIA_ROOT', default='private_media'))
 
 
 # Default primary key field type

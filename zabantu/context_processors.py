@@ -12,6 +12,10 @@ def global_settings(request):
             status=MembershipApplication.Status.PENDING).count()
         from site_web.models import ContactMessage
         unread = ContactMessage.objects.filter(is_read=False).count()
+        from courses.models import Enrollment
+        pending_enrollments = Enrollment.objects.filter(status=Enrollment.Status.PENDING).count()
+    else:
+        pending_enrollments = 0
     from django.utils.functional import SimpleLazyObject
     from site_web.content_cache import content_version
     return {
@@ -19,6 +23,9 @@ def global_settings(request):
         'content_version': SimpleLazyObject(content_version),  # lu seulement par les gabarits qui en ont besoin
         'PAGE_CACHE_TIMEOUT': settings.PAGE_CACHE_TIMEOUT,
         'pending_applications_count': pending,
+        'pending_enrollments_count': pending_enrollments,
+        'open_cohorts': SimpleLazyObject(_open_cohorts),   # menu « Formations » et section de l'accueil
+        'user_has_space': SimpleLazyObject(lambda: _has_space(user)),   # « Mon espace » dans le menu du site
         'unread_messages_count': unread,
         'DEFAULT_FROM_EMAIL': settings.DEFAULT_FROM_EMAIL,
         'DEFAULT_FROM_EMAIL_NEWS': settings.DEFAULT_FROM_EMAIL_NEWS,
@@ -30,6 +37,17 @@ def global_settings(request):
 
 
 ALTERNATE_PARAMS = ('type', 'page', 'gallery', 'tag')
+
+
+def _has_space(user):
+    from courses.backends import has_space
+    return has_space(user)
+
+
+def _open_cohorts():
+    """Cohortes aux inscriptions ouvertes (liste, lue seulement par les gabarits publics)."""
+    from courses.models import Cohort
+    return list(Cohort.objects.open().order_by('closes_on'))
 
 
 def language_links(request):

@@ -1,0 +1,6 @@
+{# Onglets du backoffice des formations #}
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link {% if tab == 'courses' %}active{% endif %}" href="{% url 'course_admin_list' %}"><i class="fas fa-book-open me-1"></i> Cours</a></li>
+    <li class="nav-item"><a class="nav-link {% if tab == 'cohorts' %}active{% endif %}" href="{% url 'cohort_admin_list' %}"><i class="fas fa-people-group me-1"></i> Cohortes{% if pending_enrollments_count %} <span class="badge bg-danger">{{ pending_enrollments_count }}</span>{% endif %}</a></li>
+    <li class="nav-item"><a class="nav-link {% if tab == 'participants' %}active{% endif %}" href="{% url 'participant_admin_list' %}"><i class="fas fa-user-graduate me-1"></i> Participants</a></li>
+</ul>

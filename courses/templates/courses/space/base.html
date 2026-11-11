@@ -1,0 +1,135 @@
+{% load static i18n %}{% get_current_language as LANG %}<!DOCTYPE html>
+<html lang="{{ LANG }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>{% block title %}{% translate "Mon espace" %}{% endblock %} · Zabantu</title>
+  <link rel="icon" type="image/png" href="{% static 'site_web/images/zabantu_logo.jpg' %}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
+  {% comment %}
+    Espace participant : zone à part du site (barre latérale, comme le backoffice), sans l'en-tête ni le pied de page
+    publics. Blocs : title, page_title, page_actions, content.
+  {% endcomment %}
+  <style>
+    :root { --zb-primary: #6f826a; --zb-secondary: #bf9264; --zb-accent: #bbd8a3; --zb-dark: #2c3e2c; --zb-side: 260px; }
+    body { margin: 0; background: #f4f5f0; color: #2f3a30; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+    .sp-side { position: fixed; inset: 0 auto 0 0; width: var(--zb-side); background: var(--zb-dark); color: #d6dfd0; display: flex; flex-direction: column; z-index: 1040; transition: transform .25s ease; }
+    .sp-brand { display: flex; align-items: center; gap: .75rem; padding: 1.1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,.08); text-decoration: none; color: #fff; }
+    .sp-brand img { height: 44px; }
+    .sp-brand span { font-weight: 700; font-size: .95rem; line-height: 1.2; }
+    .sp-brand small { display: block; font-weight: 400; color: var(--zb-accent); font-size: .78rem; }
+    .sp-user { padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .sp-user strong { display: block; color: #fff; overflow-wrap: anywhere; }
+    .sp-user span { font-size: .82rem; color: var(--zb-accent); }
+    .sp-nav { list-style: none; margin: 0; padding: .75rem .75rem; flex: 1; overflow-y: auto; }
+    .sp-nav .group { padding: .9rem .6rem .35rem; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: #8fa18a; }
+    .sp-nav a { display: flex; align-items: center; gap: .75rem; min-height: 44px; padding: .55rem .75rem; border-radius: 8px; color: #d6dfd0; text-decoration: none; font-size: .95rem; }
+    .sp-nav a i { width: 1.2rem; text-align: center; color: var(--zb-accent); }
+    .sp-nav a:hover, .sp-nav a:focus-visible { background: rgba(255,255,255,.08); color: #fff; }
+    .sp-nav a.active { background: rgba(255,255,255,.14); color: #fff; font-weight: 600; box-shadow: inset 3px 0 0 var(--zb-secondary); }
+    .sp-nav .badge { margin-left: auto; background: var(--zb-secondary); color: #2c1c0c; }
+    .sp-foot { padding: .75rem; border-top: 1px solid rgba(255,255,255,.08); display: grid; gap: .35rem; }
+    .sp-foot a, .sp-foot button { display: flex; align-items: center; gap: .75rem; min-height: 42px; padding: .5rem .75rem; border-radius: 8px; color: #d6dfd0; text-decoration: none; background: none; border: 0; width: 100%; font-size: .92rem; text-align: left; }
+    .sp-foot a:hover, .sp-foot button:hover { background: rgba(255,255,255,.08); color: #fff; }
+    .sp-main { margin-left: var(--zb-side); min-height: 100vh; display: flex; flex-direction: column; }
+    .sp-top { position: sticky; top: 0; z-index: 1030; display: flex; align-items: center; gap: .75rem; padding: .75rem 1.5rem; background: #fff; border-bottom: 1px solid #e3e7dc; }
+    .sp-top h1 { font-size: 1.2rem; font-weight: 700; color: var(--zb-dark); margin: 0; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sp-toggle { display: none; width: 44px; height: 44px; border: 1px solid #d5dacb; border-radius: 8px; background: #fff; color: var(--zb-dark); }
+    .sp-lang { min-width: 44px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #d5dacb; border-radius: 6px; color: var(--zb-dark); font-weight: 700; font-size: .82rem; text-decoration: none; padding: 0 .6rem; }
+    .sp-lang:hover { background: #f3f5ef; }
+    .sp-content { padding: 1.75rem 1.5rem 3rem; max-width: 1100px; width: 100%; }
+    .sp-card { background: #fff; border: 1px solid #e3e7dc; border-radius: 12px; padding: 1.4rem; box-shadow: 0 2px 10px rgba(0,0,0,.04); }
+    .sp-card + .sp-card { margin-top: 1.25rem; }
+    .sp-card > h2 { font-size: 1.05rem; font-weight: 700; color: var(--zb-dark); margin-bottom: 1rem; }
+    .sp-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-bottom: 1.25rem; }
+    .sp-stat { background: #fff; border: 1px solid #e3e7dc; border-radius: 12px; padding: 1.1rem 1.2rem; text-decoration: none; color: inherit; display: block; }
+    a.sp-stat:hover { border-color: var(--zb-primary); }
+    .sp-stat strong { display: block; font-size: 1.9rem; line-height: 1.1; color: var(--zb-dark); }
+    .sp-stat span { color: #5b6559; font-size: .9rem; }
+    .sp-stat i { float: right; color: var(--zb-primary); font-size: 1.2rem; }
+    .sp-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: .85rem 0; border-top: 1px solid #eef0e8; }
+    .sp-row:first-of-type { border-top: 0; padding-top: 0; }
+    .sp-row h3 { font-size: 1rem; margin: 0; color: var(--zb-dark); }
+    .sp-row small { color: #6c757d; }
+    .sp-empty { color: #5b6559; margin: 0; }
+    .btn-zb { background: #566a52; color: #fff; border: 0; border-radius: 8px; min-height: 44px; padding: 0 1.25rem; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: .5rem; text-decoration: none; }
+    .btn-zb:hover, .btn-zb:focus-visible { background: var(--zb-dark); color: #fff; }
+    .btn-zb-outline { background: #fff; color: var(--zb-dark); border: 1px solid #b9c2b2; border-radius: 8px; min-height: 40px; padding: 0 1rem; display: inline-flex; align-items: center; gap: .45rem; text-decoration: none; font-weight: 500; }
+    .btn-zb-outline:hover { border-color: var(--zb-primary); background: #f3f5ef; color: var(--zb-dark); }
+    .tr-status { display: inline-flex; align-items: center; border-radius: 999px; padding: .2rem .7rem; font-size: .8rem; font-weight: 600; }
+    .tr-status.pending { background: #fff3cd; color: #6b4e00; }
+    .tr-status.accepted { background: #d6eedd; color: #1f5a33; }
+    .tr-status.rejected, .tr-status.revoked { background: #eceeef; color: #4a4f54; }
+    .sp-content .form-label { font-weight: 600; font-size: .92rem; color: var(--zb-dark); }
+    .sp-content .form-control, .sp-content .form-select { min-height: 46px; border: 1px solid #d5dacb; border-radius: 8px; }
+    .sp-content textarea.form-control { min-height: 110px; }
+    .sp-content .form-control:focus, .sp-content .form-select:focus { border-color: var(--zb-primary); box-shadow: 0 0 0 3px rgba(111,130,106,.25); }
+    .field-error { color: #b3261e; font-size: .85rem; margin-top: .25rem; }
+    .field-help { color: #6c757d; font-size: .82rem; margin-top: .25rem; }
+    .sp-overlay { display: none; }
+    @media (max-width: 991.98px) {
+      .sp-side { transform: translateX(-100%); }
+      body.sp-open .sp-side { transform: none; box-shadow: 0 0 40px rgba(0,0,0,.3); }
+      body.sp-open .sp-overlay { display: block; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 1035; }
+      .sp-main { margin-left: 0; }
+      .sp-toggle { display: inline-flex; align-items: center; justify-content: center; }
+      .sp-top { padding: .6rem 1rem; }
+      .sp-content { padding: 1.25rem 1rem 2.5rem; }
+    }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <aside class="sp-side" id="spSide" aria-label="{% translate 'Menu de mon espace' %}">
+    <a class="sp-brand" href="{% url 'participant_space' %}">
+      <img src="{% static 'site_web/images/zabantu-logo-dark.png' %}" alt="" height="44">
+      <span>{% translate "Mon espace" %}<small>{% translate "Formations Zabantu" %}</small></span>
+    </a>
+    <div class="sp-user">
+      <strong>{{ user.get_full_name }}</strong>
+      <span>{% if user.role == 'membre' %}{% translate "Membre du groupe" %}{% else %}{% translate "Participant(e)" %}{% endif %}</span>
+    </div>
+    <ul class="sp-nav">
+      <li><a href="{% url 'participant_space' %}" class="{% if active == 'dashboard' %}active{% endif %}"{% if active == 'dashboard' %} aria-current="page"{% endif %}><i class="fas fa-gauge" aria-hidden="true"></i>{% translate "Tableau de bord" %}</a></li>
+      <li class="group">{% translate "Formations" %}</li>
+      <li><a href="{% url 'participant_courses' %}" class="{% if active == 'courses' %}active{% endif %}"{% if active == 'courses' %} aria-current="page"{% endif %}><i class="fas fa-book-open" aria-hidden="true"></i>{% translate "Mes cours" %}</a></li>
+      <li><a href="{% url 'participant_trainings' %}" class="{% if active == 'trainings' %}active{% endif %}"{% if active == 'trainings' %} aria-current="page"{% endif %}><i class="fas fa-graduation-cap" aria-hidden="true"></i>{% translate "Mes formations" %}{% if pending_count %}<span class="badge">{{ pending_count }}</span>{% endif %}</a></li>
+      <li class="group">{% translate "Compte" %}</li>
+      <li><a href="{% url 'participant_profile' %}" class="{% if active == 'profile' %}active{% endif %}"{% if active == 'profile' %} aria-current="page"{% endif %}><i class="fas fa-user" aria-hidden="true"></i>{% translate "Mon profil" %}</a></li>
+      <li><a href="{% url 'participant_password' %}" class="{% if active == 'password' %}active{% endif %}"{% if active == 'password' %} aria-current="page"{% endif %}><i class="fas fa-key" aria-hidden="true"></i>{% translate "Mot de passe" %}</a></li>
+      <li><a href="{% url 'participant_membership' %}" class="{% if active == 'membership' %}active{% endif %}"{% if active == 'membership' %} aria-current="page"{% endif %}><i class="fas fa-users" aria-hidden="true"></i>{% if user.role == 'membre' %}{% translate "Mon adhésion" %}{% else %}{% translate "Devenir membre" %}{% endif %}</a></li>
+    </ul>
+    <div class="sp-foot">
+      <a href="{% url 'home' %}"><i class="fas fa-globe" aria-hidden="true"></i>{% translate "Retour au site" %}</a>
+      <form method="post" action="{% url 'participant_logout' %}">{% csrf_token %}<button type="submit"><i class="fas fa-right-from-bracket" aria-hidden="true"></i>{% translate "Se déconnecter" %}</button></form>
+    </div>
+  </aside>
+  <div class="sp-overlay" id="spOverlay"></div>
+
+  <div class="sp-main">
+    <header class="sp-top">
+      <button type="button" class="sp-toggle" id="spToggle" aria-controls="spSide" aria-expanded="false" aria-label="{% translate 'Ouvrir le menu' %}"><i class="fas fa-bars" aria-hidden="true"></i></button>
+      <h1>{% block page_title %}{% endblock %}</h1>
+      {% block page_actions %}{% endblock %}
+      {% if other_language %}<a class="sp-lang" href="{{ other_language_url }}" hreflang="{{ other_language }}" lang="{{ other_language }}" title="{% if other_language == 'en' %}English version{% else %}Version française{% endif %}">{{ other_language|upper }}</a>{% endif %}
+    </header>
+    <main class="sp-content">
+      {% for message in messages %}<div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" role="alert">{{ message }}</div>{% endfor %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <script>
+  (function () {
+    var body = document.body, toggle = document.getElementById('spToggle');
+    function set(open) { body.classList.toggle('sp-open', open); toggle.setAttribute('aria-expanded', open ? 'true' : 'false'); }
+    toggle.addEventListener('click', function () { set(!body.classList.contains('sp-open')); });
+    document.getElementById('spOverlay').addEventListener('click', function () { set(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { set(false); } });
+  })();
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

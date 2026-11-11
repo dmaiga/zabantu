@@ -38,7 +38,7 @@ class BaseArticleForm(SectionedFormMixin, forms.ModelForm):
             if name in self.fields:
                 self.fields[name].required = True
         if 'authors' in self.fields:
-            self.fields['authors'].queryset = CustomUser.objects.exclude(role='admin')
+            self.fields['authors'].queryset = CustomUser.objects.filter(role__in=('moderateur', 'membre'))
         if self.at_least_one_author:
             # La règle est « l'un ou l'autre » : le champ des membres ne doit pas être obligatoire à lui seul
             if 'authors' in self.fields:

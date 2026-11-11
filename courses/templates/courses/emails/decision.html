@@ -1,0 +1,18 @@
+{% extends 'emails/base_email.html' %}{% load i18n %}
+{% block title %}{{ cohort }}{% endblock %}
+{% block heading %}{% if status == 'accepted' %}{% translate "Inscription acceptée" %}{% elif status == 'rejected' %}{% translate "Votre inscription" %}{% else %}{% translate "Fin de votre accès" %}{% endif %}{% endblock %}
+{% block body %}
+<p style="margin:0 0 16px;">{% blocktranslate %}Bonjour {{ name }},{% endblocktranslate %}</p>
+{% if status == 'accepted' %}
+<p style="margin:0 0 16px;">{% blocktranslate %}Bonne nouvelle : votre inscription à la formation « {{ cohort }} » est acceptée.{% endblocktranslate %}</p>
+{% if courses %}<p style="margin:0 0 8px;">{% translate "Vous avez désormais accès à :" %}</p>
+<ul style="margin:0 0 16px; padding-left:20px;">{% for course in courses %}<li>{{ course }}</li>{% endfor %}</ul>{% endif %}
+<p style="text-align:center; margin:24px 0;"><a href="{{ space_url }}" style="display:inline-block; background:#bf9264; color:#ffffff; text-decoration:none; padding:12px 28px; border-radius:30px; font-weight:bold;">{% translate "Ouvrir mon espace" %}</a></p>
+{% elif status == 'rejected' %}
+<p style="margin:0 0 16px;">{% blocktranslate %}Merci de l'intérêt que vous portez à la formation « {{ cohort }} ». Nous ne pouvons malheureusement pas retenir votre inscription cette fois-ci.{% endblocktranslate %}</p>
+<p style="margin:0 0 16px;">{% translate "Votre compte reste actif : vous serez prévenu(e) de l'ouverture des prochaines formations." %}</p>
+{% else %}
+<p style="margin:0 0 16px;">{% blocktranslate %}Votre accès à la formation « {{ cohort }} » a pris fin. Si vous pensez qu'il s'agit d'une erreur, répondez simplement à ce message.{% endblocktranslate %}</p>
+{% endif %}
+<p style="margin:0;">{% translate "L'équipe Zabantu" %}</p>
+{% endblock %}

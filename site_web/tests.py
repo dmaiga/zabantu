@@ -441,8 +441,7 @@ class DonatePageTests(TestCase):
         r = self.client.get(reverse('about'))
         self.assertContains(r, 'class="donate-link mobile d-lg-none"')  # navbar sur mobile
         self.assertContains(r, 'class="donate-link d-none d-lg-inline-flex"')  # navbar sur ordinateur
-        self.assertContains(r, 'class="donate-band"')
-        self.assertContains(r, f'<li><a href="{reverse("donate")}">Faire un don</a></li>')  # pied de page
+        self.assertContains(r, 'class="donate-band"')                      # bandeau juste avant le pied de page
         # Contact : encadré de don dans la page, à la place du bandeau
         r = self.client.get(reverse('contact'))
         self.assertContains(r, 'class="contact-donate"')

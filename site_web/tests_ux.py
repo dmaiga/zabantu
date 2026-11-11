@@ -158,3 +158,15 @@ class PublicationCardAuthorsTests(TestCase):
     def test_external_authors_of_a_book_are_listed(self):
         publish('Un ouvrage', article_type='ouvrage', academic_authors='Modibo TRAORE')
         self.assertContains(self.client.get(reverse('public_article_list')), '<i class="fas fa-user"></i>Modibo TRAORE</p>')
+
+
+class FooterTests(TestCase):
+    def test_footer_guides_to_the_essentials_without_duplicates(self):
+        import re
+        html = self.client.get(reverse('about')).content.decode()
+        footer = html[html.index('<footer class="zabantu-footer'):html.index('</footer>')]
+        links = re.findall(r'href="([^"]+)"', footer)
+        self.assertEqual(len(links), len(set(links)), links)                     # aucun lien en double
+        for name in ('public_article_list', 'public_event_list', 'membership_apply', 'training_list', 'contact', 'privacy'):
+            self.assertIn(reverse(name), links)
+        self.assertNotIn(reverse('donate'), links)                               # le don est porté par le bandeau

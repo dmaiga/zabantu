@@ -19,17 +19,17 @@ from django.urls import path,include
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.conf import settings
-from users.views import login_view 
+from django.views.generic import RedirectView
 from site_web import seo_views
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
-from django.views.generic import RedirectView
 
 urlpatterns = [
     path('sitemap.xml', seo_views.sitemap, name='sitemap'),
     path('robots.txt', seo_views.robots, name='robots'),
     path('admin/', admin.site.urls),
-    path('auth/', login_view, name='login'),  
+    # Ancienne page de connexion de l'équipe : la connexion est commune (/zabantu/connexion/)
+    path('auth/', RedirectView.as_view(pattern_name='login', query_string=True), name='login_legacy'),
 
     path('users/', include('users.urls')),              
     path('articles/', include('articles.urls')),
@@ -37,6 +37,7 @@ urlpatterns = [
     path('events/', include('events.urls')),
     path('gallery/', include('gallery.urls')),
     path('intervenants/', include('intervenants.urls')),
+    path('courses/', include('courses.admin_urls')),   # backoffice des formations
     
  path('password-reset/', 
          auth_views.PasswordResetView.as_view(
@@ -73,6 +74,7 @@ urlpatterns += i18n_patterns(
     # L'accueil canonique est /zabantu/ (et /en/zabantu/). Les anciennes racines restent accessibles par une 301.
     path('', RedirectView.as_view(pattern_name='home', permanent=True), name='home_redirect'),
     path('zabantu/', include('site_web.urls')),
+    path('zabantu/', include('courses.urls')),   # formations et compte participant
     prefix_default_language=False,
 )
 

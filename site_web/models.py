@@ -337,14 +337,20 @@ class MembershipApplication(models.Model):
             finally:
                 self.profile_picture.close()
 
+        if member.role == 'participant':   # participant des formations : devient membre et garde son espace
+            member.role = 'membre'
         member.is_active = True
         member.save()
         self.member = member
 
     def _deactivate_member(self):
-        """Retire le membre de la liste publique ; un admin/modérateur n'est jamais désactivé."""
+        """Retire le membre de la liste publique ; un admin/modérateur n'est jamais désactivé.
+        Un membre venu des formations redevient participant : il garde son compte, son espace et ses cours."""
         if self.member and self.member.role == 'membre':
-            self.member.is_active = False
+            if hasattr(self.member, 'participant_profile'):
+                self.member.role = 'participant'
+            else:
+                self.member.is_active = False
             self.member.save()
 
     def approve(self, user):

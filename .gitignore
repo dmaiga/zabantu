@@ -26,3 +26,6 @@ media/
 staticfiles/
 var/
 data/
+
+# Fichiers des cours (formations), hors du dépôt
+private_media/

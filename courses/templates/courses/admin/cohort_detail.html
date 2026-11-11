@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}{{ cohort.name }}{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <a href="{% url 'cohort_admin_list' %}" class="text-decoration-none small"><i class="fas fa-arrow-left me-1"></i> Cohortes</a>
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mt-2 mb-3">
+        <div>
+            <h1 class="h3 mb-1">{{ cohort.name }}
+                {% if cohort.state == 'open' %}<span class="badge bg-success align-middle fs-6">Ouverte</span>{% elif cohort.state == 'upcoming' %}<span class="badge bg-info text-dark align-middle fs-6">À venir</span>{% else %}<span class="badge bg-secondary align-middle fs-6">Fermée</span>{% endif %}</h1>
+            <p class="text-muted mb-0">Inscriptions du {{ cohort.opens_on|date:"d/m/Y" }} au {{ cohort.closes_on|date:"d/m/Y" }}
+                {% if cohort.announced_at %}· annoncée aux participants le {{ cohort.announced_at|date:"d/m/Y" }}{% endif %}</p>
+            <p class="small mb-0">Cours : {% for course in cohort.courses.all %}<a href="{% url 'course_admin_detail' course.pk %}">{{ course.title }}</a>{% if not forloop.last %}, {% endif %}{% empty %}<span class="text-danger">aucun</span>{% endfor %}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'cohort_admin_update' cohort.pk %}" class="btn btn-outline-secondary"><i class="fas fa-pen me-1"></i> Modifier</a>
+            {% if not total %}{% url 'cohort_admin_delete' cohort.pk as url %}{% include 'includes/post_action.html' with url=url label='Supprimer' btn_class='btn-outline-danger' icon='fa-trash' confirm='Supprimer cette cohorte ?' %}{% endif %}
+        </div>
+    </div>
+
+    <div class="btn-group flex-wrap mb-3" role="group" aria-label="Filtrer par statut">
+        <a href="?" class="btn btn-outline-primary {% if not status_filter %}active{% endif %}">Toutes ({{ total }})</a>
+        {% for value, label, n in statuses %}
+        <a href="?status={{ value }}" class="btn btn-outline-primary {% if status_filter == value %}active{% endif %}">{{ label }} ({{ n }})</a>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+    {% if page_obj %}
+        <form method="post" action="{% url 'enrollment_admin_bulk' cohort.pk %}" id="bulkForm">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <div class="d-flex flex-wrap align-items-center gap-2 p-3 border-bottom">
+                <span class="text-muted me-2"><span id="selectedCount">0</span> sélectionnée(s)</span>
+                <button type="submit" name="action" value="accept" class="btn btn-sm btn-outline-success bulk-btn" disabled data-confirm="Accepter ces inscriptions ? Chaque participant est prévenu par e-mail."><i class="fas fa-check me-1"></i>Accepter</button>
+                <button type="submit" name="action" value="reject" class="btn btn-sm btn-outline-warning bulk-btn" disabled data-confirm="Refuser ces inscriptions ? Chaque participant est prévenu par e-mail."><i class="fas fa-xmark me-1"></i>Refuser</button>
+                <button type="submit" name="action" value="revoke" class="btn btn-sm btn-outline-danger bulk-btn" disabled data-confirm="Révoquer ces inscriptions ? Les participants perdent l'accès aux cours et sont prévenus par e-mail."><i class="fas fa-ban me-1"></i>Révoquer</button>
+                <small class="text-muted ms-auto">Seules les inscriptions dont le statut le permet sont modifiées.</small>
+            </div>
+            <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead><tr>
+                    <th style="width:2.5rem"><input type="checkbox" class="form-check-input" id="selectAll" aria-label="Tout sélectionner"></th>
+                    <th>Participant</th><th>Profil</th><th>Motivation</th><th>Reçue le</th><th>Statut</th><th class="text-end">Décision</th>
+                </tr></thead>
+                <tbody>
+                {% for e in page_obj %}
+                    <tr class="{% if e.status == 'pending' %}table-warning{% endif %}">
+                        <td><input type="checkbox" class="form-check-input row-check" name="ids" value="{{ e.pk }}" aria-label="Sélectionner {{ e.user.get_full_name }}"></td>
+                        <td><strong>{{ e.user.get_full_name }}</strong><br><a href="mailto:{{ e.user.email }}" class="small">{{ e.user.email }}</a></td>
+                        <td class="small">{{ e.user.participant_profile.get_status_display }}{% if e.user.participant_profile.organization %}<br><span class="text-muted">{{ e.user.participant_profile.organization }}</span>{% endif %}</td>
+                        <td class="small" style="max-width: 420px;">
+                            <details><summary>{{ e.motivation|truncatewords:14 }}</summary>
+                                <p class="mt-2 mb-1">{{ e.motivation|linebreaksbr }}</p>
+                                {% if e.expectations %}<p class="mb-0"><strong>Attentes :</strong> {{ e.expectations|linebreaksbr }}</p>{% endif %}
+                            </details>
+                        </td>
+                        <td class="small">{{ e.created_at|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if e.status == 'pending' %}<span class="badge bg-warning text-dark">En attente</span>{% elif e.status == 'accepted' %}<span class="badge bg-success">Acceptée</span>{% elif e.status == 'rejected' %}<span class="badge bg-secondary">Refusée</span>{% else %}<span class="badge bg-danger">Révoquée</span>{% endif %}
+                            {% if e.decided_by %}<br><small class="text-muted">{{ e.decided_by.get_full_name }}, {{ e.decided_at|date:"d/m/Y" }}</small>{% endif %}
+                        </td>
+                        <td class="text-end"><div class="d-inline-flex gap-1">
+                            {% if e.status != 'accepted' %}<button type="submit" form="act-{{ e.pk }}-accept" class="btn btn-sm btn-outline-success" title="Accepter" aria-label="Accepter"><i class="fas fa-check"></i></button>{% endif %}
+                            {% if e.status == 'pending' %}<button type="submit" form="act-{{ e.pk }}-reject" class="btn btn-sm btn-outline-warning" title="Refuser" aria-label="Refuser"><i class="fas fa-xmark"></i></button>{% endif %}
+                            {% if e.status == 'accepted' %}<button type="submit" form="act-{{ e.pk }}-revoke" class="btn btn-sm btn-outline-danger" title="Révoquer" aria-label="Révoquer" onclick="return confirm('Révoquer cette inscription ? Le participant perd l’accès aux cours.')"><i class="fas fa-ban"></i></button>{% endif %}
+                        </div></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </form>
+        {# Formulaires des décisions individuelles (hors du formulaire groupé : pas de formulaires imbriqués) #}
+        {% for e in page_obj %}
+        {% if e.status != 'accepted' %}<form method="post" action="{% url 'enrollment_admin_action' e.pk 'accept' %}" id="act-{{ e.pk }}-accept" class="d-none">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"></form>{% endif %}
+        {% if e.status == 'pending' %}<form method="post" action="{% url 'enrollment_admin_action' e.pk 'reject' %}" id="act-{{ e.pk }}-reject" class="d-none">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"></form>{% endif %}
+        {% if e.status == 'accepted' %}<form method="post" action="{% url 'enrollment_admin_action' e.pk 'revoke' %}" id="act-{{ e.pk }}-revoke" class="d-none">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"></form>{% endif %}
+        {% endfor %}
+        {% include 'includes/pagination.html' %}
+    {% else %}
+        <div class="text-center py-5 text-muted"><i class="fas fa-user-graduate fa-2x mb-2"></i><p class="mb-0">Aucune inscription{% if status_filter %} avec ce statut{% endif %}.</p></div>
+    {% endif %}
+    </div>
+</div>
+{% include 'includes/bulk_select_script.html' %}
+{% endblock %}

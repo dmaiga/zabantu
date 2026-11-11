@@ -7,7 +7,7 @@ from .models import CustomUser
 class MemberFilterForm(forms.Form):
     """Filtres de la liste des membres ; une valeur invalide est ignorée."""
     q = forms.CharField(required=False)
-    role = forms.ChoiceField(required=False, choices=[c for c in CustomUser.ROLE_CHOICES if c[0] != 'admin'])
+    role = forms.ChoiceField(required=False, choices=[c for c in CustomUser.ROLE_CHOICES if c[0] in ('moderateur', 'membre')])
     access = forms.ChoiceField(required=False, choices=[('yes', 'Autorisée'), ('no', 'Sans accès')])
 
     def apply(self, queryset):

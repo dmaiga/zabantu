@@ -72,7 +72,7 @@ class EventPermissionTests(TestCase):
     def test_anonymous_is_sent_to_login(self):
         r = self.client.post(reverse('event_publish', args=[self.event.id]))
         self.assertEqual(r.status_code, 302)
-        self.assertIn('/auth/', r.url)
+        self.assertIn('/zabantu/connexion/', r.url)
 
 
 class EventListPageTests(TestCase):

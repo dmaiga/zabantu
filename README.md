@@ -17,6 +17,8 @@ python manage.py runserver
 ```
 
 - Le site public est sous `/zabantu/` (français) et `/en/zabantu/` (anglais), le backoffice sous `/users/` (toujours en français).
+- Formations : page `/zabantu/formations/`, compte participant sous `/zabantu/compte/`, backoffice sous `/courses/`.
+  Les fichiers des cours vont dans `private_media/` (ou `PRIVATE_MEDIA_ROOT`), jamais dans `media/`.
 - PostgreSQL est obligatoire (pas de SQLite). Toute la configuration est dans le `.env` (modèle commenté : `.env.example`).
 - Avec `DEBUG=True`, les e-mails s'affichent dans la console.
 - Accès au backoffice : administrateurs et modérateurs. Un membre doit avoir la case « accès au backoffice » cochée.
@@ -37,6 +39,7 @@ Les tests utilisent une base SQLite en mémoire (réglages dans `zabantu/setting
 | `users/` | comptes, backoffice, tableau de bord, communication (messages, info-lettre, adhésions) |
 | `articles/` | publications et séminaires Gɛlɛkan |
 | `events/`, `gallery/`, `intervenants/` | événements, galeries photos, intervenants |
+| `courses/` | formations : comptes participants (étudiants, chercheurs, professionnels…), cours et fichiers privés, cohortes, inscriptions, annonces |
 | `zabantu/` | réglages du projet, bilingue (`i18n.py` : langue selon l'adresse, champs `_en` avec repli sur le français) |
 | `locale/en/` | traductions anglaises des textes fixes (`.po` à éditer, `.mo` compilé et versionné) |
 | `docs/` | guide de déploiement, audit de dette technique |
@@ -59,7 +62,7 @@ python manage.py collectstatic         # fichiers statiques (à chaque déploiem
 - Pages légales : un gabarit par langue (`site_web/templates/site_web/legal/en/`) ; la version française fait foi.
 - Après avoir ajouté ou modifié un texte :
   ```bash
-  python manage.py makemessages -l en --ignore=.venv --ignore=staticfiles --ignore=media --ignore=data --ignore=var --add-location=file --no-obsolete
+  python manage.py makemessages -l en --ignore=.venv --ignore=staticfiles --ignore=media --ignore=data --ignore=var --ignore=private_media --add-location=file --no-obsolete
   # traduire les nouvelles entrées de locale/en/LC_MESSAGES/django.po (msgstr), puis :
   python manage.py compilemessages -l en --ignore=.venv
   ```

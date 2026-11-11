@@ -1,0 +1,19 @@
+{% extends 'courses/space/base.html' %}
+{% load i18n %}
+{% block title %}{% translate "Inscription" %}{% endblock %}
+{% block page_title %}{% translate "Inscription à une formation" %}{% endblock %}
+{% block content %}
+<section class="sp-card" style="max-width: 720px;">
+  <h2>{{ cohort.t.name }}</h2>
+  <p class="text-muted">{% blocktranslate with date=cohort.closes_on|date:"j F Y" %}Quelques lignes suffisent : l'équipe examine chaque demande et vous répond par e-mail. Inscriptions jusqu'au {{ date }}.{% endblocktranslate %}</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for field in form %}{% include 'courses/public/_field.html' %}{% endfor %}
+    <p class="field-help">{% translate "150 mots au plus par réponse." %}</p>
+    <div class="d-flex flex-wrap gap-2">
+      <button type="submit" class="btn-zb"><i class="fas fa-paper-plane" aria-hidden="true"></i>{% translate "Envoyer ma demande" %}</button>
+      <a class="btn-zb-outline" href="{% url 'participant_trainings' %}">{% translate "Annuler" %}</a>
+    </div>
+  </form>
+</section>
+{% endblock %}
